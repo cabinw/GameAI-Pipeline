@@ -1,0 +1,21 @@
+{
+  "name": "gameai-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable, data-driven pipelines for AI-assisted game production.",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=24.14.0 <25",
+    "pnpm": "11.9.0"
+  },
+  "scripts": {
+    "build": "pnpm --recursive --if-present run build",
+    "typecheck": "pnpm --recursive --if-present run typecheck",
+    "test": "pnpm --recursive --if-present run test",
+    "verify": "pnpm typecheck && pnpm build && pnpm test"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.0",
+    "typescript": "5.8.2"
+  }
+}

@@ -54,6 +54,17 @@ The Red Cap Target is the initial golden fixture, not a framework-specific depen
 
 Read `AGENTS.md`, then execute tasks in order. Multi-file or architectural work must first be reflected in `PLANS.md`.
 
+## Development
+
+The repository uses Node 24 and pnpm 11. Install and verify the complete workspace with:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm verify
+```
+
+Exact versions, individual commands, the workspace topology, and the Cocos extension spike are documented in `docs/environment.md`.
+
 ## Status
 
-The project is in **v0.1 Repository Bootstrap**.
+The project is in **v0.1 Repository Bootstrap**. TASK-000 established the reproducible workspace and recorded one explicit Creator UI-automation blocker; see `docs/environment.md`.

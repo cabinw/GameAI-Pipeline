@@ -1,0 +1,54 @@
+{
+  "package_version": 2,
+  "name": "gameai-task000-spike",
+  "version": "0.0.0",
+  "author": "cabinw",
+  "editor": ">=3.8.8 <3.9.0",
+  "private": true,
+  "description": "TASK-000 proof for Panel to main process to Scene Script messaging.",
+  "main": "./dist/main.js",
+  "scene": "./dist/scene.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "panels": {
+    "default": {
+      "title": "GameAI TASK-000 Spike",
+      "type": "dockable",
+      "main": "dist/panels/default",
+      "size": {
+        "min-width": 420,
+        "min-height": 240,
+        "width": 560,
+        "height": 360
+      }
+    }
+  },
+  "contributions": {
+    "menu": [
+      {
+        "path": "i18n:menu.panel/GameAI Pipeline",
+        "label": "TASK-000 Message Spike",
+        "message": "open-panel"
+      }
+    ],
+    "messages": {
+      "open-panel": {
+        "methods": [
+          "openPanel"
+        ]
+      },
+      "run-spike": {
+        "methods": [
+          "runSpike"
+        ]
+      }
+    }
+  }
+}

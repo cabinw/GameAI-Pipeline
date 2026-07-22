@@ -42,6 +42,24 @@ projects → engine adapters → pipelines → framework
 
 Framework and pipeline packages must never import project-specific modules.
 
+## Workspace topology
+
+The repository uses a private pnpm workspace. Package dependencies follow this direction:
+
+```text
+external production games
+          ↓
+Cocos adapters and fixture projects
+          ↓
+       pipelines
+          ↓
+       framework
+```
+
+Production games consume versioned packages from their own repositories. Only reproducible fixtures and integration spikes live under `cocos/projects/`; code under that directory must never be imported by `framework/`, `pipelines/`, or reusable Cocos adapters. See ADR-0003.
+
 ## Artifact rule
 
 Generated files must be distinguishable from authored specifications. Regeneration must not silently delete user-authored data.
+
+Generated package output (`dist/`, `dist-test/`) and Cocos state (`library/`, `temp/`, `local/`, `build/`, `profiles/`) are ignored. Authored fixtures, extension sources, schemas, and package manifests remain tracked.

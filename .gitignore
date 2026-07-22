@@ -1,0 +1,21 @@
+# Package-manager and TypeScript outputs
+node_modules/
+.pnpm-store/
+dist/
+dist-test/
+coverage/
+*.tsbuildinfo
+
+# Cocos Creator generated and machine-local state
+library/
+temp/
+local/
+build/
+profiles/
+native/engine/android/**/assets/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.log
