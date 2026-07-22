@@ -65,6 +65,8 @@ pnpm verify
 
 Exact versions, individual commands, the workspace topology, and the Cocos extension spike are documented in `docs/environment.md`.
 
+Character Rig and Rig Layout contracts, validation codes, and usage are documented in `docs/character-contracts.md`. Schema compatibility rules are documented in `docs/schema-versioning.md`.
+
 ## Status
 
-The project is in **v0.1 Repository Bootstrap**. TASK-000 established the reproducible workspace and recorded one explicit Creator UI-automation blocker; see `docs/environment.md`.
+The project is entering **v0.2 Character Pipeline**. TASK-001 established the complete engine-neutral Character Rig and Rig Layout contract foundation; production Cocos scene generation has not started.

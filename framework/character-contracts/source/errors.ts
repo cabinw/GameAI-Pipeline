@@ -1,0 +1,50 @@
+export const ValidationErrorCode = {
+  JSON_PARSE_ERROR: "JSON_PARSE_ERROR",
+  SCHEMA_VALIDATION_ERROR: "SCHEMA_VALIDATION_ERROR",
+  UNSUPPORTED_SCHEMA_VERSION: "UNSUPPORTED_SCHEMA_VERSION",
+  INVALID_FILE_PATH: "INVALID_FILE_PATH",
+  DUPLICATE_PART_ID: "DUPLICATE_PART_ID",
+  MISSING_REQUIRED_PART: "MISSING_REQUIRED_PART",
+  UNKNOWN_PARENT: "UNKNOWN_PARENT",
+  INVALID_ROOT_COUNT: "INVALID_ROOT_COUNT",
+  PARENT_CYCLE: "PARENT_CYCLE",
+  INVALID_NORMALIZED_ANCHOR: "INVALID_NORMALIZED_ANCHOR",
+  INVALID_RECTANGLE: "INVALID_RECTANGLE",
+  DUPLICATE_DRAW_ORDER: "DUPLICATE_DRAW_ORDER",
+  DUPLICATE_SOCKET_ID: "DUPLICATE_SOCKET_ID",
+  DUPLICATE_HIT_AREA_ID: "DUPLICATE_HIT_AREA_ID",
+  DUPLICATE_ANIMATION_TARGET_ID: "DUPLICATE_ANIMATION_TARGET_ID",
+  MISSING_ANIMATION_TARGET: "MISSING_ANIMATION_TARGET",
+} as const;
+
+export type ValidationErrorCode =
+  (typeof ValidationErrorCode)[keyof typeof ValidationErrorCode];
+
+export type ContractDocument = "characterRig" | "rigLayout" | "contract";
+
+export interface ValidationIssue {
+  code: ValidationErrorCode;
+  document: ContractDocument;
+  path: string;
+  message: string;
+  details?: Readonly<Record<string, unknown>>;
+}
+
+export type ValidationResult<T> =
+  | {
+      ok: true;
+      value: T;
+      errors: readonly [];
+    }
+  | {
+      ok: false;
+      errors: readonly ValidationIssue[];
+    };
+
+export function sortIssues(issues: readonly ValidationIssue[]): ValidationIssue[] {
+  return [...issues].sort((left, right) =>
+    [left.document, left.path, left.code, left.message]
+      .join("\u0000")
+      .localeCompare([right.document, right.path, right.code, right.message].join("\u0000")),
+  );
+}

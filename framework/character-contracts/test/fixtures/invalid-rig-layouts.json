@@ -1,0 +1,204 @@
+{
+  "duplicatePartIds": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "duplicate-part-ids",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      },
+      {
+        "partId": "root",
+        "file": "parts/root-copy.png",
+        "parentId": null,
+        "originalRect": { "x": 20, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 1
+      }
+    ]
+  },
+  "unknownParent": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "unknown-parent",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      },
+      {
+        "partId": "arm",
+        "file": "parts/arm.png",
+        "parentId": "ghost",
+        "originalRect": { "x": 20, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 10, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 1
+      }
+    ]
+  },
+  "parentCycle": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "parent-cycle",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      },
+      {
+        "partId": "arm",
+        "file": "parts/arm.png",
+        "parentId": "hand",
+        "originalRect": { "x": 20, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 10, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 1
+      },
+      {
+        "partId": "hand",
+        "file": "parts/hand.png",
+        "parentId": "arm",
+        "originalRect": { "x": 40, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 10, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 2
+      }
+    ]
+  },
+  "invalidAnchor": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "invalid-anchor",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 1.2, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      }
+    ]
+  },
+  "invalidRectangle": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "invalid-rectangle",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 90, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      }
+    ]
+  },
+  "duplicateDrawOrder": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "duplicate-draw-order",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      },
+      {
+        "partId": "arm",
+        "file": "parts/arm.png",
+        "parentId": "root",
+        "originalRect": { "x": 20, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 10, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      }
+    ]
+  },
+  "unsupportedVersion": {
+    "schemaVersion": "1.1.0",
+    "layoutId": "unsupported-version",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      }
+    ]
+  },
+  "unsafeFilePath": {
+    "schemaVersion": "1.0.0",
+    "layoutId": "unsafe-file-path",
+    "sourceCanvas": { "width": 100, "height": 100 },
+    "referenceScale": 1,
+    "drawOrderPolicy": "unique",
+    "parts": [
+      {
+        "partId": "root",
+        "file": "../parts/root.png",
+        "parentId": null,
+        "originalRect": { "x": 0, "y": 0, "width": 20, "height": 20 },
+        "trimOffset": { "x": 0, "y": 0 },
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "restPose": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 }, "opacity": 1 },
+        "drawOrder": 0
+      }
+    ]
+  }
+}

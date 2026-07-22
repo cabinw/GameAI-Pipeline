@@ -1,0 +1,43 @@
+{
+  "missingRequiredPart": {
+    "schemaVersion": "1.0.0",
+    "characterId": "missing-required-part",
+    "rigLayoutFile": "rig-layout.json",
+    "requiredParts": ["pelvis", "missing-wing"],
+    "requiredAnimationTargets": ["root"],
+    "animationTargets": [
+      { "targetId": "root", "partId": "pelvis" }
+    ]
+  },
+  "missingAnimationTarget": {
+    "schemaVersion": "1.0.0",
+    "characterId": "missing-animation-target",
+    "rigLayoutFile": "rig-layout.json",
+    "requiredParts": ["pelvis"],
+    "requiredAnimationTargets": ["root", "tail"],
+    "animationTargets": [
+      { "targetId": "root", "partId": "pelvis" }
+    ]
+  },
+  "animationTargetMissingPart": {
+    "schemaVersion": "1.0.0",
+    "characterId": "animation-target-missing-part",
+    "rigLayoutFile": "rig-layout.json",
+    "requiredParts": ["pelvis"],
+    "requiredAnimationTargets": ["root", "tail"],
+    "animationTargets": [
+      { "targetId": "root", "partId": "pelvis" },
+      { "targetId": "tail", "partId": "missing-tail" }
+    ]
+  },
+  "unsupportedVersion": {
+    "schemaVersion": "2.0.0",
+    "characterId": "unsupported-version",
+    "rigLayoutFile": "rig-layout.json",
+    "requiredParts": ["pelvis"],
+    "requiredAnimationTargets": ["root"],
+    "animationTargets": [
+      { "targetId": "root", "partId": "pelvis" }
+    ]
+  }
+}

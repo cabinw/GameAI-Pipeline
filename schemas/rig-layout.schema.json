@@ -1,0 +1,378 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gameai-pipeline.dev/schemas/rig-layout/v1.0.0",
+  "title": "GameAI Rig Layout",
+  "description": "Engine-neutral rigid Sprite part hierarchy and reference-pose geometry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "layoutId",
+    "sourceCanvas",
+    "referenceScale",
+    "drawOrderPolicy",
+    "parts"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "$ref": "#/definitions/schemaVersion"
+    },
+    "layoutId": {
+      "$ref": "#/definitions/identifier"
+    },
+    "sourceCanvas": {
+      "$ref": "#/definitions/size"
+    },
+    "referenceScale": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "drawOrderPolicy": {
+      "type": "string",
+      "enum": [
+        "unique",
+        "shared"
+      ]
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/part"
+      }
+    },
+    "sockets": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/socket"
+      }
+    },
+    "hitAreas": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/hitArea"
+      }
+    }
+  },
+  "definitions": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "assetFilePath": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[^\\u0000]+\\.(?:png|jpg|jpeg|webp)$"
+    },
+    "vector2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "rectangle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "trimOffset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "normalizedAnchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "scale2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number",
+          "not": {
+            "const": 0
+          }
+        },
+        "y": {
+          "type": "number",
+          "not": {
+            "const": 0
+          }
+        }
+      }
+    },
+    "restPose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "position",
+        "rotationDegrees",
+        "scale",
+        "opacity"
+      ],
+      "properties": {
+        "position": {
+          "$ref": "#/definitions/vector2"
+        },
+        "rotationDegrees": {
+          "type": "number"
+        },
+        "scale": {
+          "$ref": "#/definitions/scale2"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "partId",
+        "file",
+        "parentId",
+        "originalRect",
+        "trimOffset",
+        "anchor",
+        "restPose",
+        "drawOrder"
+      ],
+      "properties": {
+        "partId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "file": {
+          "$ref": "#/definitions/assetFilePath"
+        },
+        "parentId": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "originalRect": {
+          "$ref": "#/definitions/rectangle"
+        },
+        "trimOffset": {
+          "$ref": "#/definitions/trimOffset"
+        },
+        "anchor": {
+          "$ref": "#/definitions/normalizedAnchor"
+        },
+        "restPose": {
+          "$ref": "#/definitions/restPose"
+        },
+        "drawOrder": {
+          "type": "integer"
+        }
+      }
+    },
+    "socket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "socketId",
+        "parentPartId",
+        "position",
+        "rotationDegrees"
+      ],
+      "properties": {
+        "socketId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "parentPartId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "position": {
+          "$ref": "#/definitions/vector2"
+        },
+        "rotationDegrees": {
+          "type": "number"
+        }
+      }
+    },
+    "hitArea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hitAreaId",
+        "parentPartId",
+        "shape"
+      ],
+      "properties": {
+        "hitAreaId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "parentPartId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "shape": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/rectHitShape"
+            },
+            {
+              "$ref": "#/definitions/circleHitShape"
+            }
+          ]
+        }
+      }
+    },
+    "rectHitShape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "type": {
+          "const": "rect"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "circleHitShape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "x",
+        "y",
+        "radius"
+      ],
+      "properties": {
+        "type": {
+          "const": "circle"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "radius": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,68 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-001 Character Contract Foundation
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Define and validate the complete engine-neutral Character Rig and Rig Layout contracts required by the Character Rig Builder before any production scene-generation code is written.
+
+### Scope
+
+- Add canonical JSON Schemas for Character Rig and Rig Layout.
+- Add an engine-neutral `@gameai/character-contracts` workspace package with public TypeScript types.
+- Parse JSON, validate schema shape, and enforce cross-document semantic rules with stable error codes.
+- Add the Red Cap Target textual golden fixture and targeted invalid fixtures.
+- Document schema-version compatibility and contract coordinate conventions.
+- Add deterministic unit tests and include the package in the root verification gate.
+
+### Out of scope
+
+- Cocos scene, node, prefab, or asset generation.
+- Image segmentation and auto cutting.
+- Animation clip formats or runtime animation playback.
+- Binary art assets and visual regression output.
+
+### Contract decisions
+
+- `schemas/` is the canonical schema source; package builds copy those schemas into distributable output.
+- Character Rig declares identity, its Rig Layout file, required part IDs, required animation target IDs, and target-to-part mappings.
+- Rig Layout owns source-canvas geometry, trimmed-part placement, hierarchy, reference scale, draw order, sockets, and hit areas.
+- File paths are relative POSIX paths and cannot be absolute or traverse above the specification directory.
+- Schema compatibility is explicit SemVer: the current validator supports `>=1.0.0 <1.1.0`; newer minor or major versions fail with a stable error code.
+
+### Execution
+
+1. Create TASK-001 with explicit acceptance criteria.
+2. Add both JSON Schemas and public TypeScript types.
+3. Implement JSON parsing, schema validation, semantic validation, and stable diagnostics.
+4. Add the Red Cap Target valid fixture and one invalid fixture per required semantic failure.
+5. Add unit tests for schema synchronization, parsing, version compatibility, and all semantic rules.
+6. Document usage, coordinates, limitations, and schema-version compatibility.
+7. Run `pnpm verify`, review the complete diff, and commit TASK-001.
+
+### Done when
+
+- Both canonical schemas parse and compile.
+- TypeScript public types and JSON Schemas are synchronized by tests.
+- Every required invalid condition produces its documented stable error code.
+- The Red Cap Target fixture parses and validates without errors.
+- `pnpm verify` passes from the repository root.
+- No production Cocos scene-generation logic is present.
+
+### Result
+
+- Added canonical Character Rig and Rig Layout JSON Schemas and byte-identical package build copies.
+- Added the engine-neutral `@gameai/character-contracts` package with public types, Ajv parsing, semantic validation, deterministic diagnostics, and stable error codes.
+- Added the Red Cap Target textual golden fixture and targeted invalid fixtures for every required failure mode.
+- Added schema compatibility, coordinate-system, API, limitation, and error-code documentation plus ADR-0004.
+- `pnpm verify` passes with 23 Character Contract tests and the 4 existing TASK-000 tests.
+- No production Cocos scene-generation logic was added.
+
 ## Completed plan: TASK-000 Repository and Environment Audit
 
 - Status: Complete with explicit external UI-automation blocker

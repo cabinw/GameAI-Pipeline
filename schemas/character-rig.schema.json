@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gameai-pipeline.dev/schemas/character-rig/v1.0.0",
+  "title": "GameAI Character Rig",
+  "description": "Engine-neutral character identity, required rig parts, and animation target bindings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "characterId",
+    "rigLayoutFile",
+    "requiredParts",
+    "requiredAnimationTargets",
+    "animationTargets"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "$ref": "#/definitions/schemaVersion"
+    },
+    "characterId": {
+      "$ref": "#/definitions/identifier"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "rigLayoutFile": {
+      "$ref": "#/definitions/jsonFilePath"
+    },
+    "requiredParts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/identifier"
+      }
+    },
+    "requiredAnimationTargets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/identifier"
+      }
+    },
+    "animationTargets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/animationTarget"
+      }
+    }
+  },
+  "definitions": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "jsonFilePath": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[^\\u0000]+\\.json$"
+    },
+    "animationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetId",
+        "partId"
+      ],
+      "properties": {
+        "targetId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "partId": {
+          "$ref": "#/definitions/identifier"
+        }
+      }
+    }
+  }
+}
