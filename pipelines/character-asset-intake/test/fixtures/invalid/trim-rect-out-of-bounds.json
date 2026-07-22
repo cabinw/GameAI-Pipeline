@@ -1,0 +1,4 @@
+{
+  "expectedCode": "TRIM_RECT_OUT_OF_BOUNDS",
+  "action": "increase-pelvis-trim-offset"
+}

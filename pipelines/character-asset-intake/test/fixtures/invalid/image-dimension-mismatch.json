@@ -1,0 +1,5 @@
+{
+  "expectedCode": "IMAGE_DIMENSION_MISMATCH",
+  "action": "replace-pelvis-image",
+  "image": "dimension-mismatch.png"
+}

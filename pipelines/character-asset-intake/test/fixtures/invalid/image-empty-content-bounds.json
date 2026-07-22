@@ -1,0 +1,5 @@
+{
+  "expectedCode": "IMAGE_EMPTY_CONTENT_BOUNDS",
+  "action": "replace-pelvis-image",
+  "image": "fully-transparent.png"
+}

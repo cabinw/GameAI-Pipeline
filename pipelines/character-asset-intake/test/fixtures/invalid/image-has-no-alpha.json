@@ -1,0 +1,5 @@
+{
+  "expectedCode": "IMAGE_HAS_NO_ALPHA",
+  "action": "replace-pelvis-image",
+  "image": "no-alpha.jpg"
+}

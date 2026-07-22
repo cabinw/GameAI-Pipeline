@@ -1,0 +1,5 @@
+{
+  "expectedCode": "IMAGE_DECODE_ERROR",
+  "action": "replace-pelvis-image",
+  "image": "decode-error.png"
+}

@@ -1,0 +1,5 @@
+{
+  "expectedCode": "UNSUPPORTED_IMAGE_FORMAT",
+  "action": "replace-pelvis-image",
+  "image": "unsupported.png"
+}

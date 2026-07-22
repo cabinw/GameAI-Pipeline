@@ -1,0 +1,74 @@
+import type {
+  HitShape,
+  NormalizedAnchor,
+  RestPose,
+  RigHitArea,
+  RigSocket,
+} from "@gameai/character-contracts";
+
+import type { CharacterAssetDiagnostic } from "./diagnostics";
+
+export type SupportedImageFormat = "png" | "jpeg" | "webp";
+
+export interface PixelBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface NormalizedAssetPath {
+  sourceRelativePath: string;
+  resolvedPath: string;
+}
+
+export interface CharacterAssetPart extends NormalizedAssetPath {
+  partId: string;
+  parentId: string | null;
+  imageFormat: SupportedImageFormat;
+  width: number;
+  height: number;
+  hasAlpha: boolean;
+  contentBounds: PixelBounds | null;
+  originalRect: PixelBounds;
+  trimOffset: { x: number; y: number };
+  anchor: NormalizedAnchor;
+  restPose: RestPose;
+  drawOrder: number;
+}
+
+export interface CharacterAssetManifest {
+  characterId: string;
+  schemaVersions: {
+    characterRig: string;
+    rigLayout: string;
+  };
+  sourceRoot: string;
+  characterRig: NormalizedAssetPath;
+  rigLayout: NormalizedAssetPath;
+  sourceCanvas: { width: number; height: number };
+  referenceScale: number;
+  drawOrderPolicy: "unique" | "shared";
+  parts: readonly CharacterAssetPart[];
+  sockets: readonly RigSocket[];
+  hitAreas: readonly RigHitArea[];
+}
+
+export interface CharacterAssetIntakeOptions {
+  sourceRoot: string;
+  characterRigFile?: string;
+}
+
+export type CharacterAssetIntakeResult =
+  | {
+      ok: true;
+      manifest: CharacterAssetManifest;
+      diagnostics: readonly [];
+    }
+  | {
+      ok: false;
+      manifest: null;
+      diagnostics: readonly CharacterAssetDiagnostic[];
+    };
+
+export type { HitShape };

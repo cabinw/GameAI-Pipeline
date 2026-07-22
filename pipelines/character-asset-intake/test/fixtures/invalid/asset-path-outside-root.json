@@ -1,0 +1,4 @@
+{
+  "expectedCode": "ASSET_PATH_OUTSIDE_ROOT",
+  "action": "symlink-pelvis-outside-root"
+}

@@ -67,6 +67,8 @@ Exact versions, individual commands, the workspace topology, and the Cocos exten
 
 Character Rig and Rig Layout contracts, validation codes, and usage are documented in `docs/character-contracts.md`. Schema compatibility rules are documented in `docs/schema-versioning.md`.
 
+Character image loading, safe-path rules, binary validation, manifest normalization, and asset diagnostic codes are documented in `docs/character-asset-intake.md`.
+
 ## Status
 
-The project is entering **v0.2 Character Pipeline**. TASK-001 established the complete engine-neutral Character Rig and Rig Layout contract foundation; production Cocos scene generation has not started.
+The project is in **v0.2 Character Pipeline**. TASK-001 established the engine-neutral Character Rig and Rig Layout contracts, and TASK-002 added safe, deterministic asset intake and validation. Production Cocos scene generation has not started.
