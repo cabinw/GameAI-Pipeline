@@ -1,0 +1,4 @@
+{
+  "expectedCode": "TEMPLATE_HIERARCHY_ERROR",
+  "action": "cycle-template-hierarchy"
+}

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0.0",
+  "templateId": "male-normal-v1",
+  "referenceScale": 0.01,
+  "drawOrderPolicy": "unique",
+  "additionalPartPolicy": "allow-with-overrides",
+  "requiredParts": [
+    "pelvis",
+    "torso",
+    "head",
+    "upper-arm-left",
+    "forearm-left",
+    "hand-left",
+    "upper-arm-right",
+    "forearm-right",
+    "hand-right",
+    "thigh-left",
+    "shin-left",
+    "foot-left",
+    "thigh-right",
+    "shin-right",
+    "foot-right"
+  ],
+  "parts": [
+    { "partId": "pelvis", "parentId": null, "drawOrder": 9 },
+    { "partId": "torso", "parentId": "pelvis", "drawOrder": 10 },
+    { "partId": "head", "parentId": "torso", "drawOrder": 17 },
+    { "partId": "upper-arm-left", "parentId": "torso", "drawOrder": 2 },
+    { "partId": "forearm-left", "parentId": "upper-arm-left", "drawOrder": 3 },
+    { "partId": "hand-left", "parentId": "forearm-left", "drawOrder": 4 },
+    { "partId": "upper-arm-right", "parentId": "torso", "drawOrder": 14 },
+    { "partId": "forearm-right", "parentId": "upper-arm-right", "drawOrder": 15 },
+    { "partId": "hand-right", "parentId": "forearm-right", "drawOrder": 16 },
+    { "partId": "thigh-left", "parentId": "pelvis", "drawOrder": 5 },
+    { "partId": "shin-left", "parentId": "thigh-left", "drawOrder": 6 },
+    { "partId": "foot-left", "parentId": "shin-left", "drawOrder": 7 },
+    { "partId": "thigh-right", "parentId": "pelvis", "drawOrder": 11 },
+    { "partId": "shin-right", "parentId": "thigh-right", "drawOrder": 12 },
+    { "partId": "foot-right", "parentId": "shin-right", "drawOrder": 13 }
+  ],
+  "sockets": [
+    {
+      "socketId": "left-grip",
+      "parentPartId": "hand-left",
+      "normalizedPosition": { "x": 0.5, "y": 0.5 },
+      "rotationDegrees": 0
+    },
+    {
+      "socketId": "right-grip",
+      "parentPartId": "hand-right",
+      "normalizedPosition": { "x": 0.5, "y": 0.5 },
+      "rotationDegrees": 0
+    },
+    {
+      "socketId": "head-accessory",
+      "parentPartId": "head",
+      "normalizedPosition": { "x": 0.5, "y": 0 },
+      "rotationDegrees": 0
+    }
+  ],
+  "hitAreas": [
+    {
+      "hitAreaId": "body-hit",
+      "parentPartId": "torso",
+      "normalizedShape": {
+        "type": "rect",
+        "x": 0.15,
+        "y": 0.1,
+        "width": 0.7,
+        "height": 0.8
+      }
+    },
+    {
+      "hitAreaId": "head-hit",
+      "parentPartId": "head",
+      "normalizedShape": {
+        "type": "circle",
+        "x": 0.5,
+        "y": 0.45,
+        "radius": 0.4
+      }
+    }
+  ],
+  "animationTargets": [
+    { "targetId": "root", "partId": "pelvis" },
+    { "targetId": "pelvis", "partId": "pelvis" },
+    { "targetId": "torso", "partId": "torso" },
+    { "targetId": "head", "partId": "head" },
+    { "targetId": "left-hand", "partId": "hand-left" },
+    { "targetId": "right-hand", "partId": "hand-right" },
+    { "targetId": "left-foot", "partId": "foot-left" },
+    { "targetId": "right-foot", "partId": "foot-right" }
+  ]
+}

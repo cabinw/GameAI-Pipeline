@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gameai.dev/schemas/source-canvas-annotation.schema.json",
+  "title": "GameAI Source Canvas Annotation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "annotationId", "characterId", "layoutId", "sourceCanvas", "parts"],
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "annotationId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "characterId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "layoutId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "sourceCanvas": { "$ref": "#/definitions/size" },
+    "overrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "referenceScale": { "type": "number", "exclusiveMinimum": 0 },
+        "sourceRectOverlapPolicy": { "enum": ["allow", "warn"] }
+      }
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/part" }
+    }
+  },
+  "definitions": {
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+    },
+    "size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "trim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offset", "size"],
+      "properties": {
+        "offset": { "$ref": "#/definitions/vector" },
+        "size": { "$ref": "#/definitions/size" }
+      }
+    },
+    "partOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parentId": { "type": ["string", "null"] },
+        "drawOrder": { "type": "integer" },
+        "rotationDegrees": { "type": "number" },
+        "scale": {
+          "allOf": [
+            { "$ref": "#/definitions/vector" },
+            {
+              "type": "object",
+              "properties": {
+                "x": { "type": "number", "not": { "const": 0 } },
+                "y": { "type": "number", "not": { "const": 0 } }
+              }
+            }
+          ]
+        },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["partId", "file", "joint"],
+      "properties": {
+        "partId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "file": { "type": "string", "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.(?:png|jpg|jpeg|webp)$" },
+        "sourceRect": { "$ref": "#/definitions/rect" },
+        "originalRect": { "$ref": "#/definitions/rect" },
+        "trimmedRect": { "$ref": "#/definitions/rect" },
+        "trim": { "$ref": "#/definitions/trim" },
+        "joint": { "$ref": "#/definitions/vector" },
+        "visualCenter": { "$ref": "#/definitions/vector" },
+        "overrides": { "$ref": "#/definitions/partOverrides" }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            { "required": ["sourceRect"], "properties": { "sourceRect": {} } },
+            { "required": ["originalRect"], "properties": { "originalRect": {} } }
+          ]
+        },
+        {
+          "oneOf": [
+            { "required": ["trimmedRect"], "properties": { "trimmedRect": {} } },
+            { "required": ["trim"], "properties": { "trim": {} } }
+          ]
+        }
+      ]
+    }
+  }
+}

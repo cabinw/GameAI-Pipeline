@@ -21,6 +21,30 @@ function portableRelative(root: string, candidate: string): string {
   return path.relative(root, candidate).split(path.sep).join("/");
 }
 
+export function resolveSafeDocumentPath(
+  sourceRoot: string,
+  baseDirectory: string,
+  authoredPath: string,
+): SafePathResult {
+  const resolvedPath = path.resolve(baseDirectory, authoredPath);
+  if (!isWithin(sourceRoot, resolvedPath)) {
+    return {
+      ok: false,
+      diagnostic: {
+        code: AssetDiagnosticCode.ASSET_PATH_OUTSIDE_ROOT,
+        stage: "path",
+        path: authoredPath,
+        message: `Asset document path resolves outside source root: ${authoredPath}.`,
+        details: { sourceRoot, resolvedPath },
+      },
+    };
+  }
+  return {
+    ok: true,
+    value: { resolvedPath, sourceRelativePath: portableRelative(sourceRoot, resolvedPath) },
+  };
+}
+
 export async function resolveSourceRoot(sourceRoot: string): Promise<SafePathResult> {
   const requestedRoot = path.resolve(sourceRoot);
   try {

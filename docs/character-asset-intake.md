@@ -14,6 +14,8 @@ TASK-002 adds `@gameai/character-asset-intake`, the read-only `Validate → Norm
 6. Reject both lexical paths and followed filesystem links that leave `sourceRoot`.
 7. Inspect all safely resolved images and build a manifest only when no diagnostics remain.
 
+`validateCharacterAssetDocuments({ sourceRoot, characterRig, rigLayout, ...paths })` performs the same contract, safe-path, image, geometry, and manifest validation for already parsed in-memory documents. TASK-003 uses this API to verify a generated Rig Layout without writing it into the source fixture first.
+
 Missing paths and path escapes stop the affected load. Contract diagnostics retain the stable code exported by `@gameai/character-contracts`. All diagnostics are sorted by path, part ID, code, and message.
 
 ## Image rules

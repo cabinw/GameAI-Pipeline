@@ -1,16 +1,16 @@
 # Schema-Version Compatibility
 
-Character contracts use a required `schemaVersion` field with strict `MAJOR.MINOR.PATCH` syntax. File names remain stable; `$id` identifies the schema family and initial shape.
+Durable GameAI input contracts use a required `schemaVersion` field with strict `MAJOR.MINOR.PATCH` syntax. File names remain stable; `$id` identifies each schema family and initial shape.
 
 ## Current support
 
-The TASK-001 validator implements:
+The TASK-001 Character Contract validator and TASK-003 Source Canvas Annotation/Skeleton Template validators implement:
 
 ```text
 >=1.0.0 <1.1.0
 ```
 
-All `1.0.x` documents share the same machine-readable shape and semantics. A syntactically valid version outside this range produces `UNSUPPORTED_SCHEMA_VERSION` before cross-document validation.
+All `1.0.x` documents inside each family share the same machine-readable shape and semantics. A syntactically valid version outside this range produces the family-specific unsupported-version diagnostic before cross-document or generation validation.
 
 ## Version meaning
 
@@ -28,7 +28,7 @@ Schema compatibility is directional. A newer validator should continue reading d
 4. Keep canonical root schemas and package copies byte-identical.
 5. Add valid and invalid fixtures for every newly supported version.
 6. Preserve error-code meanings for the entire schema major line.
-7. Reject unsupported versions with `UNSUPPORTED_SCHEMA_VERSION`; do not downgrade to a generic shape error.
+7. Reject unsupported versions with `UNSUPPORTED_SCHEMA_VERSION` for Character Contracts or `UNSUPPORTED_GENERATOR_SCHEMA_VERSION` for generator inputs; do not downgrade to a generic shape error.
 
 ## Publishing a new version
 
@@ -40,4 +40,4 @@ Before accepting a new minor or major:
 4. prove older supported fixtures still validate or provide explicit migrations;
 5. publish schema and package changes atomically.
 
-See ADR-0004 for the decision rationale.
+See ADR-0004 for the general versioning rationale and ADR-0006 for the generator input contracts and coordinate semantics.

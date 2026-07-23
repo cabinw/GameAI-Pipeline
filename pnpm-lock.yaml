@@ -65,6 +65,25 @@ importers:
         specifier: 'catalog:'
         version: 5.8.2
 
+  pipelines/rig-layout-generator:
+    dependencies:
+      '@gameai/character-asset-intake':
+        specifier: workspace:*
+        version: link:../character-asset-intake
+      '@gameai/character-contracts':
+        specifier: workspace:*
+        version: link:../../framework/character-contracts
+      ajv:
+        specifier: 'catalog:'
+        version: 8.17.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
 packages:
 
   '@emnapi/runtime@1.11.2':

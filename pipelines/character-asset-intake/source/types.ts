@@ -1,9 +1,11 @@
 import type {
+  CharacterRig,
   HitShape,
   NormalizedAnchor,
   RestPose,
   RigHitArea,
   RigSocket,
+  RigLayout,
 } from "@gameai/character-contracts";
 
 import type { CharacterAssetDiagnostic } from "./diagnostics";
@@ -57,6 +59,14 @@ export interface CharacterAssetManifest {
 export interface CharacterAssetIntakeOptions {
   sourceRoot: string;
   characterRigFile?: string;
+}
+
+export interface CharacterAssetDocumentIntakeOptions {
+  sourceRoot: string;
+  characterRig: CharacterRig;
+  rigLayout: RigLayout;
+  characterRigPath?: string;
+  rigLayoutPath?: string;
 }
 
 export type CharacterAssetIntakeResult =

@@ -1,0 +1,5 @@
+{
+  "expectedCode": "SOURCE_RECT_OVERLAP_WARNING",
+  "action": "warn-on-overlap",
+  "warning": true
+}

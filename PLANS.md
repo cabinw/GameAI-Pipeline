@@ -2,6 +2,69 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-003 Rig Layout Generator
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Build an engine-neutral generator that deterministically converts a versioned source-canvas annotation and reusable skeleton template into a valid Rig Layout, then verifies the generated contract and all referenced assets before returning success.
+
+### Scope
+
+- Add canonical Source Canvas Annotation and Skeleton Template JSON Schemas.
+- Add `@gameai/rig-layout-generator` under `pipelines/` with parsers, public types, stable diagnostics, deterministic generation, and JSON serialization.
+- Add the reusable `male-normal-v1` skeleton template.
+- Derive untrimmed geometry, trim offsets, normalized joint anchors, parent-relative rest poses, hierarchy, draw order, sockets, and hit areas.
+- Validate generated layouts through both `@gameai/character-contracts` and `@gameai/character-asset-intake`.
+- Add a Red Cap Target annotation, generated golden layout, targeted invalid fixtures, deterministic tests, documentation, and an accepted coordinate/contract ADR.
+
+### Out of scope
+
+- Image segmentation or computer-vision joint detection.
+- Cocos Nodes, Prefabs, Scenes, or editor generation.
+- Animation playback.
+- Source-image or source-annotation mutation and automatic repair.
+
+### Coordinate decisions
+
+- Source annotations use top-left origin, positive X right, and positive Y down.
+- Every pivot is the authored joint in the untrimmed source rectangle; trimmed image centers and visual centers never determine anchors.
+- Child rest position is derived from child and parent joints in the same source canvas, scaled by `referenceScale`, with source Y inverted.
+- Root rest position is derived from the source-canvas center using the same conversion.
+- Template socket and hit-area geometry is normalized against a parent part's untrimmed rectangle and converted to parent-local reference space.
+
+### Execution
+
+1. Record TASK-003 and this active plan before implementation.
+2. Add and document the two canonical input contracts and compatibility rules.
+3. Implement parsers, template/annotation semantic checks, formulas, diagnostics, and deterministic generation.
+4. Add an in-memory asset-intake validation API and require both downstream validators before success.
+5. Add `male-normal-v1`, Red Cap Target annotation/golden output, and one invalid fixture per required diagnostic.
+6. Test formulas, pivot semantics, deterministic serialization, downstream validation, and source immutability.
+7. Run `pnpm verify`, review the complete diff, and commit with the required subject.
+
+### Done when
+
+- The Red Cap annotation generates the byte-stable golden Rig Layout.
+- All coordinate formulas and Y-axis inversion are documented and tested with exact values.
+- Every required diagnostic is stable and covered by a fixture.
+- A successful result has passed both Character Contract and Character Asset Intake validation.
+- `pnpm verify` passes from the repository root.
+- No out-of-scope engine, vision, playback, or repair logic is present.
+
+### Result
+
+- Added canonical Source Canvas Annotation and Skeleton Template schemas plus the engine-neutral `@gameai/rig-layout-generator` package.
+- Added `male-normal-v1`, deterministic coordinate conversion/serialization, stable diagnostics, overlap warnings, and downstream validation through both required packages.
+- Added the Red Cap Target source annotation and byte-stable generated Rig Layout golden fixture.
+- Added nine targeted invalid fixtures and exact tests for anchors, root/child rest poses, Y inversion, sockets, hit areas, trim dimensions, visual-center independence, and source immutability.
+- Accepted ADR-0006 for source-space joint authority and versioned generator input contracts.
+- `pnpm install --frozen-lockfile` and `pnpm verify` pass with 56 total tests.
+- No image segmentation, vision detection, Cocos generation, animation playback, or source repair was added.
+
 ## Completed plan: TASK-002 Character Asset Intake and Validation
 
 - Status: Complete

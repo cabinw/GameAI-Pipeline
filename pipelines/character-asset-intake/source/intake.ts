@@ -4,6 +4,7 @@ import path from "node:path";
 import {
   parseCharacterContract,
   parseCharacterRig,
+  type CharacterContract,
   type RigPart,
   type ValidationIssue,
 } from "@gameai/character-contracts";
@@ -14,8 +15,14 @@ import {
   type CharacterAssetDiagnostic,
 } from "./diagnostics";
 import { inspectImage } from "./image-inspector";
-import { resolveSafeExistingPath, resolveSourceRoot, type SafePath } from "./safe-path";
+import {
+  resolveSafeDocumentPath,
+  resolveSafeExistingPath,
+  resolveSourceRoot,
+  type SafePath,
+} from "./safe-path";
 import type {
+  CharacterAssetDocumentIntakeOptions,
   CharacterAssetIntakeOptions,
   CharacterAssetIntakeResult,
   CharacterAssetManifest,
@@ -108,71 +115,20 @@ function failure(diagnostics: readonly CharacterAssetDiagnostic[]): CharacterAss
   return { ok: false, manifest: null, diagnostics: sortDiagnostics(diagnostics) };
 }
 
-export async function intakeCharacterAssets(
-  options: CharacterAssetIntakeOptions,
+async function validateContractAssets(
+  sourceRoot: string,
+  characterRigPath: SafePath,
+  rigLayoutPath: SafePath,
+  contract: CharacterContract,
 ): Promise<CharacterAssetIntakeResult> {
-  const root = await resolveSourceRoot(options.sourceRoot);
-  if (!root.ok) {
-    return failure([root.diagnostic]);
-  }
-  const sourceRoot = root.value.resolvedPath;
-
-  const characterRig = await resolveSafeExistingPath(
-    sourceRoot,
-    sourceRoot,
-    options.characterRigFile ?? "character-rig.json",
-  );
-  if (!characterRig.ok) {
-    return failure([characterRig.diagnostic]);
-  }
-  const characterRigText = await readTextFile(characterRig.value);
-  if (isDiagnostic(characterRigText)) {
-    return failure([characterRigText]);
-  }
-
-  const parsedRig = parseCharacterRig(characterRigText);
-  if (!parsedRig.ok) {
-    return failure(
-      parsedRig.errors.map((issue) =>
-        contractDiagnostic(issue, characterRig.value.sourceRelativePath, "rig-layout.json"),
-      ),
-    );
-  }
-
-  const rigLayout = await resolveSafeExistingPath(
-    sourceRoot,
-    path.dirname(characterRig.value.resolvedPath),
-    parsedRig.value.rigLayoutFile,
-  );
-  if (!rigLayout.ok) {
-    return failure([rigLayout.diagnostic]);
-  }
-  const rigLayoutText = await readTextFile(rigLayout.value);
-  if (isDiagnostic(rigLayoutText)) {
-    return failure([rigLayoutText]);
-  }
-
-  const contract = parseCharacterContract(characterRigText, rigLayoutText);
-  if (!contract.ok) {
-    return failure(
-      contract.errors.map((issue) =>
-        contractDiagnostic(
-          issue,
-          characterRig.value.sourceRelativePath,
-          rigLayout.value.sourceRelativePath,
-        ),
-      ),
-    );
-  }
-
   const diagnostics: CharacterAssetDiagnostic[] = [];
   const parts: CharacterAssetPart[] = [];
   const firstPartByResolvedPath = new Map<string, string>();
 
-  for (const part of contract.value.rigLayout.parts) {
+  for (const part of contract.rigLayout.parts) {
     const asset = await resolveSafeExistingPath(
       sourceRoot,
-      path.dirname(rigLayout.value.resolvedPath),
+      path.dirname(rigLayoutPath.resolvedPath),
       part.file,
       part.partId,
     );
@@ -230,27 +186,139 @@ export async function intakeCharacterAssets(
   }
 
   const manifest: CharacterAssetManifest = {
-    characterId: contract.value.characterRig.characterId,
+    characterId: contract.characterRig.characterId,
     schemaVersions: {
-      characterRig: contract.value.characterRig.schemaVersion,
-      rigLayout: contract.value.rigLayout.schemaVersion,
+      characterRig: contract.characterRig.schemaVersion,
+      rigLayout: contract.rigLayout.schemaVersion,
     },
     sourceRoot,
-    characterRig: { ...characterRig.value },
-    rigLayout: { ...rigLayout.value },
-    sourceCanvas: { ...contract.value.rigLayout.sourceCanvas },
-    referenceScale: contract.value.rigLayout.referenceScale,
-    drawOrderPolicy: contract.value.rigLayout.drawOrderPolicy,
+    characterRig: { ...characterRigPath },
+    rigLayout: { ...rigLayoutPath },
+    sourceCanvas: { ...contract.rigLayout.sourceCanvas },
+    referenceScale: contract.rigLayout.referenceScale,
+    drawOrderPolicy: contract.rigLayout.drawOrderPolicy,
     parts,
-    sockets: (contract.value.rigLayout.sockets ?? []).map((socket) => ({
+    sockets: (contract.rigLayout.sockets ?? []).map((socket) => ({
       ...socket,
       position: { ...socket.position },
     })),
-    hitAreas: (contract.value.rigLayout.hitAreas ?? []).map((hitArea) => ({
+    hitAreas: (contract.rigLayout.hitAreas ?? []).map((hitArea) => ({
       ...hitArea,
       shape: { ...hitArea.shape },
     })),
   };
 
   return { ok: true, manifest, diagnostics: [] };
+}
+
+export async function validateCharacterAssetDocuments(
+  options: CharacterAssetDocumentIntakeOptions,
+): Promise<CharacterAssetIntakeResult> {
+  const root = await resolveSourceRoot(options.sourceRoot);
+  if (!root.ok) {
+    return failure([root.diagnostic]);
+  }
+  const sourceRoot = root.value.resolvedPath;
+  const characterRigPath = resolveSafeDocumentPath(
+    sourceRoot,
+    sourceRoot,
+    options.characterRigPath ?? "character-rig.json",
+  );
+  if (!characterRigPath.ok) {
+    return failure([characterRigPath.diagnostic]);
+  }
+  const rigLayoutPath = resolveSafeDocumentPath(
+    sourceRoot,
+    path.dirname(characterRigPath.value.resolvedPath),
+    options.rigLayoutPath ?? options.characterRig.rigLayoutFile,
+  );
+  if (!rigLayoutPath.ok) {
+    return failure([rigLayoutPath.diagnostic]);
+  }
+  const contract = parseCharacterContract(
+    JSON.stringify(options.characterRig),
+    JSON.stringify(options.rigLayout),
+  );
+  if (!contract.ok) {
+    return failure(
+      contract.errors.map((issue) =>
+        contractDiagnostic(
+          issue,
+          characterRigPath.value.sourceRelativePath,
+          rigLayoutPath.value.sourceRelativePath,
+        ),
+      ),
+    );
+  }
+  return validateContractAssets(
+    sourceRoot,
+    characterRigPath.value,
+    rigLayoutPath.value,
+    contract.value,
+  );
+}
+
+export async function intakeCharacterAssets(
+  options: CharacterAssetIntakeOptions,
+): Promise<CharacterAssetIntakeResult> {
+  const root = await resolveSourceRoot(options.sourceRoot);
+  if (!root.ok) {
+    return failure([root.diagnostic]);
+  }
+  const sourceRoot = root.value.resolvedPath;
+
+  const characterRig = await resolveSafeExistingPath(
+    sourceRoot,
+    sourceRoot,
+    options.characterRigFile ?? "character-rig.json",
+  );
+  if (!characterRig.ok) {
+    return failure([characterRig.diagnostic]);
+  }
+  const characterRigText = await readTextFile(characterRig.value);
+  if (isDiagnostic(characterRigText)) {
+    return failure([characterRigText]);
+  }
+
+  const parsedRig = parseCharacterRig(characterRigText);
+  if (!parsedRig.ok) {
+    return failure(
+      parsedRig.errors.map((issue) =>
+        contractDiagnostic(issue, characterRig.value.sourceRelativePath, "rig-layout.json"),
+      ),
+    );
+  }
+
+  const rigLayout = await resolveSafeExistingPath(
+    sourceRoot,
+    path.dirname(characterRig.value.resolvedPath),
+    parsedRig.value.rigLayoutFile,
+  );
+  if (!rigLayout.ok) {
+    return failure([rigLayout.diagnostic]);
+  }
+  const rigLayoutText = await readTextFile(rigLayout.value);
+  if (isDiagnostic(rigLayoutText)) {
+    return failure([rigLayoutText]);
+  }
+
+  const contract = parseCharacterContract(characterRigText, rigLayoutText);
+  if (!contract.ok) {
+    return failure(
+      contract.errors.map((issue) =>
+        contractDiagnostic(
+          issue,
+          characterRig.value.sourceRelativePath,
+          rigLayout.value.sourceRelativePath,
+        ),
+      ),
+    );
+  }
+
+  return validateContractAssets(
+    sourceRoot,
+    characterRig.value,
+    rigLayout.value,
+    contract.value,
+  );
 }

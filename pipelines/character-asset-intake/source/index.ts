@@ -7,8 +7,9 @@ export {
   type DiagnosticStage,
 } from "./diagnostics";
 export { inspectImage, type InspectedImage, type InspectImageResult } from "./image-inspector";
-export { intakeCharacterAssets } from "./intake";
+export { intakeCharacterAssets, validateCharacterAssetDocuments } from "./intake";
 export type {
+  CharacterAssetDocumentIntakeOptions,
   CharacterAssetIntakeOptions,
   CharacterAssetIntakeResult,
   CharacterAssetManifest,

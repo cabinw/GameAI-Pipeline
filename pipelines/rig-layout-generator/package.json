@@ -1,0 +1,24 @@
+{
+  "name": "@gameai/rig-layout-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Engine-neutral deterministic Rig Layout generation from source annotations and skeleton templates.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "templates"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-schemas.mjs",
+    "fixtures:generate": "pnpm run build && node scripts/generate-red-cap-golden.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
+  },
+  "dependencies": {
+    "@gameai/character-asset-intake": "workspace:*",
+    "@gameai/character-contracts": "workspace:*",
+    "ajv": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

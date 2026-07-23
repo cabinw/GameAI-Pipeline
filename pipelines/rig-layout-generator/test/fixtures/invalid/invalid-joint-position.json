@@ -1,0 +1,4 @@
+{
+  "expectedCode": "INVALID_JOINT_POSITION",
+  "action": "move-joint-outside-canvas"
+}

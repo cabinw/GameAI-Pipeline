@@ -69,6 +69,8 @@ Character Rig and Rig Layout contracts, validation codes, and usage are document
 
 Character image loading, safe-path rules, binary validation, manifest normalization, and asset diagnostic codes are documented in `docs/character-asset-intake.md`.
 
+Source annotation and skeleton-template contracts, coordinate formulas, deterministic Rig Layout generation, and generator diagnostics are documented in `docs/rig-layout-generator.md`.
+
 ## Status
 
-The project is in **v0.2 Character Pipeline**. TASK-001 established the engine-neutral Character Rig and Rig Layout contracts, and TASK-002 added safe, deterministic asset intake and validation. Production Cocos scene generation has not started.
+The project is in **v0.2 Character Pipeline**. TASK-001 established the engine-neutral Character Rig and Rig Layout contracts, TASK-002 added safe asset intake, and TASK-003 added deterministic annotated Rig Layout generation. Production Cocos scene generation has not started.
