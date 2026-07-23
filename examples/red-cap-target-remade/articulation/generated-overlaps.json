@@ -2,73 +2,76 @@
   "schemaVersion": "1.0.0",
   "specification": "articulation-safety.json",
   "extensionRadius": 70,
-  "generatedPixelCount": 25331,
+  "extensionCapRadius": 70,
+  "textureDilationRadius": 24,
+  "textureExtensionMethod": "nearest-original-opaque-child-texel-manhattan",
+  "generatedPixelCount": 25651,
   "parts": [
     {
       "jointId": "shoulder-left",
       "partId": "upper-arm-left",
       "coverPartId": "torso",
-      "generatedPixelCount": 2651,
+      "generatedPixelCount": 1877,
       "originalRect": {
         "x": 219,
         "y": 155,
         "width": 79,
-        "height": 168
+        "height": 164
       },
       "extendedRect": {
-        "x": 190,
-        "y": 120,
-        "width": 136,
-        "height": 203
+        "x": 160,
+        "y": 90,
+        "width": 140,
+        "height": 229
       },
-      "regionCount": 92,
-      "sha256": "cdbbce5cba09d63932760fc0dfcd256567bde29e57f87879bfc0c2f9e3db35c9"
+      "regionCount": 65,
+      "sha256": "358575d67c2305bb724ea516f8704ae265bd31b47d5895c44205b02fa85b2c24"
     },
     {
       "jointId": "elbow-left",
       "partId": "forearm-left",
       "coverPartId": "upper-arm-left",
-      "generatedPixelCount": 1655,
+      "generatedPixelCount": 1445,
       "originalRect": {
-        "x": 258,
-        "y": 282,
-        "width": 61,
-        "height": 160
+        "x": 248,
+        "y": 255,
+        "width": 71,
+        "height": 187
       },
       "extendedRect": {
-        "x": 218,
-        "y": 252,
-        "width": 108,
-        "height": 190
+        "x": 178,
+        "y": 185,
+        "width": 141,
+        "height": 257
       },
-      "regionCount": 40,
-      "sha256": "2d0929b1ebf0bc1cfd0bbd30658148c04f80e9aa9da2e2e5d589d8ab7df815aa"
+      "regionCount": 37,
+      "sha256": "6edffc6ee51208ad2f5ae4e17c7cb178c374da688ec79dd3950da4766ac408f9"
     },
     {
       "jointId": "wrist-left",
       "partId": "hand-left",
       "coverPartId": "forearm-left",
-      "generatedPixelCount": 1239,
+      "generatedPixelCount": 871,
       "originalRect": {
-        "x": 282,
-        "y": 432,
-        "width": 39,
-        "height": 80
+        "x": 265,
+        "y": 390,
+        "width": 56,
+        "height": 122
       },
       "extendedRect": {
-        "x": 228,
-        "y": 368,
-        "width": 98,
-        "height": 144
+        "x": 195,
+        "y": 320,
+        "width": 131,
+        "height": 192
       },
-      "regionCount": 38,
-      "sha256": "2e82c7d152e8b94c9b9be0aefe61dc603c058119aed99d34acaa735d4a559730"
+      "regionCount": 24,
+      "sha256": "a2c1599bc1dd8ef6b444c4a2cbbbdad11ded802785810660848b8bf86fb272bf"
     },
     {
       "jointId": "shoulder-right",
       "partId": "upper-arm-right",
       "coverPartId": "torso",
-      "generatedPixelCount": 1263,
+      "generatedPixelCount": 1593,
       "originalRect": {
         "x": 49,
         "y": 165,
@@ -76,159 +79,199 @@
         "height": 164
       },
       "extendedRect": {
-        "x": 9,
-        "y": 121,
+        "x": 40,
+        "y": 95,
         "width": 140,
-        "height": 208
+        "height": 234
       },
-      "regionCount": 59,
-      "sha256": "5592453a0a1cb2c2141fac2f897f9473941d47e0964f68ca5be2a575c3c8f0fd"
+      "regionCount": 56,
+      "sha256": "c1f827fc6f553c0757844e14eb019ca5d55b8fb0d6bfdcc32455171805aa751b"
     },
     {
       "jointId": "elbow-right",
       "partId": "forearm-right",
       "coverPartId": "upper-arm-right",
-      "generatedPixelCount": 1915,
+      "generatedPixelCount": 1693,
       "originalRect": {
         "x": 39,
-        "y": 282,
+        "y": 255,
         "width": 63,
-        "height": 164
+        "height": 191
       },
       "extendedRect": {
         "x": 0,
-        "y": 253,
-        "width": 135,
-        "height": 193
+        "y": 185,
+        "width": 125,
+        "height": 261
       },
-      "regionCount": 41,
-      "sha256": "accf453e57fcc875c012e39818bce0b9421bf6821ca5d2abf3505b7a73c7bb00"
+      "regionCount": 34,
+      "sha256": "de288753ec399f3e75b4eecfd195631a666b6c680e6eca09d854bd2257827c95"
     },
     {
       "jointId": "wrist-right",
       "partId": "hand-right",
       "coverPartId": "forearm-right",
-      "generatedPixelCount": 1542,
+      "generatedPixelCount": 1104,
       "originalRect": {
-        "x": 43,
-        "y": 436,
-        "width": 58,
-        "height": 88
+        "x": 41,
+        "y": 390,
+        "width": 60,
+        "height": 134
       },
       "extendedRect": {
         "x": 0,
-        "y": 369,
-        "width": 138,
-        "height": 155
+        "y": 320,
+        "width": 111,
+        "height": 204
       },
-      "regionCount": 24,
-      "sha256": "73f1a598a8f4848e7e400cd9a667258ab293e83c2946125b6521b702d3365955"
+      "regionCount": 21,
+      "sha256": "cf4209df01d93758c4eb11eb63e4d8668bc1c5728f4d134a946b6ecacd7b7439"
     },
     {
       "jointId": "hip-left",
       "partId": "thigh-left",
       "coverPartId": "pelvis",
-      "generatedPixelCount": 4476,
+      "generatedPixelCount": 3435,
       "originalRect": {
         "x": 169,
         "y": 430,
         "width": 94,
-        "height": 191
+        "height": 173
       },
       "extendedRect": {
-        "x": 146,
-        "y": 381,
+        "x": 135,
+        "y": 410,
         "width": 140,
-        "height": 240
+        "height": 193
       },
-      "regionCount": 59,
-      "sha256": "f841b32a6c6476eb337cef9297e32e0f909922cd0d6fb960e4d7fc6121eeee05"
+      "regionCount": 38,
+      "sha256": "d83137ec2f3ff45e3bc65e438649887dded9b44e9a6c4356cc2a741ee2b9c52c"
     },
     {
       "jointId": "knee-left",
       "partId": "shin-left",
       "coverPartId": "thigh-left",
-      "generatedPixelCount": 2059,
+      "generatedPixelCount": 1524,
       "originalRect": {
         "x": 200,
         "y": 595,
         "width": 66,
-        "height": 210
+        "height": 187
       },
       "extendedRect": {
-        "x": 149,
-        "y": 550,
+        "x": 145,
+        "y": 530,
         "width": 140,
-        "height": 255
+        "height": 252
       },
-      "regionCount": 13,
-      "sha256": "c8fb7bd018c8fbd66d30cdabd7cf4854c495028da05508fa4f58412f7ba13811"
+      "regionCount": 7,
+      "sha256": "874e36bd831768446e02190045fc3e9b223c6382e125679e4f2270de00c8b0b7"
     },
     {
       "jointId": "ankle-left",
       "partId": "foot-left",
       "coverPartId": "shin-left",
-      "generatedPixelCount": 1813,
+      "generatedPixelCount": 1339,
       "originalRect": {
         "x": 206,
-        "y": 782,
+        "y": 780,
         "width": 120,
-        "height": 80
+        "height": 82
       },
       "extendedRect": {
-        "x": 168,
-        "y": 734,
-        "width": 158,
-        "height": 140
+        "x": 140,
+        "y": 710,
+        "width": 186,
+        "height": 152
       },
-      "regionCount": 15,
-      "sha256": "6c71f30fb135136a244cd2ec4940dcba2de9cd6722b7ef5e389dc3b44d42c855"
+      "regionCount": 13,
+      "sha256": "7c10329f6d5956be2a91576c5cc9c524d467b859d7cab8a7f2bec369a6e3f774"
+    },
+    {
+      "jointId": "briefcase-occlusion-thigh-right",
+      "partId": "thigh-right",
+      "coverPartId": "briefcase",
+      "generatedPixelCount": 2778,
+      "originalRect": {
+        "x": 87,
+        "y": 430,
+        "width": 82,
+        "height": 166
+      },
+      "extendedRect": {
+        "x": 25,
+        "y": 370,
+        "width": 220,
+        "height": 226
+      },
+      "regionCount": 26,
+      "sha256": "eb69e83260626e831746e05f36a30df8bc1bd41fce8c20f85d252dce6d7d293e"
     },
     {
       "jointId": "hip-right",
       "partId": "thigh-right",
       "coverPartId": "pelvis",
-      "generatedPixelCount": 4332,
+      "generatedPixelCount": 3242,
       "originalRect": {
         "x": 87,
         "y": 430,
         "width": 82,
-        "height": 165
+        "height": 166
       },
       "extendedRect": {
-        "x": 62,
-        "y": 381,
-        "width": 140,
-        "height": 214
+        "x": 25,
+        "y": 370,
+        "width": 220,
+        "height": 226
       },
-      "regionCount": 62,
-      "sha256": "872251d921423bb2d7a8e803bcf25ed46b6da67d7a22cf94de6bdd1f5b40b920"
+      "regionCount": 39,
+      "sha256": "eb69e83260626e831746e05f36a30df8bc1bd41fce8c20f85d252dce6d7d293e"
+    },
+    {
+      "jointId": "briefcase-occlusion-shin-right",
+      "partId": "shin-right",
+      "coverPartId": "briefcase",
+      "generatedPixelCount": 2955,
+      "originalRect": {
+        "x": 87,
+        "y": 595,
+        "width": 83,
+        "height": 196
+      },
+      "extendedRect": {
+        "x": 42,
+        "y": 485,
+        "width": 220,
+        "height": 306
+      },
+      "regionCount": 49,
+      "sha256": "cab8f4ed931d8c4bdee31b6ca645769a9aca55e0093a052d04be66d203522cf7"
     },
     {
       "jointId": "knee-right",
       "partId": "shin-right",
       "coverPartId": "thigh-right",
-      "generatedPixelCount": 576,
+      "generatedPixelCount": 432,
       "originalRect": {
         "x": 87,
-        "y": 590,
+        "y": 595,
         "width": 83,
-        "height": 226
+        "height": 196
       },
       "extendedRect": {
-        "x": 87,
-        "y": 520,
-        "width": 143,
-        "height": 296
+        "x": 42,
+        "y": 485,
+        "width": 220,
+        "height": 306
       },
       "regionCount": 1,
-      "sha256": "b322b272ab33d038df5bfc28f9489cf3f555f838fd97e00b79c75feabcdb97ae"
+      "sha256": "cab8f4ed931d8c4bdee31b6ca645769a9aca55e0093a052d04be66d203522cf7"
     },
     {
       "jointId": "ankle-right",
       "partId": "foot-right",
       "coverPartId": "shin-right",
-      "generatedPixelCount": 1810,
+      "generatedPixelCount": 1363,
       "originalRect": {
         "x": 87,
         "y": 786,
@@ -236,13 +279,13 @@
         "height": 106
       },
       "extendedRect": {
-        "x": 49,
-        "y": 745,
+        "x": 45,
+        "y": 720,
         "width": 140,
-        "height": 147
+        "height": 172
       },
       "regionCount": 12,
-      "sha256": "cfa02eb4d6963e5213cfefe148f8188b125cee5fec96212d22dd3a70b553cd50"
+      "sha256": "6bf6dd1d858351e7f92e7db1c5af67cac123c5acc456ea2af85a4e548d13366b"
     }
   ]
 }

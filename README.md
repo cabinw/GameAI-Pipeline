@@ -95,5 +95,6 @@ engine-neutral contracts, TASK-002 added safe asset intake, TASK-003 added
 deterministic annotated Rig Layout generation, and TASK-004 added the first
 production Cocos Creator 3.8.8 scene-rig builder. TASK-005 adds the first
 versioned, data-driven Joint animation runtime and subtle Red Cap idle.
-TASK-006 adds articulation-safe overlaps before Walk, Hit, blending, or
-state-machine work.
+TASK-006.1 replaces the rejected initial articulation evidence with per-part,
+pivot-local seam, branch-connectivity, neutral pixel-diff, and real Cocos
+Creator 3.8.8 visual checks before Walk, Hit, blending, or state-machine work.

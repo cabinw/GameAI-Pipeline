@@ -269,9 +269,13 @@ async function prepareParts(
   provenance: CanonicalArtProvenance,
 ): Promise<readonly PreparedPart[]> {
   const byPartId = new Map(manifest.parts.map((part) => [part.partId, part]));
-  const hiddenByPart = new Map(
-    provenance.hiddenExtensions.map((entry) => [entry.partId, entry.regions]),
-  );
+  const hiddenByPart = new Map<string, PixelBounds[]>();
+  for (const entry of provenance.hiddenExtensions) {
+    hiddenByPart.set(entry.partId, [
+      ...(hiddenByPart.get(entry.partId) ?? []),
+      ...entry.regions,
+    ]);
+  }
   const prepared: PreparedPart[] = [];
   for (const [orderIndex, partId] of provenance.drawOrder.entries()) {
     const part = byPartId.get(partId)!;

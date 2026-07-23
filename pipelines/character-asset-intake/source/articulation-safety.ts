@@ -35,12 +35,42 @@ export interface ArticulationJointObservation {
   coverPartId: string;
   overlapPixelCount: number;
   proximalCoverageRatio: number;
+  seamIntersectionPixelCount: number;
+  intersectionConnectedToChild: boolean;
+  intersectionConnectedToCover: boolean;
+  corridorTransparentCrossing: boolean;
+  branchConnected: boolean;
+  longestVisibleCutEdge: number;
+}
+
+export interface ArticulationBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface ArticulationPartObservation {
+  partId: string;
+  renderedAlphaCount: number;
+  visibleAlphaCount: number;
+  sourceAlphaCount: number;
+  renderedBounds: ArticulationBounds | null;
+  expectedRenderedBounds: ArticulationBounds | null;
+  visibleBounds: ArticulationBounds | null;
+  expectedVisibleBounds: ArticulationBounds | null;
+  expectedVisibleAlphaCount: number;
+  transformPreserved: boolean;
+  hasRotatedAncestor: boolean;
+  withinCanvas: boolean;
 }
 
 export interface ArticulationPoseObservation {
   poseId: string;
   joints: readonly ArticulationJointObservation[];
+  parts: readonly ArticulationPartObservation[];
   briefcaseAttachmentError: number;
+  briefcaseConnected: boolean;
 }
 
 export interface ArticulationSafetyEvidence {
@@ -69,13 +99,25 @@ export function validateArticulationSafety(
   const parts = new Map(manifest.parts.map((part) => [part.partId, part]));
   const jointIds = new Set<string>();
   const poseIds = new Set<string>();
+  const expectedPoseIds = new Set([
+    "left-arm-positive",
+    "left-arm-negative",
+    "right-arm-positive",
+    "right-arm-negative",
+    "left-leg-positive",
+    "left-leg-negative",
+    "right-leg-positive",
+    "right-leg-negative",
+    "combined-positive",
+    "combined-negative",
+  ]);
 
   if (
     specification.schemaVersion !== "1.0.0" ||
     !Number.isInteger(specification.extensionRadius) ||
     specification.extensionRadius <= 0 ||
     specification.joints.length === 0 ||
-    specification.stressPoses.length !== 2
+    specification.stressPoses.length !== expectedPoseIds.size
   ) {
     diagnostics.push({
       code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
@@ -95,37 +137,42 @@ export function validateArticulationSafety(
       });
     }
     poseIds.add(pose.poseId);
-    for (const joint of specification.joints) {
-      const rotation = pose.rotations[joint.partId];
-      if (!Number.isFinite(rotation) || rotation === 0) {
+    if (!expectedPoseIds.has(pose.poseId)) {
+      diagnostics.push({
+        code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
+        stage: "articulation",
+        path: "articulation-safety.json",
+        message: `Stress pose ${pose.poseId} is not a required diagnostic pose.`,
+      });
+    }
+    if (Object.keys(pose.rotations).length === 0) {
+      diagnostics.push({
+        code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
+        stage: "articulation",
+        path: "articulation-safety.json",
+        message: `Stress pose ${pose.poseId} must rotate at least one part.`,
+      });
+    }
+    for (const [partId, rotation] of Object.entries(pose.rotations)) {
+      if (!parts.has(partId) || !Number.isFinite(rotation) || rotation === 0) {
         diagnostics.push({
           code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
           stage: "articulation",
           path: "articulation-safety.json",
-          partId: joint.partId,
-          message: `Stress pose ${pose.poseId} must rotate ${joint.partId}.`,
+          partId,
+          message: `Stress pose ${pose.poseId} has an invalid rotation for ${partId}.`,
         });
       }
     }
   }
-  if (specification.stressPoses.length === 2) {
-    const [firstPose, secondPose] = specification.stressPoses;
-    for (const joint of specification.joints) {
-      const first = firstPose?.rotations[joint.partId];
-      const second = secondPose?.rotations[joint.partId];
-      if (
-        !Number.isFinite(first) ||
-        !Number.isFinite(second) ||
-        Math.sign(first!) === Math.sign(second!)
-      ) {
-        diagnostics.push({
-          code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
-          stage: "articulation",
-          path: "articulation-safety.json",
-          partId: joint.partId,
-          message: `${joint.jointId} must be stressed in both rotation directions.`,
-        });
-      }
+  for (const requiredPoseId of expectedPoseIds) {
+    if (!poseIds.has(requiredPoseId)) {
+      diagnostics.push({
+        code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
+        stage: "articulation",
+        path: "articulation-safety.json",
+        message: `Required stress pose ${requiredPoseId} is missing.`,
+      });
     }
   }
 
@@ -185,22 +232,110 @@ export function validateArticulationSafety(
       });
       continue;
     }
+    const observedPartIds = new Set(observation.parts.map((part) => part.partId));
+    for (const manifestPart of manifest.parts) {
+      const part = observation.parts.find(
+        (candidate) => candidate.partId === manifestPart.partId,
+      );
+      if (
+        part === undefined ||
+        !observedPartIds.has(manifestPart.partId) ||
+        part.renderedAlphaCount <= 0 ||
+        part.visibleAlphaCount <= 0
+      ) {
+        diagnostics.push({
+          code: AssetDiagnosticCode.ARTICULATION_PART_MISSING,
+          stage: "articulation",
+          path: `articulation/stress-${pose.poseId}.png`,
+          partId: manifestPart.partId,
+          message: `Part ${manifestPart.partId} is missing from the stress render.`,
+        });
+        continue;
+      }
+      if (!part.withinCanvas || part.renderedBounds === null) {
+        diagnostics.push({
+          code: AssetDiagnosticCode.ARTICULATION_PART_OUT_OF_BOUNDS,
+          stage: "articulation",
+          path: `articulation/stress-${pose.poseId}.png`,
+          partId: manifestPart.partId,
+          message: `Part ${manifestPart.partId} extends outside the output canvas.`,
+        });
+      }
+      const alphaRatio =
+        part.renderedAlphaCount / Math.max(part.sourceAlphaCount, 1);
+      if (
+        (!part.hasRotatedAncestor &&
+          (!part.transformPreserved ||
+            part.renderedAlphaCount !== part.sourceAlphaCount ||
+            !sameBounds(part.renderedBounds, part.expectedRenderedBounds))) ||
+        alphaRatio < 0.85
+      ) {
+        diagnostics.push({
+          code: AssetDiagnosticCode.ARTICULATION_UNEXPECTED_ALPHA_LOSS,
+          stage: "articulation",
+          path: `articulation/stress-${pose.poseId}.png`,
+          partId: manifestPart.partId,
+          message: `Part ${manifestPart.partId} does not preserve its expected stress-render pixels.`,
+          details: {
+            renderedAlphaCount: part.renderedAlphaCount,
+            sourceAlphaCount: part.sourceAlphaCount,
+            visibleAlphaCount: part.visibleAlphaCount,
+            expectedVisibleAlphaCount: part.expectedVisibleAlphaCount,
+          },
+        });
+      }
+    }
+    if (
+      observation.parts.length !== manifest.parts.length ||
+      observedPartIds.size !== manifest.parts.length
+    ) {
+      diagnostics.push({
+        code: AssetDiagnosticCode.ARTICULATION_PART_MISSING,
+        stage: "articulation",
+        path: `articulation/stress-${pose.poseId}.png`,
+        message: `Stress render contains ${observedPartIds.size} of ${manifest.parts.length} expected parts.`,
+      });
+    }
     for (const joint of specification.joints) {
       const result = observation.joints.find(
         (candidate) => candidate.jointId === joint.jointId,
       );
-      if (result === undefined || result.overlapPixelCount <= 0) {
+      if (
+        result === undefined ||
+        result.seamIntersectionPixelCount <= 0 ||
+        !result.intersectionConnectedToChild ||
+        !result.intersectionConnectedToCover ||
+        (result.corridorTransparentCrossing &&
+          result.seamIntersectionPixelCount < 25)
+      ) {
         diagnostics.push({
-          code: AssetDiagnosticCode.ARTICULATION_TRANSPARENT_GAP,
+          code: AssetDiagnosticCode.ARTICULATION_BRANCH_DISCONNECTED,
           stage: "articulation",
           path: `articulation/stress-${pose.poseId}.png`,
           partId: joint.partId,
-          message: `Joint ${joint.jointId} has no child/cover overlap.`,
+          message: `Joint ${joint.jointId} is disconnected inside its pivot seam corridor.`,
         });
       }
-      if (result === undefined || result.proximalCoverageRatio < 0.85) {
+      if (
+        result === undefined ||
+        !result.branchConnected
+      ) {
         diagnostics.push({
-          code: AssetDiagnosticCode.ARTICULATION_EXPOSED_CUT_EDGE,
+          code: AssetDiagnosticCode.ARTICULATION_BRANCH_DISCONNECTED,
+          stage: "articulation",
+          path: `articulation/stress-${pose.poseId}.png`,
+          partId: joint.partId,
+          message: `The complete branch through ${joint.jointId} is disconnected.`,
+        });
+      }
+      if (
+        result === undefined ||
+        (result.longestVisibleCutEdge >= 16 &&
+          (result.proximalCoverageRatio < 0.5 ||
+            result.corridorTransparentCrossing))
+      ) {
+        diagnostics.push({
+          code: AssetDiagnosticCode.ARTICULATION_VISIBLE_CUT_EDGE,
           stage: "articulation",
           path: `articulation/stress-${pose.poseId}.png`,
           partId: joint.partId,
@@ -210,14 +345,18 @@ export function validateArticulationSafety(
             : {
                 details: {
                   proximalCoverageRatio: result.proximalCoverageRatio,
+                  longestVisibleCutEdge: result.longestVisibleCutEdge,
                 },
               }),
         });
       }
     }
-    if (observation.briefcaseAttachmentError > 0.001) {
+    if (
+      observation.briefcaseAttachmentError > 0.001 ||
+      !observation.briefcaseConnected
+    ) {
       diagnostics.push({
-        code: AssetDiagnosticCode.ARTICULATION_BRIEFCASE_BRANCH_INVALID,
+        code: AssetDiagnosticCode.ARTICULATION_BRANCH_DISCONNECTED,
         stage: "articulation",
         path: `articulation/stress-${pose.poseId}.png`,
         partId: "briefcase",
@@ -258,4 +397,16 @@ export function validateArticulationSafety(
   }
 
   return sortDiagnostics(diagnostics);
+}
+
+function sameBounds(
+  left: ArticulationBounds | null,
+  right: ArticulationBounds | null,
+): boolean {
+  return (
+    left?.x === right?.x &&
+    left?.y === right?.y &&
+    left?.width === right?.width &&
+    left?.height === right?.height
+  );
 }

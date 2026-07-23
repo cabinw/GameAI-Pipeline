@@ -110,23 +110,23 @@
       "file": "parts/upper-arm-left.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 190,
-        "y": 120,
-        "width": 136,
-        "height": 203
+        "x": 160,
+        "y": 90,
+        "width": 140,
+        "height": 229
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.514706,
-        "y": 0.344828
+        "x": 0.5,
+        "y": 0.305677
       },
       "restPose": {
         "position": {
-          "x": 0.97,
-          "y": 2.37
+          "x": 0.67,
+          "y": 2.67
         },
         "rotationDegrees": 0,
         "scale": {
@@ -142,23 +142,23 @@
       "file": "parts/forearm-left.png",
       "parentId": "upper-arm-left",
       "originalRect": {
-        "x": 218,
-        "y": 252,
-        "width": 108,
-        "height": 190
+        "x": 178,
+        "y": 185,
+        "width": 141,
+        "height": 257
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.648148,
-        "y": 0.368421
+        "x": 0.496454,
+        "y": 0.272374
       },
       "restPose": {
         "position": {
-          "x": 0.28,
-          "y": -1.32
+          "x": 0.18,
+          "y": -0.95
         },
         "rotationDegrees": 0,
         "scale": {
@@ -174,23 +174,23 @@
       "file": "parts/hand-left.png",
       "parentId": "forearm-left",
       "originalRect": {
-        "x": 228,
-        "y": 368,
-        "width": 98,
-        "height": 144
+        "x": 195,
+        "y": 320,
+        "width": 131,
+        "height": 192
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.714286,
-        "y": 0.486111
+        "x": 0.534351,
+        "y": 0.364583
       },
       "restPose": {
         "position": {
-          "x": 0.1,
-          "y": -1.16
+          "x": 0.17,
+          "y": -1.35
         },
         "rotationDegrees": 0,
         "scale": {
@@ -206,10 +206,10 @@
       "file": "parts/upper-arm-right.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 9,
-        "y": 121,
+        "x": 40,
+        "y": 95,
         "width": 140,
-        "height": 208
+        "height": 234
       },
       "trimOffset": {
         "x": 0,
@@ -217,12 +217,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.336538
+        "y": 0.299145
       },
       "restPose": {
         "position": {
-          "x": -0.84,
-          "y": 2.36
+          "x": -0.53,
+          "y": 2.62
         },
         "rotationDegrees": 0,
         "scale": {
@@ -239,22 +239,22 @@
       "parentId": "upper-arm-right",
       "originalRect": {
         "x": 0,
-        "y": 253,
-        "width": 135,
-        "height": 193
+        "y": 185,
+        "width": 125,
+        "height": 261
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.481481,
-        "y": 0.362694
+        "x": 0.44,
+        "y": 0.268199
       },
       "restPose": {
         "position": {
-          "x": -0.14,
-          "y": -1.32
+          "x": -0.55,
+          "y": -0.9
         },
         "rotationDegrees": 0,
         "scale": {
@@ -271,22 +271,22 @@
       "parentId": "forearm-right",
       "originalRect": {
         "x": 0,
-        "y": 369,
-        "width": 138,
-        "height": 155
+        "y": 320,
+        "width": 111,
+        "height": 204
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.492754,
-        "y": 0.451613
+        "x": 0.369369,
+        "y": 0.343137
       },
       "restPose": {
         "position": {
-          "x": 0.03,
-          "y": -1.16
+          "x": -0.14,
+          "y": -1.35
         },
         "rotationDegrees": 0,
         "scale": {
@@ -302,10 +302,10 @@
       "file": "parts/thigh-left.png",
       "parentId": "pelvis",
       "originalRect": {
-        "x": 146,
-        "y": 381,
+        "x": 135,
+        "y": 410,
         "width": 140,
-        "height": 240
+        "height": 193
       },
       "trimOffset": {
         "x": 0,
@@ -313,12 +313,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.291667
+        "y": 0.362694
       },
       "restPose": {
         "position": {
-          "x": 0.53,
-          "y": -0.24
+          "x": 0.42,
+          "y": -0.53
         },
         "rotationDegrees": 0,
         "scale": {
@@ -334,10 +334,10 @@
       "file": "parts/shin-left.png",
       "parentId": "thigh-left",
       "originalRect": {
-        "x": 149,
-        "y": 550,
+        "x": 145,
+        "y": 530,
         "width": 140,
-        "height": 255
+        "height": 252
       },
       "trimOffset": {
         "x": 0,
@@ -345,12 +345,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.27451
+        "y": 0.277778
       },
       "restPose": {
         "position": {
-          "x": 0.03,
-          "y": -1.69
+          "x": 0.1,
+          "y": -1.2
         },
         "rotationDegrees": 0,
         "scale": {
@@ -366,23 +366,23 @@
       "file": "parts/foot-left.png",
       "parentId": "shin-left",
       "originalRect": {
-        "x": 168,
-        "y": 734,
-        "width": 158,
-        "height": 140
+        "x": 140,
+        "y": 710,
+        "width": 186,
+        "height": 152
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.443038,
-        "y": 0.5
+        "x": 0.376344,
+        "y": 0.460526
       },
       "restPose": {
         "position": {
-          "x": 0.19,
-          "y": -1.84
+          "x": -0.05,
+          "y": -1.8
         },
         "rotationDegrees": 0,
         "scale": {
@@ -398,10 +398,10 @@
       "file": "parts/thigh-right.png",
       "parentId": "pelvis",
       "originalRect": {
-        "x": 62,
-        "y": 381,
-        "width": 140,
-        "height": 214
+        "x": 25,
+        "y": 370,
+        "width": 220,
+        "height": 226
       },
       "trimOffset": {
         "x": 0,
@@ -409,12 +409,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.327103
+        "y": 0.486726
       },
       "restPose": {
         "position": {
-          "x": -0.31,
-          "y": -0.24
+          "x": -0.28,
+          "y": -0.53
         },
         "rotationDegrees": 0,
         "scale": {
@@ -430,23 +430,23 @@
       "file": "parts/shin-right.png",
       "parentId": "thigh-right",
       "originalRect": {
-        "x": 87,
-        "y": 520,
-        "width": 143,
-        "height": 296
+        "x": 42,
+        "y": 485,
+        "width": 220,
+        "height": 306
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.51049,
-        "y": 0.236486
+        "x": 0.5,
+        "y": 0.359477
       },
       "restPose": {
         "position": {
-          "x": 0.28,
-          "y": -1.39
+          "x": 0.17,
+          "y": -1.15
         },
         "rotationDegrees": 0,
         "scale": {
@@ -462,10 +462,10 @@
       "file": "parts/foot-right.png",
       "parentId": "shin-right",
       "originalRect": {
-        "x": 49,
-        "y": 745,
+        "x": 45,
+        "y": 720,
         "width": 140,
-        "height": 147
+        "height": 172
       },
       "trimOffset": {
         "x": 0,
@@ -473,12 +473,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.47619
+        "y": 0.406977
       },
       "restPose": {
         "position": {
-          "x": -0.41,
-          "y": -2.25
+          "x": -0.37,
+          "y": -1.95
         },
         "rotationDegrees": 0,
         "scale": {
@@ -509,8 +509,8 @@
       },
       "restPose": {
         "position": {
-          "x": 0.08,
-          "y": -0.78
+          "x": 0.35,
+          "y": -1.27
         },
         "rotationDegrees": 0,
         "scale": {
@@ -519,7 +519,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 3
+      "drawOrder": 21
     },
     {
       "partId": "cap",
@@ -623,8 +623,8 @@
       "socketId": "left-grip",
       "parentPartId": "hand-left",
       "position": {
-        "x": -0.21,
-        "y": -0.02
+        "x": -0.045,
+        "y": -0.26
       },
       "rotationDegrees": 0
     },
@@ -632,8 +632,8 @@
       "socketId": "right-grip",
       "parentPartId": "hand-right",
       "position": {
-        "x": 0.01,
-        "y": -0.075
+        "x": 0.145,
+        "y": -0.32
       },
       "rotationDegrees": 0
     },

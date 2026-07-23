@@ -2,6 +2,65 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-006.1 Fix Articulation Visual Acceptance
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Replace the rejected TASK-006 visual gate with part-preserving, locally strict
+seam and branch validation, child-textured overlap generation, independently
+diagnosable stress poses, and real Cocos Creator 3.8.8 evidence.
+
+### Scope
+
+- Preserve the committed broken positive/negative renders as regression
+  fixtures that must fail.
+- Record per-part source and rendered alpha counts, bounds, transforms,
+  clipping, and preservation status for every stress pose.
+- Add stable missing-part, out-of-bounds, alpha-loss, disconnected-branch, and
+  visible-cut-edge diagnostics.
+- Replace parent-texture painting with deterministic nearest-valid child
+  texture while retaining parent-defined neutral coverage.
+- Replace the 60-pixel overlap search with pivot-local seam connectivity,
+  corridor, boundary, and complete-branch checks.
+- Render independent positive/negative arm and leg branches before combined
+  positive/negative evidence.
+- Regenerate Cocos rest and combined stress scenes, open them in Creator 3.8.8,
+  and capture required Scene and Game Preview evidence.
+
+### Out of scope
+
+- TASK-007, Walk, Hit, blending, state machines, IK, mesh deformation, or any
+  relaxation of the zero-difference neutral invariant.
+
+### Execution
+
+1. Record the TASK-006 rejection and preserve existing dirty Creator-import
+   metadata/scene changes without overwriting them.
+2. Freeze the rejected PNGs as invalid regression fixtures and prove the new
+   validator rejects them.
+3. Add per-part render accounting and stable preservation diagnostics.
+4. Implement child-textured overlap generation and strict local seam/branch
+   topology checks.
+5. Generate eight independent branch poses and two combined poses, then
+   inspect all evidence visually.
+6. Regenerate Cocos scenes, validate in Creator 3.8.8, and capture five real
+   engine screenshots.
+7. Run `CI=true pnpm verify`, review the full diff, commit as
+   `fix: validate articulation stress output visually`, and push.
+
+### Done when
+
+- Broken TASK-006 evidence fails regression checks.
+- All new branch and combined poses preserve 19/19 parts and pass strict local
+  seam and branch checks.
+- No forbidden visual defect remains in generated or real-engine evidence.
+- Neutral visible RGBA differences remain exactly zero.
+- Creator evidence is committed and full CI passes.
+
 ## Completed plan: TASK-006 Articulation-Safe Joint Overlaps
 
 - Status: Complete

@@ -36,8 +36,8 @@
         },
         "upper-arm-left": {
           "position": {
-            "x": 0.97,
-            "y": 2.37
+            "x": 0.67,
+            "y": 2.67
           },
           "rotationDegrees": 0,
           "scale": {
@@ -47,8 +47,8 @@
         },
         "upper-arm-right": {
           "position": {
-            "x": -0.84,
-            "y": 2.36
+            "x": -0.53,
+            "y": 2.62
           },
           "rotationDegrees": 0,
           "scale": {
@@ -86,8 +86,8 @@
         },
         "upper-arm-left": {
           "position": {
-            "x": 0.97,
-            "y": 2.37
+            "x": 0.67,
+            "y": 2.67
           },
           "rotationDegrees": -0.175,
           "scale": {
@@ -97,8 +97,8 @@
         },
         "upper-arm-right": {
           "position": {
-            "x": -0.84,
-            "y": 2.36
+            "x": -0.53,
+            "y": 2.62
           },
           "rotationDegrees": 0.15,
           "scale": {
@@ -136,8 +136,8 @@
         },
         "upper-arm-left": {
           "position": {
-            "x": 0.97,
-            "y": 2.37
+            "x": 0.67,
+            "y": 2.67
           },
           "rotationDegrees": -0.35,
           "scale": {
@@ -147,8 +147,8 @@
         },
         "upper-arm-right": {
           "position": {
-            "x": -0.84,
-            "y": 2.36
+            "x": -0.53,
+            "y": 2.62
           },
           "rotationDegrees": 0.3,
           "scale": {
@@ -186,8 +186,8 @@
         },
         "upper-arm-left": {
           "position": {
-            "x": 0.97,
-            "y": 2.37
+            "x": 0.67,
+            "y": 2.67
           },
           "rotationDegrees": -0.175,
           "scale": {
@@ -197,8 +197,8 @@
         },
         "upper-arm-right": {
           "position": {
-            "x": -0.84,
-            "y": 2.36
+            "x": -0.53,
+            "y": 2.62
           },
           "rotationDegrees": 0.15,
           "scale": {
@@ -236,8 +236,8 @@
         },
         "upper-arm-left": {
           "position": {
-            "x": 0.97,
-            "y": 2.37
+            "x": 0.67,
+            "y": 2.67
           },
           "rotationDegrees": 0,
           "scale": {
@@ -247,8 +247,8 @@
         },
         "upper-arm-right": {
           "position": {
-            "x": -0.84,
-            "y": 2.36
+            "x": -0.53,
+            "y": 2.62
           },
           "rotationDegrees": 0,
           "scale": {
@@ -265,6 +265,6 @@
     "visualNodesHaveNoTracks": true,
     "briefcaseHasNoIndependentTrack": true,
     "briefcaseParentId": "hand-right",
-    "visualCalibrationDigest": "7c01410fae27a8435f1acc97f011fea78f02abdf8c446478e8b0528e9b38b169"
+    "visualCalibrationDigest": "cd1f019b48a22657397d3d9e38b509f383fdeb868d9b18540d44a97b02e0fb9f"
   }
 }

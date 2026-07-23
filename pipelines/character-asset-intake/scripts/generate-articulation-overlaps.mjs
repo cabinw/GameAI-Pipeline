@@ -44,6 +44,7 @@ const order = [...annotation.parts].sort(
     left.partId.localeCompare(right.partId),
 );
 const orderIndex = new Map(order.map((part, index) => [part.partId, index]));
+provenance.drawOrder = order.map((part) => part.partId);
 const decoded = new Map();
 for (const part of annotation.parts) {
   const mappingPart = mappingByPart.get(part.partId);
@@ -104,21 +105,40 @@ for (const joint of specification.joints) {
   }
 
   const radius = specification.extensionRadius;
+  const capRadius = radius;
+  const occlusionCover =
+    part.partId === "thigh-right" || part.partId === "shin-right"
+      ? annotationByPart.get("briefcase")
+      : undefined;
+  const extentRadius = occlusionCover === undefined ? radius : 110;
   const oldRect = { ...part.sourceRect };
-  const left = Math.max(0, Math.min(oldRect.x, Math.floor(part.joint.x - radius)));
-  const top = Math.max(0, Math.min(oldRect.y, Math.floor(part.joint.y - radius)));
+  const left = Math.max(
+    0,
+    Math.min(oldRect.x, Math.floor(part.joint.x - extentRadius)),
+  );
+  const top = Math.max(
+    0,
+    Math.min(oldRect.y, Math.floor(part.joint.y - extentRadius)),
+  );
   const right = Math.min(
     canvasWidth,
-    Math.max(oldRect.x + oldRect.width, Math.ceil(part.joint.x + radius)),
+    Math.max(
+      oldRect.x + oldRect.width,
+      Math.ceil(part.joint.x + extentRadius),
+    ),
   );
   const bottom = Math.min(
     canvasHeight,
-    Math.max(oldRect.y + oldRect.height, Math.ceil(part.joint.y + radius)),
+    Math.max(
+      oldRect.y + oldRect.height,
+      Math.ceil(part.joint.y + extentRadius),
+    ),
   );
   const width = right - left;
   const height = bottom - top;
   const pixels = Buffer.alloc(width * height * 4);
   const generatedMask = new Uint8Array(width * height);
+  const occlusionMask = new Uint8Array(width * height);
   const oldImage = decoded.get(part.partId);
   for (let y = 0; y < oldImage.info.height; y += 1) {
     const sourceStart = y * oldImage.info.width * 4;
@@ -133,25 +153,47 @@ for (const joint of specification.joints) {
   }
 
   const nearest = nearestOpaqueColors(pixels, width, height);
-  const coverImage = decoded.get(cover.partId);
   const coverIndex = orderIndex.get(cover.partId);
+  const occlusionCoverIndex =
+    occlusionCover === undefined
+      ? undefined
+      : orderIndex.get(occlusionCover.partId);
   let generatedPixelCount = 0;
+  let jointPixelCount = 0;
+  let occlusionPixelCount = 0;
   for (
-    let canvasY = Math.max(0, Math.floor(part.joint.y - radius));
-    canvasY < Math.min(canvasHeight, Math.ceil(part.joint.y + radius));
+    let canvasY = Math.max(0, Math.floor(part.joint.y - extentRadius));
+    canvasY <
+    Math.min(canvasHeight, Math.ceil(part.joint.y + extentRadius));
     canvasY += 1
   ) {
     for (
-      let canvasX = Math.max(0, Math.floor(part.joint.x - radius));
-      canvasX < Math.min(canvasWidth, Math.ceil(part.joint.x + radius));
+      let canvasX = Math.max(0, Math.floor(part.joint.x - extentRadius));
+      canvasX <
+      Math.min(canvasWidth, Math.ceil(part.joint.x + extentRadius));
       canvasX += 1
     ) {
       const deltaX = canvasX + 0.5 - part.joint.x;
       const deltaY = canvasY + 0.5 - part.joint.y;
-      if (deltaX * deltaX + deltaY * deltaY > radius * radius) continue;
       const canvasIndex = canvasY * canvasWidth + canvasX;
+      const ownedByJointCover = owner[canvasIndex] === coverIndex;
+      const ownedByOcclusionCover =
+        occlusionCoverIndex !== undefined &&
+        owner[canvasIndex] === occlusionCoverIndex;
+      // Joint caps remain tightly pivot-centered. The auxiliary carried-prop
+      // restoration may extend farther only where the briefcase fully covers
+      // the child in the neutral pose.
       if (
-        owner[canvasIndex] !== coverIndex ||
+        (ownedByJointCover &&
+          deltaX * deltaX + deltaY * deltaY > capRadius * capRadius) ||
+        (ownedByOcclusionCover &&
+          deltaX * deltaX + deltaY * deltaY >
+            extentRadius * extentRadius)
+      ) {
+        continue;
+      }
+      if (
+        (!ownedByJointCover && !ownedByOcclusionCover) ||
         ownerAlpha[canvasIndex] !== 255
       ) {
         continue;
@@ -160,16 +202,25 @@ for (const joint of specification.joints) {
       const localY = canvasY - top;
       const offset = (localY * width + localX) * 4;
       if ((pixels[offset + 3] ?? 0) > 0) continue;
-      if (nearest.distance[localY * width + localX] > 32) continue;
-      const coverX = canvasX - cover.sourceRect.x;
-      const coverY = canvasY - cover.sourceRect.y;
-      const coverOffset =
-        (coverY * coverImage.info.width + coverX) * 4;
-      pixels[offset] = coverImage.data[coverOffset] ?? 0;
-      pixels[offset + 1] = coverImage.data[coverOffset + 1] ?? 0;
-      pixels[offset + 2] = coverImage.data[coverOffset + 2] ?? 0;
+      // Keep the extrusion close to the child's real silhouette. Filling the
+      // complete cover-owned cap creates large material blocks when rotation
+      // reveals it; a bounded child dilation produces a rounded local seam.
+      if (nearest.distance[localY * width + localX] > 24) continue;
+      // The cover is only an occlusion declaration. Extension texture must
+      // always come from the nearest original opaque texel of the child part.
+      const childSourceIndex = nearest.nearest[localY * width + localX];
+      const childSourceOffset = childSourceIndex * 4;
+      pixels[offset] = pixels[childSourceOffset] ?? 0;
+      pixels[offset + 1] = pixels[childSourceOffset + 1] ?? 0;
+      pixels[offset + 2] = pixels[childSourceOffset + 2] ?? 0;
       pixels[offset + 3] = 255;
-      generatedMask[localY * width + localX] = 1;
+      if (ownedByJointCover) {
+        generatedMask[localY * width + localX] = 1;
+        jointPixelCount += 1;
+      } else {
+        occlusionMask[localY * width + localX] = 1;
+        occlusionPixelCount += 1;
+      }
       generatedPixelCount += 1;
     }
   }
@@ -203,11 +254,30 @@ for (const joint of specification.joints) {
     coverPartId: cover.partId,
     regions,
   });
+  if (occlusionCover !== undefined && occlusionPixelCount > 0) {
+    const occlusionRegions = maskToRectangles(occlusionMask, width, height);
+    hiddenExtensions.push({
+      partId: part.partId,
+      jointId: `briefcase-occlusion-${part.partId}`,
+      coverPartId: occlusionCover.partId,
+      regions: occlusionRegions,
+    });
+    generatedParts.push({
+      jointId: `briefcase-occlusion-${part.partId}`,
+      partId: part.partId,
+      coverPartId: occlusionCover.partId,
+      generatedPixelCount: occlusionPixelCount,
+      originalRect: oldRect,
+      extendedRect: part.sourceRect,
+      regionCount: occlusionRegions.length,
+      sha256: createHash("sha256").update(png).digest("hex"),
+    });
+  }
   generatedParts.push({
     jointId: joint.jointId,
     partId: part.partId,
     coverPartId: cover.partId,
-    generatedPixelCount,
+    generatedPixelCount: jointPixelCount,
     originalRect: oldRect,
     extendedRect: part.sourceRect,
     regionCount: regions.length,
@@ -228,6 +298,10 @@ await Promise.all([
           schemaVersion: "1.0.0",
           specification: "articulation-safety.json",
           extensionRadius: specification.extensionRadius,
+          extensionCapRadius: specification.extensionRadius,
+          textureDilationRadius: 24,
+          textureExtensionMethod:
+            "nearest-original-opaque-child-texel-manhattan",
           generatedPixelCount: generatedParts.reduce(
             (sum, part) => sum + part.generatedPixelCount,
             0,
@@ -244,7 +318,8 @@ await Promise.all([
 console.log(
   JSON.stringify(
     {
-      jointCount: generatedParts.length,
+      jointCount: specification.joints.length,
+      hiddenExtensionCount: generatedParts.length,
       generatedPixelCount: generatedParts.reduce(
         (sum, part) => sum + part.generatedPixelCount,
         0,

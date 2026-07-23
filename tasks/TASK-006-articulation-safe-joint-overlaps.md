@@ -2,7 +2,7 @@
 
 ## Status
 
-Complete (2026-07-23)
+Rejected by visual review (2026-07-23); superseded by TASK-006.1
 
 ## Goal
 
@@ -45,7 +45,9 @@ pnpm --filter @gameai/character-asset-intake verify:red-cap-articulation
 CI=true pnpm verify
 ```
 
-Completed with all build and typecheck stages passing and 122/122 tests:
+The original automated run completed with all build and typecheck stages
+passing and 122/122 tests, but the task was subsequently rejected because the
+stress PNGs were visibly invalid:
 
 - TASK-000 extension: 4
 - Character contracts: 23
@@ -54,19 +56,13 @@ Completed with all build and typecheck stages passing and 122/122 tests:
 - Rig layout generator: 22
 - Character Rig Builder: 38
 
-## Result
+## Superseded result
 
-- Generated 25,331 exact-region hidden pixels across all 12 required seams.
-- Retained zero visible RGBA differences in the neutral composite.
-- Passed both stress directions with positive overlap at every seam and a
-  minimum proximal coverage ratio of `0.960938`.
-- Verified zero briefcase attachment drift under inherited hand rotation.
-- Added rest, positive-stress, and negative-stress Cocos scenes with autoplay
-  disabled.
-- Kept canonical cutouts separate from generated extended source sprites.
-- Added stable failure diagnostics and invalid-case coverage for gaps, cut
-  edges, draw order, and the briefcase branch.
-- Did not add Walk, Hit, blending, IK, or a state machine.
+- The negative stress output lost the head and accessories.
+- The positive stress output exposed cut edges and limb discontinuities.
+- Serialized scenes were not sufficient real-engine visual evidence.
+- TASK-006.1 retains these outputs as rejection fixtures and replaces the
+  acceptance gate.
 
 ## Commit
 

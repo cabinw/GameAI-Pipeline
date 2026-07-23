@@ -37,12 +37,12 @@
       "sourceFile": "source-parts/foot_l.png",
       "originalRect": {
         "x": 206,
-        "y": 782,
+        "y": 780,
         "width": 120,
-        "height": 80
+        "height": 82
       },
       "visiblePixelCount": 6224,
-      "sha256": "928c206b46bbb66f2e1e30d4fcacae66dfa71b8c3f44b2a8eba1b58a83ad2bd4"
+      "sha256": "fae53cf13d709a429b9a84371734a98bdf383fc9abe5a28f47e7857b6221e9ce"
     },
     {
       "partId": "foot-right",
@@ -60,25 +60,25 @@
       "partId": "forearm-left",
       "sourceFile": "source-parts/forearm_l.png",
       "originalRect": {
-        "x": 258,
-        "y": 282,
-        "width": 61,
-        "height": 160
+        "x": 248,
+        "y": 255,
+        "width": 71,
+        "height": 187
       },
       "visiblePixelCount": 6992,
-      "sha256": "eef86047298ef6b246f8d792115bd883f53bc736c1c505ae24f5955ed5268205"
+      "sha256": "e1d7844c90b849c1f8bd172de613d5430f42df4ef600a40343559dc5a2e0b41f"
     },
     {
       "partId": "forearm-right",
       "sourceFile": "source-parts/forearm_r.png",
       "originalRect": {
         "x": 39,
-        "y": 282,
+        "y": 255,
         "width": 63,
-        "height": 164
+        "height": 191
       },
       "visiblePixelCount": 8596,
-      "sha256": "b874f7f00619bf40981635654041989090cdf90caded72dfcb7d5a0aa9794949"
+      "sha256": "13e5abf53cb03441ea0b1a2e44f2e89d39ffeb9db4c9787c3875a93322b37e2b"
     },
     {
       "partId": "hair",
@@ -96,25 +96,25 @@
       "partId": "hand-left",
       "sourceFile": "source-parts/hand_l.png",
       "originalRect": {
-        "x": 282,
-        "y": 432,
-        "width": 39,
-        "height": 80
+        "x": 265,
+        "y": 390,
+        "width": 56,
+        "height": 122
       },
       "visiblePixelCount": 2290,
-      "sha256": "cef039efc9005e4d476135ef55cc3d757152df6f588f3e13edf2179462fa8604"
+      "sha256": "ceb35450115329e995d5a953f28cda880b48e267545e0b95af4996fd70a7b6aa"
     },
     {
       "partId": "hand-right",
       "sourceFile": "source-parts/hand_r.png",
       "originalRect": {
-        "x": 43,
-        "y": 436,
-        "width": 58,
-        "height": 88
+        "x": 41,
+        "y": 390,
+        "width": 60,
+        "height": 134
       },
       "visiblePixelCount": 3580,
-      "sha256": "e1a082696c0b2143e818d65f7ba70e96a2fca9f2a3289bedede7ed69320fa978"
+      "sha256": "30169c498665108c3b2f9c04683f9d8fd7e7d7cd085292dda3d971a7fc11cc90"
     },
     {
       "partId": "head",
@@ -147,22 +147,22 @@
         "x": 200,
         "y": 595,
         "width": 66,
-        "height": 210
+        "height": 187
       },
       "visiblePixelCount": 11359,
-      "sha256": "80e96886d1a13401064a62ea93039d6dd308a2b96b38fe90a37ac53a98104523"
+      "sha256": "a89a1e67d053858289c50e2c85359f7f6b6c4abb4744959cd67be39e0922e079"
     },
     {
       "partId": "shin-right",
       "sourceFile": "source-parts/shin_r.png",
       "originalRect": {
         "x": 87,
-        "y": 590,
+        "y": 595,
         "width": 83,
-        "height": 226
+        "height": 196
       },
       "visiblePixelCount": 7647,
-      "sha256": "db112a59c5ad40c6f4b871f019b1a571165903b6b1899cff0fc1ffc5123a267a"
+      "sha256": "25818e6f10264c539a6c226c58d51903e94f9943d3685e9a77571e1bfb6e9135"
     },
     {
       "partId": "sunglasses",
@@ -183,10 +183,10 @@
         "x": 169,
         "y": 430,
         "width": 94,
-        "height": 191
+        "height": 173
       },
       "visiblePixelCount": 8887,
-      "sha256": "96dde3b5b914f2bae7483ca4f2af73f0391230c196400a7ae5bebbd9400bd53e"
+      "sha256": "c7edab41b229532ba54745b8e2e7cd80c4318dd165055194c9d2bbb6525847f7"
     },
     {
       "partId": "thigh-right",
@@ -195,10 +195,10 @@
         "x": 87,
         "y": 430,
         "width": 82,
-        "height": 165
+        "height": 166
       },
       "visiblePixelCount": 2371,
-      "sha256": "0c19b6951117c8cac58c6b85931b526e5604f5d5a0f3365903ee8fab402e5dec"
+      "sha256": "81846f741259da8857e00179e4935421c907b51d43690dbf385a44ddc5bf6392"
     },
     {
       "partId": "torso",
@@ -219,10 +219,10 @@
         "x": 219,
         "y": 155,
         "width": 79,
-        "height": 168
+        "height": 164
       },
       "visiblePixelCount": 6917,
-      "sha256": "de34bc1724e585b728ed0201a65f0246e6401048c631071f0d718394cb7c7662"
+      "sha256": "8ab135e1a0fc7a566b22763d6f9118e55759bf60b67711360d6af7889c6f05ba"
     },
     {
       "partId": "upper-arm-right",
