@@ -27,6 +27,25 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
+  cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder:
+    dependencies:
+      '@gameai/character-asset-intake':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/character-asset-intake
+      '@gameai/character-contracts':
+        specifier: workspace:*
+        version: link:../../../../../framework/character-contracts
+      '@gameai/rig-layout-generator':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/rig-layout-generator
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
   cocos/projects/task000-spike/extensions/gameai-task000-spike:
     devDependencies:
       '@types/node':

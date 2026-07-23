@@ -2,6 +2,83 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-004 Cocos Scene Rig Builder MVP
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Build the first production Cocos Creator 3.8.8 Panel → Main → validated scene
+plan → Scene Script pipeline and assemble the Red Cap Target as an idempotent,
+animation-ready rigid-sprite scene rig.
+
+### Scope
+
+- Add a dedicated project-local Character Rig Builder editor extension.
+- Reuse all three engine-neutral Character Pipeline packages before scene
+  mutation.
+- Resolve SpriteFrame UUIDs through AssetDB and pass a deterministic pure-data
+  scene plan across the process boundary.
+- Build proximal `Joint_<partId>` hierarchy nodes with center-anchored,
+  trim-compensated `Visual_<partId>` Sprite children.
+- Apply a deterministic global render order across hierarchy branches.
+- Replace only the exact marker-guarded generated character root.
+- Preserve one correlation ID through the UI, validation, mutation, and
+  acceptance evidence.
+- Add deterministic automated tests and Red Cap Target Cocos acceptance
+  evidence.
+
+### Out of scope
+
+- Animation playback or generation.
+- Auto cutting or computer-vision joint detection.
+- Production-game integration.
+- Mutation of unrelated scene nodes or source assets.
+
+### Execution
+
+1. Record TASK-004, this active plan, and the scene-boundary ADR before
+   implementation.
+2. Implement and test deterministic scene-plan generation and replacement
+   policy independently of Cocos objects.
+3. Implement the Panel, Main Process validation/generation/AssetDB flow, and
+   Scene Script mutation.
+4. Add the Cocos fixture project, Red Cap Target assets, documentation, and
+   stable diagnostics.
+5. Run the real Cocos Creator 3.8.8 acceptance procedure and capture evidence.
+6. Remove generated build state, run frozen installation and `pnpm verify`, and
+   review the final diff.
+7. Complete the task records and commit with the required subject.
+
+### Done when
+
+- Validation failure cannot create scene nodes.
+- Every part has the required Joint/Visual structure, proximal hierarchy,
+  correct trim compensation, scale, and global draw order.
+- Repeated generation is idempotent and unrelated scene nodes remain intact.
+- Red Cap Target acceptance evidence is correlation-linked across all stages.
+- A clean repository state passes frozen installation and `pnpm verify`.
+
+### Result
+
+- Added a dedicated Cocos Creator 3.8.8 extension with the required
+  Panel → Main → engine-neutral validation/generation → AssetDB → Scene Script
+  boundary.
+- Added deterministic scene-plan generation, center-anchored trim
+  compensation, proximal Joint/Visual hierarchy, global Sorting2D order, and
+  stable diagnostics.
+- Added exact-root marker protection, duplicate-run replacement, and atomic
+  rollback on replacement verification failure.
+- Ran the Red Cap Target in the real editor twice. The first run created 18
+  Joint/Visual pairs and the second replaced the same root; all four unrelated
+  scene roots remained.
+- Saved the imported fixture, AssetDB-authored metadata, acceptance scene,
+  correlation-linked JSON evidence, and hierarchy screenshot.
+- Cleaned all ignored outputs and dependencies, ran frozen installation, and
+  passed the complete 81-test `pnpm verify` gate (63 prior plus 18 new).
+
 ## Completed plan: TASK-003.2 Clean-Checkout Verification
 
 - Status: Complete

@@ -1,0 +1,62 @@
+{
+  "package_version": 2,
+  "name": "gameai-character-rig-builder",
+  "version": "0.1.0",
+  "author": "cabinw",
+  "editor": ">=3.8.8 <3.9.0",
+  "private": true,
+  "description": "Validated Character Rig to Cocos scene assembly pipeline.",
+  "main": "./dist/main.js",
+  "scene": "./dist/scene.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
+  },
+  "dependencies": {
+    "@gameai/character-asset-intake": "workspace:*",
+    "@gameai/character-contracts": "workspace:*",
+    "@gameai/rig-layout-generator": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "panels": {
+    "default": {
+      "title": "GameAI Character Rig Builder",
+      "type": "dockable",
+      "main": "dist/panels/default",
+      "size": {
+        "min-width": 480,
+        "min-height": 420,
+        "width": 620,
+        "height": 620
+      }
+    }
+  },
+  "contributions": {
+    "scene": {
+      "script": "./dist/scene.js"
+    },
+    "menu": [
+      {
+        "path": "i18n:menu.panel/GameAI Pipeline",
+        "label": "Character Rig Builder",
+        "message": "open-panel"
+      }
+    ],
+    "messages": {
+      "open-panel": {
+        "methods": [
+          "openPanel"
+        ]
+      },
+      "build-character-rig": {
+        "methods": [
+          "buildCharacterRig"
+        ]
+      }
+    }
+  }
+}

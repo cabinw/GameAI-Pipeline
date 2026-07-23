@@ -1,0 +1,36 @@
+export const SceneRigDiagnosticCode = {
+  INVALID_BUILD_REQUEST: "INVALID_BUILD_REQUEST",
+  SOURCE_ROOT_OUTSIDE_ASSETS: "SOURCE_ROOT_OUTSIDE_ASSETS",
+  CHARACTER_RIG_INVALID: "CHARACTER_RIG_INVALID",
+  RIG_LAYOUT_GENERATION_FAILED: "RIG_LAYOUT_GENERATION_FAILED",
+  ASSETDB_ASSET_NOT_FOUND: "ASSETDB_ASSET_NOT_FOUND",
+  ASSETDB_SPRITE_FRAME_NOT_FOUND: "ASSETDB_SPRITE_FRAME_NOT_FOUND",
+  SCENE_CORRELATION_MISMATCH: "SCENE_CORRELATION_MISMATCH",
+  SCENE_NOT_AVAILABLE: "SCENE_NOT_AVAILABLE",
+  GENERATED_ROOT_CONFLICT: "GENERATED_ROOT_CONFLICT",
+  GENERATED_ROOT_AMBIGUOUS: "GENERATED_ROOT_AMBIGUOUS",
+  SPRITE_FRAME_LOAD_FAILED: "SPRITE_FRAME_LOAD_FAILED",
+  SCENE_GENERATION_FAILED: "SCENE_GENERATION_FAILED",
+} as const;
+
+export type SceneRigDiagnosticCode =
+  (typeof SceneRigDiagnosticCode)[keyof typeof SceneRigDiagnosticCode];
+
+export interface SceneRigDiagnostic {
+  code: SceneRigDiagnosticCode;
+  message: string;
+  stage: "main" | "assetdb" | "scene";
+  correlationId: string;
+  partId?: string;
+  details?: Readonly<Record<string, unknown>>;
+}
+
+export class SceneRigBuilderError extends Error {
+  readonly diagnostic: SceneRigDiagnostic;
+
+  constructor(diagnostic: SceneRigDiagnostic) {
+    super(`${diagnostic.code}: ${diagnostic.message}`);
+    this.name = "SceneRigBuilderError";
+    this.diagnostic = diagnostic;
+  }
+}
