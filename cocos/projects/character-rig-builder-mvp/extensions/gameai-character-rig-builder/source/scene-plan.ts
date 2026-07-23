@@ -93,12 +93,13 @@ export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan
   });
 
   return {
-    planVersion: "1.0.0",
+    planVersion: "1.1.0",
     correlationId: input.correlationId,
     characterId: input.manifest.characterId,
     characterRootName: `CHR_${safeCharacterToken(input.manifest.characterId)}`,
     rigRootName: "RigRoot",
     generatedMarkerName: "__GameAI_Generated__",
+    renderLayer: "UI_3D",
     schemaVersions: { ...input.manifest.schemaVersions },
     referenceScale: input.manifest.referenceScale,
     parts,

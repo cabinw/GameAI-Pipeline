@@ -39,12 +39,13 @@ export interface CocosScenePartPlan {
 }
 
 export interface CocosSceneRigPlan {
-  planVersion: "1.0.0";
+  planVersion: "1.1.0";
   correlationId: string;
   characterId: string;
   characterRootName: string;
   rigRootName: "RigRoot";
   generatedMarkerName: "__GameAI_Generated__";
+  renderLayer: "UI_3D";
   schemaVersions: CharacterAssetManifest["schemaVersions"];
   referenceScale: number;
   parts: readonly CocosScenePartPlan[];
@@ -76,6 +77,12 @@ export interface SceneBuildSuccess {
   socketCount: number;
   unrelatedRootCountBefore: number;
   unrelatedRootCountAfter: number;
+  renderLayer: "UI_3D";
+  renderRoot2DVerified: true;
+  spriteFramesVerified: number;
+  nonZeroContentSizesVerified: number;
+  compatibleCameraNames: readonly string[];
+  cameraStatePreserved: true;
   verifiedPartIds: readonly string[];
   sortingOrders: readonly number[];
 }

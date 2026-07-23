@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "correlationId": "task004-1784780669198",
+  "correlationId": "task004-1784786876157",
   "creatorVersion": "3.8.8",
   "stages": [
     "panel",
@@ -9,12 +9,12 @@
     "scene",
     "verification"
   ],
-  "panelStartedAt": "2026-07-23T04:24:29.198Z",
-  "mainReceivedAt": "2026-07-23T04:24:29.199Z",
-  "validationCompletedAt": "2026-07-23T04:24:29.218Z",
-  "assetDbCompletedAt": "2026-07-23T04:24:29.218Z",
-  "sceneCompletedAt": "2026-07-23T04:24:29.233Z",
-  "completedAt": "2026-07-23T04:24:29.233Z",
+  "panelStartedAt": "2026-07-23T06:07:56.157Z",
+  "mainReceivedAt": "2026-07-23T06:07:56.159Z",
+  "validationCompletedAt": "2026-07-23T06:07:56.187Z",
+  "assetDbCompletedAt": "2026-07-23T06:07:56.187Z",
+  "sceneCompletedAt": "2026-07-23T06:07:56.205Z",
+  "completedAt": "2026-07-23T06:07:56.205Z",
   "sourceRoot": "/Users/wukaibing/Codex/GameAI-Pipline/cocos/projects/character-rig-builder-mvp/assets/gameai/red-cap-target",
   "characterId": "red-cap-target",
   "schemaVersions": {
@@ -26,9 +26,9 @@
   "sceneResult": {
     "ok": true,
     "stage": "scene",
-    "correlationId": "task004-1784780669198",
-    "sceneName": "",
-    "sceneUuid": "02986f68-0f60-4067-bbb6-3e9cee062c4c",
+    "correlationId": "task004-1784786876157",
+    "sceneName": "red-cap-acceptance",
+    "sceneUuid": "e4b5f82a-8e90-450d-b1cc-b0940d1c1f6b",
     "characterRootName": "CHR_red_cap_target",
     "replacement": "replaced",
     "partCount": 18,
@@ -37,6 +37,14 @@
     "socketCount": 3,
     "unrelatedRootCountBefore": 4,
     "unrelatedRootCountAfter": 4,
+    "renderLayer": "UI_3D",
+    "renderRoot2DVerified": true,
+    "spriteFramesVerified": 18,
+    "nonZeroContentSizesVerified": 18,
+    "compatibleCameraNames": [
+      "Main Camera"
+    ],
+    "cameraStatePreserved": true,
     "verifiedPartIds": [
       "pelvis",
       "torso",
@@ -78,5 +86,5 @@
       17
     ]
   },
-  "planDigest": "3699ca82ab3d77f40579a926023ccc1c83f34e5315295d196e00ba6e6c4b971d"
+  "planDigest": "c993978b74a51587e9d4a84201d130073e677a2acbb37c58b144dc5a16c6589a"
 }

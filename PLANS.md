@@ -2,6 +2,76 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-004.1 Cocos Visible Rig Acceptance
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Make the generated Red Cap rig visibly render as world-space 2D content in
+Cocos Creator 3.8.8 and upgrade acceptance from hierarchy proof to visual
+assembly proof.
+
+### Scope
+
+- Add a generated RenderRoot2D boundary and move all generated nodes to UI_3D.
+- Add pre-commit Scene Script verification for render-root ancestry,
+  SpriteFrames, non-zero sizes, consistent layers, and compatible cameras.
+- Add a stable missing-camera diagnostic without mutating unrelated cameras.
+- Configure only the acceptance fixture camera for orthographic UI_3D
+  visibility.
+- Extend deterministic tests, documentation, saved scene, and real editor
+  evidence.
+
+### Out of scope
+
+- Automatic changes to unrelated project cameras.
+- Animation, production runtime integration, or contract changes.
+- Changes to existing Joint/Visual transforms or draw order.
+
+### Execution
+
+1. Record TASK-004.1, this plan, and the world-space 2D decision.
+2. Add render-layer and render-root information to the deterministic scene
+   plan.
+3. Build and verify a RenderRoot2D-backed detached character tree.
+4. Add camera-mask policy tests and failure diagnostics.
+5. Update the acceptance camera without placing it inside the generated
+   replacement boundary.
+6. Run the real editor twice and replace evidence with visible Scene and
+   Game/Preview captures where practical.
+7. Clean ignored state, run frozen installation and `pnpm verify`, document the
+   result, and commit with the required subject.
+
+### Done when
+
+- Red Cap is visibly assembled in the saved acceptance scene and capture.
+- Every generated Sprite is below RenderRoot2D with a non-null SpriteFrame,
+  non-zero size, and UI_3D layer.
+- A compatible active camera is proven without generator-owned camera changes.
+- Duplicate generation remains safe and idempotent.
+- Clean-checkout verification passes.
+
+### Result
+
+- Added a generated RenderRoot2D boundary and assigned every generated node
+  to UI_3D while retaining the complete Joint/Visual hierarchy, transforms,
+  pivots, and global Sorting2D order.
+- Added atomic preflight and post-attachment verification for render-root
+  ancestry, SpriteFrames, non-zero sizes, layer consistency, compatible
+  cameras, and unchanged camera state.
+- Added the stable `NO_CAMERA_CAN_RENDER_GENERATED_LAYER` diagnostic and
+  deterministic camera-mask tests.
+- Calibrated the fixture-owned Main Camera to an orthographic 2D view and
+  included `sorting-2d` in the acceptance project's runtime engine modules.
+- Ran Cocos Creator 3.8.8 generation twice. The second run safely replaced the
+  marked root; Scene and Web Preview visibly rendered all 18 parts with zero
+  console errors.
+- Removed dependencies and all build outputs, then passed
+  `pnpm install --frozen-lockfile` and the complete 84-test `pnpm verify`.
+
 ## Completed plan: TASK-004 Cocos Scene Rig Builder MVP
 
 - Status: Complete

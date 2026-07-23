@@ -83,6 +83,27 @@ files nor generates or guesses UUID values.
 The Scene Script preloads all SpriteFrames using their UUIDs before inspecting
 or changing the live generated root.
 
+## World-space 2D rendering
+
+Generated Character Rigs are world-space 2D content. `CHR_<characterId>` owns
+a `RenderRoot2D`, and every generated descendant—including RigRoot, Joint,
+Visual, socket, hit-area, marker, and metadata nodes—uses `UI_3D`.
+
+Before replacement begins, the Scene Script requires an active scene Camera
+whose visibility mask contains `UI_3D`. It does not create, move, rotate, or
+change the visibility of any camera. The detached generated tree and the
+attached replacement are both verified for:
+
+- a generated `RenderRoot2D`;
+- Visual ancestry below that render root;
+- non-null SpriteFrames and non-zero UITransform sizes;
+- one consistent generated layer; and
+- a compatible active camera.
+
+The acceptance scene owns its fixture-specific orthographic camera
+configuration. The project also includes the `sorting-2d` engine feature so
+the saved `Sorting2D` components deserialize in Web Preview.
+
 ## Idempotence and failure safety
 
 Generation is limited to `CHR_<characterId>`, which is
@@ -105,5 +126,6 @@ than duplicating it.
 The adapter defines stable codes for invalid requests, unsafe source roots,
 contract or layout-generation failures, missing AssetDB assets or SpriteFrames,
 correlation mismatch, unavailable scenes, unsafe root replacement, SpriteFrame
-load failure, and unexpected scene-generation failure. A single
+load failure, missing RenderRoot2D, invalid generated visuals, layer mismatch,
+no compatible camera, and unexpected scene-generation failure. A single
 `correlationId` is preserved from Panel through evidence.

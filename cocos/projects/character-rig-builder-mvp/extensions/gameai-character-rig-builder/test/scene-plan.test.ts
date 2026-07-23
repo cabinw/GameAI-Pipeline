@@ -15,6 +15,11 @@ import {
   SceneRigDiagnosticCode,
 } from "../source/diagnostics";
 import {
+  cameraRendersLayer,
+  compatibleCameras,
+  type SceneCameraDescriptor,
+} from "../source/camera-visibility";
+import {
   digestScenePlan,
   executeCharacterRigBuild,
 } from "../source/orchestrator";
@@ -75,6 +80,11 @@ function part(partId: string) {
 }
 
 describe("buildCocosSceneRigPlan", () => {
+  it("selects the versioned world-space 2D render contract", () => {
+    assert.equal(plan.planVersion, "1.1.0");
+    assert.equal(plan.renderLayer, "UI_3D");
+  });
+
   it("creates one Joint/Visual pair and the complete proximal hierarchy", () => {
     assert.equal(plan.characterRootName, "CHR_red_cap_target");
     assert.equal(plan.parts.length, manifest.parts.length);
@@ -145,6 +155,47 @@ describe("buildCocosSceneRigPlan", () => {
     });
     assert.equal(JSON.stringify(second), JSON.stringify(plan));
     assert.equal(digestScenePlan(second), digestScenePlan(plan));
+  });
+});
+
+describe("world-space 2D camera visibility", () => {
+  const ui3d = 1 << 23;
+  const cameras: readonly SceneCameraDescriptor[] = [
+    {
+      name: "Disabled Camera",
+      uuid: "camera-disabled",
+      enabledInHierarchy: false,
+      visibility: ui3d,
+    },
+    {
+      name: "World Camera",
+      uuid: "camera-world",
+      enabledInHierarchy: true,
+      visibility: ui3d | (1 << 30),
+    },
+    {
+      name: "UI Camera",
+      uuid: "camera-ui",
+      enabledInHierarchy: true,
+      visibility: 1 << 25,
+    },
+  ];
+
+  it("requires an active camera whose visibility contains the selected layer", () => {
+    assert.equal(cameraRendersLayer(cameras[0]!, ui3d), false);
+    assert.equal(cameraRendersLayer(cameras[1]!, ui3d), true);
+    assert.equal(cameraRendersLayer(cameras[2]!, ui3d), false);
+    assert.deepEqual(
+      compatibleCameras(cameras, ui3d).map((camera) => camera.name),
+      ["World Camera"],
+    );
+  });
+
+  it("publishes a stable missing-camera diagnostic code", () => {
+    assert.equal(
+      SceneRigDiagnosticCode.NO_CAMERA_CAN_RENDER_GENERATED_LAYER,
+      "NO_CAMERA_CAN_RENDER_GENERATED_LAYER",
+    );
   });
 });
 
@@ -319,6 +370,12 @@ describe("executeCharacterRigBuild", () => {
           socketCount: value.plan.sockets.length,
           unrelatedRootCountBefore: 1,
           unrelatedRootCountAfter: 1,
+          renderLayer: "UI_3D",
+          renderRoot2DVerified: true,
+          spriteFramesVerified: value.plan.parts.length,
+          nonZeroContentSizesVerified: value.plan.parts.length,
+          compatibleCameraNames: ["Acceptance Camera"],
+          cameraStatePreserved: true,
           verifiedPartIds: value.plan.parts.map((partValue) => partValue.partId),
           sortingOrders: value.plan.parts.map((partValue) => partValue.sortingOrder),
         };
