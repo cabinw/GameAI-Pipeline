@@ -157,12 +157,12 @@
       "sourceFile": "source-parts/shin_r.png",
       "originalRect": {
         "x": 87,
-        "y": 595,
+        "y": 590,
         "width": 83,
-        "height": 221
+        "height": 226
       },
       "visiblePixelCount": 7647,
-      "sha256": "6d44f843903765f69788895c1e8fad766b337e6dfc28b139ad06775185c8af54"
+      "sha256": "db112a59c5ad40c6f4b871f019b1a571165903b6b1899cff0fc1ffc5123a267a"
     },
     {
       "partId": "sunglasses",
@@ -195,10 +195,10 @@
         "x": 87,
         "y": 430,
         "width": 82,
-        "height": 191
+        "height": 165
       },
       "visiblePixelCount": 2371,
-      "sha256": "ba6a427f37bb0cfa0888ce876d8e22baec6f73e08dee00a6f012a16222a0535e"
+      "sha256": "0c19b6951117c8cac58c6b85931b526e5604f5d5a0f3365903ee8fab402e5dec"
     },
     {
       "partId": "torso",

@@ -19,6 +19,7 @@ if (mapping.mappingVersion !== "1.0.0" || !Array.isArray(mapping.parts)) {
 
 const files = [
   "README.md",
+  "articulation-safety.json",
   "assembled-preview.svg",
   "character-rig.json",
   "rig-layout.json",

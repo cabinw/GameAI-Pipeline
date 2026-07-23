@@ -207,7 +207,9 @@ for (const [partIndex, partId] of expectedPartIds.entries()) {
   }
 
   const mappingPart = mappingByPart.get(partId);
-  const outputPath = resolve(fixtureRoot, mappingPart.sourceFile);
+  const canonicalSourceFile =
+    mappingPart.canonicalSourceFile ?? mappingPart.sourceFile;
+  const outputPath = resolve(fixtureRoot, canonicalSourceFile);
   await mkdir(dirname(outputPath), { recursive: true });
   const png = await sharp(outputPixels, {
     raw: { width, height, channels: 4 },
@@ -224,7 +226,7 @@ for (const [partIndex, partId] of expectedPartIds.entries()) {
   mappingPart.cropRect = { x: 0, y: 0, width, height };
   extractionParts.push({
     partId,
-    sourceFile: mappingPart.sourceFile,
+    sourceFile: canonicalSourceFile,
     originalRect: { x: left, y: top, width, height },
     visiblePixelCount: coordinates.length,
     sha256: createHash("sha256").update(png).digest("hex"),

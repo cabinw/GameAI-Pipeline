@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "rigId": "red-cap-target-remade-layout",
+  "extensionRadius": 70,
+  "stressPoses": [
+    {
+      "poseId": "positive",
+      "rotations": {
+        "upper-arm-left": 12,
+        "forearm-left": -18,
+        "hand-left": 12,
+        "upper-arm-right": 12,
+        "forearm-right": -18,
+        "hand-right": 12,
+        "thigh-left": 10,
+        "shin-left": -15,
+        "foot-left": 10,
+        "thigh-right": 10,
+        "shin-right": -15,
+        "foot-right": 10
+      }
+    },
+    {
+      "poseId": "negative",
+      "rotations": {
+        "upper-arm-left": -12,
+        "forearm-left": 18,
+        "hand-left": -12,
+        "upper-arm-right": -12,
+        "forearm-right": 18,
+        "hand-right": -12,
+        "thigh-left": -10,
+        "shin-left": 15,
+        "foot-left": -10,
+        "thigh-right": -10,
+        "shin-right": 15,
+        "foot-right": -10
+      }
+    }
+  ],
+  "joints": [
+    { "jointId": "shoulder-left", "partId": "upper-arm-left", "coverPartId": "torso" },
+    { "jointId": "elbow-left", "partId": "forearm-left", "coverPartId": "upper-arm-left" },
+    { "jointId": "wrist-left", "partId": "hand-left", "coverPartId": "forearm-left" },
+    { "jointId": "shoulder-right", "partId": "upper-arm-right", "coverPartId": "torso" },
+    { "jointId": "elbow-right", "partId": "forearm-right", "coverPartId": "upper-arm-right" },
+    { "jointId": "wrist-right", "partId": "hand-right", "coverPartId": "forearm-right" },
+    { "jointId": "hip-left", "partId": "thigh-left", "coverPartId": "pelvis" },
+    { "jointId": "knee-left", "partId": "shin-left", "coverPartId": "thigh-left" },
+    { "jointId": "ankle-left", "partId": "foot-left", "coverPartId": "shin-left" },
+    { "jointId": "hip-right", "partId": "thigh-right", "coverPartId": "pelvis" },
+    { "jointId": "knee-right", "partId": "shin-right", "coverPartId": "thigh-right" },
+    { "jointId": "ankle-right", "partId": "foot-right", "coverPartId": "shin-right" }
+  ],
+  "briefcaseBranch": [
+    "upper-arm-right",
+    "forearm-right",
+    "hand-right",
+    "briefcase"
+  ]
+}

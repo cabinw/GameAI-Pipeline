@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "passed",
+  "neutral": {
+    "canonical": "reference/full_character.png",
+    "composite": "provenance/flat-composite.png",
+    "diff": "articulation/neutral-pixel-diff.png",
+    "pixelDifferenceCount": 0,
+    "canonicalPixelSha256": "659d76db159ff154ab535ca34110dec21fccc3966cd59d6de9ac234892a45b92",
+    "compositePixelSha256": "7f321e8ba0377ba7dd33f7a1d6a0e9b088b2c97de966f07ea457670ade0f54f5"
+  },
+  "poses": [
+    {
+      "poseId": "positive",
+      "joints": [
+        {
+          "jointId": "shoulder-left",
+          "partId": "upper-arm-left",
+          "coverPartId": "torso",
+          "overlapPixelCount": 1384,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "elbow-left",
+          "partId": "forearm-left",
+          "coverPartId": "upper-arm-left",
+          "overlapPixelCount": 687,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "wrist-left",
+          "partId": "hand-left",
+          "coverPartId": "forearm-left",
+          "overlapPixelCount": 1136,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "shoulder-right",
+          "partId": "upper-arm-right",
+          "coverPartId": "torso",
+          "overlapPixelCount": 420,
+          "proximalCoverageRatio": 0.960938
+        },
+        {
+          "jointId": "elbow-right",
+          "partId": "forearm-right",
+          "coverPartId": "upper-arm-right",
+          "overlapPixelCount": 939,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "wrist-right",
+          "partId": "hand-right",
+          "coverPartId": "forearm-right",
+          "overlapPixelCount": 1430,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "hip-left",
+          "partId": "thigh-left",
+          "coverPartId": "pelvis",
+          "overlapPixelCount": 4023,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "knee-left",
+          "partId": "shin-left",
+          "coverPartId": "thigh-left",
+          "overlapPixelCount": 1522,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "ankle-left",
+          "partId": "foot-left",
+          "coverPartId": "shin-left",
+          "overlapPixelCount": 1591,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "hip-right",
+          "partId": "thigh-right",
+          "coverPartId": "pelvis",
+          "overlapPixelCount": 4074,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "knee-right",
+          "partId": "shin-right",
+          "coverPartId": "thigh-right",
+          "overlapPixelCount": 484,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "ankle-right",
+          "partId": "foot-right",
+          "coverPartId": "shin-right",
+          "overlapPixelCount": 1436,
+          "proximalCoverageRatio": 1
+        }
+      ],
+      "briefcaseAttachmentError": 0
+    },
+    {
+      "poseId": "negative",
+      "joints": [
+        {
+          "jointId": "shoulder-left",
+          "partId": "upper-arm-left",
+          "coverPartId": "torso",
+          "overlapPixelCount": 1637,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "elbow-left",
+          "partId": "forearm-left",
+          "coverPartId": "upper-arm-left",
+          "overlapPixelCount": 761,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "wrist-left",
+          "partId": "hand-left",
+          "coverPartId": "forearm-left",
+          "overlapPixelCount": 1116,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "shoulder-right",
+          "partId": "upper-arm-right",
+          "coverPartId": "torso",
+          "overlapPixelCount": 240,
+          "proximalCoverageRatio": 0.96875
+        },
+        {
+          "jointId": "elbow-right",
+          "partId": "forearm-right",
+          "coverPartId": "upper-arm-right",
+          "overlapPixelCount": 866,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "wrist-right",
+          "partId": "hand-right",
+          "coverPartId": "forearm-right",
+          "overlapPixelCount": 1438,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "hip-left",
+          "partId": "thigh-left",
+          "coverPartId": "pelvis",
+          "overlapPixelCount": 4263,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "knee-left",
+          "partId": "shin-left",
+          "coverPartId": "thigh-left",
+          "overlapPixelCount": 1767,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "ankle-left",
+          "partId": "foot-left",
+          "coverPartId": "shin-left",
+          "overlapPixelCount": 1625,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "hip-right",
+          "partId": "thigh-right",
+          "coverPartId": "pelvis",
+          "overlapPixelCount": 3965,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "knee-right",
+          "partId": "shin-right",
+          "coverPartId": "thigh-right",
+          "overlapPixelCount": 482,
+          "proximalCoverageRatio": 1
+        },
+        {
+          "jointId": "ankle-right",
+          "partId": "foot-right",
+          "coverPartId": "shin-right",
+          "overlapPixelCount": 1470,
+          "proximalCoverageRatio": 1
+        }
+      ],
+      "briefcaseAttachmentError": 0
+    }
+  ],
+  "diagnostics": []
+}

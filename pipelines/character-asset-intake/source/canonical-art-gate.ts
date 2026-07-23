@@ -23,6 +23,8 @@ export interface CanonicalArtTolerance {
 
 export interface HiddenExtensionDeclaration {
   partId: string;
+  jointId?: string;
+  coverPartId?: string;
   regions: readonly PixelBounds[];
 }
 

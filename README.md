@@ -84,6 +84,10 @@ Rig Animation schema compatibility, stable diagnostics, rest-pose-relative
 sampling, idle data, and Cocos Joint-only playback are documented in
 `docs/rig-animation.md`.
 
+Hidden joint extensions, bidirectional stress validation, neutral pixel-diff
+evidence, and fixed Cocos acceptance scenes are documented in
+`docs/articulation-safety.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -91,3 +95,5 @@ engine-neutral contracts, TASK-002 added safe asset intake, TASK-003 added
 deterministic annotated Rig Layout generation, and TASK-004 added the first
 production Cocos Creator 3.8.8 scene-rig builder. TASK-005 adds the first
 versioned, data-driven Joint animation runtime and subtle Red Cap idle.
+TASK-006 adds articulation-safe overlaps before Walk, Hit, blending, or
+state-machine work.

@@ -2,6 +2,86 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-006 Articulation-Safe Joint Overlaps
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Extend the accepted Red Cap Remade rigid sprites with deterministic,
+neutral-hidden joint overlap art, then prove representative positive and
+negative rotations remain connected before adding broader animation behavior.
+
+### Scope
+
+- Add a versioned articulation-safety specification for both shoulders,
+  elbows, wrists, hips, knees, and ankles.
+- Generate extension pixels deterministically inside declared part-local
+  regions while retaining canonical pixels byte-for-byte.
+- Strengthen the canonical gate so every noncanonical pixel must be declared,
+  neutral-covered, and covered by a strictly higher draw-order part.
+- Add a pure stress-pose renderer and stable diagnostics for transparent gaps,
+  exposed proximal cut edges, invalid draw order, and the right-hand briefcase
+  branch.
+- Produce positive/negative stress PNGs, neutral pixel-diff evidence, and
+  machine-readable reports.
+- Synchronize the engine-neutral fixture into the Cocos AssetDB mirror and add
+  rest, positive-stress, and negative-stress acceptance scenes.
+
+### Out of scope
+
+- Walk, Hit, animation blending, state machines, IK, mesh deformation,
+  retargeting, or changes to the accepted neutral silhouette and visible RGBA
+  pixels.
+
+### Execution
+
+1. Record TASK-006 and its exact invariants before implementation.
+2. Define joint coverage, rotation amplitudes, extension ownership, and
+   covering draw-order relationships as deterministic fixture data.
+3. Generate only neutral-covered extension pixels, preserving all existing
+   canonical pixels, then run the canonical gate.
+4. Render and validate both stress directions, including the complete
+   `upper-arm-right → forearm-right → hand-right → briefcase` branch.
+5. Generate Cocos acceptance scenes from the accepted rig with fixed rest and
+   stress rotations and autoplay disabled.
+6. Add invalid fixtures and synchronization tests, refresh evidence and docs,
+   then run `CI=true pnpm verify`.
+7. Review the complete diff, commit as
+   `feat: add articulation-safe joint overlaps`, and push.
+
+### Done when
+
+- Neutral flat-composite and canonical reference differ by exactly zero pixels.
+- All twelve articulation seams have declared, generated, and fully covered
+  overlap pixels with correct draw order.
+- Both stress directions pass gap, cut-edge, order, and briefcase-branch
+  checks.
+- Cocos rest and stress scenes consume the synchronized extended sprites.
+- Full CI verification passes and no out-of-scope animation feature appears in
+  the diff.
+
+### Result
+
+- Added a versioned articulation-safety fixture covering both shoulders,
+  elbows, wrists, hips, knees, and ankles, with every joint stressed in both
+  rotation directions.
+- Generated 25,331 parent-colored extension pixels into separate generated
+  sources and declared their exact run regions in the canonical provenance
+  input.
+- Preserved the accepted neutral pose with zero visible-pixel differences,
+  zero silhouette mismatch, and zero generated pixels visible at rest.
+- Added pure validation and stable gap, cut-edge, draw-order, specification,
+  and briefcase-branch diagnostics.
+- Both stress renders pass all 12 seams; minimum proximal coverage is
+  `0.960938` and briefcase attachment error is zero.
+- Added deterministic rest, positive-stress, and negative-stress Cocos scenes
+  with updated transforms/sizes and autoplay disabled.
+- Repeated generation is deterministic. `CI=true pnpm verify` passes all 122
+  tests.
+
 ## Completed plan: TASK-005 Data-Driven Rig Animation MVP
 
 - Status: Complete

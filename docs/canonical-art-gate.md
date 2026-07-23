@@ -85,7 +85,7 @@ The reproducible ownership input is
 metadata and the ownership preview are under the fixture's `provenance/`
 directory.
 
-The canonical source is a flattened image. Only pixels visible in its neutral
-pose can be recovered. Occluded anatomy and joint interiors remain absent and
-must not be invented as visible art. Future animation work may add explicitly
-declared hidden extensions only where the neutral pose fully covers them.
+The canonical source is flattened. TASK-006 adds exact declared overlap pixels
+only where a fully opaque, higher draw-order part covers them in the neutral
+pose. Visible declared extension pixels still fail the gate. See
+`docs/articulation-safety.md`.

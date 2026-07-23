@@ -206,7 +206,12 @@ test("every required asset diagnostic has a deterministic invalid fixture", asyn
       code !== AssetDiagnosticCode.PART_PIXEL_PROVENANCE_MISMATCH &&
       code !== AssetDiagnosticCode.FLAT_COMPOSITE_SILHOUETTE_MISMATCH &&
       code !== AssetDiagnosticCode.FLAT_COMPOSITE_PIXEL_DIFF_EXCEEDED &&
-      code !== AssetDiagnosticCode.UNDECLARED_GENERATED_VISIBLE_REGION,
+      code !== AssetDiagnosticCode.UNDECLARED_GENERATED_VISIBLE_REGION &&
+      code !== AssetDiagnosticCode.ARTICULATION_SPEC_INVALID &&
+      code !== AssetDiagnosticCode.ARTICULATION_TRANSPARENT_GAP &&
+      code !== AssetDiagnosticCode.ARTICULATION_EXPOSED_CUT_EDGE &&
+      code !== AssetDiagnosticCode.ARTICULATION_DRAW_ORDER_INVALID &&
+      code !== AssetDiagnosticCode.ARTICULATION_BRIEFCASE_BRANCH_INVALID,
   );
   assert.equal(fixtureFiles.length, fixtureBackedCodes.length);
 

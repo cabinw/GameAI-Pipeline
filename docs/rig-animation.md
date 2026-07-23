@@ -118,9 +118,8 @@ The real Creator acceptance procedure and evidence are recorded in
 
 - One animation plays at a time; there is no blending, state machine, IK,
   retargeting, or walk cycle.
-- The accepted canonical parts are visible-pixel cutouts from a flattened
-  neutral reference. Occluded joint-interior extensions do not yet exist, so
-  the idle amplitude is intentionally very small. This is a non-blocking
-  baseline limitation, not an art recalibration in TASK-005.
+- TASK-006 adds neutral-hidden shoulder, elbow, wrist, hip, knee, and ankle
+  overlaps with fixed bidirectional stress evidence. The TASK-005 idle remains
+  unchanged; Walk, Hit, blending, and state-machine behavior are still absent.
 - Runtime validation assumes Main supplied normalized, already validated data;
   Scene Script does not duplicate JSON-contract parsing.

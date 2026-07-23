@@ -40,6 +40,9 @@ TASK-004.5 replaced all 19 visible sprites with direct canonical cutouts.
 `provenance/canonical-extraction-manifest.json` records exact output hashes.
 The flat canonical gate now passes with zero silhouette and RGBA mismatch.
 
-Because the reference is flattened, these assets contain only neutral-pose
-visible pixels. Occluded joint interiors require a later, explicitly declared
-hidden-extension art task before animation.
+TASK-006 adds deterministic overlap pixels for both shoulders, elbows, wrists,
+hips, knees, and ankles. Canonical cutouts remain under `source-parts/`;
+generated extended sources and stress evidence are under `articulation/`.
+`articulation-safety.json` declares both rotation directions, exact cover
+relationships, and the right-hand briefcase branch. The neutral composite
+retains zero visible-pixel differences from the accepted reference.

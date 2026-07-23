@@ -21,6 +21,12 @@ export const AssetDiagnosticCode = {
     "FLAT_COMPOSITE_PIXEL_DIFF_EXCEEDED",
   UNDECLARED_GENERATED_VISIBLE_REGION:
     "UNDECLARED_GENERATED_VISIBLE_REGION",
+  ARTICULATION_SPEC_INVALID: "ARTICULATION_SPEC_INVALID",
+  ARTICULATION_TRANSPARENT_GAP: "ARTICULATION_TRANSPARENT_GAP",
+  ARTICULATION_EXPOSED_CUT_EDGE: "ARTICULATION_EXPOSED_CUT_EDGE",
+  ARTICULATION_DRAW_ORDER_INVALID: "ARTICULATION_DRAW_ORDER_INVALID",
+  ARTICULATION_BRIEFCASE_BRANCH_INVALID:
+    "ARTICULATION_BRIEFCASE_BRANCH_INVALID",
 } as const;
 
 export type AssetDiagnosticCode =
@@ -34,7 +40,8 @@ export type DiagnosticStage =
   | "contract"
   | "image"
   | "geometry"
-  | "provenance";
+  | "provenance"
+  | "articulation";
 
 export interface CharacterAssetDiagnostic {
   code: CharacterAssetDiagnosticCode;

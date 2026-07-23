@@ -176,10 +176,10 @@
       "partId": "upper-arm-left",
       "file": "parts/upper-arm-left.png",
       "sourceRect": {
-        "x": 219,
-        "y": 155,
-        "width": 79,
-        "height": 168
+        "x": 190,
+        "y": 120,
+        "width": 136,
+        "height": 203
       },
       "trim": {
         "offset": {
@@ -187,8 +187,8 @@
           "y": 0
         },
         "size": {
-          "width": 79,
-          "height": 168
+          "width": 136,
+          "height": 203
         }
       },
       "joint": {
@@ -213,10 +213,10 @@
       "partId": "forearm-left",
       "file": "parts/forearm-left.png",
       "sourceRect": {
-        "x": 258,
-        "y": 282,
-        "width": 61,
-        "height": 160
+        "x": 218,
+        "y": 252,
+        "width": 108,
+        "height": 190
       },
       "trim": {
         "offset": {
@@ -224,8 +224,8 @@
           "y": 0
         },
         "size": {
-          "width": 61,
-          "height": 160
+          "width": 108,
+          "height": 190
         }
       },
       "joint": {
@@ -250,10 +250,10 @@
       "partId": "hand-left",
       "file": "parts/hand-left.png",
       "sourceRect": {
-        "x": 282,
-        "y": 432,
-        "width": 39,
-        "height": 80
+        "x": 228,
+        "y": 368,
+        "width": 98,
+        "height": 144
       },
       "trim": {
         "offset": {
@@ -261,8 +261,8 @@
           "y": 0
         },
         "size": {
-          "width": 39,
-          "height": 80
+          "width": 98,
+          "height": 144
         }
       },
       "joint": {
@@ -277,10 +277,10 @@
       "partId": "upper-arm-right",
       "file": "parts/upper-arm-right.png",
       "sourceRect": {
-        "x": 49,
-        "y": 165,
-        "width": 88,
-        "height": 164
+        "x": 9,
+        "y": 121,
+        "width": 140,
+        "height": 208
       },
       "trim": {
         "offset": {
@@ -288,8 +288,8 @@
           "y": 0
         },
         "size": {
-          "width": 88,
-          "height": 164
+          "width": 140,
+          "height": 208
         }
       },
       "joint": {
@@ -314,10 +314,10 @@
       "partId": "forearm-right",
       "file": "parts/forearm-right.png",
       "sourceRect": {
-        "x": 39,
-        "y": 282,
-        "width": 63,
-        "height": 164
+        "x": 0,
+        "y": 253,
+        "width": 135,
+        "height": 193
       },
       "trim": {
         "offset": {
@@ -325,8 +325,8 @@
           "y": 0
         },
         "size": {
-          "width": 63,
-          "height": 164
+          "width": 135,
+          "height": 193
         }
       },
       "joint": {
@@ -351,10 +351,10 @@
       "partId": "hand-right",
       "file": "parts/hand-right.png",
       "sourceRect": {
-        "x": 43,
-        "y": 436,
-        "width": 58,
-        "height": 88
+        "x": 0,
+        "y": 369,
+        "width": 138,
+        "height": 155
       },
       "trim": {
         "offset": {
@@ -362,8 +362,8 @@
           "y": 0
         },
         "size": {
-          "width": 58,
-          "height": 88
+          "width": 138,
+          "height": 155
         }
       },
       "joint": {
@@ -388,10 +388,10 @@
       "partId": "thigh-left",
       "file": "parts/thigh-left.png",
       "sourceRect": {
-        "x": 169,
-        "y": 430,
-        "width": 94,
-        "height": 191
+        "x": 146,
+        "y": 381,
+        "width": 140,
+        "height": 240
       },
       "trim": {
         "offset": {
@@ -399,8 +399,8 @@
           "y": 0
         },
         "size": {
-          "width": 94,
-          "height": 191
+          "width": 140,
+          "height": 240
         }
       },
       "joint": {
@@ -425,10 +425,10 @@
       "partId": "shin-left",
       "file": "parts/shin-left.png",
       "sourceRect": {
-        "x": 200,
-        "y": 595,
-        "width": 66,
-        "height": 210
+        "x": 149,
+        "y": 550,
+        "width": 140,
+        "height": 255
       },
       "trim": {
         "offset": {
@@ -436,8 +436,8 @@
           "y": 0
         },
         "size": {
-          "width": 66,
-          "height": 210
+          "width": 140,
+          "height": 255
         }
       },
       "joint": {
@@ -462,10 +462,10 @@
       "partId": "foot-left",
       "file": "parts/foot-left.png",
       "sourceRect": {
-        "x": 206,
-        "y": 782,
-        "width": 120,
-        "height": 80
+        "x": 168,
+        "y": 734,
+        "width": 158,
+        "height": 140
       },
       "trim": {
         "offset": {
@@ -473,8 +473,8 @@
           "y": 0
         },
         "size": {
-          "width": 120,
-          "height": 80
+          "width": 158,
+          "height": 140
         }
       },
       "joint": {
@@ -489,10 +489,10 @@
       "partId": "thigh-right",
       "file": "parts/thigh-right.png",
       "sourceRect": {
-        "x": 87,
-        "y": 430,
-        "width": 82,
-        "height": 191
+        "x": 62,
+        "y": 381,
+        "width": 140,
+        "height": 214
       },
       "trim": {
         "offset": {
@@ -500,8 +500,8 @@
           "y": 0
         },
         "size": {
-          "width": 82,
-          "height": 191
+          "width": 140,
+          "height": 214
         }
       },
       "joint": {
@@ -513,8 +513,8 @@
           "attachmentId": "knee-right",
           "childPartId": "shin-right",
           "position": {
-            "x": 124,
-            "y": 620
+            "x": 160,
+            "y": 590
           }
         }
       ],
@@ -527,9 +527,9 @@
       "file": "parts/shin-right.png",
       "sourceRect": {
         "x": 87,
-        "y": 595,
-        "width": 83,
-        "height": 221
+        "y": 520,
+        "width": 143,
+        "height": 296
       },
       "trim": {
         "offset": {
@@ -537,13 +537,13 @@
           "y": 0
         },
         "size": {
-          "width": 83,
-          "height": 221
+          "width": 143,
+          "height": 296
         }
       },
       "joint": {
-        "x": 124,
-        "y": 620
+        "x": 160,
+        "y": 590
       },
       "childAttachments": [
         {
@@ -563,10 +563,10 @@
       "partId": "foot-right",
       "file": "parts/foot-right.png",
       "sourceRect": {
-        "x": 87,
-        "y": 786,
-        "width": 69,
-        "height": 106
+        "x": 49,
+        "y": 745,
+        "width": 140,
+        "height": 147
       },
       "trim": {
         "offset": {
@@ -574,8 +574,8 @@
           "y": 0
         },
         "size": {
-          "width": 69,
-          "height": 106
+          "width": 140,
+          "height": 147
         }
       },
       "joint": {

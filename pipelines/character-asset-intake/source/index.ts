@@ -29,6 +29,15 @@ export {
   type CanonicalArtTolerance,
   type HiddenExtensionDeclaration,
 } from "./canonical-art-gate";
+export {
+  validateArticulationSafety,
+  type ArticulationJointObservation,
+  type ArticulationJointSpecification,
+  type ArticulationPoseObservation,
+  type ArticulationSafetyEvidence,
+  type ArticulationSafetySpecification,
+  type ArticulationStressPose,
+} from "./articulation-safety";
 export type {
   CharacterAssetDocumentIntakeOptions,
   CharacterAssetIntakeOptions,

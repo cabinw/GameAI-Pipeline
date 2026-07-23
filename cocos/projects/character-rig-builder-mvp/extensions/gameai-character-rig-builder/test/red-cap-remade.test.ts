@@ -135,10 +135,19 @@ describe("Red Cap Remade source art", () => {
       correlationId: "task0042-map",
     });
     assert.equal(mapping.parts.length, 19);
+    const sourceMap = JSON.parse(
+      await readFile(resolve(fixtureRoot, "source-asset-map.json"), "utf8"),
+    ) as {
+      parts: Array<{
+        partId: string;
+        sourceFile: string;
+        canonicalSourceFile?: string;
+      }>;
+    };
     assert.deepEqual(
       Object.fromEntries(
-        mapping.parts.map((entry) => [
-          entry.sourceFile.split("/").at(-1),
+        sourceMap.parts.map((entry) => [
+          (entry.canonicalSourceFile ?? entry.sourceFile).split("/").at(-1),
           entry.partId,
         ]),
       ),
@@ -196,6 +205,7 @@ describe("Red Cap Remade source art", () => {
     );
     const documents = [
       "README.md",
+      "articulation-safety.json",
       "character-rig.json",
       "source-asset-map.json",
       "source-annotation.json",
