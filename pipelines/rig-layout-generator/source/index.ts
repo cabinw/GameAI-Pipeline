@@ -5,6 +5,7 @@ export {
   type RigLayoutDiagnosticCode as RigLayoutDiagnosticCodeValue,
 } from "./diagnostics";
 export { generateRigLayout, serializeRigLayout } from "./generator";
+export { renderAssembledPreviewSvg } from "./preview";
 export {
   parseSkeletonTemplate,
   parseSourceCanvasAnnotation,
@@ -18,6 +19,7 @@ export {
 export { maleNormalV1 } from "./template-loader";
 export type {
   AnnotationPartOverrides,
+  ChildAttachment,
   GenerateRigLayoutOptions,
   NormalizedCircleShape,
   NormalizedRectShape,

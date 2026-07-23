@@ -83,8 +83,8 @@
       "additionalProperties": false,
       "required": ["x", "y"],
       "properties": {
-        "x": { "type": "number" },
-        "y": { "type": "number" }
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 }
       }
     },
     "normalizedRect": {
@@ -93,10 +93,10 @@
       "required": ["type", "x", "y", "width", "height"],
       "properties": {
         "type": { "const": "rect" },
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "width": { "type": "number", "exclusiveMinimum": 0 },
-        "height": { "type": "number", "exclusiveMinimum": 0 }
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
       }
     },
     "normalizedCircle": {
@@ -105,9 +105,9 @@
       "required": ["type", "x", "y", "radius"],
       "properties": {
         "type": { "const": "circle" },
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "radius": { "type": "number", "exclusiveMinimum": 0 }
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "radius": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
       }
     }
   }

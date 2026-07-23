@@ -24,12 +24,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.55
+        "y": 0.5
       },
       "restPose": {
         "position": {
           "x": -0.02,
-          "y": -0.505
+          "y": -0.43
         },
         "rotationDegrees": 0,
         "scale": {
@@ -56,12 +56,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.12
+        "y": 0.923077
       },
       "restPose": {
         "position": {
           "x": 0,
-          "y": 2.513
+          "y": 0.35
         },
         "rotationDegrees": 0,
         "scale": {
@@ -88,12 +88,12 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.08
+        "y": 0.961905
       },
       "restPose": {
         "position": {
           "x": 0.05,
-          "y": 2.044
+          "y": 2.28
         },
         "rotationDegrees": 0,
         "scale": {
@@ -119,13 +119,13 @@
         "y": 7
       },
       "anchor": {
-        "x": 0.72,
-        "y": 0.86
+        "x": 0.862069,
+        "y": 0.119048
       },
       "restPose": {
         "position": {
-          "x": -1.206,
-          "y": -1.844
+          "x": -1,
+          "y": 1.8
         },
         "rotationDegrees": -8,
         "scale": {
@@ -151,13 +151,13 @@
         "y": 8
       },
       "anchor": {
-        "x": 0.6,
-        "y": 0.86
+        "x": 0.777778,
+        "y": 0.170732
       },
       "restPose": {
         "position": {
-          "x": -0.634,
-          "y": -1.457
+          "x": -0.6,
+          "y": -1.6
         },
         "rotationDegrees": -4,
         "scale": {
@@ -183,13 +183,13 @@
         "y": 5
       },
       "anchor": {
-        "x": 0.55,
-        "y": 0.86
+        "x": 0.666667,
+        "y": 0.190476
       },
       "restPose": {
         "position": {
-          "x": -0.3825,
-          "y": -0.84
+          "x": -0.5,
+          "y": -1.55
         },
         "rotationDegrees": 2,
         "scale": {
@@ -215,13 +215,13 @@
         "y": 7
       },
       "anchor": {
-        "x": 0.28,
-        "y": 0.86
+        "x": 0.068966,
+        "y": 0.119048
       },
       "restPose": {
         "position": {
-          "x": 1.306,
-          "y": -1.844
+          "x": 1,
+          "y": 1.8
         },
         "rotationDegrees": 8,
         "scale": {
@@ -247,13 +247,13 @@
         "y": 8
       },
       "anchor": {
-        "x": 0.4,
-        "y": 0.86
+        "x": 0.222222,
+        "y": 0.170732
       },
       "restPose": {
         "position": {
-          "x": 0.634,
-          "y": -1.457
+          "x": 0.7,
+          "y": -1.6
         },
         "rotationDegrees": 4,
         "scale": {
@@ -279,13 +279,13 @@
         "y": 5
       },
       "anchor": {
-        "x": 0.45,
-        "y": 0.86
+        "x": 0.333333,
+        "y": 0.190476
       },
       "restPose": {
         "position": {
-          "x": 0.4325,
-          "y": -0.84
+          "x": 0.55,
+          "y": -1.55
         },
         "rotationDegrees": -2,
         "scale": {
@@ -311,13 +311,13 @@
         "y": 6
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.88
+        "x": 0.64,
+        "y": 0.068182
       },
       "restPose": {
         "position": {
-          "x": -0.725,
-          "y": -2.311
+          "x": -0.55,
+          "y": -0.6
         },
         "rotationDegrees": -2,
         "scale": {
@@ -343,13 +343,13 @@
         "y": 6
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.9
+        "x": 0.583333,
+        "y": 0.121951
       },
       "restPose": {
         "position": {
-          "x": -0.125,
-          "y": -1.609
+          "x": -0.2,
+          "y": -1.8
         },
         "rotationDegrees": 1,
         "scale": {
@@ -375,13 +375,13 @@
         "y": 4
       },
       "anchor": {
-        "x": 0.58,
-        "y": 0.72
+        "x": 0.5625,
+        "y": 0.266667
       },
       "restPose": {
         "position": {
-          "x": 0.078,
-          "y": -0.395
+          "x": -0.05,
+          "y": -1.65
         },
         "rotationDegrees": 0,
         "scale": {
@@ -407,13 +407,13 @@
         "y": 6
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.88
+        "x": 0.36,
+        "y": 0.068182
       },
       "restPose": {
         "position": {
-          "x": 0.725,
-          "y": -2.311
+          "x": 0.55,
+          "y": -0.6
         },
         "rotationDegrees": 2,
         "scale": {
@@ -439,13 +439,13 @@
         "y": 6
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.9
+        "x": 0.416667,
+        "y": 0.121951
       },
       "restPose": {
         "position": {
-          "x": 0.125,
-          "y": -1.609
+          "x": 0.2,
+          "y": -1.8
         },
         "rotationDegrees": -1,
         "scale": {
@@ -471,13 +471,13 @@
         "y": 4
       },
       "anchor": {
-        "x": 0.42,
-        "y": 0.72
+        "x": 0.40625,
+        "y": 0.266667
       },
       "restPose": {
         "position": {
-          "x": -0.028,
-          "y": -0.395
+          "x": 0.05,
+          "y": -1.65
         },
         "rotationDegrees": 0,
         "scale": {
@@ -504,12 +504,12 @@
       },
       "anchor": {
         "x": 0.82,
-        "y": 0.82
+        "y": 0.121951
       },
       "restPose": {
         "position": {
-          "x": 0.0725,
-          "y": -1.328
+          "x": -0.05,
+          "y": -0.6
         },
         "rotationDegrees": 0,
         "scale": {
@@ -535,13 +535,13 @@
         "y": 4
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.2
+        "x": 0.487179,
+        "y": 0.714286
       },
       "restPose": {
         "position": {
-          "x": 0.025,
-          "y": 0.508
+          "x": 0,
+          "y": 1.82
         },
         "rotationDegrees": -2,
         "scale": {
@@ -573,7 +573,7 @@
       "restPose": {
         "position": {
           "x": 0.025,
-          "y": -0.707
+          "y": 1.145
         },
         "rotationDegrees": -1,
         "scale": {
@@ -590,8 +590,8 @@
       "socketId": "left-grip",
       "parentPartId": "hand-left",
       "position": {
-        "x": -0.0525,
-        "y": 0.378
+        "x": -0.175,
+        "y": -0.325
       },
       "rotationDegrees": 0
     },
@@ -599,8 +599,8 @@
       "socketId": "right-grip",
       "parentPartId": "hand-right",
       "position": {
-        "x": 0.0525,
-        "y": 0.378
+        "x": 0.175,
+        "y": -0.325
       },
       "rotationDegrees": 0
     },
@@ -609,7 +609,7 @@
       "parentPartId": "head",
       "position": {
         "x": 0,
-        "y": 0.168
+        "y": 2.02
       },
       "rotationDegrees": 0
     }
@@ -621,7 +621,7 @@
       "shape": {
         "type": "rect",
         "x": -0.805,
-        "y": -2.028,
+        "y": 0.06,
         "width": 1.61,
         "height": 2.08
       }
@@ -632,7 +632,7 @@
       "shape": {
         "type": "circle",
         "x": 0,
-        "y": -0.777,
+        "y": 1.075,
         "radius": 0.68
       }
     }

@@ -32,10 +32,19 @@ export interface AnnotationPartOverrides {
   opacity?: number;
 }
 
+export interface ChildAttachment {
+  attachmentId: string;
+  childPartId: string;
+  position: Point;
+}
+
 interface AnnotationPartBase {
   partId: string;
   file: string;
+  /** Proximal animation pivot used to attach this part to its parent. */
   joint: Point;
+  /** Named distal attachment points owned by this part, in source-canvas coordinates. */
+  childAttachments?: ChildAttachment[];
   visualCenter?: Point;
   overrides?: AnnotationPartOverrides;
 }

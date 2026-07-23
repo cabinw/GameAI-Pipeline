@@ -27,7 +27,8 @@ import type {
   TrimMetadata,
 } from "./types";
 
-const SUPPORTED_SCHEMA_RANGE = ">=1.0.0 <1.1.0";
+const SUPPORTED_ANNOTATION_SCHEMA_RANGE = ">=1.0.0 <1.2.0";
+const SUPPORTED_TEMPLATE_SCHEMA_RANGE = ">=1.0.0 <1.1.0";
 const VERSION_PATTERN = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
 
 function round(value: number): number {
@@ -55,9 +56,19 @@ function diagnostic(
   };
 }
 
-function isSupportedVersion(version: string): boolean {
+function supportedMinor(version: string, maximumMinor: number): boolean {
   const match = VERSION_PATTERN.exec(version);
-  return match !== null && Number(match[1]) === 1 && Number(match[2]) === 0;
+  return (
+    match !== null &&
+    Number(match[1]) === 1 &&
+    Number(match[2]) >= 0 &&
+    Number(match[2]) <= maximumMinor
+  );
+}
+
+function annotationUsesExplicitAttachments(version: string): boolean {
+  const match = VERSION_PATTERN.exec(version);
+  return match !== null && Number(match[1]) === 1 && Number(match[2]) >= 1;
 }
 
 function sourceRect(part: SourceAnnotationPart): SourceRect {
@@ -101,6 +112,14 @@ function rectanglesOverlap(left: SourceRect, right: SourceRect): boolean {
     Math.max(left.x, right.x) < Math.min(left.x + left.width, right.x + right.width) &&
     Math.max(left.y, right.y) < Math.min(left.y + left.height, right.y + right.height)
   );
+}
+
+function normalizedPointIsValid(point: Point): boolean {
+  return point.x >= 0 && point.x <= 1 && point.y >= 0 && point.y <= 1;
+}
+
+function pointsEqual(left: Point, right: Point): boolean {
+  return Math.abs(left.x - right.x) <= 1e-6 && Math.abs(left.y - right.y) <= 1e-6;
 }
 
 function templateHierarchyDiagnostics(template: SkeletonTemplate): RigLayoutDiagnostic[] {
@@ -167,6 +186,15 @@ function templateHierarchyDiagnostics(template: SkeletonTemplate): RigLayoutDiag
         ),
       );
     }
+    if (!normalizedPointIsValid(socket.normalizedPosition)) {
+      diagnostics.push(
+        diagnostic(
+          RigLayoutDiagnosticCode.INVALID_NORMALIZED_TEMPLATE_GEOMETRY,
+          `/sockets/${index}/normalizedPosition`,
+          `Template socket ${socket.socketId} must remain within normalized part bounds.`,
+        ),
+      );
+    }
   }
   for (const [index, hitArea] of (template.hitAreas ?? []).entries()) {
     if (!partById.has(hitArea.parentPartId)) {
@@ -175,6 +203,28 @@ function templateHierarchyDiagnostics(template: SkeletonTemplate): RigLayoutDiag
           RigLayoutDiagnosticCode.TEMPLATE_HIERARCHY_ERROR,
           `/hitAreas/${index}/parentPartId`,
           `Template hit area ${hitArea.hitAreaId} references unknown part ${hitArea.parentPartId}.`,
+        ),
+      );
+    }
+    const shape = hitArea.normalizedShape;
+    const valid =
+      normalizedPointIsValid(shape) &&
+      (shape.type === "circle"
+        ? shape.radius > 0 &&
+          shape.x - shape.radius >= 0 &&
+          shape.y - shape.radius >= 0 &&
+          shape.x + shape.radius <= 1 &&
+          shape.y + shape.radius <= 1
+        : shape.width > 0 &&
+          shape.height > 0 &&
+          shape.x + shape.width <= 1 &&
+          shape.y + shape.height <= 1);
+    if (!valid) {
+      diagnostics.push(
+        diagnostic(
+          RigLayoutDiagnosticCode.INVALID_NORMALIZED_TEMPLATE_GEOMETRY,
+          `/hitAreas/${index}/normalizedShape`,
+          `Template hit area ${hitArea.hitAreaId} must remain entirely within normalized part bounds.`,
         ),
       );
     }
@@ -221,27 +271,41 @@ function inputDiagnostics(
   template: SkeletonTemplate,
 ): RigLayoutDiagnostic[] {
   const diagnostics: RigLayoutDiagnostic[] = [];
-  if (!isSupportedVersion(annotation.schemaVersion)) {
+  if (!supportedMinor(annotation.schemaVersion, 1)) {
     diagnostics.push(
       diagnostic(
         RigLayoutDiagnosticCode.UNSUPPORTED_GENERATOR_SCHEMA_VERSION,
         "/annotation/schemaVersion",
-        `Annotation schema version ${annotation.schemaVersion} is unsupported; supported range is ${SUPPORTED_SCHEMA_RANGE}.`,
+        `Annotation schema version ${annotation.schemaVersion} is unsupported; supported range is ${SUPPORTED_ANNOTATION_SCHEMA_RANGE}.`,
       ),
     );
   }
-  if (!isSupportedVersion(template.schemaVersion)) {
+  if (!supportedMinor(template.schemaVersion, 0)) {
     diagnostics.push(
       diagnostic(
         RigLayoutDiagnosticCode.UNSUPPORTED_GENERATOR_SCHEMA_VERSION,
         "/template/schemaVersion",
-        `Template schema version ${template.schemaVersion} is unsupported; supported range is ${SUPPORTED_SCHEMA_RANGE}.`,
+        `Template schema version ${template.schemaVersion} is unsupported; supported range is ${SUPPORTED_TEMPLATE_SCHEMA_RANGE}.`,
       ),
     );
   }
   diagnostics.push(...templateHierarchyDiagnostics(template));
 
-  const annotationById = new Map(annotation.parts.map((part) => [part.partId, part]));
+  const annotationById = new Map<string, SourceAnnotationPart>();
+  for (const [index, part] of annotation.parts.entries()) {
+    if (annotationById.has(part.partId)) {
+      diagnostics.push(
+        diagnostic(
+          RigLayoutDiagnosticCode.DUPLICATE_ANNOTATION_PART_ID,
+          `/annotation/parts/${index}/partId`,
+          `Annotation part ${part.partId} is duplicated.`,
+          { partId: part.partId },
+        ),
+      );
+    } else {
+      annotationById.set(part.partId, part);
+    }
+  }
   const templateById = new Map(template.parts.map((part) => [part.partId, part]));
   const referencedTemplateParts = new Set([
     ...(template.sockets ?? []).map((socket) => socket.parentPartId),
@@ -294,6 +358,60 @@ function inputDiagnostics(
 
     const original = sourceRect(part);
     const trim = trimMetadata(part);
+    const attachmentIds = new Set<string>();
+    const attachmentChildren = new Set<string>();
+    for (const [attachmentIndex, attachment] of (part.childAttachments ?? []).entries()) {
+      const attachmentPath = `/annotation/parts/${index}/childAttachments/${attachmentIndex}`;
+      const child = annotationById.get(attachment.childPartId);
+      const childTemplate = templateById.get(attachment.childPartId);
+      const childParentId =
+        child === undefined ? undefined : resolvedParentId(child, childTemplate);
+      if (
+        attachmentIds.has(attachment.attachmentId) ||
+        attachmentChildren.has(attachment.childPartId)
+      ) {
+        diagnostics.push(
+          diagnostic(
+            RigLayoutDiagnosticCode.INVALID_CHILD_ATTACHMENT,
+            attachmentPath,
+            `Part ${part.partId} has a duplicate attachment id or child reference.`,
+            { partId: part.partId },
+          ),
+        );
+      }
+      attachmentIds.add(attachment.attachmentId);
+      attachmentChildren.add(attachment.childPartId);
+      if (
+        child === undefined ||
+        childParentId !== part.partId ||
+        !pointInsideRect(attachment.position, original) ||
+        attachment.position.x < 0 ||
+        attachment.position.y < 0 ||
+        attachment.position.x > annotation.sourceCanvas.width ||
+        attachment.position.y > annotation.sourceCanvas.height
+      ) {
+        diagnostics.push(
+          diagnostic(
+            RigLayoutDiagnosticCode.INVALID_CHILD_ATTACHMENT,
+            attachmentPath,
+            `Attachment ${attachment.attachmentId} must reference a direct child and lie within the parent part rectangle.`,
+            { partId: part.partId, details: { childPartId: attachment.childPartId } },
+          ),
+        );
+      } else if (!pointsEqual(attachment.position, child.joint)) {
+        diagnostics.push(
+          diagnostic(
+            RigLayoutDiagnosticCode.CHILD_ATTACHMENT_MISMATCH,
+            `${attachmentPath}/position`,
+            `Attachment ${attachment.attachmentId} does not coincide with child ${child.partId}'s proximal joint.`,
+            {
+              partId: part.partId,
+              details: { childPartId: child.partId, attachment: attachment.position, joint: child.joint },
+            },
+          ),
+        );
+      }
+    }
     if (
       part.joint.x < 0 ||
       part.joint.y < 0 ||
@@ -351,6 +469,21 @@ function inputDiagnostics(
           { partId: part.partId, details: { parentId } },
         ),
       );
+    } else if (parentId !== null && parentId !== undefined) {
+      const parent = annotationById.get(parentId);
+      const attachment = parent?.childAttachments?.find(
+        (candidate) => candidate.childPartId === part.partId,
+      );
+      if (attachment === undefined && annotationUsesExplicitAttachments(annotation.schemaVersion)) {
+        diagnostics.push(
+          diagnostic(
+            RigLayoutDiagnosticCode.CHILD_ATTACHMENT_MISSING,
+            `/annotation/parts/${index}/joint`,
+            `Parent ${parentId} has no named child attachment for ${part.partId}.`,
+            { partId: part.partId, details: { parentId } },
+          ),
+        );
+      }
     }
   }
 
@@ -390,9 +523,12 @@ function deriveRestPosition(
     x: annotation.sourceCanvas.width / 2,
     y: annotation.sourceCanvas.height / 2,
   };
+  const sourcePosition =
+    parent?.childAttachments?.find((attachment) => attachment.childPartId === part.partId)
+      ?.position ?? part.joint;
   return {
-    x: round((part.joint.x - origin.x) * referenceScale),
-    y: round((origin.y - part.joint.y) * referenceScale),
+    x: round((sourcePosition.x - origin.x) * referenceScale),
+    y: round((origin.y - sourcePosition.y) * referenceScale),
   };
 }
 

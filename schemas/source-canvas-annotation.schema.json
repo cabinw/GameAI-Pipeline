@@ -61,6 +61,16 @@
         "size": { "$ref": "#/definitions/size" }
       }
     },
+    "childAttachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attachmentId", "childPartId", "position"],
+      "properties": {
+        "attachmentId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "childPartId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "position": { "$ref": "#/definitions/vector" }
+      }
+    },
     "partOverrides": {
       "type": "object",
       "additionalProperties": false,
@@ -95,6 +105,10 @@
         "trimmedRect": { "$ref": "#/definitions/rect" },
         "trim": { "$ref": "#/definitions/trim" },
         "joint": { "$ref": "#/definitions/vector" },
+        "childAttachments": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/childAttachment" }
+        },
         "visualCenter": { "$ref": "#/definitions/vector" },
         "overrides": { "$ref": "#/definitions/partOverrides" }
       },

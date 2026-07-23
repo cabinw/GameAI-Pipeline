@@ -6,6 +6,7 @@
 import {
   generateRigLayout,
   maleNormalV1,
+  renderAssembledPreviewSvg,
   serializeRigLayout,
 } from "@gameai/rig-layout-generator";
 
@@ -18,6 +19,7 @@ const result = await generateRigLayout({
 
 if (result.ok) {
   const json = serializeRigLayout(result.rigLayout);
+  const preview = renderAssembledPreviewSvg(annotation, result.rigLayout);
   console.log(result.manifest.parts, json);
 } else {
   console.error(result.diagnostics);

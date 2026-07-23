@@ -2,6 +2,63 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-003.1 Rig Semantics and Red Cap Calibration
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Correct Rig Layout semantics so every part pivot is its proximal attachment joint, explicitly represent parent-owned child attachment points, and recalibrate the Red Cap Target into an animation-ready golden fixture with a deterministic assembled preview.
+
+### Scope
+
+- Define `joint` as the part's proximal pivot and add named `childAttachments` as distinct parent-owned source-canvas points.
+- Require each non-root part's proximal joint to coincide with its parent's attachment for that child without treating the two records as the same semantic field.
+- Recalibrate Red Cap waist, neck, shoulder, elbow, wrist, hip, knee, and ankle pivots.
+- Reject duplicate annotation `partId` values deterministically.
+- Constrain normalized sockets, rectangle hit areas, and circle hit areas to the normalized part bounds.
+- Regenerate the Red Cap golden Rig Layout and a deterministic assembled SVG acceptance preview.
+- Update ADR-0006, schemas, public types, diagnostics, docs, and tests.
+
+### Out of scope
+
+- Production Cocos Scene, Node, or Prefab generation.
+- Computer-vision joint detection or image segmentation.
+- Animation playback or automatic animation generation.
+- Source-art mutation or repair.
+
+### Execution
+
+1. Record TASK-003.1 and this active plan before implementation.
+2. Add explicit named child-attachment data and semantic validation.
+3. Add duplicate part-ID and normalized template-geometry validation.
+4. Recalibrate Red Cap proximal pivots and parent-owned attachment points.
+5. Regenerate the golden layout and assembled preview acceptance artifact.
+6. Add exact shoulder, elbow, hip, knee, duplicate-ID, and normalized-geometry tests.
+7. Update architecture and user documentation.
+8. Run `pnpm verify`, review the diff, and commit the completed task.
+
+### Done when
+
+- Every Red Cap limb anchor is at the documented proximal joint.
+- Parent child-attachment records are explicit and match, but do not replace, child proximal pivots.
+- Duplicate annotation part IDs and invalid normalized template geometry fail deterministically.
+- The generated golden layout and assembled SVG preview are byte-stable.
+- `pnpm verify` passes and no production Cocos Scene Builder code exists.
+
+### Result
+
+- Made each annotation `joint` a proximal animation pivot and added distinct named parent-owned `childAttachments`.
+- Added Source Annotation 1.1 explicit-attachment semantics with a tested 1.0 compatibility fallback.
+- Recalibrated Red Cap waist, neck, shoulder, elbow, wrist, hip, knee, and ankle pivots and regenerated the Rig Layout golden.
+- Added deterministic diagnostics and tests for duplicate annotation IDs, child-attachment correspondence, and bounded normalized socket/hit-area geometry.
+- Added a byte-stable assembled SVG acceptance preview and changed fixture generation to preserve the authored annotation.
+- Updated ADR-0006, schemas, public types, schema compatibility docs, package docs, and generator documentation.
+- `CI=true pnpm verify` passes with 63 tests.
+- No production Cocos Scene Builder behavior was introduced.
+
 ## Completed plan: TASK-003 Rig Layout Generator
 
 - Status: Complete

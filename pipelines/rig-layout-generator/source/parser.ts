@@ -67,5 +67,21 @@ export function parseSourceCanvasAnnotation(
 export function parseSkeletonTemplate(
   value: unknown,
 ): ParseGeneratorContractResult<SkeletonTemplate> {
-  return parseContract(value, validateTemplate, RigLayoutDiagnosticCode.TEMPLATE_SCHEMA_INVALID);
+  const result = parseContract(
+    value,
+    validateTemplate,
+    RigLayoutDiagnosticCode.TEMPLATE_SCHEMA_INVALID,
+  );
+  if (result.ok) {
+    return result;
+  }
+  return {
+    ok: false,
+    diagnostics: result.diagnostics.map((item) =>
+      item.path.includes("/normalizedPosition") ||
+      item.path.includes("/normalizedShape")
+        ? { ...item, code: RigLayoutDiagnosticCode.INVALID_NORMALIZED_TEMPLATE_GEOMETRY }
+        : item,
+    ),
+  };
 }

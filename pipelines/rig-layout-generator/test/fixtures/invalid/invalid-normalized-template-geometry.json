@@ -1,0 +1,4 @@
+{
+  "expectedCode": "INVALID_NORMALIZED_TEMPLATE_GEOMETRY",
+  "action": "overflow-normalized-hit-area"
+}

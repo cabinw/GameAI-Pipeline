@@ -4,13 +4,19 @@ Durable GameAI input contracts use a required `schemaVersion` field with strict 
 
 ## Current support
 
-The TASK-001 Character Contract validator and TASK-003 Source Canvas Annotation/Skeleton Template validators implement:
+The TASK-001 Character Contract validator and TASK-003 Skeleton Template validator implement:
 
 ```text
 >=1.0.0 <1.1.0
 ```
 
-All `1.0.x` documents inside each family share the same machine-readable shape and semantics. A syntactically valid version outside this range produces the family-specific unsupported-version diagnostic before cross-document or generation validation.
+Source Canvas Annotation implements:
+
+```text
+>=1.0.0 <1.2.0
+```
+
+Its `1.1.x` minor adds explicit parent-owned `childAttachments`; `1.0.x` remains readable through the documented implicit child-joint fallback. New annotations use `1.1.0`. Within each implemented minor, all patch versions share the same machine-readable shape and semantics. A syntactically valid version outside a family's range produces the family-specific unsupported-version diagnostic before cross-document or generation validation.
 
 ## Version meaning
 

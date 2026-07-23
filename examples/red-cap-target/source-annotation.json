@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "annotationId": "red-cap-target-source-v1",
   "characterId": "red-cap-target",
   "layoutId": "red-cap-target-generated-rig",
@@ -29,8 +29,34 @@
       },
       "joint": {
         "x": 510,
-        "y": 562.5
+        "y": 555
       },
+      "childAttachments": [
+        {
+          "attachmentId": "waist",
+          "childPartId": "torso",
+          "position": {
+            "x": 510,
+            "y": 520
+          }
+        },
+        {
+          "attachmentId": "hip-left",
+          "childPartId": "thigh-left",
+          "position": {
+            "x": 455,
+            "y": 615
+          }
+        },
+        {
+          "attachmentId": "hip-right",
+          "childPartId": "thigh-right",
+          "position": {
+            "x": 565,
+            "y": 615
+          }
+        }
+      ],
       "visualCenter": {
         "x": 516,
         "y": 559
@@ -61,8 +87,34 @@
       },
       "joint": {
         "x": 510,
-        "y": 311.2
+        "y": 520
       },
+      "childAttachments": [
+        {
+          "attachmentId": "neck",
+          "childPartId": "head",
+          "position": {
+            "x": 515,
+            "y": 292
+          }
+        },
+        {
+          "attachmentId": "shoulder-left",
+          "childPartId": "upper-arm-left",
+          "position": {
+            "x": 410,
+            "y": 340
+          }
+        },
+        {
+          "attachmentId": "shoulder-right",
+          "childPartId": "upper-arm-right",
+          "position": {
+            "x": 610,
+            "y": 340
+          }
+        }
+      ],
       "visualCenter": {
         "x": 517,
         "y": 415
@@ -93,8 +145,26 @@
       },
       "joint": {
         "x": 515,
-        "y": 106.8
+        "y": 292
       },
+      "childAttachments": [
+        {
+          "attachmentId": "cap-mount",
+          "childPartId": "cap",
+          "position": {
+            "x": 515,
+            "y": 110
+          }
+        },
+        {
+          "attachmentId": "eyewear-mount",
+          "childPartId": "sunglasses",
+          "position": {
+            "x": 517.5,
+            "y": 177.5
+          }
+        }
+      ],
       "visualCenter": {
         "x": 519,
         "y": 198
@@ -124,8 +194,8 @@
         "height": 101
       },
       "joint": {
-        "x": 517.5,
-        "y": 56
+        "x": 515,
+        "y": 110
       },
       "visualCenter": {
         "x": 520,
@@ -192,9 +262,19 @@
         "height": 203
       },
       "joint": {
-        "x": 389.4,
-        "y": 495.6
+        "x": 410,
+        "y": 340
       },
+      "childAttachments": [
+        {
+          "attachmentId": "elbow-left",
+          "childPartId": "forearm-left",
+          "position": {
+            "x": 350,
+            "y": 500
+          }
+        }
+      ],
       "visualCenter": {
         "x": 362.5,
         "y": 423.5
@@ -224,9 +304,19 @@
         "height": 197
       },
       "joint": {
-        "x": 326,
-        "y": 641.3
+        "x": 350,
+        "y": 500
       },
+      "childAttachments": [
+        {
+          "attachmentId": "wrist-left",
+          "childPartId": "hand-left",
+          "position": {
+            "x": 300,
+            "y": 655
+          }
+        }
+      ],
       "visualCenter": {
         "x": 317,
         "y": 571.5
@@ -256,9 +346,19 @@
         "height": 100
       },
       "joint": {
-        "x": 287.75,
-        "y": 725.3
+        "x": 300,
+        "y": 655
       },
+      "childAttachments": [
+        {
+          "attachmentId": "left-grip",
+          "childPartId": "briefcase",
+          "position": {
+            "x": 295,
+            "y": 715
+          }
+        }
+      ],
       "visualCenter": {
         "x": 285.5,
         "y": 690
@@ -289,7 +389,7 @@
       },
       "joint": {
         "x": 295,
-        "y": 858.1
+        "y": 715
       },
       "visualCenter": {
         "x": 221,
@@ -322,9 +422,19 @@
         "height": 203
       },
       "joint": {
-        "x": 640.6,
-        "y": 495.6
+        "x": 610,
+        "y": 340
       },
+      "childAttachments": [
+        {
+          "attachmentId": "elbow-right",
+          "childPartId": "forearm-right",
+          "position": {
+            "x": 680,
+            "y": 500
+          }
+        }
+      ],
       "visualCenter": {
         "x": 677.5,
         "y": 423.5
@@ -354,9 +464,19 @@
         "height": 197
       },
       "joint": {
-        "x": 704,
-        "y": 641.3
+        "x": 680,
+        "y": 500
       },
+      "childAttachments": [
+        {
+          "attachmentId": "wrist-right",
+          "childPartId": "hand-right",
+          "position": {
+            "x": 735,
+            "y": 655
+          }
+        }
+      ],
       "visualCenter": {
         "x": 722,
         "y": 571.5
@@ -386,8 +506,8 @@
         "height": 100
       },
       "joint": {
-        "x": 747.25,
-        "y": 725.3
+        "x": 735,
+        "y": 655
       },
       "visualCenter": {
         "x": 755.5,
@@ -418,9 +538,19 @@
         "height": 214
       },
       "joint": {
-        "x": 437.5,
-        "y": 793.6
+        "x": 455,
+        "y": 615
       },
+      "childAttachments": [
+        {
+          "attachmentId": "knee-left",
+          "childPartId": "shin-left",
+          "position": {
+            "x": 435,
+            "y": 795
+          }
+        }
+      ],
       "visualCenter": {
         "x": 441.5,
         "y": 713
@@ -450,9 +580,19 @@
         "height": 199
       },
       "joint": {
-        "x": 425,
-        "y": 954.5
+        "x": 435,
+        "y": 795
       },
+      "childAttachments": [
+        {
+          "attachmentId": "ankle-left",
+          "childPartId": "foot-left",
+          "position": {
+            "x": 430,
+            "y": 960
+          }
+        }
+      ],
       "visualCenter": {
         "x": 428.5,
         "y": 875.5
@@ -482,8 +622,8 @@
         "height": 71
       },
       "joint": {
-        "x": 432.8,
-        "y": 994
+        "x": 430,
+        "y": 960
       },
       "visualCenter": {
         "x": 422.5,
@@ -514,9 +654,19 @@
         "height": 214
       },
       "joint": {
-        "x": 582.5,
-        "y": 793.6
+        "x": 565,
+        "y": 615
       },
+      "childAttachments": [
+        {
+          "attachmentId": "knee-right",
+          "childPartId": "shin-right",
+          "position": {
+            "x": 585,
+            "y": 795
+          }
+        }
+      ],
       "visualCenter": {
         "x": 586.5,
         "y": 713
@@ -546,9 +696,19 @@
         "height": 199
       },
       "joint": {
-        "x": 595,
-        "y": 954.5
+        "x": 585,
+        "y": 795
       },
+      "childAttachments": [
+        {
+          "attachmentId": "ankle-right",
+          "childPartId": "foot-right",
+          "position": {
+            "x": 590,
+            "y": 960
+          }
+        }
+      ],
       "visualCenter": {
         "x": 598.5,
         "y": 875.5
@@ -578,8 +738,8 @@
         "height": 71
       },
       "joint": {
-        "x": 592.2,
-        "y": 994
+        "x": 590,
+        "y": 960
       },
       "visualCenter": {
         "x": 607.5,
