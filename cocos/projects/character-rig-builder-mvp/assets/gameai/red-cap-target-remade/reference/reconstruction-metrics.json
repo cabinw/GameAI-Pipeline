@@ -5,5 +5,5 @@
   },
   "reference": "full_character.png",
   "reconstruction": "reconstructed-neutral.png",
-  "alphaSilhouetteIoU": 0.800928
+  "alphaSilhouetteIoU": 1
 }

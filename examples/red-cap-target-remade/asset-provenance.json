@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "canonicalReference": "reference/full_character.png",
+  "drawOrder": [
+    "hand-left",
+    "forearm-left",
+    "upper-arm-left",
+    "briefcase",
+    "hand-right",
+    "forearm-right",
+    "upper-arm-right",
+    "foot-left",
+    "shin-left",
+    "thigh-left",
+    "foot-right",
+    "shin-right",
+    "thigh-right",
+    "pelvis",
+    "torso",
+    "head",
+    "hair",
+    "cap",
+    "sunglasses"
+  ],
+  "hiddenExtensions": [],
+  "tolerance": {
+    "maxChannelDelta": 2,
+    "maxVisiblePixelMismatchRatio": 0.001,
+    "maxSilhouetteMismatchRatio": 0,
+    "minExactCanonicalPixelRatio": 0.999
+  }
+}

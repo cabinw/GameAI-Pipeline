@@ -2,24 +2,214 @@
   "mappingVersion": "1.0.0",
   "assetDirectory": "parts",
   "parts": [
-    { "sourceFile": "source-parts/briefcase.png", "importFile": "parts/briefcase.png", "partId": "briefcase", "cropRect": { "x": 0, "y": 0, "width": 150, "height": 133 } },
-    { "sourceFile": "source-parts/cap.png", "importFile": "parts/cap.png", "partId": "cap", "cropRect": { "x": 0, "y": 0, "width": 126, "height": 76 } },
-    { "sourceFile": "source-parts/foot_l.png", "importFile": "parts/foot-left.png", "partId": "foot-left", "cropRect": { "x": 0, "y": 0, "width": 69, "height": 62 } },
-    { "sourceFile": "source-parts/foot_r.png", "importFile": "parts/foot-right.png", "partId": "foot-right", "cropRect": { "x": 0, "y": 0, "width": 60, "height": 59 } },
-    { "sourceFile": "source-parts/forearm_l.png", "importFile": "parts/forearm-left.png", "partId": "forearm-left", "cropRect": { "x": 0, "y": 0, "width": 55, "height": 147 } },
-    { "sourceFile": "source-parts/forearm_r.png", "importFile": "parts/forearm-right.png", "partId": "forearm-right", "cropRect": { "x": 0, "y": 0, "width": 87, "height": 134 } },
-    { "sourceFile": "source-parts/glasses.png", "importFile": "parts/sunglasses.png", "partId": "sunglasses", "cropRect": { "x": 0, "y": 0, "width": 103, "height": 30 } },
-    { "sourceFile": "source-parts/hair.png", "importFile": "parts/hair.png", "partId": "hair", "cropRect": { "x": 0, "y": 0, "width": 128, "height": 106 } },
-    { "sourceFile": "source-parts/hand_l.png", "importFile": "parts/hand-left.png", "partId": "hand-left", "cropRect": { "x": 0, "y": 0, "width": 51, "height": 107 } },
-    { "sourceFile": "source-parts/hand_r.png", "importFile": "parts/hand-right.png", "partId": "hand-right", "cropRect": { "x": 0, "y": 0, "width": 65, "height": 111 } },
-    { "sourceFile": "source-parts/head.png", "importFile": "parts/head.png", "partId": "head", "cropRect": { "x": 0, "y": 0, "width": 126, "height": 155 } },
-    { "sourceFile": "source-parts/pelvis.png", "importFile": "parts/pelvis.png", "partId": "pelvis", "cropRect": { "x": 0, "y": 0, "width": 141, "height": 98 } },
-    { "sourceFile": "source-parts/shin_l.png", "importFile": "parts/shin-left.png", "partId": "shin-left", "cropRect": { "x": 0, "y": 0, "width": 54, "height": 131 } },
-    { "sourceFile": "source-parts/shin_r.png", "importFile": "parts/shin-right.png", "partId": "shin-right", "cropRect": { "x": 0, "y": 0, "width": 51, "height": 120 } },
-    { "sourceFile": "source-parts/thigh_l.png", "importFile": "parts/thigh-left.png", "partId": "thigh-left", "cropRect": { "x": 0, "y": 0, "width": 64, "height": 145 } },
-    { "sourceFile": "source-parts/thigh_r.png", "importFile": "parts/thigh-right.png", "partId": "thigh-right", "cropRect": { "x": 0, "y": 0, "width": 53, "height": 139 } },
-    { "sourceFile": "source-parts/torso.png", "importFile": "parts/torso.png", "partId": "torso", "cropRect": { "x": 0, "y": 0, "width": 208, "height": 179 } },
-    { "sourceFile": "source-parts/upper_arm_l.png", "importFile": "parts/upper-arm-left.png", "partId": "upper-arm-left", "cropRect": { "x": 0, "y": 0, "width": 67, "height": 173 } },
-    { "sourceFile": "source-parts/upper_arm_r.png", "importFile": "parts/upper-arm-right.png", "partId": "upper-arm-right", "cropRect": { "x": 0, "y": 0, "width": 95, "height": 146 } }
+    {
+      "sourceFile": "source-parts/briefcase.png",
+      "importFile": "parts/briefcase.png",
+      "partId": "briefcase",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 151,
+        "height": 201
+      }
+    },
+    {
+      "sourceFile": "source-parts/cap.png",
+      "importFile": "parts/cap.png",
+      "partId": "cap",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 118,
+        "height": 77
+      }
+    },
+    {
+      "sourceFile": "source-parts/foot_l.png",
+      "importFile": "parts/foot-left.png",
+      "partId": "foot-left",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 120,
+        "height": 80
+      }
+    },
+    {
+      "sourceFile": "source-parts/foot_r.png",
+      "importFile": "parts/foot-right.png",
+      "partId": "foot-right",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 69,
+        "height": 106
+      }
+    },
+    {
+      "sourceFile": "source-parts/forearm_l.png",
+      "importFile": "parts/forearm-left.png",
+      "partId": "forearm-left",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 61,
+        "height": 160
+      }
+    },
+    {
+      "sourceFile": "source-parts/forearm_r.png",
+      "importFile": "parts/forearm-right.png",
+      "partId": "forearm-right",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 63,
+        "height": 164
+      }
+    },
+    {
+      "sourceFile": "source-parts/glasses.png",
+      "importFile": "parts/sunglasses.png",
+      "partId": "sunglasses",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 94,
+        "height": 33
+      }
+    },
+    {
+      "sourceFile": "source-parts/hair.png",
+      "importFile": "parts/hair.png",
+      "partId": "hair",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 84,
+        "height": 61
+      }
+    },
+    {
+      "sourceFile": "source-parts/hand_l.png",
+      "importFile": "parts/hand-left.png",
+      "partId": "hand-left",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 39,
+        "height": 80
+      }
+    },
+    {
+      "sourceFile": "source-parts/hand_r.png",
+      "importFile": "parts/hand-right.png",
+      "partId": "hand-right",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 58,
+        "height": 88
+      }
+    },
+    {
+      "sourceFile": "source-parts/head.png",
+      "importFile": "parts/head.png",
+      "partId": "head",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 87,
+        "height": 141
+      }
+    },
+    {
+      "sourceFile": "source-parts/pelvis.png",
+      "importFile": "parts/pelvis.png",
+      "partId": "pelvis",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 149,
+        "height": 100
+      }
+    },
+    {
+      "sourceFile": "source-parts/shin_l.png",
+      "importFile": "parts/shin-left.png",
+      "partId": "shin-left",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 66,
+        "height": 210
+      }
+    },
+    {
+      "sourceFile": "source-parts/shin_r.png",
+      "importFile": "parts/shin-right.png",
+      "partId": "shin-right",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 83,
+        "height": 221
+      }
+    },
+    {
+      "sourceFile": "source-parts/thigh_l.png",
+      "importFile": "parts/thigh-left.png",
+      "partId": "thigh-left",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 94,
+        "height": 191
+      }
+    },
+    {
+      "sourceFile": "source-parts/thigh_r.png",
+      "importFile": "parts/thigh-right.png",
+      "partId": "thigh-right",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 82,
+        "height": 191
+      }
+    },
+    {
+      "sourceFile": "source-parts/torso.png",
+      "importFile": "parts/torso.png",
+      "partId": "torso",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 312,
+        "height": 478
+      }
+    },
+    {
+      "sourceFile": "source-parts/upper_arm_l.png",
+      "importFile": "parts/upper-arm-left.png",
+      "partId": "upper-arm-left",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 79,
+        "height": 168
+      }
+    },
+    {
+      "sourceFile": "source-parts/upper_arm_r.png",
+      "importFile": "parts/upper-arm-right.png",
+      "partId": "upper-arm-right",
+      "cropRect": {
+        "x": 0,
+        "y": 0,
+        "width": 88,
+        "height": 164
+      }
+    }
   ]
 }

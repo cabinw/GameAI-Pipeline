@@ -201,7 +201,12 @@ test("every required asset diagnostic has a deterministic invalid fixture", asyn
   const fixtureBackedCodes = Object.keys(AssetDiagnosticCode).filter(
     (code) =>
       code !== AssetDiagnosticCode.SOURCE_CANVAS_METADATA_INCONSISTENT &&
-      code !== AssetDiagnosticCode.TRIM_METADATA_INCONSISTENT,
+      code !== AssetDiagnosticCode.TRIM_METADATA_INCONSISTENT &&
+      code !== AssetDiagnosticCode.CANONICAL_REFERENCE_MISSING &&
+      code !== AssetDiagnosticCode.PART_PIXEL_PROVENANCE_MISMATCH &&
+      code !== AssetDiagnosticCode.FLAT_COMPOSITE_SILHOUETTE_MISMATCH &&
+      code !== AssetDiagnosticCode.FLAT_COMPOSITE_PIXEL_DIFF_EXCEEDED &&
+      code !== AssetDiagnosticCode.UNDECLARED_GENERATED_VISIBLE_REGION,
   );
   assert.equal(fixtureFiles.length, fixtureBackedCodes.length);
 

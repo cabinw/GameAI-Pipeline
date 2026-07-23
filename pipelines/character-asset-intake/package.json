@@ -13,7 +13,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js",
     "fixtures:generate": "node scripts/generate-fixtures.mjs",
-    "reconstruct:red-cap": "node scripts/reconstruct-red-cap-remade.mjs"
+    "reconstruct:red-cap": "node scripts/reconstruct-red-cap-remade.mjs",
+    "audit:red-cap": "pnpm run build && node scripts/audit-red-cap-canonical-art.mjs",
+    "audit:red-cap:report": "pnpm run build && node scripts/audit-red-cap-canonical-art.mjs --allow-blocked",
+    "extract:red-cap-canonical": "node scripts/extract-canonical-parts.mjs",
+    "sync:red-cap-cocos": "node scripts/sync-cocos-fixture.mjs ../../examples/red-cap-target-remade ../../cocos/projects/character-rig-builder-mvp/assets/gameai/red-cap-target-remade"
   },
   "dependencies": {
     "@gameai/character-contracts": "workspace:*",

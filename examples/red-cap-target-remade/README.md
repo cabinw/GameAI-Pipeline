@@ -34,3 +34,12 @@ The Cocos acceptance project contains an AssetDB import mirror at
 derived PNG bytes to match this canonical fixture. The mirror's
 `source-asset-map.json` retains `sourceFile` as provenance while Cocos consumes
 only each verified `importFile`.
+
+TASK-004.5 replaced all 19 visible sprites with direct canonical cutouts.
+`canonical-part-segmentation.json` declares source-canvas pixel ownership and
+`provenance/canonical-extraction-manifest.json` records exact output hashes.
+The flat canonical gate now passes with zero silhouette and RGBA mismatch.
+
+Because the reference is flattened, these assets contain only neutral-pose
+visible pixels. Occluded joint interiors require a later, explicitly declared
+hidden-extension art task before animation.

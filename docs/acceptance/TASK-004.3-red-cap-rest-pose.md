@@ -1,5 +1,11 @@
 # TASK-004.3 Red Cap Rest-Pose Acceptance
 
+> **Rejected by TASK-004.4:** this evidence proves rendering and hierarchy
+> behavior only. It does not prove that the right-side assembled art originates
+> from the canonical left-side character. The current part pack is
+> `BLOCKED_BY_INVALID_ART_ASSETS` and must not be treated as canonical visual
+> acceptance.
+
 ## Engine-neutral acceptance
 
 `reference/full_character.png` is the 326×892 visual source of truth.

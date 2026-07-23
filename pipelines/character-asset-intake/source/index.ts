@@ -18,6 +18,17 @@ export {
   type ReconstructedPartPlacement,
   type ReferencePoint,
 } from "./reconstruction";
+export {
+  auditCanonicalArt,
+  type CanonicalArtGateArtifacts,
+  type CanonicalArtGateOptions,
+  type CanonicalArtGateReport,
+  type CanonicalArtGateResult,
+  type CanonicalArtPartReport,
+  type CanonicalArtProvenance,
+  type CanonicalArtTolerance,
+  type HiddenExtensionDeclaration,
+} from "./canonical-art-gate";
 export type {
   CharacterAssetDocumentIntakeOptions,
   CharacterAssetIntakeOptions,

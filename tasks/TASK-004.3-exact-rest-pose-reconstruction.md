@@ -1,5 +1,11 @@
 # TASK-004.3: Exact Rest-Pose Reconstruction
 
+> Canonical-art acceptance of this task's original pack was revoked by
+> TASK-004.4 on 2026-07-23. The structural reconstruction work remains
+> recorded, but its 0.8 silhouette-IoU result is not evidence of canonical
+> pixel provenance. TASK-004.5 subsequently replaced that pack with direct
+> canonical cutouts; the old screenshots remain rejected.
+
 ## Status
 
 Complete

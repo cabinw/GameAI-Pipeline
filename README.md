@@ -69,6 +69,11 @@ Character Rig and Rig Layout contracts, validation codes, and usage are document
 
 Character image loading, safe-path rules, binary validation, manifest normalization, and asset diagnostic codes are documented in `docs/character-asset-intake.md`.
 
+Canonical visible-pixel provenance, flat-composite verification, tolerances,
+and art-blocking diagnostics are documented in `docs/canonical-art-gate.md`.
+Deterministic canonical pixel ownership and part regeneration are documented
+in `docs/canonical-part-remake.md`.
+
 Source annotation and skeleton-template contracts, coordinate formulas, deterministic Rig Layout generation, and generator diagnostics are documented in `docs/rig-layout-generator.md`.
 
 Cocos scene-plan boundaries, Joint/Visual assembly, trim compensation,

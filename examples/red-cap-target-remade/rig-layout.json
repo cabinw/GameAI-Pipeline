@@ -14,18 +14,18 @@
       "file": "parts/pelvis.png",
       "parentId": null,
       "originalRect": {
-        "x": 102,
+        "x": 98,
         "y": 400,
-        "width": 145,
-        "height": 102
+        "width": 149,
+        "height": 100
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.42069,
-        "y": 0.264706
+        "x": 0.436242,
+        "y": 0.27
       },
       "restPose": {
         "position": {
@@ -46,18 +46,18 @@
       "file": "parts/torso.png",
       "parentId": "pelvis",
       "originalRect": {
-        "x": 39,
-        "y": 154,
-        "width": 267,
-        "height": 280
+        "x": 7,
+        "y": 117,
+        "width": 312,
+        "height": 478
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.464419,
-        "y": 0.975
+        "x": 0.5,
+        "y": 0.648536
       },
       "restPose": {
         "position": {
@@ -78,18 +78,18 @@
       "file": "parts/head.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 112,
-        "y": 35,
-        "width": 126,
-        "height": 155
+        "x": 141,
+        "y": 55,
+        "width": 87,
+        "height": 141
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.404762,
-        "y": 0.870968
+        "x": 0.252874,
+        "y": 0.815603
       },
       "restPose": {
         "position": {
@@ -110,18 +110,18 @@
       "file": "parts/upper-arm-left.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 239,
-        "y": 185,
-        "width": 67,
-        "height": 173
+        "x": 219,
+        "y": 155,
+        "width": 79,
+        "height": 168
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.313433,
-        "y": 0.028902
+        "x": 0.518987,
+        "y": 0.208333
       },
       "restPose": {
         "position": {
@@ -142,18 +142,18 @@
       "file": "parts/forearm-left.png",
       "parentId": "upper-arm-left",
       "originalRect": {
-        "x": 268,
-        "y": 304,
-        "width": 55,
-        "height": 147
+        "x": 258,
+        "y": 282,
+        "width": 61,
+        "height": 160
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.363636,
-        "y": 0.122449
+        "x": 0.491803,
+        "y": 0.25
       },
       "restPose": {
         "position": {
@@ -174,18 +174,18 @@
       "file": "parts/hand-left.png",
       "parentId": "forearm-left",
       "originalRect": {
-        "x": 275,
-        "y": 426,
-        "width": 51,
-        "height": 107
+        "x": 282,
+        "y": 432,
+        "width": 39,
+        "height": 80
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.45098,
-        "y": 0.11215
+        "x": 0.410256,
+        "y": 0.075
       },
       "restPose": {
         "position": {
@@ -206,18 +206,18 @@
       "file": "parts/upper-arm-right.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 37,
-        "y": 185,
-        "width": 95,
-        "height": 170
+        "x": 49,
+        "y": 165,
+        "width": 88,
+        "height": 164
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.442105,
-        "y": 0.035294
+        "x": 0.340909,
+        "y": 0.158537
       },
       "restPose": {
         "position": {
@@ -238,18 +238,18 @@
       "file": "parts/forearm-right.png",
       "parentId": "upper-arm-right",
       "originalRect": {
-        "x": 27,
-        "y": 304,
-        "width": 87,
-        "height": 150
+        "x": 39,
+        "y": 282,
+        "width": 63,
+        "height": 164
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.436782,
-        "y": 0.126667
+        "x": 0.412698,
+        "y": 0.25
       },
       "restPose": {
         "position": {
@@ -270,18 +270,18 @@
       "file": "parts/hand-right.png",
       "parentId": "forearm-right",
       "originalRect": {
-        "x": 42,
-        "y": 426,
-        "width": 65,
-        "height": 111
+        "x": 43,
+        "y": 436,
+        "width": 58,
+        "height": 88
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.4,
-        "y": 0.117117
+        "x": 0.431034,
+        "y": 0.034091
       },
       "restPose": {
         "position": {
@@ -302,18 +302,18 @@
       "file": "parts/thigh-left.png",
       "parentId": "pelvis",
       "originalRect": {
-        "x": 184,
-        "y": 438,
-        "width": 68,
-        "height": 195
+        "x": 169,
+        "y": 430,
+        "width": 94,
+        "height": 191
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.470588,
-        "y": 0.066667
+        "x": 0.5,
+        "y": 0.109948
       },
       "restPose": {
         "position": {
@@ -334,9 +334,9 @@
       "file": "parts/shin-left.png",
       "parentId": "thigh-left",
       "originalRect": {
-        "x": 202,
-        "y": 610,
-        "width": 64,
+        "x": 200,
+        "y": 595,
+        "width": 66,
         "height": 210
       },
       "trimOffset": {
@@ -344,8 +344,8 @@
         "y": 0
       },
       "anchor": {
-        "x": 0.265625,
-        "y": 0.047619
+        "x": 0.287879,
+        "y": 0.119048
       },
       "restPose": {
         "position": {
@@ -366,18 +366,18 @@
       "file": "parts/foot-left.png",
       "parentId": "shin-left",
       "originalRect": {
-        "x": 202,
-        "y": 797,
-        "width": 124,
-        "height": 74
+        "x": 206,
+        "y": 782,
+        "width": 120,
+        "height": 80
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.290323,
-        "y": 0.094595
+        "x": 0.266667,
+        "y": 0.275
       },
       "restPose": {
         "position": {
@@ -398,18 +398,18 @@
       "file": "parts/thigh-right.png",
       "parentId": "pelvis",
       "originalRect": {
-        "x": 99,
-        "y": 438,
-        "width": 65,
-        "height": 195
+        "x": 87,
+        "y": 430,
+        "width": 82,
+        "height": 191
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.507692,
-        "y": 0.066667
+        "x": 0.54878,
+        "y": 0.109948
       },
       "restPose": {
         "position": {
@@ -430,18 +430,18 @@
       "file": "parts/shin-right.png",
       "parentId": "thigh-right",
       "originalRect": {
-        "x": 89,
-        "y": 610,
-        "width": 62,
-        "height": 220
+        "x": 87,
+        "y": 595,
+        "width": 83,
+        "height": 221
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.564516,
-        "y": 0.045455
+        "x": 0.445783,
+        "y": 0.113122
       },
       "restPose": {
         "position": {
@@ -463,17 +463,17 @@
       "parentId": "shin-right",
       "originalRect": {
         "x": 87,
-        "y": 805,
-        "width": 105,
-        "height": 87
+        "y": 786,
+        "width": 69,
+        "height": 106
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.304762,
-        "y": 0.114943
+        "x": 0.463768,
+        "y": 0.273585
       },
       "restPose": {
         "position": {
@@ -495,17 +495,17 @@
       "parentId": "hand-right",
       "originalRect": {
         "x": 0,
-        "y": 500,
-        "width": 150,
-        "height": 182
+        "y": 478,
+        "width": 151,
+        "height": 201
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.506667,
-        "y": 0.093407
+        "x": 0.503311,
+        "y": 0.19403
       },
       "restPose": {
         "position": {
@@ -526,18 +526,18 @@
       "file": "parts/cap.png",
       "parentId": "head",
       "originalRect": {
-        "x": 130,
+        "x": 133,
         "y": 0,
-        "width": 126,
-        "height": 76
+        "width": 118,
+        "height": 77
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.349206,
-        "y": 0.723684
+        "x": 0.347458,
+        "y": 0.714286
       },
       "restPose": {
         "position": {
@@ -558,18 +558,18 @@
       "file": "parts/hair.png",
       "parentId": "head",
       "originalRect": {
-        "x": 126,
-        "y": 28,
-        "width": 128,
-        "height": 106
+        "x": 135,
+        "y": 65,
+        "width": 84,
+        "height": 61
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.289063,
-        "y": 0.396226
+        "x": 0.333333,
+        "y": 0.081967
       },
       "restPose": {
         "position": {
@@ -590,18 +590,18 @@
       "file": "parts/sunglasses.png",
       "parentId": "head",
       "originalRect": {
-        "x": 139,
+        "x": 145,
         "y": 66,
-        "width": 103,
-        "height": 30
+        "width": 94,
+        "height": 33
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.5
+        "x": 0.484043,
+        "y": 0.454545
       },
       "restPose": {
         "position": {
@@ -623,8 +623,8 @@
       "socketId": "left-grip",
       "parentPartId": "hand-left",
       "position": {
-        "x": 0.025,
-        "y": -0.415
+        "x": 0.035,
+        "y": -0.34
       },
       "rotationDegrees": 0
     },
@@ -632,8 +632,8 @@
       "socketId": "right-grip",
       "parentPartId": "hand-right",
       "position": {
-        "x": 0.065,
-        "y": -0.425
+        "x": 0.04,
+        "y": -0.41
       },
       "rotationDegrees": 0
     },
@@ -641,8 +641,8 @@
       "socketId": "head-accessory",
       "parentPartId": "head",
       "position": {
-        "x": 0.12,
-        "y": 1.35
+        "x": 0.215,
+        "y": 1.15
       },
       "rotationDegrees": 0
     }
@@ -653,10 +653,10 @@
       "parentPartId": "torso",
       "shape": {
         "type": "rect",
-        "x": -0.8395,
-        "y": 0.21,
-        "width": 1.869,
-        "height": 2.24
+        "x": -1.092,
+        "y": -1.202,
+        "width": 2.184,
+        "height": 3.824
       }
     },
     {
@@ -664,9 +664,9 @@
       "parentPartId": "head",
       "shape": {
         "type": "circle",
-        "x": 0.12,
-        "y": 0.6525,
-        "radius": 0.504
+        "x": 0.215,
+        "y": 0.5155,
+        "radius": 0.348
       }
     }
   ]

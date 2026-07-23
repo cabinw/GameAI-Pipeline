@@ -2,6 +2,148 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-004.5 Canonical Part Remake
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Replace all 19 rejected Red Cap Remade sprites with deterministic, direct
+pixel extractions from the canonical transparent full-body reference and pass
+the TASK-004.4 provenance gate without generated visible pixels.
+
+### Scope
+
+- Add a reproducible canonical segmentation specification and extraction
+  command.
+- Assign every canonical nontransparent pixel to exactly one semantic part.
+- Preserve original canonical RGBA values and source-canvas coordinates
+  without resizing, repainting, or AI generation.
+- Regenerate the 19 canonical part PNGs, source mapping, annotations, layout,
+  Cocos AssetDB import mirror, and provenance evidence.
+- Add deterministic tests for exact pixel ownership, nonempty required parts,
+  output hashes, and a passing flat composite.
+
+### Out of scope
+
+- Painted hidden joint extensions, inpainting, generative art, animation, or
+  further Cocos scene calibration.
+- Changes to Character Rig Builder behavior, hierarchy, camera, or scene
+  transforms.
+
+### Execution
+
+1. Record TASK-004.5 and this plan before implementation.
+2. Define explicit source-canvas ownership polygons for all 19 canonical
+   semantic parts, with deterministic priority and complete pixel coverage.
+3. Extract tight lossless PNG cutouts, update source metadata, and regenerate
+   the engine-neutral layout.
+4. Run the TASK-004.4 gate and require zero silhouette mismatch and visible
+   pixel mismatch within its accepted tolerance.
+5. Synchronize only the existing Cocos asset mirror and verify all SpriteFrame
+   inputs remain resolvable.
+6. Run frozen installation and `CI=true pnpm verify`, document exact results,
+   and review the complete diff.
+
+### Done when
+
+- All 19 parts are direct canonical-pixel cutouts and nonempty.
+- Every canonical visible pixel has exactly one declared part owner.
+- `flat-composite.png` reproduces the canonical alpha silhouette exactly and
+  passes the pixel-diff threshold.
+- The canonical art gate returns success rather than a blocked result.
+- No builder or scene-generation implementation changes.
+
+### Result
+
+- Added deterministic semantic pixel-ownership input and a reusable extraction
+  command.
+- Remade all 19 source/import sprites from exact canonical pixels and assigned
+  all 162,968 visible pixels exactly once.
+- Regenerated annotation geometry, Rig Layout, neutral reconstruction, Cocos
+  import mirror, extraction hashes, ownership preview, flat composite, and
+  diff evidence.
+- The unchanged canonical gate passes with 0 silhouette mismatches, 0 visible
+  RGBA mismatches, and 100% exact canonical-pixel provenance for every part.
+- No Character Rig Builder or scene-generation behavior changed.
+- Flattened-source limitation remains: occluded joint interiors need a future
+  declared hidden-extension art task before animation.
+- Re-ran the real Creator 3.8.8 Character Rig Builder and saved correlation
+  `task004-1784799620716`; it safely replaced the single generated root with
+  the canonical 19-part scene rig and reported zero warnings/errors.
+
+## Completed plan: TASK-004.4 Canonical Art Asset Gate
+
+- Status: `BLOCKED_BY_INVALID_ART_ASSETS`
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Prove pixel provenance and flat-composite equivalence against the canonical
+full-body reference before any rig hierarchy or Cocos scene generation is
+allowed to claim visual acceptance.
+
+### Scope
+
+- Require the canonical transparent full-body PNG and fail closed when it is
+  absent.
+- Audit every current Red Cap Remade part against the canonical reference,
+  including face/headwear, clothing, limbs, hands, shoes, and briefcase.
+- Add an engine-neutral provenance manifest with explicit hidden-extension
+  regions; no visible generated or painted rest-pose pixels are allowed.
+- Composite parts only from `sourceCanvas`, `originalRect`, and canonical draw
+  order, then export `flat-composite.png`, `diff.png`, and deterministic
+  mismatch statistics.
+- Add stable provenance and flat-composite diagnostic codes and automated
+  invalid cases.
+- Report whether the current pack is salvageable and list every asset that must
+  be remade.
+
+### Out of scope
+
+- Joint, anchor, scale, rotation, rest-pose, or draw-order calibration.
+- Cocos Scene Script, hierarchy, camera, or Sprite changes.
+- Animation, deformation, source-art repair, or AI redraw.
+
+### Execution
+
+1. Record TASK-004.4 and this active plan before implementation.
+2. Locate and strictly decode the canonical transparent reference; fail if it
+   is missing or unusable.
+3. Add provenance contract, pure audit/composite/diff logic, stable
+   diagnostics, and deterministic tests.
+4. Run the gate against all current parts and publish its flat composite,
+   diff, statistics, and per-part mismatch report.
+5. Update documentation and mark the task
+   `BLOCKED_BY_INVALID_ART_ASSETS` if any visible part lacks canonical pixel
+   provenance.
+6. Run `CI=true pnpm verify`, review the complete diff, and report results.
+
+### Done when
+
+- The gate objectively distinguishes direct canonical pixels from visually
+  similar replacement art.
+- Only declared, neutral-pose-covered hidden extensions may be ignored.
+- Alpha silhouette and visible RGBA tolerances are documented and enforced.
+- Every mismatched current part is named.
+- No rig-builder or Cocos scene-generation behavior changes.
+
+### Result
+
+- Added an engine-neutral, fail-closed provenance gate that composites only
+  from the declared source canvas, original rectangles, and draw order.
+- Added accepted ADR-0010, the provenance declaration, five stable diagnostics,
+  deterministic valid/invalid tests, an audit command, and PNG/JSON evidence.
+- The canonical 326×892 transparent reference exists and is usable.
+- The current pack is rejected: all 19 parts fail provenance, visible pixel
+  mismatch is 84.125104%, and alpha silhouette mismatch is 21.5165%.
+- The task is intentionally closed as `BLOCKED_BY_INVALID_ART_ASSETS`; all 19
+  visible part sprites must be remade from direct canonical cutouts before rig
+  acceptance can resume.
+
 ## Completed plan: TASK-004.3 Exact Rest-Pose Reconstruction
 
 - Status: Complete

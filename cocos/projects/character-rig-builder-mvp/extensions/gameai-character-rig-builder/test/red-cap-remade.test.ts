@@ -68,38 +68,6 @@ const canonicalMapping = {
   "upper_arm_r.png": "upper-arm-right",
 } as const;
 
-const expectedDimensions = {
-  briefcase: [150, 133],
-  cap: [126, 76],
-  "foot-left": [69, 62],
-  "foot-right": [60, 59],
-  "forearm-left": [55, 147],
-  "forearm-right": [87, 134],
-  sunglasses: [103, 30],
-  hair: [128, 106],
-  "hand-left": [51, 107],
-  "hand-right": [65, 111],
-  head: [126, 155],
-  pelvis: [141, 98],
-  "shin-left": [54, 131],
-  "shin-right": [51, 120],
-  "thigh-left": [64, 145],
-  "thigh-right": [53, 139],
-  torso: [208, 179],
-  "upper-arm-left": [67, 173],
-  "upper-arm-right": [95, 146],
-} as const;
-
-const insetContentBounds = {
-  "forearm-right": { x: 7, y: 0, width: 67, height: 134 },
-  "hand-right": { x: 1, y: 0, width: 53, height: 111 },
-  "shin-left": { x: 3, y: 0, width: 38, height: 131 },
-  "shin-right": { x: 2, y: 0, width: 33, height: 120 },
-  "thigh-left": { x: 2, y: 0, width: 62, height: 145 },
-  "thigh-right": { x: 0, y: 0, width: 44, height: 139 },
-  "upper-arm-right": { x: 11, y: 0, width: 63, height: 146 },
-} as const;
-
 let manifest: CharacterAssetManifest;
 let cocosManifest: CharacterAssetManifest;
 let remadePlan: CocosSceneRigPlan;
@@ -185,23 +153,38 @@ describe("Red Cap Remade source art", () => {
       new Set(manifest.parts.map((part) => part.partId)),
       new Set(Object.values(canonicalMapping)),
     );
+    const annotationParts = (
+      annotation as {
+        parts: Array<{
+          partId: string;
+          sourceRect: { width: number; height: number };
+        }>;
+      }
+    ).parts;
     for (const part of manifest.parts) {
-      const dimensions =
-        expectedDimensions[part.partId as keyof typeof expectedDimensions];
-      assert.notEqual(dimensions, undefined, part.partId);
+      const annotated = annotationParts.find(
+        (candidate) => candidate.partId === part.partId,
+      );
+      assert.notEqual(annotated, undefined, part.partId);
       assert.equal(part.imageFormat, "png", part.partId);
       assert.equal(part.hasAlpha, true, part.partId);
       assert.equal(part.hasTransparency, true, part.partId);
       assert.ok(part.transparentPixelCount > 0, part.partId);
-      assert.deepEqual([part.width, part.height], dimensions, part.partId);
       assert.deepEqual(
-        part.contentBounds,
-        insetContentBounds[part.partId as keyof typeof insetContentBounds] ?? {
-          x: 0,
-          y: 0,
-          width: dimensions[0],
-          height: dimensions[1],
-        },
+        [part.width, part.height],
+        [annotated!.sourceRect.width, annotated!.sourceRect.height],
+        part.partId,
+      );
+      assert.notEqual(part.contentBounds, null, part.partId);
+      const contentBounds = part.contentBounds!;
+      assert.ok(contentBounds.width > 0, part.partId);
+      assert.ok(contentBounds.height > 0, part.partId);
+      assert.ok(
+        contentBounds.x + contentBounds.width <= part.width,
+        part.partId,
+      );
+      assert.ok(
+        contentBounds.y + contentBounds.height <= part.height,
         part.partId,
       );
     }

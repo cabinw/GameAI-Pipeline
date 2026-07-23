@@ -13,6 +13,14 @@ export const AssetDiagnosticCode = {
   DUPLICATE_ASSET_REFERENCE: "DUPLICATE_ASSET_REFERENCE",
   SOURCE_CANVAS_METADATA_INCONSISTENT: "SOURCE_CANVAS_METADATA_INCONSISTENT",
   TRIM_METADATA_INCONSISTENT: "TRIM_METADATA_INCONSISTENT",
+  CANONICAL_REFERENCE_MISSING: "CANONICAL_REFERENCE_MISSING",
+  PART_PIXEL_PROVENANCE_MISMATCH: "PART_PIXEL_PROVENANCE_MISMATCH",
+  FLAT_COMPOSITE_SILHOUETTE_MISMATCH:
+    "FLAT_COMPOSITE_SILHOUETTE_MISMATCH",
+  FLAT_COMPOSITE_PIXEL_DIFF_EXCEEDED:
+    "FLAT_COMPOSITE_PIXEL_DIFF_EXCEEDED",
+  UNDECLARED_GENERATED_VISIBLE_REGION:
+    "UNDECLARED_GENERATED_VISIBLE_REGION",
 } as const;
 
 export type AssetDiagnosticCode =
@@ -20,7 +28,13 @@ export type AssetDiagnosticCode =
 
 export type CharacterAssetDiagnosticCode = AssetDiagnosticCode | ValidationErrorCodeValue;
 
-export type DiagnosticStage = "path" | "read" | "contract" | "image" | "geometry";
+export type DiagnosticStage =
+  | "path"
+  | "read"
+  | "contract"
+  | "image"
+  | "geometry"
+  | "provenance";
 
 export interface CharacterAssetDiagnostic {
   code: CharacterAssetDiagnosticCode;

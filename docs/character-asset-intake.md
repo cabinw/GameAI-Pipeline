@@ -77,6 +77,11 @@ Part array order is the authored Rig Layout order. This preserves the specified 
 | `DUPLICATE_ASSET_REFERENCE` | More than one part resolves to the same real image path. |
 | `SOURCE_CANVAS_METADATA_INCONSISTENT` | An assembled `originalRect` leaves the declared common canvas. |
 | `TRIM_METADATA_INCONSISTENT` | Exact source-canvas placement would apply crop metadata twice. |
+| `CANONICAL_REFERENCE_MISSING` | The canonical transparent full-body PNG is unavailable or unusable. |
+| `PART_PIXEL_PROVENANCE_MISMATCH` | A part's visible/native pixels fail canonical provenance thresholds. |
+| `FLAT_COMPOSITE_SILHOUETTE_MISMATCH` | Flat-composite alpha differs from the canonical reference. |
+| `FLAT_COMPOSITE_PIXEL_DIFF_EXCEEDED` | Flat visible RGBA mismatch exceeds the accepted tolerance. |
+| `UNDECLARED_GENERATED_VISIBLE_REGION` | Generated pixels remain visible outside a covered declared extension. |
 
 Code strings are public compatibility surface for the package's `0.1.x` line. Messages and details are explanatory and must not be parsed by consumers.
 
@@ -86,3 +91,14 @@ Code strings are public compatibility surface for the package's `0.1.x` line. Me
 - SVG, GIF, animated images, color-profile normalization, and orientation rewriting are unsupported.
 - No Cocos Node, Sprite, Prefab, Scene, UUID, or import metadata is produced.
 - Animation playback and generation begin in later tasks.
+
+Canonical-art provenance is a separate opt-in gate because not every intake
+fixture has a full-body reference. See `docs/canonical-art-gate.md`. Cocos
+builders must not interpret ordinary asset-intake success as canonical visual
+acceptance.
+
+The Red Cap canonical cutouts can be reproduced with
+`pnpm --filter @gameai/character-asset-intake extract:red-cap-canonical`.
+Pixel ownership, exact-copy guarantees, fixture refresh order, and the
+flattened-source limitation are documented in
+`docs/canonical-part-remake.md`.

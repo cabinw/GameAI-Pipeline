@@ -10,25 +10,25 @@
   </style>
   <rect width="326" height="892" fill="#20242d"/>
   <g id="assembled-assets">
-    <image href="parts/hand-left.png" x="275" y="426" width="51" height="107"><title>hand-left</title></image>
-    <image href="parts/forearm-left.png" x="268" y="304" width="55" height="147"><title>forearm-left</title></image>
-    <image href="parts/upper-arm-left.png" x="239" y="185" width="67" height="173"><title>upper-arm-left</title></image>
-    <image href="parts/briefcase.png" x="0" y="500" width="150" height="133"><title>briefcase</title></image>
-    <image href="parts/hand-right.png" x="42" y="426" width="65" height="111"><title>hand-right</title></image>
-    <image href="parts/forearm-right.png" x="27" y="304" width="87" height="134"><title>forearm-right</title></image>
-    <image href="parts/upper-arm-right.png" x="37" y="185" width="95" height="146"><title>upper-arm-right</title></image>
-    <image href="parts/foot-left.png" x="202" y="797" width="69" height="62"><title>foot-left</title></image>
-    <image href="parts/shin-left.png" x="202" y="610" width="54" height="131"><title>shin-left</title></image>
-    <image href="parts/thigh-left.png" x="184" y="438" width="64" height="145"><title>thigh-left</title></image>
-    <image href="parts/foot-right.png" x="87" y="805" width="60" height="59"><title>foot-right</title></image>
-    <image href="parts/shin-right.png" x="89" y="610" width="51" height="120"><title>shin-right</title></image>
-    <image href="parts/thigh-right.png" x="99" y="438" width="53" height="139"><title>thigh-right</title></image>
-    <image href="parts/pelvis.png" x="102" y="400" width="141" height="98"><title>pelvis</title></image>
-    <image href="parts/torso.png" x="39" y="154" width="208" height="179"><title>torso</title></image>
-    <image href="parts/head.png" x="112" y="35" width="126" height="155"><title>head</title></image>
-    <image href="parts/hair.png" x="126" y="28" width="128" height="106"><title>hair</title></image>
-    <image href="parts/cap.png" x="130" y="0" width="126" height="76"><title>cap</title></image>
-    <image href="parts/sunglasses.png" x="139" y="66" width="103" height="30"><title>sunglasses</title></image>
+    <image href="parts/hand-left.png" x="282" y="432" width="39" height="80"><title>hand-left</title></image>
+    <image href="parts/forearm-left.png" x="258" y="282" width="61" height="160"><title>forearm-left</title></image>
+    <image href="parts/upper-arm-left.png" x="219" y="155" width="79" height="168"><title>upper-arm-left</title></image>
+    <image href="parts/briefcase.png" x="0" y="478" width="151" height="201"><title>briefcase</title></image>
+    <image href="parts/hand-right.png" x="43" y="436" width="58" height="88"><title>hand-right</title></image>
+    <image href="parts/forearm-right.png" x="39" y="282" width="63" height="164"><title>forearm-right</title></image>
+    <image href="parts/upper-arm-right.png" x="49" y="165" width="88" height="164"><title>upper-arm-right</title></image>
+    <image href="parts/foot-left.png" x="206" y="782" width="120" height="80"><title>foot-left</title></image>
+    <image href="parts/shin-left.png" x="200" y="595" width="66" height="210"><title>shin-left</title></image>
+    <image href="parts/thigh-left.png" x="169" y="430" width="94" height="191"><title>thigh-left</title></image>
+    <image href="parts/foot-right.png" x="87" y="786" width="69" height="106"><title>foot-right</title></image>
+    <image href="parts/shin-right.png" x="87" y="595" width="83" height="221"><title>shin-right</title></image>
+    <image href="parts/thigh-right.png" x="87" y="430" width="82" height="191"><title>thigh-right</title></image>
+    <image href="parts/pelvis.png" x="98" y="400" width="149" height="100"><title>pelvis</title></image>
+    <image href="parts/torso.png" x="7" y="117" width="312" height="478"><title>torso</title></image>
+    <image href="parts/head.png" x="141" y="55" width="87" height="141"><title>head</title></image>
+    <image href="parts/hair.png" x="135" y="65" width="84" height="61"><title>hair</title></image>
+    <image href="parts/cap.png" x="133" y="0" width="118" height="77"><title>cap</title></image>
+    <image href="parts/sunglasses.png" x="145" y="66" width="94" height="33"><title>sunglasses</title></image>
   </g>
   <g id="rig-bones">
     <line x1="288" y1="322" x2="298" y2="438"><title>forearm-left to hand-left via wrist-left</title></line>

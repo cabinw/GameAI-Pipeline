@@ -1,0 +1,240 @@
+{
+  "schemaVersion": "1.0.0",
+  "reference": "reference/full_character.png",
+  "sourceCanvas": {
+    "width": 326,
+    "height": 892
+  },
+  "canonicalVisiblePixelCount": 162968,
+  "assignedVisiblePixelCount": 162968,
+  "parts": [
+    {
+      "partId": "briefcase",
+      "sourceFile": "source-parts/briefcase.png",
+      "originalRect": {
+        "x": 0,
+        "y": 478,
+        "width": 151,
+        "height": 201
+      },
+      "visiblePixelCount": 21729,
+      "sha256": "ef50251cb625e6a646660c93f18d4dd8b5a3a47d97bb04a14f1d14b5cc14ecf6"
+    },
+    {
+      "partId": "cap",
+      "sourceFile": "source-parts/cap.png",
+      "originalRect": {
+        "x": 133,
+        "y": 0,
+        "width": 118,
+        "height": 77
+      },
+      "visiblePixelCount": 6261,
+      "sha256": "ba36920fde82961c785fa479c41af58bd9661afeed7202c19c4cdbe5983e1e81"
+    },
+    {
+      "partId": "foot-left",
+      "sourceFile": "source-parts/foot_l.png",
+      "originalRect": {
+        "x": 206,
+        "y": 782,
+        "width": 120,
+        "height": 80
+      },
+      "visiblePixelCount": 6224,
+      "sha256": "928c206b46bbb66f2e1e30d4fcacae66dfa71b8c3f44b2a8eba1b58a83ad2bd4"
+    },
+    {
+      "partId": "foot-right",
+      "sourceFile": "source-parts/foot_r.png",
+      "originalRect": {
+        "x": 87,
+        "y": 786,
+        "width": 69,
+        "height": 106
+      },
+      "visiblePixelCount": 5872,
+      "sha256": "ef8d599711404f97746a6c5fe1c858a7ed6c5e0874b1bfd34353023fa87a5454"
+    },
+    {
+      "partId": "forearm-left",
+      "sourceFile": "source-parts/forearm_l.png",
+      "originalRect": {
+        "x": 258,
+        "y": 282,
+        "width": 61,
+        "height": 160
+      },
+      "visiblePixelCount": 6992,
+      "sha256": "eef86047298ef6b246f8d792115bd883f53bc736c1c505ae24f5955ed5268205"
+    },
+    {
+      "partId": "forearm-right",
+      "sourceFile": "source-parts/forearm_r.png",
+      "originalRect": {
+        "x": 39,
+        "y": 282,
+        "width": 63,
+        "height": 164
+      },
+      "visiblePixelCount": 8596,
+      "sha256": "b874f7f00619bf40981635654041989090cdf90caded72dfcb7d5a0aa9794949"
+    },
+    {
+      "partId": "hair",
+      "sourceFile": "source-parts/hair.png",
+      "originalRect": {
+        "x": 135,
+        "y": 65,
+        "width": 84,
+        "height": 61
+      },
+      "visiblePixelCount": 841,
+      "sha256": "a4424f59ad76715ac942ee4effac0a3ef31b3247b7d8ca7a0840040d43dbac64"
+    },
+    {
+      "partId": "hand-left",
+      "sourceFile": "source-parts/hand_l.png",
+      "originalRect": {
+        "x": 282,
+        "y": 432,
+        "width": 39,
+        "height": 80
+      },
+      "visiblePixelCount": 2290,
+      "sha256": "cef039efc9005e4d476135ef55cc3d757152df6f588f3e13edf2179462fa8604"
+    },
+    {
+      "partId": "hand-right",
+      "sourceFile": "source-parts/hand_r.png",
+      "originalRect": {
+        "x": 43,
+        "y": 436,
+        "width": 58,
+        "height": 88
+      },
+      "visiblePixelCount": 3580,
+      "sha256": "e1a082696c0b2143e818d65f7ba70e96a2fca9f2a3289bedede7ed69320fa978"
+    },
+    {
+      "partId": "head",
+      "sourceFile": "source-parts/head.png",
+      "originalRect": {
+        "x": 141,
+        "y": 55,
+        "width": 87,
+        "height": 141
+      },
+      "visiblePixelCount": 6274,
+      "sha256": "3e007200b7ded4bf3d4222e3688a54d09a1297447552c2dec4d891afd4b7f3ac"
+    },
+    {
+      "partId": "pelvis",
+      "sourceFile": "source-parts/pelvis.png",
+      "originalRect": {
+        "x": 98,
+        "y": 400,
+        "width": 149,
+        "height": 100
+      },
+      "visiblePixelCount": 14846,
+      "sha256": "14c919b8c3a58a8c3c302d38371472413436744f7d181393b97cee50fc3b9602"
+    },
+    {
+      "partId": "shin-left",
+      "sourceFile": "source-parts/shin_l.png",
+      "originalRect": {
+        "x": 200,
+        "y": 595,
+        "width": 66,
+        "height": 210
+      },
+      "visiblePixelCount": 11359,
+      "sha256": "80e96886d1a13401064a62ea93039d6dd308a2b96b38fe90a37ac53a98104523"
+    },
+    {
+      "partId": "shin-right",
+      "sourceFile": "source-parts/shin_r.png",
+      "originalRect": {
+        "x": 87,
+        "y": 595,
+        "width": 83,
+        "height": 221
+      },
+      "visiblePixelCount": 7647,
+      "sha256": "6d44f843903765f69788895c1e8fad766b337e6dfc28b139ad06775185c8af54"
+    },
+    {
+      "partId": "sunglasses",
+      "sourceFile": "source-parts/glasses.png",
+      "originalRect": {
+        "x": 145,
+        "y": 66,
+        "width": 94,
+        "height": 33
+      },
+      "visiblePixelCount": 1926,
+      "sha256": "43337a7ab751a00999638b33e3732c343fd1986e799e9bc61ea42d71c60fd172"
+    },
+    {
+      "partId": "thigh-left",
+      "sourceFile": "source-parts/thigh_l.png",
+      "originalRect": {
+        "x": 169,
+        "y": 430,
+        "width": 94,
+        "height": 191
+      },
+      "visiblePixelCount": 8887,
+      "sha256": "96dde3b5b914f2bae7483ca4f2af73f0391230c196400a7ae5bebbd9400bd53e"
+    },
+    {
+      "partId": "thigh-right",
+      "sourceFile": "source-parts/thigh_r.png",
+      "originalRect": {
+        "x": 87,
+        "y": 430,
+        "width": 82,
+        "height": 191
+      },
+      "visiblePixelCount": 2371,
+      "sha256": "ba6a427f37bb0cfa0888ce876d8e22baec6f73e08dee00a6f012a16222a0535e"
+    },
+    {
+      "partId": "torso",
+      "sourceFile": "source-parts/torso.png",
+      "originalRect": {
+        "x": 7,
+        "y": 117,
+        "width": 312,
+        "height": 478
+      },
+      "visiblePixelCount": 32539,
+      "sha256": "d113a08fb6857b8433b7846be6566c7572b30275d492eb9080272ddeb5ed61cd"
+    },
+    {
+      "partId": "upper-arm-left",
+      "sourceFile": "source-parts/upper_arm_l.png",
+      "originalRect": {
+        "x": 219,
+        "y": 155,
+        "width": 79,
+        "height": 168
+      },
+      "visiblePixelCount": 6917,
+      "sha256": "de34bc1724e585b728ed0201a65f0246e6401048c631071f0d718394cb7c7662"
+    },
+    {
+      "partId": "upper-arm-right",
+      "sourceFile": "source-parts/upper_arm_r.png",
+      "originalRect": {
+        "x": 49,
+        "y": 165,
+        "width": 88,
+        "height": 164
+      },
+      "visiblePixelCount": 7817,
+      "sha256": "fd46915551b9d0a653ece723cd1af984d4b91f197ba72e54d6dc1e3a24f07945"
+    }
+  ]
+}
