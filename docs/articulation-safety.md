@@ -1,9 +1,9 @@
 # Articulation-Safe Joint Overlaps
 
-TASK-006.1 replaces the rejected TASK-006 visual checks with deterministic
-hidden-overlap generation, per-part preservation, pivot-local seam validation,
-and real Cocos Creator 3.8.8 evidence. Larger animation presets remain blocked
-until this gate passes.
+TASK-006.2 replaces the rejected masked TASK-006.1 evidence with deterministic
+hidden-overlap generation, final draw-ordered ownership checks, pivot-local
+seam validation, and an unmasked Cocos Creator 3.8.8 render. Larger animation
+presets remain out of scope.
 
 ## Contract and generation
 
@@ -19,17 +19,12 @@ cutouts remain under `source-parts/`; extended source sprites are generated
 separately under `articulation/source-parts/`. The cover part defines where an
 extension is hidden in the neutral pose, but never supplies its texture.
 Every extension texel is copied from the nearest original opaque texel of the
-child within a 24-pixel dilation, using Manhattan distance with deterministic
-coordinate tie-breaking.
+child using Manhattan distance with deterministic coordinate tie-breaking.
+Distal joints use a 24-pixel dilation. Shoulders use an 80-pixel child-texture
+dilation inside a 120-pixel torso-owned cap so the required ±8-degree stress
+range remains connected.
 This prevents torso texture from entering an arm, sleeve texture from entering
 a hand, and thigh texture from entering a shin.
-
-The source character has right-thigh and right-shin cut edges hidden by the
-foreground briefcase. Two additional declared child-textured occlusion
-extensions keep those canonical cuts covered when the independently rotated
-right leg and inherited briefcase branch move apart. They are generated only
-inside fully opaque briefcase-owned pixels in the neutral pose. The briefcase
-has the highest draw order, matching its foreground role.
 
 `asset-provenance.json` declares the exact generated pixels as deterministic
 run rectangles. A broad joint rectangle is not permission to paint: every
@@ -47,12 +42,14 @@ The canonical gate requires every extension pixel to be declared and covered
 at rest. A visible declared pixel, incorrect draw order, or generated pixel
 outside a region fails.
 
-The articulation verifier renders all 19 parts for every stress pose. It
-records rendered and visible alpha, transformed bounds, expected invariant
-bounds, and ancestor-rotation state. Unrotated parts with no rotated ancestor
-must preserve their transform, rendered alpha count, and bounds. Required
-head/accessory, body, hand, foot, and briefcase parts cannot disappear, and
-every transformed part must remain inside the canvas.
+The articulation verifier renders all 19 parts for every stress pose. After
+draw-order compositing it builds a final visible-owner map and records each
+part's final visible count, bounds, occluding part IDs, and stable pixel hash.
+The encoded PNG must byte-match that owner composite, and transparent source
+samples cannot erase already composed pixels. Unrotated head, cap, hair,
+sunglasses, and torso must preserve their neutral final pixels and bounds.
+Required body, hand, foot, and briefcase parts cannot disappear, and every
+transformed part must remain inside the canvas.
 
 Each joint is checked only inside a small pivot-centered seam region. The
 child/cover intersection must connect to both parts, the expected connection
@@ -69,6 +66,9 @@ Stable diagnostics include:
 - `ARTICULATION_UNEXPECTED_ALPHA_LOSS`
 - `ARTICULATION_BRANCH_DISCONNECTED`
 - `ARTICULATION_VISIBLE_CUT_EDGE`
+- `ARTICULATION_FINAL_PART_INVISIBLE`
+- `ARTICULATION_UNEXPECTED_OCCLUSION`
+- `ARTICULATION_FINAL_COMPOSITE_MISMATCH`
 - `ARTICULATION_DRAW_ORDER_INVALID`
 - `ARTICULATION_BRIEFCASE_BRANCH_INVALID`
 
@@ -82,7 +82,7 @@ pnpm --filter @gameai/character-asset-intake verify:red-cap-articulation
 
 Evidence under `examples/red-cap-target-remade/articulation/` includes ten
 stress PNGs, `stress-report.json`, `neutral-pixel-diff.png`, and
-`generated-overlaps.json`. The two broken TASK-006 images are retained under
+`generated-overlaps.json`. Six broken TASK-006/TASK-006.1 images are retained under
 `pipelines/character-asset-intake/test/fixtures/articulation-invalid/` and
 must be rejected by the current verifier. The neutral diff ignores RGB
 payload only where both pixels are transparent and compares every visible RGBA
@@ -91,14 +91,15 @@ pixel exactly.
 ## Cocos acceptance
 
 The Cocos Creator 3.8.8 project includes fixed rest, positive-stress, and
-negative-stress scenes. Their Joint transforms, Visual offsets, and sizes are
-generated from the current Rig Layout, and runtime autoplay is disabled. Each
-scene keeps the complete inspectable 19-part rig and adds the exact accepted
-composite at sorting order 1000 as the visual acceptance surface. This avoids
-transparent nested-sprite depth ambiguity in the UI_3D Scene renderer while
-keeping the articulated hierarchy available for inspection.
+negative-stress scenes. Their Joint transforms, Visual offsets, sizes, sibling
+order, and Sorting2D values are generated from the current Rig Layout, and
+runtime autoplay is disabled. Every Sprite uses untrimmed mode so hidden
+extension coordinates remain aligned with the source canvas. Each scene has
+exactly 19 `Visual_*` Sprites and no flattened acceptance composite.
 
 Scene and Game Preview captures are recorded in
-`docs/acceptance/evidence/TASK-006.1/`.
+`docs/acceptance/evidence/TASK-006.2/`. The manual proof disables
+`Visual_torso`; the torso visibly disappears, demonstrating that no overlay
+can hide an individual rig part.
 
 Walk, Hit, blending, IK, and animation state machines remain out of scope.

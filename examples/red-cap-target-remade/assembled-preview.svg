@@ -12,23 +12,23 @@
   <g id="assembled-assets">
     <image href="parts/hand-left.png" x="195" y="320" width="131" height="192"><title>hand-left</title></image>
     <image href="parts/forearm-left.png" x="178" y="185" width="141" height="257"><title>forearm-left</title></image>
-    <image href="parts/upper-arm-left.png" x="160" y="90" width="140" height="229"><title>upper-arm-left</title></image>
+    <image href="parts/upper-arm-left.png" x="110" y="40" width="216" height="279"><title>upper-arm-left</title></image>
     <image href="parts/hand-right.png" x="0" y="320" width="111" height="204"><title>hand-right</title></image>
     <image href="parts/forearm-right.png" x="0" y="185" width="125" height="261"><title>forearm-right</title></image>
-    <image href="parts/upper-arm-right.png" x="40" y="95" width="140" height="234"><title>upper-arm-right</title></image>
+    <image href="parts/upper-arm-right.png" x="0" y="45" width="230" height="284"><title>upper-arm-right</title></image>
+    <image href="parts/foot-right.png" x="45" y="720" width="140" height="172"><title>foot-right</title></image>
+    <image href="parts/shin-right.png" x="82" y="525" width="140" height="266"><title>shin-right</title></image>
+    <image href="parts/thigh-right.png" x="65" y="410" width="140" height="186"><title>thigh-right</title></image>
     <image href="parts/foot-left.png" x="140" y="710" width="186" height="152"><title>foot-left</title></image>
     <image href="parts/shin-left.png" x="145" y="530" width="140" height="252"><title>shin-left</title></image>
     <image href="parts/thigh-left.png" x="135" y="410" width="140" height="193"><title>thigh-left</title></image>
-    <image href="parts/foot-right.png" x="45" y="720" width="140" height="172"><title>foot-right</title></image>
-    <image href="parts/shin-right.png" x="42" y="485" width="220" height="306"><title>shin-right</title></image>
-    <image href="parts/thigh-right.png" x="25" y="370" width="220" height="226"><title>thigh-right</title></image>
+    <image href="parts/briefcase.png" x="0" y="478" width="151" height="201"><title>briefcase</title></image>
     <image href="parts/pelvis.png" x="98" y="400" width="149" height="100"><title>pelvis</title></image>
     <image href="parts/torso.png" x="7" y="117" width="312" height="478"><title>torso</title></image>
     <image href="parts/head.png" x="141" y="55" width="87" height="141"><title>head</title></image>
     <image href="parts/hair.png" x="135" y="65" width="84" height="61"><title>hair</title></image>
     <image href="parts/cap.png" x="133" y="0" width="118" height="77"><title>cap</title></image>
     <image href="parts/sunglasses.png" x="145" y="66" width="94" height="33"><title>sunglasses</title></image>
-    <image href="parts/briefcase.png" x="0" y="478" width="151" height="201"><title>briefcase</title></image>
   </g>
   <g id="rig-bones">
     <line x1="248" y1="255" x2="265" y2="390"><title>forearm-left to hand-left via wrist-left</title></line>
@@ -36,10 +36,10 @@
     <line x1="41" y1="390" x2="76" y2="517"><title>hand-right to briefcase via right-grip</title></line>
     <line x1="55" y1="255" x2="41" y2="390"><title>forearm-right to hand-right via wrist-right</title></line>
     <line x1="110" y1="165" x2="55" y2="255"><title>upper-arm-right to forearm-right via elbow-right</title></line>
-    <line x1="215" y1="600" x2="210" y2="780"><title>shin-left to foot-left via ankle-left</title></line>
-    <line x1="205" y1="480" x2="215" y2="600"><title>thigh-left to shin-left via knee-left</title></line>
     <line x1="152" y1="595" x2="115" y2="790"><title>shin-right to foot-right via ankle-right</title></line>
     <line x1="135" y1="480" x2="152" y2="595"><title>thigh-right to shin-right via knee-right</title></line>
+    <line x1="215" y1="600" x2="210" y2="780"><title>shin-left to foot-left via ankle-left</title></line>
+    <line x1="205" y1="480" x2="215" y2="600"><title>thigh-left to shin-left via knee-left</title></line>
     <line x1="163" y1="427" x2="163" y2="427"><title>pelvis to torso via waist</title></line>
     <line x1="163" y1="427" x2="205" y2="480"><title>pelvis to thigh-left via hip-left</title></line>
     <line x1="163" y1="427" x2="135" y2="480"><title>pelvis to thigh-right via hip-right</title></line>
@@ -56,10 +56,10 @@
     <circle class="attachment" cx="76" cy="517" r="7"><title>hand-right.right-grip</title></circle>
     <circle class="attachment" cx="41" cy="390" r="7"><title>forearm-right.wrist-right</title></circle>
     <circle class="attachment" cx="55" cy="255" r="7"><title>upper-arm-right.elbow-right</title></circle>
-    <circle class="attachment" cx="210" cy="780" r="7"><title>shin-left.ankle-left</title></circle>
-    <circle class="attachment" cx="215" cy="600" r="7"><title>thigh-left.knee-left</title></circle>
     <circle class="attachment" cx="115" cy="790" r="7"><title>shin-right.ankle-right</title></circle>
     <circle class="attachment" cx="152" cy="595" r="7"><title>thigh-right.knee-right</title></circle>
+    <circle class="attachment" cx="210" cy="780" r="7"><title>shin-left.ankle-left</title></circle>
+    <circle class="attachment" cx="215" cy="600" r="7"><title>thigh-left.knee-left</title></circle>
     <circle class="attachment" cx="163" cy="427" r="7"><title>pelvis.waist</title></circle>
     <circle class="attachment" cx="205" cy="480" r="7"><title>pelvis.hip-left</title></circle>
     <circle class="attachment" cx="135" cy="480" r="7"><title>pelvis.hip-right</title></circle>
@@ -77,18 +77,18 @@
     <circle class="pivot" cx="41" cy="390" r="3.5"><title>hand-right proximal pivot</title></circle>
     <circle class="pivot" cx="55" cy="255" r="3.5"><title>forearm-right proximal pivot</title></circle>
     <circle class="pivot" cx="110" cy="165" r="3.5"><title>upper-arm-right proximal pivot</title></circle>
-    <circle class="pivot" cx="210" cy="780" r="3.5"><title>foot-left proximal pivot</title></circle>
-    <circle class="pivot" cx="215" cy="600" r="3.5"><title>shin-left proximal pivot</title></circle>
-    <circle class="pivot" cx="205" cy="480" r="3.5"><title>thigh-left proximal pivot</title></circle>
     <circle class="pivot" cx="115" cy="790" r="3.5"><title>foot-right proximal pivot</title></circle>
     <circle class="pivot" cx="152" cy="595" r="3.5"><title>shin-right proximal pivot</title></circle>
     <circle class="pivot" cx="135" cy="480" r="3.5"><title>thigh-right proximal pivot</title></circle>
+    <circle class="pivot" cx="210" cy="780" r="3.5"><title>foot-left proximal pivot</title></circle>
+    <circle class="pivot" cx="215" cy="600" r="3.5"><title>shin-left proximal pivot</title></circle>
+    <circle class="pivot" cx="205" cy="480" r="3.5"><title>thigh-left proximal pivot</title></circle>
+    <circle class="pivot" cx="76" cy="517" r="3.5"><title>briefcase proximal pivot</title></circle>
     <circle class="pivot" cx="163" cy="427" r="3.5"><title>pelvis proximal pivot</title></circle>
     <circle class="pivot" cx="163" cy="427" r="3.5"><title>torso proximal pivot</title></circle>
     <circle class="pivot" cx="163" cy="170" r="3.5"><title>head proximal pivot</title></circle>
     <circle class="pivot" cx="163" cy="70" r="3.5"><title>hair proximal pivot</title></circle>
     <circle class="pivot" cx="174" cy="55" r="3.5"><title>cap proximal pivot</title></circle>
     <circle class="pivot" cx="190.5" cy="81" r="3.5"><title>sunglasses proximal pivot</title></circle>
-    <circle class="pivot" cx="76" cy="517" r="3.5"><title>briefcase proximal pivot</title></circle>
   </g>
 </svg>

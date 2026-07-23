@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,37 +11,14 @@ const cocosAssets = resolve(
   "cocos/projects/character-rig-builder-mvp/assets",
 );
 const baseScenePath = resolve(cocosAssets, "red-cap-remade-acceptance.scene");
-const [baseSceneText, baseMetaText, layout, specification, referenceMeta] =
+const [baseSceneText, baseMetaText, layout, specification] =
   await Promise.all([
   readFile(baseScenePath, "utf8"),
   readFile(`${baseScenePath}.meta`, "utf8"),
   readJson(resolve(fixtureRoot, "rig-layout.json")),
   readJson(resolve(fixtureRoot, "articulation-safety.json")),
-  readJson(
-    resolve(
-      cocosAssets,
-      "gameai/red-cap-target-remade/reference/full_character.png.meta",
-    ),
-  ),
 ]);
 const baseMeta = JSON.parse(baseMetaText);
-const acceptanceCompositeUuids = new Map([
-  ["rest", referenceMeta.uuid],
-  [
-    "positive",
-    await installAcceptanceComposite(
-      "combined-positive",
-      referenceMeta,
-    ),
-  ],
-  [
-    "negative",
-    await installAcceptanceComposite(
-      "combined-negative",
-      referenceMeta,
-    ),
-  ],
-]);
 const poses = [
   { poseId: "rest", rotations: {} },
   {
@@ -98,6 +75,7 @@ for (const pose of poses) {
     jointNode._euler.z = degrees;
     visualNode._lpos.x = round(center.x - joint.x);
     visualNode._lpos.y = round(center.y - joint.y);
+    visualNode._lpos.z = 0;
     const transformReference = visualNode._components.find(
       (reference) => scene[reference.__id__]?.__type__ === "cc.UITransform",
     );
@@ -108,6 +86,65 @@ for (const pose of poses) {
     transform._contentSize.height = round(
       part.originalRect.height * layout.referenceScale,
     );
+    const spriteReference = visualNode._components.find(
+      (reference) => scene[reference.__id__]?.__type__ === "cc.Sprite",
+    );
+    const sprite =
+      spriteReference === undefined ? undefined : scene[spriteReference.__id__];
+    if (sprite === undefined) {
+      throw new Error(`Visual_${part.partId} is missing Sprite.`);
+    }
+    // Extension textures rely on their untrimmed source-canvas placement.
+    // Auto-trim offsets would rescale the opaque bounds into the extended
+    // rectangle and visibly turn hidden caps into rectangular blocks.
+    sprite._isTrimmedMode = false;
+    const sortingReference = visualNode._components.find(
+      (reference) => scene[reference.__id__]?.__type__ === "cc.Sorting2D",
+    );
+    const sorting =
+      sortingReference === undefined
+        ? undefined
+        : scene[sortingReference.__id__];
+    if (sorting === undefined) {
+      throw new Error(`Visual_${part.partId} is missing Sorting2D.`);
+    }
+    // Match the engine-neutral contract where larger drawOrder values are
+    // topmost.
+    sorting._enabled = true;
+    sorting._sortingOrder = part.drawOrder;
+  }
+  // Sorting2D alone does not reorder Sprite renderers across nested joint
+  // branches in Creator's Scene view. Put every joint's renderable children
+  // into engine-neutral draw order as well: distal limbs precede their cover
+  // visual, while head accessories follow the head visual.
+  for (const part of layout.parts) {
+    const jointNode = byName.get(`Joint_${part.partId}`)?.entry;
+    if (jointNode === undefined) continue;
+    jointNode._children = jointNode._children
+      .map((reference, originalIndex) => {
+        const child = scene[reference.__id__];
+        const childPartId =
+          child?._name?.startsWith("Visual_")
+            ? child._name.slice("Visual_".length)
+            : child?._name?.startsWith("Joint_")
+              ? child._name.slice("Joint_".length)
+              : undefined;
+        return {
+          reference,
+          originalIndex,
+          drawOrder:
+            childPartId === undefined
+              ? Number.MAX_SAFE_INTEGER
+              : (byPartId.get(childPartId)?.drawOrder ??
+                Number.MAX_SAFE_INTEGER),
+        };
+      })
+      .sort(
+        (left, right) =>
+          left.drawOrder - right.drawOrder ||
+          left.originalIndex - right.originalIndex,
+      )
+      .map(({ reference }) => reference);
   }
   for (const entry of scene) {
     if (
@@ -119,12 +156,6 @@ for (const pose of poses) {
       entry.autoplay = false;
     }
   }
-  appendAcceptanceComposite(
-    scene,
-    byName.get("RigRoot")?.entry,
-    acceptanceCompositeUuids.get(pose.poseId),
-    pose.poseId,
-  );
   const sceneAsset = scene.find((entry) => entry?.__type__ === "cc.SceneAsset");
   const sceneNode =
     sceneAsset?._scene?.__id__ === undefined
@@ -184,120 +215,6 @@ function deterministicUuid(value) {
 function round(value) {
   const result = Math.round(value * 1_000_000) / 1_000_000;
   return Object.is(result, -0) ? 0 : result;
-}
-
-function appendAcceptanceComposite(scene, rigRoot, imageUuid, poseId) {
-  if (rigRoot === undefined) {
-    throw new Error("Base scene is missing RigRoot.");
-  }
-  const nodeIndex = scene.length;
-  const transformIndex = nodeIndex + 1;
-  const spriteIndex = nodeIndex + 2;
-  const sortingIndex = nodeIndex + 3;
-  scene.push(
-    {
-      __type__: "cc.Node",
-      _name: `AcceptanceComposite_${poseId}`,
-      _objFlags: 0,
-      __editorExtras__: {},
-      _parent: { __id__: scene.indexOf(rigRoot) },
-      _children: [],
-      _active: true,
-      _components: [
-        { __id__: transformIndex },
-        { __id__: spriteIndex },
-        { __id__: sortingIndex },
-      ],
-      _prefab: null,
-      _lpos: { __type__: "cc.Vec3", x: 0, y: 0, z: 0 },
-      _lrot: { __type__: "cc.Quat", x: 0, y: 0, z: 0, w: 1 },
-      _lscale: { __type__: "cc.Vec3", x: 1, y: 1, z: 1 },
-      _mobility: 0,
-      _layer: 8388608,
-      _euler: { __type__: "cc.Vec3", x: 0, y: 0, z: 0 },
-      _id: deterministicUuid(`TASK-006.1:AcceptanceComposite:${poseId}`),
-    },
-    {
-      __type__: "cc.UITransform",
-      _name: "",
-      _objFlags: 0,
-      __editorExtras__: {},
-      node: { __id__: nodeIndex },
-      _enabled: true,
-      __prefab: null,
-      _contentSize: { __type__: "cc.Size", width: 3.26, height: 8.92 },
-      _anchorPoint: { __type__: "cc.Vec2", x: 0.5, y: 0.5 },
-      _id: deterministicUuid(`TASK-006.1:AcceptanceComposite:${poseId}:UITransform`),
-    },
-    {
-      __type__: "cc.Sprite",
-      _name: "",
-      _objFlags: 0,
-      __editorExtras__: {},
-      node: { __id__: nodeIndex },
-      _enabled: true,
-      __prefab: null,
-      _customMaterial: null,
-      _srcBlendFactor: 2,
-      _dstBlendFactor: 4,
-      _color: { __type__: "cc.Color", r: 255, g: 255, b: 255, a: 255 },
-      _spriteFrame: {
-        __uuid__: `${imageUuid}@f9941`,
-        __expectedType__: "cc.SpriteFrame",
-      },
-      _type: 0,
-      _fillType: 0,
-      _sizeMode: 0,
-      _fillCenter: { __type__: "cc.Vec2", x: 0, y: 0 },
-      _fillStart: 0,
-      _fillRange: 0,
-      _isTrimmedMode: true,
-      _useGrayscale: false,
-      _atlas: null,
-      _id: deterministicUuid(`TASK-006.1:AcceptanceComposite:${poseId}:Sprite`),
-    },
-    {
-      __type__: "cc.Sorting2D",
-      _name: "",
-      _objFlags: 0,
-      __editorExtras__: {},
-      node: { __id__: nodeIndex },
-      _enabled: true,
-      __prefab: null,
-      _sortingLayer: 0,
-      _sortingOrder: 1000,
-      _id: deterministicUuid(`TASK-006.1:AcceptanceComposite:${poseId}:Sorting2D`),
-    },
-  );
-  rigRoot._children.push({ __id__: nodeIndex });
-}
-
-async function installAcceptanceComposite(poseId, templateMeta) {
-  const source = resolve(
-    fixtureRoot,
-    `articulation/stress-${poseId}.png`,
-  );
-  const destinationDirectory = resolve(
-    cocosAssets,
-    "gameai/red-cap-target-remade/articulation",
-  );
-  const destination = resolve(
-    destinationDirectory,
-    `stress-${poseId}.png`,
-  );
-  const uuid = deterministicUuid(`TASK-006.1:stress-${poseId}.png`);
-  const meta = structuredClone(templateMeta);
-  meta.uuid = uuid;
-  for (const [subId, subMeta] of Object.entries(meta.subMetas ?? {})) {
-    subMeta.uuid = `${uuid}@${subId}`;
-    subMeta.displayName = `stress-${poseId}`;
-  }
-  await mkdir(destinationDirectory, { recursive: true });
-  await Promise.all([
-    copyFile(source, destination),
-    writeFile(`${destination}.meta`, `${JSON.stringify(meta, null, 2)}\n`),
-  ]);
-  return uuid;
 }
 
 async function readJson(path) {

@@ -62,7 +62,7 @@ const outputRoot = resolve(fixtureRoot, "articulation");
 await mkdir(outputRoot, { recursive: true });
 
 const neutralRender = renderScene({});
-const neutralVisible = visiblePartStats(neutralRender.owner);
+const neutralVisible = finalPartStats(neutralRender);
 const neutralOwn = new Map(
   ordered.map((part) => [
     part.partId,
@@ -74,7 +74,7 @@ const acceptedBuffers = new Map();
 
 for (const pose of specification.stressPoses) {
   const render = renderScene(pose.rotations);
-  const visible = visiblePartStats(render.owner);
+  const visible = finalPartStats(render);
   const parts = ordered.map((part) => {
     const ownStats = maskStats(render.masks.get(part.partId));
     const expectedOwn = neutralOwn.get(part.partId);
@@ -95,6 +95,14 @@ for (const pose of specification.stressPoses) {
       visibleBounds: actual.bounds,
       expectedVisibleBounds: expected.bounds,
       expectedVisibleAlphaCount: expected.alphaCount,
+      finalVisiblePixelCount: actual.alphaCount,
+      expectedFinalVisiblePixelCount: expected.alphaCount,
+      finalVisibleBounds: actual.bounds,
+      expectedFinalVisibleBounds: expected.bounds,
+      finalVisiblePixelHash: actual.hash,
+      expectedFinalVisiblePixelHash: expected.hash,
+      occludingParts: actual.occludingParts,
+      expectedOccludingParts: expected.occludingParts,
       transformPreserved: matrixIsIdentity(render.matrices.get(part.partId)),
       hasRotatedAncestor: transformed,
       withinCanvas: render.withinCanvas.get(part.partId),
@@ -114,6 +122,17 @@ for (const pose of specification.stressPoses) {
   })
     .png({ compressionLevel: 9, adaptiveFiltering: false })
     .toBuffer();
+  const encoded = await sharp(png, { failOn: "error" })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const finalCompositePixelHash = sha256(render.composite);
+  const encodedCompositePixelHash = sha256(encoded.data);
+  const finalCompositeMatchesEncoded =
+    encoded.info.width === outputWidth &&
+    encoded.info.height === outputHeight &&
+    encoded.data.equals(render.composite);
+  const ownerCoverageMatchesComposite = ownerMatchesComposite(render);
   await writeFile(resolve(outputRoot, `stress-${pose.poseId}.png`), png);
   acceptedBuffers.set(pose.poseId, render.composite);
   observations.push({
@@ -122,6 +141,10 @@ for (const pose of specification.stressPoses) {
     joints,
     briefcaseAttachmentError,
     briefcaseConnected,
+    finalCompositePixelHash,
+    encodedCompositePixelHash,
+    finalCompositeMatchesEncoded,
+    ownerCoverageMatchesComposite,
   });
 }
 
@@ -174,6 +197,22 @@ await sharp(neutralDiff, {
 const rejectedRegressions = await Promise.all([
   analyzeRejectedFixture("task006-stress-positive.png", "combined-positive"),
   analyzeRejectedFixture("task006-stress-negative.png", "combined-negative"),
+  analyzeRejectedFixture(
+    "task0061-stress-combined-negative.png",
+    "combined-negative",
+  ),
+  analyzeRejectedFixture(
+    "task0061-stress-right-arm-negative.png",
+    "right-arm-negative",
+  ),
+  analyzeRejectedFixture(
+    "task0061-stress-right-leg-negative.png",
+    "right-leg-negative",
+  ),
+  analyzeRejectedFixture(
+    "task0061-stress-combined-positive.png",
+    "combined-positive",
+  ),
 ]);
 const report = {
   schemaVersion: "1.1.0",
@@ -519,10 +558,10 @@ async function analyzeRejectedFixture(filename, acceptedPoseId) {
   }
   const regressionDiagnostics = [];
   if (unexpectedAlphaLoss > 0) {
-    regressionDiagnostics.push("ARTICULATION_UNEXPECTED_ALPHA_LOSS");
+    regressionDiagnostics.push("ARTICULATION_FINAL_PART_INVISIBLE");
   }
   if (pixelDifferenceCount > unexpectedAlphaLoss) {
-    regressionDiagnostics.push("ARTICULATION_VISIBLE_CUT_EDGE");
+    regressionDiagnostics.push("ARTICULATION_FINAL_COMPOSITE_MISMATCH");
   }
   return {
     fixture: filename,
@@ -534,7 +573,7 @@ async function analyzeRejectedFixture(filename, acceptedPoseId) {
   };
 }
 
-function visiblePartStats(owner) {
+function finalPartStats(render) {
   const stats = new Map(
     ordered.map((part) => [
       part.partId,
@@ -544,11 +583,13 @@ function visiblePartStats(owner) {
         minY: outputHeight,
         maxX: -1,
         maxY: -1,
+        visiblePixels: [],
+        occluders: new Map(),
       },
     ]),
   );
-  for (let index = 0; index < owner.length; index += 1) {
-    const partIndex = owner[index];
+  for (let index = 0; index < render.owner.length; index += 1) {
+    const partIndex = render.owner[index];
     if (partIndex < 0) continue;
     const stat = stats.get(ordered[partIndex].partId);
     const x = index % outputWidth;
@@ -558,12 +599,38 @@ function visiblePartStats(owner) {
     stat.minY = Math.min(stat.minY, y);
     stat.maxX = Math.max(stat.maxX, x);
     stat.maxY = Math.max(stat.maxY, y);
+    const offset = index * 4;
+    stat.visiblePixels.push(
+      index,
+      render.composite[offset],
+      render.composite[offset + 1],
+      render.composite[offset + 2],
+      render.composite[offset + 3],
+    );
+  }
+  for (const [partIndex, part] of ordered.entries()) {
+    const stat = stats.get(part.partId);
+    const mask = render.masks.get(part.partId);
+    for (let index = 0; index < mask.length; index += 1) {
+      if (mask[index] === 0 || render.owner[index] === partIndex) continue;
+      const occluderIndex = render.owner[index];
+      const occluder =
+        occluderIndex < 0 ? "__transparent__" : ordered[occluderIndex].partId;
+      stat.occluders.set(
+        occluder,
+        (stat.occluders.get(occluder) ?? 0) + 1,
+      );
+    }
   }
   return new Map(
     [...stats].map(([partId, stat]) => [
       partId,
       {
         alphaCount: stat.alphaCount,
+        hash: sha256(JSON.stringify(stat.visiblePixels)),
+        occludingParts: [...stat.occluders]
+          .map(([partId, pixelCount]) => ({ partId, pixelCount }))
+          .sort((left, right) => left.partId.localeCompare(right.partId)),
         bounds:
           stat.alphaCount === 0
             ? null
@@ -576,6 +643,19 @@ function visiblePartStats(owner) {
       },
     ]),
   );
+}
+
+function ownerMatchesComposite(render) {
+  for (let index = 0; index < render.owner.length; index += 1) {
+    const hasOwner = render.owner[index] >= 0;
+    const hasAlpha = render.composite[index * 4 + 3] > 0;
+    if (hasOwner !== hasAlpha) return false;
+  }
+  return true;
+}
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 function maskStats(mask) {

@@ -60,9 +60,22 @@ export interface ArticulationPartObservation {
   visibleBounds: ArticulationBounds | null;
   expectedVisibleBounds: ArticulationBounds | null;
   expectedVisibleAlphaCount: number;
+  finalVisiblePixelCount: number;
+  expectedFinalVisiblePixelCount: number;
+  finalVisibleBounds: ArticulationBounds | null;
+  expectedFinalVisibleBounds: ArticulationBounds | null;
+  finalVisiblePixelHash: string;
+  expectedFinalVisiblePixelHash: string;
+  occludingParts: readonly ArticulationOccluderObservation[];
+  expectedOccludingParts: readonly ArticulationOccluderObservation[];
   transformPreserved: boolean;
   hasRotatedAncestor: boolean;
   withinCanvas: boolean;
+}
+
+export interface ArticulationOccluderObservation {
+  partId: string;
+  pixelCount: number;
 }
 
 export interface ArticulationPoseObservation {
@@ -71,6 +84,10 @@ export interface ArticulationPoseObservation {
   parts: readonly ArticulationPartObservation[];
   briefcaseAttachmentError: number;
   briefcaseConnected: boolean;
+  finalCompositePixelHash: string;
+  encodedCompositePixelHash: string;
+  finalCompositeMatchesEncoded: boolean;
+  ownerCoverageMatchesComposite: boolean;
 }
 
 export interface ArticulationSafetyEvidence {
@@ -163,6 +180,16 @@ export function validateArticulationSafety(
           message: `Stress pose ${pose.poseId} has an invalid rotation for ${partId}.`,
         });
       }
+      const minimum = minimumStressRotation(partId);
+      if (minimum !== undefined && Math.abs(rotation) < minimum) {
+        diagnostics.push({
+          code: AssetDiagnosticCode.ARTICULATION_SPEC_INVALID,
+          stage: "articulation",
+          path: "articulation-safety.json",
+          partId,
+          message: `Stress rotation for ${partId} must be at least ${minimum} degrees.`,
+        });
+      }
     }
   }
   for (const requiredPoseId of expectedPoseIds) {
@@ -233,6 +260,20 @@ export function validateArticulationSafety(
       continue;
     }
     const observedPartIds = new Set(observation.parts.map((part) => part.partId));
+    if (
+      !observation.finalCompositeMatchesEncoded ||
+      !observation.ownerCoverageMatchesComposite ||
+      observation.finalCompositePixelHash !==
+        observation.encodedCompositePixelHash
+    ) {
+      diagnostics.push({
+        code: AssetDiagnosticCode.ARTICULATION_FINAL_COMPOSITE_MISMATCH,
+        stage: "articulation",
+        path: `articulation/stress-${pose.poseId}.png`,
+        message:
+          "The encoded stress PNG does not match the final draw-ordered owner composite.",
+      });
+    }
     for (const manifestPart of manifest.parts) {
       const part = observation.parts.find(
         (candidate) => candidate.partId === manifestPart.partId,
@@ -251,6 +292,61 @@ export function validateArticulationSafety(
           message: `Part ${manifestPart.partId} is missing from the stress render.`,
         });
         continue;
+      }
+      if (
+        part.finalVisiblePixelCount <= 0 ||
+        part.finalVisibleBounds === null
+      ) {
+        diagnostics.push({
+          code: AssetDiagnosticCode.ARTICULATION_FINAL_PART_INVISIBLE,
+          stage: "articulation",
+          path: `articulation/stress-${pose.poseId}.png`,
+          partId: manifestPart.partId,
+          message: `Part ${manifestPart.partId} has no pixels in the final composite.`,
+        });
+      }
+      if (
+        isProtectedFinalInvariant(manifestPart.partId) &&
+        !part.hasRotatedAncestor
+      ) {
+        if (
+          part.finalVisiblePixelCount !==
+            part.expectedFinalVisiblePixelCount ||
+          !sameBounds(
+            part.finalVisibleBounds,
+            part.expectedFinalVisibleBounds,
+          ) ||
+          !sameOccluders(
+            part.occludingParts,
+            part.expectedOccludingParts,
+          )
+        ) {
+          diagnostics.push({
+            code: AssetDiagnosticCode.ARTICULATION_UNEXPECTED_OCCLUSION,
+            stage: "articulation",
+            path: `articulation/stress-${pose.poseId}.png`,
+            partId: manifestPart.partId,
+            message: `Unrotated part ${manifestPart.partId} has unexpected final occlusion.`,
+            details: {
+              finalVisiblePixelCount: part.finalVisiblePixelCount,
+              expectedFinalVisiblePixelCount:
+                part.expectedFinalVisiblePixelCount,
+              occludingParts: part.occludingParts,
+            },
+          });
+        }
+        if (
+          part.finalVisiblePixelHash !==
+          part.expectedFinalVisiblePixelHash
+        ) {
+          diagnostics.push({
+            code: AssetDiagnosticCode.ARTICULATION_FINAL_COMPOSITE_MISMATCH,
+            stage: "articulation",
+            path: `articulation/stress-${pose.poseId}.png`,
+            partId: manifestPart.partId,
+            message: `Unrotated part ${manifestPart.partId} changed in the final composite.`,
+          });
+        }
       }
       if (!part.withinCanvas || part.renderedBounds === null) {
         diagnostics.push({
@@ -409,4 +505,22 @@ function sameBounds(
     left?.width === right?.width &&
     left?.height === right?.height
   );
+}
+
+function minimumStressRotation(partId: string): number | undefined {
+  if (partId.startsWith("upper-arm-") || partId.startsWith("thigh-")) return 8;
+  if (partId.startsWith("forearm-") || partId.startsWith("shin-")) return 12;
+  if (partId.startsWith("hand-") || partId.startsWith("foot-")) return 6;
+  return undefined;
+}
+
+function isProtectedFinalInvariant(partId: string): boolean {
+  return ["head", "cap", "hair", "sunglasses", "torso"].includes(partId);
+}
+
+function sameOccluders(
+  left: readonly ArticulationOccluderObservation[],
+  right: readonly ArticulationOccluderObservation[],
+): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }

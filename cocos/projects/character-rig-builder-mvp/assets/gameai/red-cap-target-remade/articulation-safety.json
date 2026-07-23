@@ -6,7 +6,7 @@
     {
       "poseId": "left-arm-positive",
       "rotations": {
-        "upper-arm-left": 6,
+        "upper-arm-left": 8,
         "forearm-left": -12,
         "hand-left": 6
       }
@@ -14,7 +14,7 @@
     {
       "poseId": "left-arm-negative",
       "rotations": {
-        "upper-arm-left": -6,
+        "upper-arm-left": -8,
         "forearm-left": 12,
         "hand-left": -6
       }
@@ -22,83 +22,83 @@
     {
       "poseId": "right-arm-positive",
       "rotations": {
-        "upper-arm-right": 1,
-        "forearm-right": -2,
-        "hand-right": 1
+        "upper-arm-right": 8,
+        "forearm-right": -12,
+        "hand-right": 6
       }
     },
     {
       "poseId": "right-arm-negative",
       "rotations": {
-        "upper-arm-right": -1,
-        "forearm-right": 2,
-        "hand-right": -1
+        "upper-arm-right": -8,
+        "forearm-right": 12,
+        "hand-right": -6
       }
     },
     {
       "poseId": "left-leg-positive",
       "rotations": {
-        "thigh-left": 3,
-        "shin-left": -6,
-        "foot-left": 3
+        "thigh-left": 8,
+        "shin-left": -12,
+        "foot-left": 6
       }
     },
     {
       "poseId": "left-leg-negative",
       "rotations": {
-        "thigh-left": -3,
-        "shin-left": 6,
-        "foot-left": -3
+        "thigh-left": -8,
+        "shin-left": 12,
+        "foot-left": -6
       }
     },
     {
       "poseId": "right-leg-positive",
       "rotations": {
-        "thigh-right": 1,
-        "shin-right": -2,
-        "foot-right": 1
+        "thigh-right": 8,
+        "shin-right": -12,
+        "foot-right": 6
       }
     },
     {
       "poseId": "right-leg-negative",
       "rotations": {
-        "thigh-right": -1,
-        "shin-right": 2,
-        "foot-right": -1
+        "thigh-right": -8,
+        "shin-right": 12,
+        "foot-right": -6
       }
     },
     {
       "poseId": "combined-positive",
       "rotations": {
-        "upper-arm-left": 6,
+        "upper-arm-left": 8,
         "forearm-left": -12,
         "hand-left": 6,
-        "upper-arm-right": 1,
-        "forearm-right": -2,
-        "hand-right": 1,
-        "thigh-left": 3,
-        "shin-left": -6,
-        "foot-left": 3,
-        "thigh-right": 1,
-        "shin-right": -2,
-        "foot-right": 1
+        "upper-arm-right": 8,
+        "forearm-right": -12,
+        "hand-right": 6,
+        "thigh-left": 8,
+        "shin-left": -12,
+        "foot-left": 6,
+        "thigh-right": 8,
+        "shin-right": -12,
+        "foot-right": 6
       }
     },
     {
       "poseId": "combined-negative",
       "rotations": {
-        "upper-arm-left": -6,
+        "upper-arm-left": -8,
         "forearm-left": 12,
         "hand-left": -6,
-        "upper-arm-right": -1,
-        "forearm-right": 2,
-        "hand-right": -1,
-        "thigh-left": -3,
-        "shin-left": 6,
-        "foot-left": -3,
-        "thigh-right": -1,
-        "shin-right": 2,
-        "foot-right": -1
+        "upper-arm-right": -8,
+        "forearm-right": 12,
+        "hand-right": -6,
+        "thigh-left": -8,
+        "shin-left": 12,
+        "foot-left": -6,
+        "thigh-right": -8,
+        "shin-right": 12,
+        "foot-right": -6
       }
     }
   ],

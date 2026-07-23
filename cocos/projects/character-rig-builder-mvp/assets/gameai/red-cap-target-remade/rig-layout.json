@@ -39,7 +39,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 13
+      "drawOrder": 14
     },
     {
       "partId": "torso",
@@ -71,7 +71,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 14
+      "drawOrder": 15
     },
     {
       "partId": "head",
@@ -103,25 +103,25 @@
         },
         "opacity": 1
       },
-      "drawOrder": 17
+      "drawOrder": 18
     },
     {
       "partId": "upper-arm-left",
       "file": "parts/upper-arm-left.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 160,
-        "y": 90,
-        "width": 140,
-        "height": 229
+        "x": 110,
+        "y": 40,
+        "width": 216,
+        "height": 279
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.305677
+        "x": 0.555556,
+        "y": 0.430108
       },
       "restPose": {
         "position": {
@@ -206,18 +206,18 @@
       "file": "parts/upper-arm-right.png",
       "parentId": "torso",
       "originalRect": {
-        "x": 40,
-        "y": 95,
-        "width": 140,
-        "height": 234
+        "x": 0,
+        "y": 45,
+        "width": 230,
+        "height": 284
       },
       "trimOffset": {
         "x": 0,
         "y": 0
       },
       "anchor": {
-        "x": 0.5,
-        "y": 0.299145
+        "x": 0.478261,
+        "y": 0.422535
       },
       "restPose": {
         "position": {
@@ -327,7 +327,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 9
+      "drawOrder": 12
     },
     {
       "partId": "shin-left",
@@ -359,7 +359,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 8
+      "drawOrder": 11
     },
     {
       "partId": "foot-left",
@@ -391,17 +391,17 @@
         },
         "opacity": 1
       },
-      "drawOrder": 7
+      "drawOrder": 10
     },
     {
       "partId": "thigh-right",
       "file": "parts/thigh-right.png",
       "parentId": "pelvis",
       "originalRect": {
-        "x": 25,
-        "y": 370,
-        "width": 220,
-        "height": 226
+        "x": 65,
+        "y": 410,
+        "width": 140,
+        "height": 186
       },
       "trimOffset": {
         "x": 0,
@@ -409,7 +409,7 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.486726
+        "y": 0.376344
       },
       "restPose": {
         "position": {
@@ -423,17 +423,17 @@
         },
         "opacity": 1
       },
-      "drawOrder": 12
+      "drawOrder": 9
     },
     {
       "partId": "shin-right",
       "file": "parts/shin-right.png",
       "parentId": "thigh-right",
       "originalRect": {
-        "x": 42,
-        "y": 485,
-        "width": 220,
-        "height": 306
+        "x": 82,
+        "y": 525,
+        "width": 140,
+        "height": 266
       },
       "trimOffset": {
         "x": 0,
@@ -441,7 +441,7 @@
       },
       "anchor": {
         "x": 0.5,
-        "y": 0.359477
+        "y": 0.263158
       },
       "restPose": {
         "position": {
@@ -455,7 +455,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 11
+      "drawOrder": 8
     },
     {
       "partId": "foot-right",
@@ -487,7 +487,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 10
+      "drawOrder": 7
     },
     {
       "partId": "briefcase",
@@ -519,7 +519,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 21
+      "drawOrder": 13
     },
     {
       "partId": "cap",
@@ -551,7 +551,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 19
+      "drawOrder": 20
     },
     {
       "partId": "hair",
@@ -583,7 +583,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 18
+      "drawOrder": 19
     },
     {
       "partId": "sunglasses",
@@ -615,7 +615,7 @@
         },
         "opacity": 1
       },
-      "drawOrder": 20
+      "drawOrder": 21
     }
   ],
   "sockets": [

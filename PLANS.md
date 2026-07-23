@@ -2,9 +2,70 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Completed plan: TASK-006.1 Fix Articulation Visual Acceptance
+## Completed plan: TASK-006.2 Unmasked Rig Render Verification
 
 - Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Reject masked or pre-flattened articulation evidence, validate the final
+draw-ordered composite rather than pre-composite masks, restore meaningful
+joint ranges, and prove the real 19-part hierarchy in Cocos Creator 3.8.8.
+
+### Scope
+
+- Preserve the four rejected TASK-006.1 stress PNGs as invalid regression
+  fixtures.
+- Remove every `AcceptanceComposite_*` node, generated flattened acceptance
+  image, overlay meta, and overlay-generation function.
+- Record final-owner counts, bounds, occluders, and hashes after draw-order
+  compositing, with strict invariant checks for unrotated head/accessory and
+  torso parts.
+- Add stable final-invisible, unexpected-occlusion, and final-composite
+  mismatch diagnostics.
+- Prove rotated right-arm and right-leg branches cannot transform, clip,
+  occlude, or erase unrelated sibling parts.
+- Restore at least ±8-degree shoulders/hips, ±12-degree elbows/knees, and
+  ±6-degree wrists/ankles.
+- Regenerate unmasked Cocos scenes and capture hierarchy, Scene, Game Preview,
+  and individual-Visual-disable evidence in Creator 3.8.8.
+
+### Out of scope
+
+- TASK-007, Walk, Hit, blending, state machines, IK, mesh deformation, or any
+  claim that the rig is Walk-ready without passing the requested ranges.
+
+### Execution
+
+1. Record TASK-006.1 rejection and freeze the four current broken outputs.
+2. Remove flattened overlay generation, assets, metas, and scene nodes; add
+   structural scene rejection tests.
+3. Build final-owner and encoded-composite evidence with invariant hashes and
+   occluder diagnostics.
+4. Restore minimum stress amplitudes and repair renderer, draw order, or art
+   until the complete character remains visible.
+5. Open only the segmented hierarchy in Cocos Creator 3.8.8, expand it, and
+   prove an individual `Visual_*` toggle changes the acceptance view.
+6. Run `CI=true pnpm verify`, review the complete diff, commit as
+   `fix: verify unmasked articulated rig rendering`, and push.
+
+### Done when
+
+- All four TASK-006.1 PNGs fail as regression fixtures.
+- No acceptance scene contains or renders a flattened full-character overlay.
+- Final-owner evidence preserves every unrelated invariant part and matches
+  the encoded PNG.
+- Minimum target rotations pass without missing parts, cracks, cropped parts,
+  or transparent overwrite.
+- Neutral visible RGBA differences remain exactly zero.
+- Real Cocos evidence shows only the 19-part Joint/Visual hierarchy and full
+  CI passes.
+
+## Rejected plan: TASK-006.1 Fix Articulation Visual Acceptance
+
+- Status: Rejected by TASK-006.2
 - Started: 2026-07-23
 - Completed: 2026-07-23
 

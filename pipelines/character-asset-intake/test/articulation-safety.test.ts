@@ -66,20 +66,12 @@ test("accepts all twelve hidden overlap seams and branch-isolated stress directi
       "combined-negative",
     ],
   );
-  assert.equal(input.provenance.hiddenExtensions.length, 14);
-  assert.deepEqual(
-    input.provenance.hiddenExtensions
-      .filter((extension) =>
-        extension.jointId?.startsWith("briefcase-occlusion-"),
-      )
-      .map((extension) => [
-        extension.partId,
-        extension.coverPartId,
-      ]),
-    [
-      ["thigh-right", "briefcase"],
-      ["shin-right", "briefcase"],
-    ],
+  assert.equal(input.provenance.hiddenExtensions.length, 12);
+  assert.equal(
+    input.provenance.hiddenExtensions.some((extension) =>
+      extension.jointId?.startsWith("briefcase-occlusion-"),
+    ),
+    false,
   );
   assert.deepEqual(
     validateArticulationSafety(
@@ -94,6 +86,7 @@ test("accepts all twelve hidden overlap seams and branch-isolated stress directi
   const generated = await readJson<{
     generatedPixelCount: number;
     textureDilationRadius: number;
+    textureDilationRadiusOverrides: Record<string, number>;
     textureExtensionMethod: string;
     parts: Array<{ jointId: string; generatedPixelCount: number }>;
   }>("articulation/generated-overlaps.json");
@@ -103,7 +96,11 @@ test("accepts all twelve hidden overlap seams and branch-isolated stress directi
     "nearest-original-opaque-child-texel-manhattan",
   );
   assert.equal(generated.textureDilationRadius, 24);
-  assert.equal(generated.parts.length, 14);
+  assert.deepEqual(generated.textureDilationRadiusOverrides, {
+    "shoulder-left": 80,
+    "shoulder-right": 80,
+  });
+  assert.equal(generated.parts.length, 12);
   assert.ok(generated.parts.every((part) => part.generatedPixelCount > 0));
 });
 
@@ -131,14 +128,16 @@ test("detects gaps, exposed cut edges, bad draw order, and briefcase drift", asy
   if (briefcasePose === undefined) return;
   briefcasePose.briefcaseAttachmentError = 1;
   briefcasePose.briefcaseConnected = false;
-  const [missingPart, outOfBoundsPart, alphaLossPart] = firstPose.parts;
+  const [missingPart, outOfBoundsPart, alphaLossPart, finalInvisiblePart] =
+    firstPose.parts;
   assert.notEqual(missingPart, undefined);
   assert.notEqual(outOfBoundsPart, undefined);
   assert.notEqual(alphaLossPart, undefined);
   if (
     missingPart === undefined ||
     outOfBoundsPart === undefined ||
-    alphaLossPart === undefined
+    alphaLossPart === undefined ||
+    finalInvisiblePart === undefined
   ) {
     return;
   }
@@ -146,6 +145,19 @@ test("detects gaps, exposed cut edges, bad draw order, and briefcase drift", asy
   missingPart.visibleAlphaCount = 0;
   outOfBoundsPart.withinCanvas = false;
   alphaLossPart.renderedAlphaCount = 1;
+  finalInvisiblePart.finalVisiblePixelCount = 0;
+  finalInvisiblePart.finalVisibleBounds = null;
+  alphaLossPart.finalVisiblePixelHash = "mutated";
+  alphaLossPart.occludingParts = [
+    { partId: "mutating-occluder", pixelCount: 1 },
+  ];
+  firstPose.finalCompositeMatchesEncoded = false;
+  firstPose.ownerCoverageMatchesComposite = false;
+  const protectedPart = firstPose.parts.find((part) => part.partId === "head");
+  assert.ok(protectedPart);
+  protectedPart.occludingParts = [
+    { partId: "mutating-occluder", pixelCount: 1 },
+  ];
 
   const manifest = structuredClone(input.manifest);
   const cover = manifest.parts.find((part) => part.partId === first.coverPartId);
@@ -171,13 +183,20 @@ test("detects gaps, exposed cut edges, bad draw order, and briefcase drift", asy
   assert.ok(codes.has(AssetDiagnosticCode.ARTICULATION_PART_MISSING));
   assert.ok(codes.has(AssetDiagnosticCode.ARTICULATION_PART_OUT_OF_BOUNDS));
   assert.ok(codes.has(AssetDiagnosticCode.ARTICULATION_UNEXPECTED_ALPHA_LOSS));
+  assert.ok(
+    codes.has(AssetDiagnosticCode.ARTICULATION_FINAL_PART_INVISIBLE),
+  );
+  assert.ok(
+    codes.has(AssetDiagnosticCode.ARTICULATION_FINAL_COMPOSITE_MISMATCH),
+  );
+  assert.ok(codes.has(AssetDiagnosticCode.ARTICULATION_UNEXPECTED_OCCLUSION));
   assert.ok(codes.has(AssetDiagnosticCode.ARTICULATION_DRAW_ORDER_INVALID));
   assert.ok(
     codes.has(AssetDiagnosticCode.ARTICULATION_BRIEFCASE_BRANCH_INVALID),
   );
 });
 
-test("ships fixed Cocos rest and stress scenes with autoplay disabled", async () => {
+test("ships unmasked Cocos rest and stress scenes with autoplay disabled", async () => {
   const specification =
     await readJson<ArticulationSafetySpecification>("articulation-safety.json");
   const cocosAssets = path.join(
@@ -212,19 +231,34 @@ test("ships fixed Cocos rest and stress scenes with autoplay disabled", async ()
     );
     assert.equal(player?.autoplay, false);
     const acceptanceComposite = scene.find(
-      (entry) => entry._name === `AcceptanceComposite_${pose.poseId}`,
-    );
-    assert.notEqual(acceptanceComposite, undefined);
-    const acceptanceSorting = scene.find(
       (entry) =>
-        entry.__type__ === "cc.Sorting2D" &&
-        entry.node &&
-        typeof entry.node === "object" &&
-        acceptanceComposite &&
-        (entry.node as { __id__?: number }).__id__ ===
-          scene.indexOf(acceptanceComposite),
+        typeof entry._name === "string" &&
+        entry._name.startsWith("AcceptanceComposite_"),
     );
-    assert.equal(acceptanceSorting?._sortingOrder, 1000);
+    assert.equal(acceptanceComposite, undefined);
+    const sprites = scene.filter((entry) => entry.__type__ === "cc.Sprite");
+    assert.equal(sprites.length, 19);
+    assert.ok(
+      sprites.every((sprite) => sprite._isTrimmedMode === false),
+      "articulated SpriteFrames must preserve untrimmed extension placement",
+    );
+    assert.ok(
+      sprites.every((sprite) => {
+        const nodeReference = sprite.node as { __id__?: number } | undefined;
+        const node =
+          nodeReference?.__id__ === undefined
+            ? undefined
+            : scene[nodeReference.__id__];
+        return (
+          typeof node?._name === "string" &&
+          node._name.startsWith("Visual_")
+        );
+      }),
+    );
+    const sortingOrders = scene
+      .filter((entry) => entry.__type__ === "cc.Sorting2D")
+      .map((entry) => entry._sortingOrder as number);
+    assert.ok(sortingOrders.every((order) => order < 1000));
     for (const [partId, degrees] of Object.entries(pose.rotations)) {
       const node = scene.find((entry) => entry._name === `Joint_${partId}`) as
         | { _euler?: { z?: number } }
@@ -232,9 +266,29 @@ test("ships fixed Cocos rest and stress scenes with autoplay disabled", async ()
       assert.equal(node?._euler?.z, degrees);
     }
   }
+  for (const overlay of [
+    "gameai/red-cap-target-remade/articulation/stress-combined-positive.png",
+    "gameai/red-cap-target-remade/articulation/stress-combined-positive.png.meta",
+    "gameai/red-cap-target-remade/articulation/stress-combined-negative.png",
+    "gameai/red-cap-target-remade/articulation/stress-combined-negative.png.meta",
+  ]) {
+    await assert.rejects(
+      readFile(path.join(cocosAssets, overlay)),
+      (error: NodeJS.ErrnoException) => error.code === "ENOENT",
+    );
+  }
+  const generator = await readFile(
+    path.join(
+      packageRoot,
+      "scripts/generate-cocos-articulation-scenes.mjs",
+    ),
+    "utf8",
+  );
+  assert.doesNotMatch(generator, /appendAcceptanceComposite/);
+  assert.doesNotMatch(generator, /installAcceptanceComposite/);
 });
 
-test("rejects the two TASK-006 stress renders as visual regressions", async () => {
+test("rejects TASK-006 and TASK-006.1 stress renders as visual regressions", async () => {
   const report = await readJson<{
     rejectedRegressions: Array<{
       fixture: string;
@@ -244,7 +298,14 @@ test("rejects the two TASK-006 stress renders as visual regressions", async () =
   }>("articulation/stress-report.json");
   assert.deepEqual(
     report.rejectedRegressions.map((item) => item.fixture),
-    ["task006-stress-positive.png", "task006-stress-negative.png"],
+    [
+      "task006-stress-positive.png",
+      "task006-stress-negative.png",
+      "task0061-stress-combined-negative.png",
+      "task0061-stress-right-arm-negative.png",
+      "task0061-stress-right-leg-negative.png",
+      "task0061-stress-combined-positive.png",
+    ],
   );
   assert.ok(
     report.rejectedRegressions.every((item) => item.status === "rejected"),
@@ -253,12 +314,75 @@ test("rejects the two TASK-006 stress renders as visual regressions", async () =
     report.rejectedRegressions.every((item) =>
       item.diagnostics.some((code) =>
         [
-          AssetDiagnosticCode.ARTICULATION_UNEXPECTED_ALPHA_LOSS,
-          AssetDiagnosticCode.ARTICULATION_VISIBLE_CUT_EDGE,
-        ].includes(code as typeof AssetDiagnosticCode.ARTICULATION_VISIBLE_CUT_EDGE),
+          AssetDiagnosticCode.ARTICULATION_FINAL_PART_INVISIBLE,
+          AssetDiagnosticCode.ARTICULATION_FINAL_COMPOSITE_MISMATCH,
+        ].includes(
+          code as
+            | typeof AssetDiagnosticCode.ARTICULATION_FINAL_PART_INVISIBLE
+            | typeof AssetDiagnosticCode.ARTICULATION_FINAL_COMPOSITE_MISMATCH,
+        ),
       ),
     ),
   );
+});
+
+test("preserves unrelated siblings in the final draw-ordered composite", async () => {
+  const input = await acceptedInputs();
+  const rightArm = input.evidence.poses.find(
+    (pose) => pose.poseId === "right-arm-negative",
+  );
+  const rightLeg = input.evidence.poses.find(
+    (pose) => pose.poseId === "right-leg-negative",
+  );
+  assert.ok(rightArm);
+  assert.ok(rightLeg);
+  for (const [pose, partIds] of [
+    [rightArm, ["head", "cap", "hair", "sunglasses"]],
+    [rightLeg, ["head", "cap", "hair", "sunglasses", "torso"]],
+  ] as const) {
+    assert.equal(pose.finalCompositeMatchesEncoded, true);
+    assert.equal(pose.ownerCoverageMatchesComposite, true);
+    for (const partId of partIds) {
+      const part = pose.parts.find((candidate) => candidate.partId === partId);
+      assert.ok(part);
+      assert.equal(part.transformPreserved, true);
+      assert.equal(
+        part.finalVisiblePixelCount,
+        part.expectedFinalVisiblePixelCount,
+      );
+      assert.deepEqual(part.finalVisibleBounds, part.expectedFinalVisibleBounds);
+      assert.equal(
+        part.finalVisiblePixelHash,
+        part.expectedFinalVisiblePixelHash,
+      );
+      assert.deepEqual(part.occludingParts, part.expectedOccludingParts);
+    }
+  }
+  for (const pose of input.evidence.poses) {
+    assert.equal(pose.ownerCoverageMatchesComposite, true);
+    assert.ok(
+      pose.parts
+        .filter((part) => !part.hasRotatedAncestor)
+        .every((part) => part.finalVisiblePixelCount > 0),
+    );
+  }
+});
+
+test("uses meaningful minimum joint stress amplitudes", async () => {
+  const input = await acceptedInputs();
+  for (const pose of input.specification.stressPoses) {
+    for (const [partId, rotation] of Object.entries(pose.rotations)) {
+      const minimum =
+        partId.startsWith("upper-arm-") || partId.startsWith("thigh-")
+          ? 8
+          : partId.startsWith("forearm-") || partId.startsWith("shin-")
+            ? 12
+            : partId.startsWith("hand-") || partId.startsWith("foot-")
+              ? 6
+              : 0;
+      assert.ok(Math.abs(rotation) >= minimum, `${pose.poseId}:${partId}`);
+    }
+  }
 });
 
 async function readJson<T>(relativePath: string): Promise<T> {

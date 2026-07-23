@@ -2,7 +2,7 @@
 
 ## Status
 
-Complete (2026-07-23)
+Rejected; superseded by TASK-006.2 (2026-07-23)
 
 ## Rejection
 
@@ -68,17 +68,9 @@ CI=true pnpm verify
 fix: validate articulation stress output visually
 ```
 
-## Result
+## Rejected result
 
-- Both rejected TASK-006 stress renders fail the updated visual regression
-  gate.
-- All 10 independent and combined stress renders preserve 19/19 parts and pass
-  all 12 pivot-local seam and complete-branch checks.
-- Hidden extensions use only nearest opaque child texels.
-- Two extra declared right-leg regions restore canonical pixels normally
-  hidden by the foreground briefcase, using the same child-only method.
-- The neutral composite remains at zero visible RGBA differences.
-- Cocos Creator 3.8.8 Scene and Game Preview evidence covers rest and both
-  combined stress directions.
-- `CI=true pnpm verify` passes 123/123 tests.
-- TASK-007, Walk, Hit, blending, IK, and state-machine work were not started.
+The test count was not sufficient acceptance. Several final composites lost
+unrelated head parts, a positive pose retained a torso/arm crack, and flattened
+`AcceptanceComposite_*` sprites hid the real rig in Cocos. TASK-006.2 preserves
+these outputs as rejected regression fixtures and removes the overlay path.

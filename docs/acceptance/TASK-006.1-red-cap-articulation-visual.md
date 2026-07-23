@@ -2,8 +2,13 @@
 
 ## Result
 
-Accepted by deterministic validation and Cocos Creator 3.8.8 visual review on
-2026-07-23.
+Rejected on 2026-07-23; superseded by TASK-006.2.
+
+The final negative PNGs could lose unrelated head/accessory pixels, the
+combined positive PNG retained a torso/arm crack, and the Cocos scenes rendered
+a flattened `AcceptanceComposite_*` above the actual rig. The right-arm and
+right-leg ranges were also reduced to ±1 degree. The prior pass summary below
+is retained only as rejection history and is not current acceptance evidence.
 
 - All 19 expected parts render with nonzero alpha in all 10 stress poses.
 - Both directions are captured independently for the left arm, right arm with

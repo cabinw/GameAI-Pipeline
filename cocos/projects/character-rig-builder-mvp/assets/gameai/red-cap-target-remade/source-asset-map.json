@@ -159,8 +159,8 @@
       "cropRect": {
         "x": 0,
         "y": 0,
-        "width": 220,
-        "height": 306
+        "width": 140,
+        "height": 266
       },
       "canonicalSourceFile": "source-parts/shin_r.png"
     },
@@ -183,8 +183,8 @@
       "cropRect": {
         "x": 0,
         "y": 0,
-        "width": 220,
-        "height": 226
+        "width": 140,
+        "height": 186
       },
       "canonicalSourceFile": "source-parts/thigh_r.png"
     },
@@ -206,8 +206,8 @@
       "cropRect": {
         "x": 0,
         "y": 0,
-        "width": 140,
-        "height": 229
+        "width": 216,
+        "height": 279
       },
       "canonicalSourceFile": "source-parts/upper_arm_l.png"
     },
@@ -218,8 +218,8 @@
       "cropRect": {
         "x": 0,
         "y": 0,
-        "width": 140,
-        "height": 234
+        "width": 230,
+        "height": 284
       },
       "canonicalSourceFile": "source-parts/upper_arm_r.png"
     }

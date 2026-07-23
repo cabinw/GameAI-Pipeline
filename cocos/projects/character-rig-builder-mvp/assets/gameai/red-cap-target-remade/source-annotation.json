@@ -63,7 +63,7 @@
         }
       ],
       "overrides": {
-        "drawOrder": 13
+        "drawOrder": 14
       }
     },
     {
@@ -116,7 +116,7 @@
         }
       ],
       "overrides": {
-        "drawOrder": 14
+        "drawOrder": 15
       }
     },
     {
@@ -169,17 +169,17 @@
         }
       ],
       "overrides": {
-        "drawOrder": 17
+        "drawOrder": 18
       }
     },
     {
       "partId": "upper-arm-left",
       "file": "parts/upper-arm-left.png",
       "sourceRect": {
-        "x": 160,
-        "y": 90,
-        "width": 140,
-        "height": 229
+        "x": 110,
+        "y": 40,
+        "width": 216,
+        "height": 279
       },
       "trim": {
         "offset": {
@@ -187,8 +187,8 @@
           "y": 0
         },
         "size": {
-          "width": 140,
-          "height": 229
+          "width": 216,
+          "height": 279
         }
       },
       "joint": {
@@ -277,10 +277,10 @@
       "partId": "upper-arm-right",
       "file": "parts/upper-arm-right.png",
       "sourceRect": {
-        "x": 40,
-        "y": 95,
-        "width": 140,
-        "height": 234
+        "x": 0,
+        "y": 45,
+        "width": 230,
+        "height": 284
       },
       "trim": {
         "offset": {
@@ -288,8 +288,8 @@
           "y": 0
         },
         "size": {
-          "width": 140,
-          "height": 234
+          "width": 230,
+          "height": 284
         }
       },
       "joint": {
@@ -418,7 +418,7 @@
         }
       ],
       "overrides": {
-        "drawOrder": 9
+        "drawOrder": 12
       }
     },
     {
@@ -455,7 +455,7 @@
         }
       ],
       "overrides": {
-        "drawOrder": 8
+        "drawOrder": 11
       }
     },
     {
@@ -482,17 +482,17 @@
         "y": 780
       },
       "overrides": {
-        "drawOrder": 7
+        "drawOrder": 10
       }
     },
     {
       "partId": "thigh-right",
       "file": "parts/thigh-right.png",
       "sourceRect": {
-        "x": 25,
-        "y": 370,
-        "width": 220,
-        "height": 226
+        "x": 65,
+        "y": 410,
+        "width": 140,
+        "height": 186
       },
       "trim": {
         "offset": {
@@ -500,8 +500,8 @@
           "y": 0
         },
         "size": {
-          "width": 220,
-          "height": 226
+          "width": 140,
+          "height": 186
         }
       },
       "joint": {
@@ -519,17 +519,17 @@
         }
       ],
       "overrides": {
-        "drawOrder": 12
+        "drawOrder": 9
       }
     },
     {
       "partId": "shin-right",
       "file": "parts/shin-right.png",
       "sourceRect": {
-        "x": 42,
-        "y": 485,
-        "width": 220,
-        "height": 306
+        "x": 82,
+        "y": 525,
+        "width": 140,
+        "height": 266
       },
       "trim": {
         "offset": {
@@ -537,8 +537,8 @@
           "y": 0
         },
         "size": {
-          "width": 220,
-          "height": 306
+          "width": 140,
+          "height": 266
         }
       },
       "joint": {
@@ -556,7 +556,7 @@
         }
       ],
       "overrides": {
-        "drawOrder": 11
+        "drawOrder": 8
       }
     },
     {
@@ -583,7 +583,7 @@
         "y": 790
       },
       "overrides": {
-        "drawOrder": 10
+        "drawOrder": 7
       }
     },
     {
@@ -611,7 +611,7 @@
       },
       "overrides": {
         "parentId": "head",
-        "drawOrder": 18
+        "drawOrder": 19
       }
     },
     {
@@ -639,7 +639,7 @@
       },
       "overrides": {
         "parentId": "head",
-        "drawOrder": 19
+        "drawOrder": 20
       }
     },
     {
@@ -667,7 +667,7 @@
       },
       "overrides": {
         "parentId": "head",
-        "drawOrder": 20
+        "drawOrder": 21
       }
     },
     {
@@ -695,7 +695,7 @@
       },
       "overrides": {
         "parentId": "hand-right",
-        "drawOrder": 21
+        "drawOrder": 13
       }
     }
   ]
