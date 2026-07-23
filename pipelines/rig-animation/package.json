@@ -1,0 +1,23 @@
+{
+  "name": "@gameai/rig-animation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Engine-neutral data-driven rigid Joint animation contracts, validation, normalization, and sampling.",
+  "main": "./dist/index.js",
+  "browser": "./dist/runtime.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.runtime.json && node scripts/mark-runtime-esm.mjs && node scripts/copy-schema.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "evidence:red-cap-idle": "node scripts/generate-red-cap-idle-evidence.mjs",
+    "test": "pnpm run build && pnpm run evidence:red-cap-idle && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
+  },
+  "dependencies": {
+    "ajv": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

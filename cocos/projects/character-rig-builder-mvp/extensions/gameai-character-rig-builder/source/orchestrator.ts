@@ -32,11 +32,12 @@ export async function executeCharacterRigBuild(
     request.sourceRoot.trim().length === 0 ||
     request.characterRigFile.trim().length === 0 ||
     request.sourceAnnotationFile.trim().length === 0 ||
-    request.assetMappingFile.trim().length === 0
+    request.assetMappingFile.trim().length === 0 ||
+    request.animationPresetFile.trim().length === 0
   ) {
     throw new SceneRigBuilderError({
       code: SceneRigDiagnosticCode.INVALID_BUILD_REQUEST,
-      message: "correlationId and all input paths, including assetMappingFile, are required.",
+      message: "correlationId and all input paths, including assetMappingFile and animationPresetFile, are required.",
       stage: "main",
       correlationId: request.correlationId,
     });

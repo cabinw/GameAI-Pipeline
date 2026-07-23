@@ -103,7 +103,7 @@ export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan
   });
 
   return {
-    planVersion: "1.2.0",
+    planVersion: "1.3.0",
     correlationId: input.correlationId,
     characterId: input.manifest.characterId,
     characterRootName: `CHR_${safeCharacterToken(input.manifest.characterId)}`,
@@ -123,5 +123,6 @@ export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan
       ...hitArea,
       shape: { ...hitArea.shape },
     })),
+    animation: input.animation ?? null,
   };
 }

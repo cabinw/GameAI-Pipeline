@@ -2,6 +2,9 @@ import type {
   CharacterAssetManifest,
   CharacterAssetPart,
 } from "@gameai/character-asset-intake";
+import type {
+  NormalizedRigAnimation,
+} from "@gameai/rig-animation";
 
 import type { SceneRigDiagnostic } from "./diagnostics";
 
@@ -12,6 +15,8 @@ export interface BuildCharacterRigRequest {
   characterRigFile: string;
   sourceAnnotationFile: string;
   assetMappingFile: string;
+  animationPresetFile: string;
+  autoplayAnimation: boolean;
 }
 
 export interface SpriteFrameAssetReference {
@@ -40,7 +45,7 @@ export interface CocosScenePartPlan {
 }
 
 export interface CocosSceneRigPlan {
-  planVersion: "1.2.0";
+  planVersion: "1.3.0";
   correlationId: string;
   characterId: string;
   characterRootName: string;
@@ -54,6 +59,15 @@ export interface CocosSceneRigPlan {
   parts: readonly CocosScenePartPlan[];
   sockets: CharacterAssetManifest["sockets"];
   hitAreas: CharacterAssetManifest["hitAreas"];
+  animation: CocosRigAnimationPlan | null;
+}
+
+export interface CocosRigAnimationPlan {
+  componentClassName: "GameAIRigAnimationPlayer";
+  presetAssetUrl: string;
+  presetAssetUuid: string;
+  normalizedAnimation: NormalizedRigAnimation;
+  autoplay: boolean;
 }
 
 export interface PreparedSceneRig {
@@ -88,6 +102,10 @@ export interface SceneBuildSuccess {
   cameraStatePreserved: true;
   verifiedPartIds: readonly string[];
   sortingOrders: readonly number[];
+  animationRuntimeVerified: boolean;
+  animationId: string | null;
+  animationTrackCount: number;
+  animationAutoplay: boolean;
 }
 
 export interface SceneBuildFailure {
@@ -123,6 +141,7 @@ export interface ScenePlanInput {
   correlationId: string;
   manifest: CharacterAssetManifest;
   assetReferences: readonly SpriteFrameAssetReference[];
+  animation?: CocosRigAnimationPlan | null;
 }
 
 export type ManifestPart = CharacterAssetPart;

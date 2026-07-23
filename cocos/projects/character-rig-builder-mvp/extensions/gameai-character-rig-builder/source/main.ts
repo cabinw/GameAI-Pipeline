@@ -6,8 +6,12 @@ import {
   generateRigLayout,
   maleNormalV1,
 } from "@gameai/rig-layout-generator";
+import {
+  normalizeRigAnimation,
+  parseRigAnimation,
+} from "@gameai/rig-animation";
 
-import { resolveSpriteFrameAssets } from "./assetdb";
+import { resolveJsonAsset, resolveSpriteFrameAssets } from "./assetdb";
 import {
   SceneRigBuilderError,
   SceneRigDiagnosticCode,
@@ -56,7 +60,12 @@ async function prepareSceneRig(
   const sourceRoot = sourceRootForRequest(request);
   const characterRigPath = resolve(sourceRoot, request.characterRigFile);
   const annotationPath = resolve(sourceRoot, request.sourceAnnotationFile);
-  if (!inside(sourceRoot, characterRigPath) || !inside(sourceRoot, annotationPath)) {
+  const animationPresetPath = resolve(sourceRoot, request.animationPresetFile);
+  if (
+    !inside(sourceRoot, characterRigPath) ||
+    !inside(sourceRoot, annotationPath) ||
+    !inside(sourceRoot, animationPresetPath)
+  ) {
     throw new SceneRigBuilderError({
       code: SceneRigDiagnosticCode.SOURCE_ROOT_OUTSIDE_ASSETS,
       message: "Input documents must remain inside the selected source root.",
@@ -67,10 +76,12 @@ async function prepareSceneRig(
 
   let characterRigDocument: unknown;
   let annotationDocument: unknown;
+  let animationPresetDocument: unknown;
   try {
-    [characterRigDocument, annotationDocument] = await Promise.all([
+    [characterRigDocument, annotationDocument, animationPresetDocument] = await Promise.all([
       readJson(characterRigPath),
       readJson(annotationPath),
+      readJson(animationPresetPath),
     ]);
   } catch (error) {
     throw new SceneRigBuilderError({
@@ -117,15 +128,46 @@ async function prepareSceneRig(
     });
   }
 
+  const parsedAnimation = parseRigAnimation(
+    JSON.stringify(animationPresetDocument),
+    {
+      rigId: generation.rigLayout.layoutId,
+      rigSchemaVersion: generation.rigLayout.schemaVersion,
+      jointIds: new Set(generation.manifest.parts.map((part) => part.partId)),
+    },
+  );
+  if (!parsedAnimation.ok) {
+    throw new SceneRigBuilderError({
+      code: SceneRigDiagnosticCode.ANIMATION_PRESET_INVALID,
+      message: "Rig Animation failed contract parsing or semantic validation.",
+      stage: "main",
+      correlationId: request.correlationId,
+      details: { issues: parsedAnimation.errors },
+    });
+  }
+
   const assetReferences = await resolveSpriteFrameAssets(
     generation.manifest.parts,
     resolve(Editor.Project.path, "assets"),
+    request.correlationId,
+  );
+  const projectAssetsRoot = resolve(Editor.Project.path, "assets");
+  const animationAssetLocalPath = relative(projectAssetsRoot, animationPresetPath);
+  const animationAsset = await resolveJsonAsset(
+    `db://assets/${animationAssetLocalPath.split(sep).join("/")}`,
     request.correlationId,
   );
   const plan = buildCocosSceneRigPlan({
     correlationId: request.correlationId,
     manifest: generation.manifest,
     assetReferences,
+    animation: {
+      componentClassName: "GameAIRigAnimationPlayer",
+      presetAssetUrl: animationAsset.assetUrl,
+      presetAssetUuid: animationAsset.assetUuid,
+      normalizedAnimation: normalizeRigAnimation(parsedAnimation.value),
+      autoplay: request.autoplayAnimation,
+    },
   });
   return {
     plan,

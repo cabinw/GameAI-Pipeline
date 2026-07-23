@@ -10,6 +10,8 @@ interface PanelElements {
   characterRig: HTMLInputElement;
   sourceAnnotation: HTMLInputElement;
   assetMapping: HTMLInputElement;
+  animationPreset: HTMLInputElement;
+  autoplay: HTMLInputElement;
   run: HTMLButtonElement;
   status: HTMLElement;
   output: HTMLElement;
@@ -28,7 +30,9 @@ module.exports = Editor.Panel.define({
       <label>Character Rig<input id="character-rig" value="character-rig.json"></label>
       <label>Source annotation<input id="source-annotation" value="source-annotation.json"></label>
       <label>Source asset map<input id="asset-mapping" value="source-asset-map.json"></label>
-      <button id="run" type="button">Build selected Red Cap rig</button>
+      <label>Animation preset<input id="animation-preset" value="animations/idle-subtle.json"></label>
+      <label class="check"><input id="autoplay" type="checkbox" checked> Autoplay validated idle</label>
+      <button id="run" type="button">Build animated Red Cap rig</button>
       <p id="status" data-state="idle">Not run</p>
       <pre id="output"></pre>
     </section>
@@ -38,6 +42,7 @@ module.exports = Editor.Panel.define({
     label { display: grid; gap: 4px; margin: 12px 0; font-weight: 600; }
     input { padding: 7px; color: var(--color-normal-contrast); background: var(--color-normal-fill); border: 1px solid var(--color-normal-border); }
     button { padding: 8px 12px; margin-top: 8px; }
+    .check { display: flex; align-items: center; gap: 8px; }
     #status[data-state="passed"] { color: var(--color-success-fill); }
     #status[data-state="failed"] { color: var(--color-danger-fill); }
     pre { max-height: 280px; overflow: auto; white-space: pre-wrap; user-select: text; }
@@ -47,6 +52,8 @@ module.exports = Editor.Panel.define({
     characterRig: "#character-rig",
     sourceAnnotation: "#source-annotation",
     assetMapping: "#asset-mapping",
+    animationPreset: "#animation-preset",
+    autoplay: "#autoplay",
     run: "#run",
     status: "#status",
     output: "#output",
@@ -54,12 +61,14 @@ module.exports = Editor.Panel.define({
   ready(this: PanelContext): void {
     const run = async (): Promise<void> => {
       const request: BuildCharacterRigRequest = {
-        correlationId: `task004-${Date.now()}`,
+        correlationId: `task005-${Date.now()}`,
         panelStartedAt: new Date().toISOString(),
         sourceRoot: this.$.sourceRoot.value,
         characterRigFile: this.$.characterRig.value,
         sourceAnnotationFile: this.$.sourceAnnotation.value,
         assetMappingFile: this.$.assetMapping.value,
+        animationPresetFile: this.$.animationPreset.value,
+        autoplayAnimation: this.$.autoplay.checked,
       };
       this.$.run.disabled = true;
       this.$.status.dataset.state = "running";

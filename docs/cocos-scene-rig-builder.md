@@ -5,7 +5,8 @@
 The Character Rig Builder is the first production editor adapter for the
 engine-neutral Character Pipeline. It consumes validated Character Rig data,
 the Rig Layout generated from a source annotation and `male-normal-v1`, and
-the normalized asset manifest. It does not add animation playback, animation
+the normalized asset manifest. TASK-005 extends the same validation boundary
+with normalized Joint animation playback; it does not add animation
 generation, auto cutting, or production-game integration.
 
 ## Validation and mutation boundary
@@ -20,11 +21,14 @@ The extension Main Process:
 4. Generates the Rig Layout with `@gameai/rig-layout-generator`.
 5. Receives the already decoded and validated asset manifest produced through
    `@gameai/character-asset-intake`.
-6. Resolves every imported image and SpriteFrame subasset through AssetDB.
-7. Creates a deterministic, JSON-serializable scene plan.
+6. Parses and validates the selected Rig Animation against the generated
+   layout, then normalizes it with `@gameai/rig-animation`.
+7. Resolves every imported image, SpriteFrame subasset, and animation JSON
+   through AssetDB.
+8. Creates a deterministic, JSON-serializable scene plan.
 
 Only that scene plan crosses into the Scene Script. Therefore a contract,
-layout, image, or AssetDB failure cannot create scene nodes.
+layout, image, animation, or AssetDB failure cannot create scene nodes.
 
 ## Joint and visual nodes
 
@@ -68,7 +72,8 @@ visualOffset.y =
 trimmed image size multiplied by `referenceScale`; the untrimmed normalized
 anchor is never assigned to the trimmed Sprite.
 
-Rig plan 1.2 also supports validated `source-canvas-rect` placement. It derives
+Rig plan 1.3 supports validated `source-canvas-rect` placement and an optional
+normalized animation payload. Placement derives
 both sides of the hierarchy conversion from the same common canvas:
 
 ```text
@@ -100,6 +105,19 @@ files nor generates or guesses UUID values.
 
 The Scene Script preloads all SpriteFrames using their UUIDs before inspecting
 or changing the live generated root.
+
+## Joint-only animation
+
+When Rig plan 1.3 contains animation data, Scene Script attaches the registered
+`GameAIRigAnimationPlayer` to the generated character root. The runtime
+captures generated Joint local rest poses and applies absolute-time,
+rest-relative samples to `Joint_*` nodes only. Visual nodes remain render-only.
+The animation preset AssetDB UUID is provenance evidence, never a node target.
+
+Missing targets report `ANIMATION_JOINT_TARGET_MISSING`; an unavailable
+registered component reports `ANIMATION_RUNTIME_COMPONENT_MISSING`. Stop and
+reset restore the exact captured rest transforms. See
+`docs/rig-animation.md` for coordinate and loop semantics.
 
 ## World-space 2D rendering
 

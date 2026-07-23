@@ -9,6 +9,7 @@ import {
 } from "@gameai/rig-layout-generator";
 import { parseCharacterRig } from "@gameai/character-contracts";
 import type { CharacterAssetManifest } from "@gameai/character-asset-intake";
+import type { NormalizedRigAnimation } from "@gameai/rig-animation";
 
 import {
   SceneRigBuilderError,
@@ -81,7 +82,7 @@ function part(partId: string) {
 
 describe("buildCocosSceneRigPlan", () => {
   it("selects the versioned world-space 2D render contract", () => {
-    assert.equal(plan.planVersion, "1.2.0");
+    assert.equal(plan.planVersion, "1.3.0");
     assert.equal(plan.renderLayer, "UI_3D");
     assert.deepEqual(plan.sourceCanvas, manifest.sourceCanvas);
     assert.equal(plan.visualPlacementMode, "trimmed-pixels");
@@ -157,6 +158,98 @@ describe("buildCocosSceneRigPlan", () => {
     });
     assert.equal(JSON.stringify(second), JSON.stringify(plan));
     assert.equal(digestScenePlan(second), digestScenePlan(plan));
+  });
+
+  it("carries normalized Joint-only animation data without changing visual calibration", () => {
+    const animation = {
+      schemaVersion: "1.0.0",
+      animationId: "idle-test",
+      rigId: "red-cap-target-layout",
+      rigSchemaVersion: manifest.schemaVersions.rigLayout,
+      duration: 2,
+      loop: true,
+      tracks: [
+        {
+          jointId: "torso",
+          property: "position",
+          keyframes: [
+            {
+              time: 0,
+              value: { x: 0, y: 0 },
+              interpolation: "linear",
+              easing: "linear",
+            },
+            {
+              time: 2,
+              value: { x: 0, y: 0 },
+              interpolation: "linear",
+              easing: "linear",
+            },
+          ],
+        },
+      ],
+    } satisfies NormalizedRigAnimation;
+    const animated = buildCocosSceneRigPlan({
+      correlationId: "task005-test",
+      manifest,
+      assetReferences: references,
+      animation: {
+        componentClassName: "GameAIRigAnimationPlayer",
+        presetAssetUrl: "db://assets/gameai/red-cap-target/animations/idle.json",
+        presetAssetUuid: "idle-json-uuid",
+        normalizedAnimation: animation,
+        autoplay: true,
+      },
+    });
+    assert.deepEqual(
+      animated.parts.map(({ partId, visualOffset, visualSize, sortingOrder }) => ({
+        partId,
+        visualOffset,
+        visualSize,
+        sortingOrder,
+      })),
+      plan.parts.map(({ partId, visualOffset, visualSize, sortingOrder }) => ({
+        partId,
+        visualOffset,
+        visualSize,
+        sortingOrder,
+      })),
+    );
+    assert.equal(animated.animation?.normalizedAnimation.tracks[0]?.jointId, "torso");
+    assert.equal(
+      animated.animation?.normalizedAnimation.tracks.some((track) =>
+        track.jointId.startsWith("Visual_"),
+      ),
+      false,
+    );
+    assert.equal(
+      JSON.stringify(animated),
+      JSON.stringify(
+        buildCocosSceneRigPlan({
+          correlationId: "task005-test",
+          manifest,
+          assetReferences: references,
+          animation: animated.animation,
+        }),
+      ),
+    );
+  });
+});
+
+describe("Cocos animation runtime boundary", () => {
+  it("applies absolute samples only to Joint nodes and restores captured rest pose", async () => {
+    const runtimeSource = await readFile(
+      resolve(
+        process.cwd(),
+        "../../assets/gameai/runtime/rig-animation-player.ts",
+      ),
+      "utf8",
+    );
+    assert.match(runtimeSource, /Joint_\$\{jointId\}/);
+    assert.match(runtimeSource, /composeJointPose\(binding\.restPose/);
+    assert.match(runtimeSource, /restoreRestPose\(\)/);
+    assert.doesNotMatch(runtimeSource, /getComponent\(Sprite\)/);
+    assert.doesNotMatch(runtimeSource, /Visual_\$\{jointId\}/);
   });
 });
 
@@ -315,6 +408,8 @@ describe("executeCharacterRigBuild", () => {
     characterRigFile: "character-rig.json",
     sourceAnnotationFile: "source-annotation.json",
     assetMappingFile: "source-asset-map.json",
+    animationPresetFile: "animations/idle-subtle.json",
+    autoplayAnimation: true,
   };
 
   function prepared(): PreparedSceneRig {
@@ -381,6 +476,11 @@ describe("executeCharacterRigBuild", () => {
           cameraStatePreserved: true,
           verifiedPartIds: value.plan.parts.map((partValue) => partValue.partId),
           sortingOrders: value.plan.parts.map((partValue) => partValue.sortingOrder),
+          animationRuntimeVerified: value.plan.animation !== null,
+          animationId: value.plan.animation?.normalizedAnimation.animationId ?? null,
+          animationTrackCount:
+            value.plan.animation?.normalizedAnimation.tracks.length ?? 0,
+          animationAutoplay: value.plan.animation?.autoplay ?? false,
         };
       },
       async writeEvidence(value) {

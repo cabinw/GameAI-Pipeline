@@ -2,6 +2,7 @@ packages:
   - framework/*
   - pipelines/*
   - cocos/extensions/*
+  - cocos/projects/*
   - cocos/projects/*/extensions/*
 
 catalog:

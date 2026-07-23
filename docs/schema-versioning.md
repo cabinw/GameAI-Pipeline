@@ -18,6 +18,16 @@ The TASK-001 Character Contract validator and TASK-003 Skeleton Template validat
 >=1.0.0 <1.1.0
 ```
 
+The TASK-005 Rig Animation validator implements:
+
+```text
+>=1.0.0 <1.1.0
+```
+
+An animation additionally declares its compatible Rig Layout identity and
+version. The rig ID and implemented major/minor must match before animation
+normalization.
+
 Source Canvas Annotation implements:
 
 ```text

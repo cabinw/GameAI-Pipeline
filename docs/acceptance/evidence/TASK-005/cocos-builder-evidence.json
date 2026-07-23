@@ -1,0 +1,65 @@
+{
+  "status": "passed",
+  "correlationId": "task005-1784804936809",
+  "creatorVersion": "3.8.8",
+  "stages": [
+    "panel",
+    "main-validation",
+    "assetdb",
+    "scene",
+    "verification"
+  ],
+  "sourceRoot": "cocos/projects/character-rig-builder-mvp/assets/gameai/red-cap-target-remade",
+  "characterId": "red-cap-target-remade",
+  "schemaVersions": {
+    "characterRig": "1.0.0",
+    "rigLayout": "1.0.0",
+    "rigAnimation": "1.0.0"
+  },
+  "manifestPartCount": 19,
+  "assetReferenceCount": 19,
+  "sceneResult": {
+    "ok": true,
+    "sceneName": "red-cap-remade-acceptance",
+    "characterRootName": "CHR_red_cap_target_remade",
+    "replacement": "replaced",
+    "partCount": 19,
+    "jointCount": 19,
+    "visualCount": 19,
+    "socketCount": 3,
+    "renderLayer": "UI_3D",
+    "renderRoot2DVerified": true,
+    "spriteFramesVerified": 19,
+    "nonZeroContentSizesVerified": 19,
+    "compatibleCameraNames": [
+      "Main Camera"
+    ],
+    "cameraStatePreserved": true,
+    "sortingOrders": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "animationRuntimeVerified": true,
+    "animationId": "red-cap-target-remade-idle-subtle",
+    "animationTrackCount": 5,
+    "animationAutoplay": true
+  },
+  "planDigest": "6f65d2cf71cd283122d7d3d6e7ccfaee919ea5d462cb1f3d63b7bb9583aff7ef"
+}

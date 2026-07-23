@@ -24,6 +24,7 @@ const files = [
   "rig-layout.json",
   "source-annotation.json",
   "source-asset-map.json",
+  "animations/idle-subtle.json",
   "reference/reconstructed-neutral.png",
   "reference/reconstruction-metrics.json",
   "reference/reference-comparison.png",

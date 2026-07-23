@@ -27,6 +27,12 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
+  cocos/projects/character-rig-builder-mvp:
+    dependencies:
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../../../pipelines/rig-animation
+
   cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder:
     dependencies:
       '@gameai/character-asset-intake':
@@ -35,6 +41,9 @@ importers:
       '@gameai/character-contracts':
         specifier: workspace:*
         version: link:../../../../../framework/character-contracts
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/rig-animation
       '@gameai/rig-layout-generator':
         specifier: workspace:*
         version: link:../../../../../pipelines/rig-layout-generator
@@ -45,6 +54,8 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.8.2
+
+  cocos/projects/task000-spike: {}
 
   cocos/projects/task000-spike/extensions/gameai-task000-spike:
     devDependencies:
@@ -76,6 +87,19 @@ importers:
       sharp:
         specifier: 0.35.3
         version: 0.35.3(@types/node@24.0.0)
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
+  pipelines/rig-animation:
+    dependencies:
+      ajv:
+        specifier: 'catalog:'
+        version: 8.17.1
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

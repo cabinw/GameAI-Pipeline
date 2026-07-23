@@ -125,6 +125,7 @@ Error-code string values are public compatibility surface. Messages and `details
 ## Deliberate limitations
 
 - Referenced image and JSON files are not opened or checked for existence in TASK-001.
-- No animation clip contract is defined yet.
+- Rig animation clips are a separate TASK-005 contract documented in
+  `docs/rig-animation.md`; Character Rig retains only stable target bindings.
 - No Cocos-specific UUID, `Node`, `Sprite`, prefab, scene, or component data is allowed in these schemas.
 - Mesh deformation, IK, Spine, and DragonBones remain outside the MVP contract.

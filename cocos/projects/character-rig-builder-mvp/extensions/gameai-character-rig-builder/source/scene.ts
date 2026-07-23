@@ -31,8 +31,13 @@ import type {
   SceneBuildResult,
   SceneBuildSuccess,
 } from "./types";
+import type { NormalizedRigAnimation } from "@gameai/rig-animation";
 
 const EXTENSION_NAME = "gameai-character-rig-builder";
+
+interface RigAnimationRuntimeComponent {
+  configure(animation: NormalizedRigAnimation, autoplay: boolean): void;
+}
 
 function diagnosticFromError(
   error: unknown,
@@ -165,6 +170,31 @@ function buildDetachedRoot(
     const y = shape.type === "rect" ? shape.y + shape.height / 2 : shape.y;
     node.setPosition(x, y, 0);
   }
+  if (plan.animation != null) {
+    const addByClassName = characterRoot.addComponent as unknown as (
+      className: string,
+    ) => unknown;
+    const component = addByClassName.call(
+      characterRoot,
+      plan.animation.componentClassName,
+    ) as RigAnimationRuntimeComponent | null;
+    if (component === null || typeof component.configure !== "function") {
+      throw new SceneRigBuilderError({
+        code: SceneRigDiagnosticCode.ANIMATION_RUNTIME_COMPONENT_MISSING,
+        message: `${plan.animation.componentClassName} is not registered in the Cocos project.`,
+        stage: "scene",
+        correlationId: plan.correlationId,
+        details: {
+          presetAssetUrl: plan.animation.presetAssetUrl,
+          presetAssetUuid: plan.animation.presetAssetUuid,
+        },
+      });
+    }
+    component.configure(
+      plan.animation.normalizedAnimation,
+      plan.animation.autoplay,
+    );
+  }
   return characterRoot;
 }
 
@@ -271,6 +301,36 @@ function verifyRenderTree(
       });
     }
     nonZeroContentSizesVerified += 1;
+  }
+
+  if (plan.animation != null) {
+    for (const track of plan.animation.normalizedAnimation.tracks) {
+      const joint = nodesByName.get(`Joint_${track.jointId}`);
+      if (joint === undefined || joint.name.startsWith("Visual_")) {
+        throw new SceneRigBuilderError({
+          code: SceneRigDiagnosticCode.ANIMATION_JOINT_TARGET_MISSING,
+          message: `Validated animation target Joint_${track.jointId} is missing from the generated rig.`,
+          stage: "scene",
+          correlationId: plan.correlationId,
+          details: { jointId: track.jointId, property: track.property },
+        });
+      }
+    }
+    const getByClassName = root.getComponent as unknown as (
+      className: string,
+    ) => unknown;
+    const runtime = getByClassName.call(
+      root,
+      plan.animation.componentClassName,
+    ) as RigAnimationRuntimeComponent | null;
+    if (runtime === null) {
+      throw new SceneRigBuilderError({
+        code: SceneRigDiagnosticCode.ANIMATION_RUNTIME_COMPONENT_MISSING,
+        message: `${plan.animation.componentClassName} was not attached to ${root.name}.`,
+        stage: "scene",
+        correlationId: plan.correlationId,
+      });
+    }
   }
 
   return { spriteFramesVerified, nonZeroContentSizesVerified };
@@ -438,6 +498,11 @@ export const methods = {
         sortingOrders: plan.parts
           .map((part) => part.sortingOrder)
           .sort((left, right) => left - right),
+        animationRuntimeVerified: plan.animation !== null,
+        animationId: plan.animation?.normalizedAnimation.animationId ?? null,
+        animationTrackCount:
+          plan.animation?.normalizedAnimation.tracks.length ?? 0,
+        animationAutoplay: plan.animation?.autoplay ?? false,
       };
       console.info(
         `[${EXTENSION_NAME}] ${result.replacement} ${plan.characterRootName} (${plan.correlationId})`,

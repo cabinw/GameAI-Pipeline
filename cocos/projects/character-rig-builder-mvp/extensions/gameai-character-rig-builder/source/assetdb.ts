@@ -17,6 +17,11 @@ interface AssetInfo {
   subAssets?: unknown;
 }
 
+export interface JsonAssetReference {
+  assetUrl: string;
+  assetUuid: string;
+}
+
 function asAssetInfo(value: unknown): AssetInfo | null {
   return typeof value === "object" && value !== null ? (value as AssetInfo) : null;
 }
@@ -70,6 +75,23 @@ async function queryAssetInfo(assetUrl: string): Promise<AssetInfo | null> {
   return asAssetInfo(
     await Editor.Message.request("asset-db", "query-asset-info", assetUrl),
   );
+}
+
+export async function resolveJsonAsset(
+  assetUrl: string,
+  correlationId: string,
+): Promise<JsonAssetReference> {
+  const info = await queryAssetInfo(assetUrl);
+  if (info?.uuid === undefined) {
+    throw new SceneRigBuilderError({
+      code: SceneRigDiagnosticCode.ANIMATION_ASSET_NOT_FOUND,
+      message: `AssetDB has not imported animation preset ${assetUrl}.`,
+      stage: "assetdb",
+      correlationId,
+      details: { assetUrl },
+    });
+  }
+  return { assetUrl, assetUuid: info.uuid };
 }
 
 async function spriteFrameInfo(assetUrl: string, imageInfo: AssetInfo): Promise<AssetInfo | null> {

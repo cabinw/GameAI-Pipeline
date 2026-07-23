@@ -1,0 +1,270 @@
+{
+  "evidenceVersion": "1.0.0",
+  "animationId": "red-cap-target-remade-idle-subtle",
+  "animationSchemaVersion": "1.0.0",
+  "rigId": "red-cap-target-remade-layout",
+  "rigSchemaVersion": "1.0.0",
+  "duration": 2,
+  "loop": true,
+  "coordinateConvention": "CCW degrees; additive position/rotation; multiplicative scale",
+  "samples": [
+    {
+      "requestedTime": 0,
+      "sampleTime": 0,
+      "joints": {
+        "head": {
+          "position": {
+            "x": 0,
+            "y": 2.57
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "torso": {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-left": {
+          "position": {
+            "x": 0.97,
+            "y": 2.37
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-right": {
+          "position": {
+            "x": -0.84,
+            "y": 2.36
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "requestedTime": 0.5,
+      "sampleTime": 0.5,
+      "joints": {
+        "head": {
+          "position": {
+            "x": 0,
+            "y": 2.57
+          },
+          "rotationDegrees": 0.4,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "torso": {
+          "position": {
+            "x": 0,
+            "y": 0.006
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1.0015,
+            "y": 1.003
+          }
+        },
+        "upper-arm-left": {
+          "position": {
+            "x": 0.97,
+            "y": 2.37
+          },
+          "rotationDegrees": -0.175,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-right": {
+          "position": {
+            "x": -0.84,
+            "y": 2.36
+          },
+          "rotationDegrees": 0.15,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "requestedTime": 1,
+      "sampleTime": 1,
+      "joints": {
+        "head": {
+          "position": {
+            "x": 0,
+            "y": 2.57
+          },
+          "rotationDegrees": 0.8,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "torso": {
+          "position": {
+            "x": 0,
+            "y": 0.012
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1.003,
+            "y": 1.006
+          }
+        },
+        "upper-arm-left": {
+          "position": {
+            "x": 0.97,
+            "y": 2.37
+          },
+          "rotationDegrees": -0.35,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-right": {
+          "position": {
+            "x": -0.84,
+            "y": 2.36
+          },
+          "rotationDegrees": 0.3,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "requestedTime": 1.5,
+      "sampleTime": 1.5,
+      "joints": {
+        "head": {
+          "position": {
+            "x": 0,
+            "y": 2.57
+          },
+          "rotationDegrees": 0.4,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "torso": {
+          "position": {
+            "x": 0,
+            "y": 0.006
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1.0015,
+            "y": 1.003
+          }
+        },
+        "upper-arm-left": {
+          "position": {
+            "x": 0.97,
+            "y": 2.37
+          },
+          "rotationDegrees": -0.175,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-right": {
+          "position": {
+            "x": -0.84,
+            "y": 2.36
+          },
+          "rotationDegrees": 0.15,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "requestedTime": 2,
+      "sampleTime": 0,
+      "joints": {
+        "head": {
+          "position": {
+            "x": 0,
+            "y": 2.57
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "torso": {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-left": {
+          "position": {
+            "x": 0.97,
+            "y": 2.37
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "upper-arm-right": {
+          "position": {
+            "x": -0.84,
+            "y": 2.36
+          },
+          "rotationDegrees": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      }
+    }
+  ],
+  "invariants": {
+    "loopBoundaryExact": true,
+    "feetHaveNoTracks": true,
+    "visualNodesHaveNoTracks": true,
+    "briefcaseHasNoIndependentTrack": true,
+    "briefcaseParentId": "hand-right",
+    "visualCalibrationDigest": "6e44f346670c90cb2fd0af598966f61f876db1605dee131b1ccd95889cd0ad62"
+  }
+}

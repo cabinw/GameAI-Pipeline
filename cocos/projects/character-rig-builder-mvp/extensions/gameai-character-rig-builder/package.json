@@ -16,6 +16,7 @@
   "dependencies": {
     "@gameai/character-asset-intake": "workspace:*",
     "@gameai/character-contracts": "workspace:*",
+    "@gameai/rig-animation": "workspace:*",
     "@gameai/rig-layout-generator": "workspace:*"
   },
   "devDependencies": {

@@ -2,6 +2,88 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-005 Data-Driven Rig Animation MVP
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Add a reusable, engine-neutral rig-animation contract and deterministic
+sampler, then autoplay one subtle, seamless idle preset on the accepted
+Red Cap Remade Joint hierarchy in Cocos Creator 3.8.8.
+
+### Scope
+
+- Add canonical `rig-animation.schema.json`, TypeScript types, parser,
+  semantic validator, stable diagnostics, normalizer, pure sampler, and
+  drift-free playback state under `@gameai/rig-animation`.
+- Use stable `jointId` targets and degree-based rotation offsets; reject Cocos
+  UUIDs and Visual-node targets in animation data.
+- Define the Red Cap Remade idle entirely as JSON data with subtle torso,
+  head, and arm offsets while feet remain untracked and planted.
+- Extend Builder Main validation so preset parsing, rig compatibility, target
+  resolution, and AssetDB JSON resolution finish before scene mutation.
+- Add a reusable Cocos `RigAnimationPlayer` project component that applies
+  absolute rest-pose-relative samples to `Joint_*` nodes only and restores the
+  exact rest pose on stop/reset.
+- Configure the acceptance scene to autoplay and capture rest, intermediate,
+  loop-end, hierarchy, Game Preview, and machine-readable sampling evidence.
+
+### Out of scope
+
+- Art recalibration, SpriteFrame replacement, Visual offsets, draw-order
+  changes, hidden-extension art, IK, blending, state machines, walk cycles, or
+  production gameplay.
+
+### Execution
+
+1. Record TASK-005 and the accepted coordinate/runtime decision before
+   implementation.
+2. Build the engine-neutral schema/package with invalid fixtures and
+   deterministic tests.
+3. Add and validate the Red Cap idle preset against stable rig joint IDs.
+4. Add the thin Cocos runtime component and extend the existing validation →
+   AssetDB → Scene Script boundary without duplicating contract parsing in the
+   Scene Script.
+5. Add runtime and integration tests for rest-pose-relative transforms,
+   loop continuity, frame-rate independence, no drift, reset, Joint-only
+   targets, unchanged Visual offsets, and inherited briefcase motion.
+6. Run frozen install and full verification, then use Creator 3.8.8 for
+   autoplay acceptance and timestamped evidence.
+7. Review the complete diff, commit as
+   `feat: add data-driven rig idle animation`, and push.
+
+### Done when
+
+- The idle JSON validates and normalizes through the engine-neutral package.
+- Sampling is deterministic, loop-seamless, frame-rate independent, and never
+  accumulates deltas.
+- Only Joint nodes change; Visual calibration and feet remain exact.
+- Stop/reset restores byte-equivalent rest transform data.
+- Creator Scene and Game Preview show subtle autoplay with no detached joints,
+  foot sliding, drift, loop jump, warnings, or errors.
+- `CI=true pnpm verify` passes from a frozen installation.
+
+### Result
+
+- Added the 1.0 Rig Animation schema and `@gameai/rig-animation` package with
+  stable diagnostics, parser, semantic validation, normalization, pure
+  sampling, and drift-free playback state.
+- Added a two-second data-only Red Cap idle that animates five Joint tracks,
+  keeps feet untracked, and inherits briefcase motion from the right hand.
+- Extended the editor boundary so Main validates animation/rig compatibility
+  and resolves the preset through AssetDB before Scene Script mutation.
+- Added `GameAIRigAnimationPlayer`, which applies absolute rest-relative
+  samples to Joint nodes and supports play, pause, stop, reset, seek, and loop.
+- Completed a real Creator 3.8.8 autoplay run with correlation
+  `task005-1784804936809`, Scene hierarchy evidence, three live Game Preview
+  frames, and exact machine-readable samples at 0, 0.5, 1, 1.5, and 2 seconds.
+- Frozen install and `CI=true pnpm verify` passed with 119 tests.
+- Minor flattened-source overlap artifacts remain recorded as non-blocking;
+  no art calibration was performed.
+
 ## Completed plan: TASK-004.5 Canonical Part Remake
 
 - Status: Complete

@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gameai.dev/schemas/rig-animation.schema.json",
+  "title": "GameAI Rig Animation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "animationId",
+    "rig",
+    "duration",
+    "loop",
+    "tracks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "animationId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "rig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rigId", "schemaVersion"],
+      "properties": {
+        "rigId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "schemaVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    },
+    "duration": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "loop": {
+      "type": "boolean"
+    },
+    "tracks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/track"
+      }
+    }
+  },
+  "definitions": {
+    "vector2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "keyframe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time", "value", "interpolation", "easing"],
+      "properties": {
+        "time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "value": {
+          "oneOf": [
+            { "type": "number" },
+            { "$ref": "#/definitions/vector2" }
+          ]
+        },
+        "interpolation": {
+          "type": "string",
+          "enum": ["linear", "step"]
+        },
+        "easing": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "ease-in-sine",
+            "ease-out-sine",
+            "ease-in-out-sine"
+          ]
+        }
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jointId", "property", "keyframes"],
+      "properties": {
+        "jointId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "property": {
+          "type": "string",
+          "enum": ["position", "rotation", "scale"]
+        },
+        "keyframes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/keyframe"
+          }
+        }
+      }
+    }
+  }
+}
