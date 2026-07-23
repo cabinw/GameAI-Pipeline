@@ -42,6 +42,11 @@ trimOffset.y + image.height <= originalRect.height
 
 An image larger than its untrimmed rectangle emits `IMAGE_DIMENSION_MISMATCH`. An otherwise valid image whose offset placement crosses the rectangle emits `TRIM_RECT_OUT_OF_BOUNDS`. The Character Contract validator separately proves that `originalRect` lies inside `sourceCanvas`, so the checks together establish the full source-canvas relationship.
 
+For `source-canvas-rect`, intake also validates the engine-neutral
+reconstruction before returning a manifest. It exposes pure helpers for
+source-to-reference conversion, source-rectangle centers, world pivots,
+parent-relative Joint transforms, and Visual-local transforms.
+
 ## Normalized manifest
 
 A successful `CharacterAssetManifest` contains:
@@ -70,6 +75,8 @@ Part array order is the authored Rig Layout order. This preserves the specified 
 | `IMAGE_FULLY_TRANSPARENT` | Every decoded alpha value is zero. |
 | `IMAGE_EMPTY_CONTENT_BOUNDS` | No non-transparent content rectangle can be calculated. |
 | `DUPLICATE_ASSET_REFERENCE` | More than one part resolves to the same real image path. |
+| `SOURCE_CANVAS_METADATA_INCONSISTENT` | An assembled `originalRect` leaves the declared common canvas. |
+| `TRIM_METADATA_INCONSISTENT` | Exact source-canvas placement would apply crop metadata twice. |
 
 Code strings are public compatibility surface for the package's `0.1.x` line. Messages and details are explanatory and must not be parsed by consumers.
 

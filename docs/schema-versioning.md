@@ -1,5 +1,13 @@
 # Schema-Version Compatibility
 
+## Additive Rig Layout 1.0 placement mode
+
+`visualPlacementMode` is an optional additive field in the supported Rig Layout
+1.0 line. Documents that omit it behave as `trimmed-pixels`; therefore existing
+fixtures and consumers remain compatible. `source-canvas-rect` opts into the
+stricter common-canvas reconstruction rules described by ADR-0009. This does
+not widen the existing accepted schema-version range.
+
 Durable GameAI input contracts use a required `schemaVersion` field with strict `MAJOR.MINOR.PATCH` syntax. File names remain stable; `$id` identifies each schema family and initial shape.
 
 ## Current support

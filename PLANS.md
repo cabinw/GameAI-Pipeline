@@ -2,6 +2,86 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-004.3 Exact Rest-Pose Reconstruction
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Reconstruct the Red Cap Remade neutral composite exactly from common
+source-canvas geometry, then prove that expressing the same placement as
+separate Joint and Visual transforms does not move any sprite.
+
+### Scope
+
+- Treat `reference/full_character.png` as the visual source of truth.
+- Audit and document source-canvas, `originalRect`, `trimOffset`, anatomical
+  left/right, Y-axis, units, and one-time scaling semantics.
+- Add stable source-canvas consistency diagnostics.
+- Add a deterministic neutral-composite reconstruction command and reference
+  comparison artifact.
+- Derive every Joint world pivot, parent-relative child Joint transform, and
+  Visual local offset from the same source-canvas coordinates.
+- Store all visual calibration in the remade annotation and generated layout;
+  add no scene-local corrective offsets.
+- Retain validation-before-mutation, AssetDB UUID resolution, global Sorting2D,
+  RenderRoot2D/UI_3D, compatible-camera checks, and safe idempotent replacement.
+- Re-run Cocos Creator 3.8.8 Scene and Game Preview acceptance.
+
+### Out of scope
+
+- Animation playback, animation generation, deformation, IK, or source-art
+  repainting.
+- Manual hierarchy assembly or dragging generated nodes.
+- Arbitrary per-part scene offsets.
+
+### Execution
+
+1. Record TASK-004.3 before implementation and compare the rejected render
+   against the complete 326×892 reference composite.
+2. Add pure source/reference coordinate helpers, diagnostics, reconstruction
+   output, and deterministic tests.
+3. Calibrate annotation rectangles and joints against the full composite,
+   regenerate the layout, and prove reconstruction equivalence.
+4. Update the scene plan to carry explicit joint-world and visual-world
+   evidence while emitting parent-relative Joint transforms and local Visual
+   offsets with `referenceScale` applied once.
+5. Synchronize the Cocos fixture, rebuild twice in the real editor, and capture
+   Scene, Game Preview, hierarchy, and reference-comparison evidence.
+6. Run `CI=true pnpm verify`, complete task records, commit, and push.
+
+### Done when
+
+- Neutral source-canvas composition closely matches the supplied complete
+  reference before hierarchy is involved.
+- Joint/Visual conversion preserves every reconstructed sprite center.
+- Shoulders, elbows, wrists, hips, knees, ankles, hat, glasses, and briefcase
+  are connected in Scene and Game Preview.
+- Left/right tests use anatomical—not viewer—semantics.
+- Two editor runs retain exactly one safe generated character root.
+- The complete verification gate passes.
+
+### Result
+
+- Added `source-canvas-rect` as an explicit, backward-compatible placement mode
+  and documented the decision in accepted ADR-0009.
+- Recalibrated all 19 Red Cap Remade assembled rectangles, proximal pivots,
+  child attachments, and draw order from the complete 326×892 reference.
+- Added deterministic neutral reconstruction and side-by-side output with an
+  enforced `0.8` alpha-silhouette IoU threshold; accepted IoU is `0.800928`.
+- Updated scene plan 1.2 so exact-mode Joint and Visual transforms share one
+  source-canvas derivation with a single Y flip and scale application.
+- Added stable metadata diagnostics and automated coverage for hierarchy/world
+  equivalence, visual offsets, anatomical sides, and exact scaling.
+- Ran the real Creator 3.8.8 builder twice. The final correlation-linked result
+  safely replaced one generated root and verified 19/19 SpriteFrames and
+  non-zero sizes, RenderRoot2D/UI_3D, camera visibility, and Sorting2D.
+- Captured Scene, expanded Joint/Visual hierarchy, Game Preview, and
+  engine-neutral reference-comparison evidence with no warnings or errors.
+- `CI=true pnpm verify` passes all 101 tests.
+
 ## Completed plan: TASK-004.2 Red Cap Remade Asset Integration
 
 - Status: Complete

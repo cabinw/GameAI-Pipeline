@@ -53,6 +53,7 @@ export interface CharacterAssetManifest {
   sourceCanvas: { width: number; height: number };
   referenceScale: number;
   drawOrderPolicy: "unique" | "shared";
+  visualPlacementMode: "trimmed-pixels" | "source-canvas-rect";
   parts: readonly CharacterAssetPart[];
   sockets: readonly RigSocket[];
   hitAreas: readonly RigHitArea[];

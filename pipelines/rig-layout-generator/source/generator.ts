@@ -642,6 +642,9 @@ function deriveLayout(
     sourceCanvas: { ...annotation.sourceCanvas },
     referenceScale,
     drawOrderPolicy: template.drawOrderPolicy,
+    ...(annotation.overrides?.visualPlacementMode === undefined
+      ? {}
+      : { visualPlacementMode: annotation.overrides.visualPlacementMode }),
     parts,
     ...(sockets.length === 0 ? {} : { sockets }),
     ...(hitAreas.length === 0 ? {} : { hitAreas }),

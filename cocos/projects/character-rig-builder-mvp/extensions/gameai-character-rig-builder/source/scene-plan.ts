@@ -4,6 +4,10 @@ import type {
   ManifestPart,
   ScenePlanInput,
 } from "./types";
+import {
+  reconstructManifestPlacements,
+  type ReconstructedPartPlacement,
+} from "@gameai/character-asset-intake";
 
 function round(value: number): number {
   const result = Math.round((value + Number.EPSILON) * 1_000_000) / 1_000_000;
@@ -18,33 +22,28 @@ function safeCharacterToken(characterId: string): string {
   return token;
 }
 
-function jointSourcePosition(part: ManifestPart): { x: number; y: number } {
-  return {
-    x: part.originalRect.x + part.anchor.x * part.originalRect.width,
-    y: part.originalRect.y + part.anchor.y * part.originalRect.height,
-  };
-}
-
 function scenePart(
   part: ManifestPart,
+  placement: ReconstructedPartPlacement,
+  visualPlacementMode: "trimmed-pixels" | "source-canvas-rect",
   sortingOrder: number,
-  referenceScale: number,
   spriteFrameUuid: string,
   assetUrl: string,
 ): CocosScenePartPlan {
-  const joint = jointSourcePosition(part);
-  const trimmedCenter = {
-    x: part.originalRect.x + part.trimOffset.x + part.width / 2,
-    y: part.originalRect.y + part.trimOffset.y + part.height / 2,
-  };
   return {
     partId: part.partId,
     parentId: part.parentId,
     jointName: `Joint_${part.partId}`,
     visualName: `Visual_${part.partId}`,
     jointPosition: {
-      x: round(part.restPose.position.x),
-      y: round(part.restPose.position.y),
+      x:
+        visualPlacementMode === "source-canvas-rect"
+          ? placement.jointLocalPosition.x
+          : round(part.restPose.position.x),
+      y:
+        visualPlacementMode === "source-canvas-rect"
+          ? placement.jointLocalPosition.y
+          : round(part.restPose.position.y),
     },
     jointRotationDegrees: round(part.restPose.rotationDegrees),
     jointScale: {
@@ -52,12 +51,12 @@ function scenePart(
       y: round(part.restPose.scale.y),
     },
     visualOffset: {
-      x: round((trimmedCenter.x - joint.x) * referenceScale),
-      y: round((joint.y - trimmedCenter.y) * referenceScale),
+      x: placement.visualLocalPosition.x,
+      y: placement.visualLocalPosition.y,
     },
     visualSize: {
-      width: round(part.width * referenceScale),
-      height: round(part.height * referenceScale),
+      width: placement.visualSize.width,
+      height: placement.visualSize.height,
     },
     visualAnchor: { x: 0.5, y: 0.5 },
     opacity: round(part.restPose.opacity),
@@ -70,6 +69,12 @@ function scenePart(
 
 export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan {
   const references = new Map(input.assetReferences.map((value) => [value.partId, value]));
+  const placements = new Map(
+    reconstructManifestPlacements(input.manifest).map((value) => [
+      value.partId,
+      value,
+    ]),
+  );
   const orderedForRendering = [...input.manifest.parts].sort(
     (left, right) =>
       left.drawOrder - right.drawOrder || left.partId.localeCompare(right.partId),
@@ -83,17 +88,22 @@ export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan
     if (reference === undefined) {
       throw new Error(`No AssetDB SpriteFrame reference was supplied for ${part.partId}.`);
     }
+    const placement = placements.get(part.partId);
+    if (placement === undefined) {
+      throw new Error(`No source-canvas reconstruction exists for ${part.partId}.`);
+    }
     return scenePart(
       part,
+      placement,
+      input.manifest.visualPlacementMode,
       sortingOrder.get(part.partId) ?? 0,
-      input.manifest.referenceScale,
       reference.spriteFrameUuid,
       reference.assetUrl,
     );
   });
 
   return {
-    planVersion: "1.1.0",
+    planVersion: "1.2.0",
     correlationId: input.correlationId,
     characterId: input.manifest.characterId,
     characterRootName: `CHR_${safeCharacterToken(input.manifest.characterId)}`,
@@ -103,6 +113,7 @@ export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan
     schemaVersions: { ...input.manifest.schemaVersions },
     sourceCanvas: { ...input.manifest.sourceCanvas },
     referenceScale: input.manifest.referenceScale,
+    visualPlacementMode: input.manifest.visualPlacementMode,
     parts,
     sockets: input.manifest.sockets.map((socket) => ({
       ...socket,

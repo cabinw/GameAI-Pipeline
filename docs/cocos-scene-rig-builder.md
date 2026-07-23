@@ -68,6 +68,22 @@ visualOffset.y =
 trimmed image size multiplied by `referenceScale`; the untrimmed normalized
 anchor is never assigned to the trimmed Sprite.
 
+Rig plan 1.2 also supports validated `source-canvas-rect` placement. It derives
+both sides of the hierarchy conversion from the same common canvas:
+
+```text
+world(source) = (
+  (source.x - canvas.width / 2) * referenceScale,
+  (canvas.height / 2 - source.y) * referenceScale
+)
+jointLocal = jointWorld - parentJointWorld
+visualLocal = originalRectCenterWorld - jointWorld
+visualSize = originalRect.size * referenceScale
+```
+
+Scene Script consumes these plan values unchanged. It does not add arbitrary
+part offsets, reapply trim metadata, or scale a second time.
+
 ## Draw order
 
 Parts are ordered by authored `drawOrder`, with `partId` as the deterministic

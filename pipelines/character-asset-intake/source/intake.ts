@@ -15,6 +15,7 @@ import {
   type CharacterAssetDiagnostic,
 } from "./diagnostics";
 import { inspectImage } from "./image-inspector";
+import { validateSourceCanvasReconstruction } from "./reconstruction";
 import {
   resolveSafeDocumentPath,
   resolveSafeExistingPath,
@@ -197,6 +198,8 @@ async function validateContractAssets(
     sourceCanvas: { ...contract.rigLayout.sourceCanvas },
     referenceScale: contract.rigLayout.referenceScale,
     drawOrderPolicy: contract.rigLayout.drawOrderPolicy,
+    visualPlacementMode:
+      contract.rigLayout.visualPlacementMode ?? "trimmed-pixels",
     parts,
     sockets: (contract.rigLayout.sockets ?? []).map((socket) => ({
       ...socket,
@@ -207,6 +210,11 @@ async function validateContractAssets(
       shape: { ...hitArea.shape },
     })),
   };
+
+  const reconstructionDiagnostics = validateSourceCanvasReconstruction(manifest);
+  if (reconstructionDiagnostics.length > 0) {
+    return failure(reconstructionDiagnostics);
+  }
 
   return { ok: true, manifest, diagnostics: [] };
 }

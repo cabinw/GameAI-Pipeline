@@ -60,6 +60,7 @@ export interface RigLayout {
   sourceCanvas: Size;
   referenceScale: number;
   drawOrderPolicy: "unique" | "shared";
+  visualPlacementMode?: "trimmed-pixels" | "source-canvas-rect";
   parts: RigPart[];
   sockets?: RigSocket[];
   hitAreas?: RigHitArea[];

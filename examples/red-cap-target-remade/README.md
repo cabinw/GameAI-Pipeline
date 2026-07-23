@@ -19,7 +19,15 @@ Regenerate the derived PNGs and layout from the repository root:
 pnpm exec node pipelines/character-asset-intake/scripts/prepare-mapped-assets.mjs \
   examples/red-cap-target-remade/source-asset-map.json
 pnpm --filter @gameai/rig-layout-generator generate:red-cap
+pnpm --filter @gameai/character-asset-intake reconstruct:red-cap
 ```
+
+The final command reconstructs the neutral pose from `originalRect` centers,
+proximal pivots, draw order, and the 326×892 common canvas before any hierarchy
+or engine is involved. It writes a side-by-side comparison and fails if the
+alpha-silhouette IoU is below `0.8`. Left/right names are always the
+character's anatomical sides, so anatomical left appears on the viewer's
+right in the front-facing reference.
 
 The Cocos acceptance project contains an AssetDB import mirror at
 `assets/gameai/red-cap-target-remade`. Tests require its source documents and

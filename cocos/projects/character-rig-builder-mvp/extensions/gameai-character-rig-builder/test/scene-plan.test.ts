@@ -81,9 +81,10 @@ function part(partId: string) {
 
 describe("buildCocosSceneRigPlan", () => {
   it("selects the versioned world-space 2D render contract", () => {
-    assert.equal(plan.planVersion, "1.1.0");
+    assert.equal(plan.planVersion, "1.2.0");
     assert.equal(plan.renderLayer, "UI_3D");
     assert.deepEqual(plan.sourceCanvas, manifest.sourceCanvas);
+    assert.equal(plan.visualPlacementMode, "trimmed-pixels");
   });
 
   it("creates one Joint/Visual pair and the complete proximal hierarchy", () => {

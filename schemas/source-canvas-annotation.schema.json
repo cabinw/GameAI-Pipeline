@@ -16,7 +16,8 @@
       "additionalProperties": false,
       "properties": {
         "referenceScale": { "type": "number", "exclusiveMinimum": 0 },
-        "sourceRectOverlapPolicy": { "enum": ["allow", "warn"] }
+        "sourceRectOverlapPolicy": { "enum": ["allow", "warn"] },
+        "visualPlacementMode": { "enum": ["trimmed-pixels", "source-canvas-rect"] }
       }
     },
     "parts": {

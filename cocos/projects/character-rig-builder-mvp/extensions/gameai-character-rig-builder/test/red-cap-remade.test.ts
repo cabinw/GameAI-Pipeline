@@ -16,7 +16,13 @@ import {
   maleNormalV1,
   serializeRigLayout,
 } from "@gameai/rig-layout-generator";
-import type { CharacterAssetManifest } from "@gameai/character-asset-intake";
+import {
+  AssetDiagnosticCode,
+  reconstructManifestPlacements,
+  sourcePointToReference,
+  validateSourceCanvasReconstruction,
+  type CharacterAssetManifest,
+} from "@gameai/character-asset-intake";
 
 import { resolveSpriteFrameAssets } from "../source/assetdb";
 import {
@@ -31,6 +37,7 @@ import {
   auditSourceAssetMap,
   parseSourceAssetMap,
 } from "../source/source-asset-map";
+import type { CocosSceneRigPlan } from "../source/types";
 
 const repositoryRoot = resolve(process.cwd(), "../../../../..");
 const fixtureRoot = resolve(repositoryRoot, "examples/red-cap-target-remade");
@@ -95,6 +102,7 @@ const insetContentBounds = {
 
 let manifest: CharacterAssetManifest;
 let cocosManifest: CharacterAssetManifest;
+let remadePlan: CocosSceneRigPlan;
 let annotation: unknown;
 let temporaryRoots: string[] = [];
 
@@ -118,6 +126,16 @@ before(async () => {
   assert.equal(generation.ok, true);
   if (!generation.ok) return;
   manifest = generation.manifest;
+  remadePlan = buildCocosSceneRigPlan({
+    correlationId: "task0043-reconstruction",
+    manifest,
+    assetReferences: manifest.parts.map((part) => ({
+      partId: part.partId,
+      assetUrl: `db://assets/gameai/red-cap-target-remade/${part.sourceRelativePath}`,
+      imageUuid: `image-${part.partId}`,
+      spriteFrameUuid: `frame-${part.partId}`,
+    })),
+  });
   assert.equal(
     serializeRigLayout(generation.rigLayout),
     await readFile(resolve(fixtureRoot, "rig-layout.json"), "utf8"),
@@ -200,6 +218,9 @@ describe("Red Cap Remade source art", () => {
       "source-annotation.json",
       "rig-layout.json",
       "assembled-preview.svg",
+      "reference/reconstructed-neutral.png",
+      "reference/reference-comparison.png",
+      "reference/reconstruction-metrics.json",
     ];
     for (const file of [...mappedFiles, ...documents]) {
       assert.deepEqual(
@@ -269,6 +290,154 @@ describe("Red Cap Remade source art", () => {
       ),
       { action: "replace", matchingIndex: 1, unrelatedRootCount: 1 },
     );
+  });
+});
+
+describe("Red Cap Remade exact source-canvas reconstruction", () => {
+  function plannedPart(partId: string) {
+    const value = remadePlan.parts.find((part) => part.partId === partId);
+    assert.notEqual(value, undefined);
+    return value!;
+  }
+
+  function jointWorld(partId: string): { x: number; y: number } {
+    const part = plannedPart(partId);
+    const parent =
+      part.parentId === null ? { x: 0, y: 0 } : jointWorld(part.parentId);
+    return {
+      x: Math.round((parent.x + part.jointPosition.x) * 1_000_000) / 1_000_000,
+      y: Math.round((parent.y + part.jointPosition.y) * 1_000_000) / 1_000_000,
+    };
+  }
+
+  it("reconstructs source-rect centers before applying the hierarchy", () => {
+    assert.equal(manifest.visualPlacementMode, "source-canvas-rect");
+    assert.equal(remadePlan.visualPlacementMode, "source-canvas-rect");
+    const placements = reconstructManifestPlacements(manifest);
+    for (const placement of placements) {
+      const sourcePart = manifest.parts.find(
+        (part) => part.partId === placement.partId,
+      )!;
+      assert.deepEqual(placement.visualSourceCenter, {
+        x: sourcePart.originalRect.x + sourcePart.originalRect.width / 2,
+        y: sourcePart.originalRect.y + sourcePart.originalRect.height / 2,
+      });
+    }
+  });
+
+  it("preserves every visual world position through Joint + Visual conversion", () => {
+    const placements = new Map(
+      reconstructManifestPlacements(manifest).map((value) => [
+        value.partId,
+        value,
+      ]),
+    );
+    for (const part of remadePlan.parts) {
+      const joint = jointWorld(part.partId);
+      const actualVisualWorld = {
+        x: Math.round((joint.x + part.visualOffset.x) * 1_000_000) / 1_000_000,
+        y: Math.round((joint.y + part.visualOffset.y) * 1_000_000) / 1_000_000,
+      };
+      assert.deepEqual(
+        actualVisualWorld,
+        placements.get(part.partId)!.visualWorldPosition,
+        part.partId,
+      );
+    }
+  });
+
+  it("keeps nonzero visual offsets when pivots differ from sprite centers", () => {
+    for (const partId of [
+      "torso",
+      "upper-arm-left",
+      "forearm-left",
+      "hand-right",
+      "thigh-left",
+      "shin-right",
+      "foot-left",
+      "briefcase",
+    ]) {
+      const offset = plannedPart(partId).visualOffset;
+      assert.notDeepEqual(offset, { x: 0, y: 0 }, partId);
+    }
+  });
+
+  it("reconstructs annotated world pivots from parent-relative child joints", () => {
+    for (const sourcePart of manifest.parts) {
+      const expected = sourcePointToReference(
+        {
+          x:
+            sourcePart.originalRect.x +
+            sourcePart.anchor.x * sourcePart.originalRect.width,
+          y:
+            sourcePart.originalRect.y +
+            sourcePart.anchor.y * sourcePart.originalRect.height,
+        },
+        manifest.sourceCanvas,
+        manifest.referenceScale,
+      );
+      assert.deepEqual(jointWorld(sourcePart.partId), expected, sourcePart.partId);
+    }
+  });
+
+  it("applies referenceScale exactly once to visual sizes", () => {
+    for (const sourcePart of manifest.parts) {
+      assert.deepEqual(plannedPart(sourcePart.partId).visualSize, {
+        width:
+          Math.round(
+            sourcePart.originalRect.width * manifest.referenceScale * 1_000_000,
+          ) / 1_000_000,
+        height:
+          Math.round(
+            sourcePart.originalRect.height * manifest.referenceScale * 1_000_000,
+          ) / 1_000_000,
+      });
+    }
+  });
+
+  it("uses anatomical left/right rather than viewer-left/right", () => {
+    for (const [left, right] of [
+      ["upper-arm-left", "upper-arm-right"],
+      ["hand-left", "hand-right"],
+      ["thigh-left", "thigh-right"],
+      ["shin-left", "shin-right"],
+      ["foot-left", "foot-right"],
+    ] as const) {
+      assert.ok(
+        reconstructManifestPlacements(manifest).find(
+          (part) => part.partId === left,
+        )!.jointSourcePosition.x >
+          reconstructManifestPlacements(manifest).find(
+            (part) => part.partId === right,
+          )!.jointSourcePosition.x,
+        `${left} must be on the viewer-right side of the front-facing character`,
+      );
+    }
+  });
+
+  it("publishes a stable diagnostic for double-applied trim metadata", () => {
+    const invalid: CharacterAssetManifest = {
+      ...manifest,
+      parts: manifest.parts.map((part, index) =>
+        index === 0
+          ? { ...part, trimOffset: { x: 1, y: 0 } }
+          : part,
+      ),
+    };
+    assert.equal(
+      validateSourceCanvasReconstruction(invalid)[0]?.code,
+      AssetDiagnosticCode.TRIM_METADATA_INCONSISTENT,
+    );
+  });
+
+  it("keeps the neutral reconstruction close to the complete reference", async () => {
+    const metrics = JSON.parse(
+      await readFile(
+        resolve(fixtureRoot, "reference/reconstruction-metrics.json"),
+        "utf8",
+      ),
+    ) as { alphaSilhouetteIoU: number };
+    assert.ok(metrics.alphaSilhouetteIoU >= 0.8);
   });
 });
 

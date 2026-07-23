@@ -12,7 +12,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js",
-    "fixtures:generate": "node scripts/generate-fixtures.mjs"
+    "fixtures:generate": "node scripts/generate-fixtures.mjs",
+    "reconstruct:red-cap": "node scripts/reconstruct-red-cap-remade.mjs"
   },
   "dependencies": {
     "@gameai/character-contracts": "workspace:*",

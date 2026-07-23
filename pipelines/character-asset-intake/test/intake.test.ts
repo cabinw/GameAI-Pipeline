@@ -19,6 +19,9 @@ import {
   AssetDiagnosticCode,
   inspectImage,
   intakeCharacterAssets,
+  sourcePointToReference,
+  validateSourceCanvasReconstruction,
+  type CharacterAssetManifest,
 } from "../source";
 
 const packageRoot = path.resolve(__dirname, "../..");
@@ -153,6 +156,25 @@ test("loads the Red Cap fixture without mutation and returns a deterministic man
   assert.deepEqual(first.manifest.parts[1]?.restPose.position, { x: 0, y: 108 });
 });
 
+test("converts source-canvas coordinates with positive Y up and applies scale once", () => {
+  assert.deepEqual(
+    sourcePointToReference(
+      { x: 163, y: 446 },
+      { width: 326, height: 892 },
+      0.01,
+    ),
+    { x: 0, y: 0 },
+  );
+  assert.deepEqual(
+    sourcePointToReference(
+      { x: 263, y: 346 },
+      { width: 326, height: 892 },
+      0.01,
+    ),
+    { x: 1, y: 1 },
+  );
+});
+
 test("inspects a valid alpha WebP and calculates content bounds", async () => {
   const result = await inspectImage(
     path.join(imageFixtureRoot, "valid-alpha.webp"),
@@ -176,7 +198,12 @@ test("every required asset diagnostic has a deterministic invalid fixture", asyn
   const fixtureFiles = (await readdir(invalidFixtureRoot))
     .filter((file) => file.endsWith(".json"))
     .sort();
-  assert.equal(fixtureFiles.length, Object.keys(AssetDiagnosticCode).length);
+  const fixtureBackedCodes = Object.keys(AssetDiagnosticCode).filter(
+    (code) =>
+      code !== AssetDiagnosticCode.SOURCE_CANVAS_METADATA_INCONSISTENT &&
+      code !== AssetDiagnosticCode.TRIM_METADATA_INCONSISTENT,
+  );
+  assert.equal(fixtureFiles.length, fixtureBackedCodes.length);
 
   for (const fixtureFile of fixtureFiles) {
     await context.test(fixtureFile, async () => {
@@ -200,6 +227,29 @@ test("every required asset diagnostic has a deterministic invalid fixture", asyn
       }
     });
   }
+});
+
+test("reports stable source-canvas and trim metadata diagnostics", async () => {
+  const result = await intakeCharacterAssets({ sourceRoot: validFixtureRoot });
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+
+  const invalidManifest = structuredClone(result.manifest) as CharacterAssetManifest;
+  invalidManifest.visualPlacementMode = "source-canvas-rect";
+  invalidManifest.parts = [invalidManifest.parts[0]!];
+  invalidManifest.parts[0]!.originalRect.x = invalidManifest.sourceCanvas.width;
+  invalidManifest.parts[0]!.trimOffset.x = 1;
+
+  const diagnostics = validateSourceCanvasReconstruction(invalidManifest);
+  assert.deepEqual(
+    diagnostics.map((diagnostic) => diagnostic.code),
+    [
+      AssetDiagnosticCode.SOURCE_CANVAS_METADATA_INCONSISTENT,
+      AssetDiagnosticCode.TRIM_METADATA_INCONSISTENT,
+    ],
+  );
 });
 
 test("rejects an entry contract path outside the selected source root", async () => {

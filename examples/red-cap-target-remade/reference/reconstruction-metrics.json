@@ -1,0 +1,9 @@
+{
+  "sourceCanvas": {
+    "width": 326,
+    "height": 892
+  },
+  "reference": "full_character.png",
+  "reconstruction": "reconstructed-neutral.png",
+  "alphaSilhouetteIoU": 0.800928
+}

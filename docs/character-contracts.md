@@ -31,6 +31,12 @@ Animation targets decouple future animation data from artwork-specific part nami
 
 The Rig Layout document contains `sourceCanvas`, `referenceScale`, an explicit `drawOrderPolicy`, and one or more parts. It may also contain sockets and hit areas.
 
+`visualPlacementMode` is optional in Rig Layout 1.0. `trimmed-pixels` is the
+default and places decoded pixels from `trimOffset`. `source-canvas-rect`
+declares that each `originalRect` is the calibrated assembled rectangle on the
+common canvas; decoded pixels are scaled to that rectangle and `trimOffset`
+must be zero so crop placement is not applied twice.
+
 Every part contains all fields required by TASK-001:
 
 | Field | Meaning |
@@ -52,6 +58,10 @@ Every part contains all fields required by TASK-001:
 - `trimOffset` uses the `originalRect` top-left as its origin. Both components are non-negative and must remain inside the original rectangle.
 - `anchor` is normalized over the untrimmed `originalRect`: `(0, 0)` is top-left and `(1, 1)` is bottom-right.
 - Rest-pose positions and socket positions use reference units with positive `x` right and positive `y` up. Convert a source-pixel distance to reference units by multiplying by `referenceScale` and invert the source Y direction when deriving a rest-pose vector.
+- Exact source-canvas reconstruction centers source coordinates, flips Y, and
+  applies `referenceScale` exactly once. Joint locals are child/parent
+  world-pivot differences; Visual locals are assembled-rectangle-center/world-
+  pivot differences.
 - `rotationDegrees` is counter-clockwise in reference space.
 - Rest-pose scale components are non-zero; negative values intentionally mirror a part.
 - Opacity is normalized to `[0, 1]`.

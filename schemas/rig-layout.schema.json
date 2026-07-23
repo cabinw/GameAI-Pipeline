@@ -34,6 +34,14 @@
         "shared"
       ]
     },
+    "visualPlacementMode": {
+      "type": "string",
+      "enum": [
+        "trimmed-pixels",
+        "source-canvas-rect"
+      ],
+      "default": "trimmed-pixels"
+    },
     "parts": {
       "type": "array",
       "minItems": 1,

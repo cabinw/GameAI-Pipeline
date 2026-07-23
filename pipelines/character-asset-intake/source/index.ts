@@ -8,6 +8,16 @@ export {
 } from "./diagnostics";
 export { inspectImage, type InspectedImage, type InspectImageResult } from "./image-inspector";
 export { intakeCharacterAssets, validateCharacterAssetDocuments } from "./intake";
+export {
+  partJointSourcePosition,
+  reconstructManifestPlacements,
+  reconstructPartPlacement,
+  sourcePointToReference,
+  sourceRectCenter,
+  validateSourceCanvasReconstruction,
+  type ReconstructedPartPlacement,
+  type ReferencePoint,
+} from "./reconstruction";
 export type {
   CharacterAssetDocumentIntakeOptions,
   CharacterAssetIntakeOptions,

@@ -62,6 +62,7 @@ export interface SourceCanvasAnnotation {
   overrides?: {
     referenceScale?: number;
     sourceRectOverlapPolicy?: "allow" | "warn";
+    visualPlacementMode?: "trimmed-pixels" | "source-canvas-rect";
   };
   parts: SourceAnnotationPart[];
 }

@@ -40,7 +40,7 @@ export interface CocosScenePartPlan {
 }
 
 export interface CocosSceneRigPlan {
-  planVersion: "1.1.0";
+  planVersion: "1.2.0";
   correlationId: string;
   characterId: string;
   characterRootName: string;
@@ -50,6 +50,7 @@ export interface CocosSceneRigPlan {
   schemaVersions: CharacterAssetManifest["schemaVersions"];
   sourceCanvas: CharacterAssetManifest["sourceCanvas"];
   referenceScale: number;
+  visualPlacementMode: CharacterAssetManifest["visualPlacementMode"];
   parts: readonly CocosScenePartPlan[];
   sockets: CharacterAssetManifest["sockets"];
   hitAreas: CharacterAssetManifest["hitAreas"];

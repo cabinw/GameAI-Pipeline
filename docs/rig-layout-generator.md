@@ -25,6 +25,11 @@ An annotation declares identity, `sourceCanvas`, optional generation overrides, 
 
 `visualCenter` is never a pivot input. A parent `joint` is its own proximal pivot and is never reused as a distal joint. Every 1.1 child attachment must lie inside its parent rectangle and coincide with the named child's proximal `joint`; the two remain separate records for future animation targeting. Parent and draw-order overrides are required for additional parts not declared in a template when `additionalPartPolicy` is `allow-with-overrides`.
 
+The annotation may select `visualPlacementMode`. The generator copies it to
+Rig Layout. `source-canvas-rect` means `originalRect` is an assembled visual
+rectangle rather than the decoded PNG's native size; this is the mode used by
+Red Cap Remade exact rest-pose reconstruction.
+
 The proximal pivot vocabulary used by the first humanoid template is:
 
 | Part | Proximal pivot |
