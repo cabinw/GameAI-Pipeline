@@ -29,13 +29,15 @@ Run from the repository root:
 
 ```bash
 pnpm install --frozen-lockfile
+pnpm build
 pnpm typecheck
 pnpm test
-pnpm build
 pnpm verify
 ```
 
-`pnpm verify` is the required local and CI gate. It performs the TypeScript check and test suite. Creator itself is not installed in CI, so editor integration remains a recorded local acceptance check.
+`pnpm verify` is the required local and CI gate. It performs a topologically ordered workspace build before repository-wide typechecking, then runs the complete test suite. The build-first order is required on a clean checkout because workspace consumers resolve dependency declarations from generated package `dist` directories. Neither local verification nor CI relies on pre-existing `dist` or `dist-test` output.
+
+CI starts from a checkout with no build output, runs `pnpm install --frozen-lockfile`, and then runs `pnpm verify`. Creator itself is not installed in CI, so editor integration remains a recorded local acceptance check.
 
 ## Workspace and Cocos project decision
 

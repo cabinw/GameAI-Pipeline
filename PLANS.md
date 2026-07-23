@@ -2,6 +2,54 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-003.2 Clean-Checkout Verification
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Make the repository verification gate reproducible from a fresh checkout where no workspace package has prebuilt `dist` or `dist-test` declarations.
+
+### Scope
+
+- Change the root verification order so workspace dependencies build before repository-wide typechecking.
+- Preserve topological workspace build ordering through pnpm.
+- Make the GitHub Actions verification job explicitly assert that checkout-time build outputs are absent.
+- Prove the documented `pnpm install --frozen-lockfile` followed by `pnpm verify` workflow succeeds without pre-existing generated directories.
+
+### Out of scope
+
+- Production pipeline or Cocos behavior.
+- Workspace topology changes.
+- Committing generated `dist` or `dist-test` output.
+- New runtime dependencies.
+
+### Execution
+
+1. Record TASK-003.2 and this active plan before implementation.
+2. Reproduce the clean-output failure and confirm the dependency ordering cause.
+3. Build workspace dependencies before the repository-wide typecheck in `pnpm verify`.
+4. Strengthen CI with a clean-checkout output assertion followed by frozen install and verify.
+5. Remove local build outputs, run the exact clean-checkout command sequence, and confirm all 63 tests.
+6. Review the diff and commit with the required subject.
+
+### Done when
+
+- `pnpm install --frozen-lockfile` and `pnpm verify` pass with no pre-existing workspace `dist` or `dist-test` directories.
+- Workspace consumers resolve dependency declarations created by the preceding topological build.
+- CI guards the clean-checkout assumption.
+- All 63 tests pass and generated output remains ignored.
+
+### Result
+
+- Reproduced the clean-output failure as `TS2307` errors in `@gameai/character-asset-intake` before `@gameai/character-contracts/dist` existed.
+- Changed the root gate to topological build → repository-wide typecheck → complete test suite.
+- Added a CI assertion that the checkout contains no `dist` or `dist-test` before frozen installation and verification.
+- Removed all local workspace build output and `node_modules`, then ran `pnpm install --frozen-lockfile` followed by `pnpm verify`.
+- All 63 tests pass; no generated output or dependency changes are tracked.
+
 ## Completed plan: TASK-003.1 Rig Semantics and Red Cap Calibration
 
 - Status: Complete

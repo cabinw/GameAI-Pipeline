@@ -17,6 +17,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Assert clean checkout has no build outputs
+        shell: bash
+        run: |
+          if find framework pipelines cocos -type d \( -name dist -o -name dist-test \) -print -quit | grep -q .; then
+            echo "::error::Clean checkout unexpectedly contains dist or dist-test output."
+            exit 1
+          fi
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
