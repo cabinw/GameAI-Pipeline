@@ -1,0 +1,24 @@
+{
+  "mappingVersion": "1.0.0",
+  "assetDirectory": "assets/parts",
+  "parts": [
+    { "sourceFile": "assets/parts/briefcase.png", "partId": "briefcase" },
+    { "sourceFile": "assets/parts/cap.png", "partId": "cap" },
+    { "sourceFile": "assets/parts/foot-left.png", "partId": "foot-left" },
+    { "sourceFile": "assets/parts/foot-right.png", "partId": "foot-right" },
+    { "sourceFile": "assets/parts/forearm-left.png", "partId": "forearm-left" },
+    { "sourceFile": "assets/parts/forearm-right.png", "partId": "forearm-right" },
+    { "sourceFile": "assets/parts/hand-left.png", "partId": "hand-left" },
+    { "sourceFile": "assets/parts/hand-right.png", "partId": "hand-right" },
+    { "sourceFile": "assets/parts/head.png", "partId": "head" },
+    { "sourceFile": "assets/parts/pelvis.png", "partId": "pelvis" },
+    { "sourceFile": "assets/parts/shin-left.png", "partId": "shin-left" },
+    { "sourceFile": "assets/parts/shin-right.png", "partId": "shin-right" },
+    { "sourceFile": "assets/parts/sunglasses.png", "partId": "sunglasses" },
+    { "sourceFile": "assets/parts/thigh-left.png", "partId": "thigh-left" },
+    { "sourceFile": "assets/parts/thigh-right.png", "partId": "thigh-right" },
+    { "sourceFile": "assets/parts/torso.png", "partId": "torso" },
+    { "sourceFile": "assets/parts/upper-arm-left.png", "partId": "upper-arm-left" },
+    { "sourceFile": "assets/parts/upper-arm-right.png", "partId": "upper-arm-right" }
+  ]
+}

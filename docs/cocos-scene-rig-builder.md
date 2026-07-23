@@ -14,12 +14,14 @@ The extension Main Process:
 
 1. Reads `character-rig.json` and the source annotation from a source root
    contained by the Cocos project's `assets` directory.
-2. Parses the Character Rig with `@gameai/character-contracts`.
-3. Generates the Rig Layout with `@gameai/rig-layout-generator`.
-4. Receives the already decoded and validated asset manifest produced through
+2. Audits an explicit `source-asset-map.json`: every annotation part must map
+   one-to-one to an existing safe import path and unexpected PNGs fail closed.
+3. Parses the Character Rig with `@gameai/character-contracts`.
+4. Generates the Rig Layout with `@gameai/rig-layout-generator`.
+5. Receives the already decoded and validated asset manifest produced through
    `@gameai/character-asset-intake`.
-5. Resolves every imported image and SpriteFrame subasset through AssetDB.
-6. Creates a deterministic, JSON-serializable scene plan.
+6. Resolves every imported image and SpriteFrame subasset through AssetDB.
+7. Creates a deterministic, JSON-serializable scene plan.
 
 Only that scene plan crosses into the Scene Script. Therefore a contract,
 layout, image, or AssetDB failure cannot create scene nodes.
@@ -106,9 +108,9 @@ the saved `Sorting2D` components deserialize in Web Preview.
 
 ## Idempotence and failure safety
 
-Generation is limited to `CHR_<characterId>`, which is
-`CHR_red_cap_target` for the acceptance fixture. A replacement is allowed only
-when the exact root also contains `__GameAI_Generated__`.
+Generation is limited to `CHR_<characterId>`; for example,
+`red-cap-target-remade` becomes `CHR_red_cap_target_remade`. A replacement is
+allowed only when the exact root also contains `__GameAI_Generated__`.
 
 - No matching root: attach the new detached tree.
 - One marked matching root: detach it, attach the replacement, then destroy the
@@ -127,5 +129,6 @@ The adapter defines stable codes for invalid requests, unsafe source roots,
 contract or layout-generation failures, missing AssetDB assets or SpriteFrames,
 correlation mismatch, unavailable scenes, unsafe root replacement, SpriteFrame
 load failure, missing RenderRoot2D, invalid generated visuals, layer mismatch,
-no compatible camera, and unexpected scene-generation failure. A single
+no compatible camera, invalid source-art mappings, missing or ambiguous mapped
+parts, unexpected PNGs, and unexpected scene-generation failure. A single
 `correlationId` is preserved from Panel through evidence.

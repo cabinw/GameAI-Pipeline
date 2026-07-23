@@ -83,6 +83,7 @@ describe("buildCocosSceneRigPlan", () => {
   it("selects the versioned world-space 2D render contract", () => {
     assert.equal(plan.planVersion, "1.1.0");
     assert.equal(plan.renderLayer, "UI_3D");
+    assert.deepEqual(plan.sourceCanvas, manifest.sourceCanvas);
   });
 
   it("creates one Joint/Visual pair and the complete proximal hierarchy", () => {
@@ -312,6 +313,7 @@ describe("executeCharacterRigBuild", () => {
     sourceRoot: "assets/gameai/red-cap-target",
     characterRigFile: "character-rig.json",
     sourceAnnotationFile: "source-annotation.json",
+    assetMappingFile: "source-asset-map.json",
   };
 
   function prepared(): PreparedSceneRig {

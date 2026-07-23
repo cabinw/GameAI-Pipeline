@@ -11,6 +11,7 @@ export interface BuildCharacterRigRequest {
   sourceRoot: string;
   characterRigFile: string;
   sourceAnnotationFile: string;
+  assetMappingFile: string;
 }
 
 export interface SpriteFrameAssetReference {
@@ -47,6 +48,7 @@ export interface CocosSceneRigPlan {
   generatedMarkerName: "__GameAI_Generated__";
   renderLayer: "UI_3D";
   schemaVersions: CharacterAssetManifest["schemaVersions"];
+  sourceCanvas: CharacterAssetManifest["sourceCanvas"];
   referenceScale: number;
   parts: readonly CocosScenePartPlan[];
   sockets: CharacterAssetManifest["sockets"];

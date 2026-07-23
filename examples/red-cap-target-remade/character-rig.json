@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "red-cap-target-remade",
+  "displayName": "Red Cap Target Remade",
+  "rigLayoutFile": "rig-layout.json",
+  "requiredParts": [
+    "pelvis",
+    "torso",
+    "head",
+    "hair",
+    "cap",
+    "sunglasses",
+    "upper-arm-left",
+    "forearm-left",
+    "hand-left",
+    "upper-arm-right",
+    "forearm-right",
+    "hand-right",
+    "thigh-left",
+    "shin-left",
+    "foot-left",
+    "thigh-right",
+    "shin-right",
+    "foot-right",
+    "briefcase"
+  ],
+  "requiredAnimationTargets": [
+    "root",
+    "pelvis",
+    "torso",
+    "head",
+    "left-hand",
+    "right-hand",
+    "left-foot",
+    "right-foot"
+  ],
+  "animationTargets": [
+    { "targetId": "root", "partId": "pelvis" },
+    { "targetId": "pelvis", "partId": "pelvis" },
+    { "targetId": "torso", "partId": "torso" },
+    { "targetId": "head", "partId": "head" },
+    { "targetId": "left-hand", "partId": "hand-left" },
+    { "targetId": "right-hand", "partId": "hand-right" },
+    { "targetId": "left-foot", "partId": "foot-left" },
+    { "targetId": "right-foot", "partId": "foot-right" }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.1.0",
+  "annotationId": "red-cap-target-remade-source",
+  "characterId": "red-cap-target-remade",
+  "layoutId": "red-cap-target-remade-layout",
+  "sourceCanvas": { "width": 326, "height": 892 },
+  "overrides": {
+    "referenceScale": 0.01,
+    "sourceRectOverlapPolicy": "allow"
+  },
+  "parts": [
+    {
+      "partId": "pelvis",
+      "file": "parts/pelvis.png",
+      "sourceRect": { "x": 93, "y": 374, "width": 141, "height": 98 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 141, "height": 98 } },
+      "joint": { "x": 163, "y": 378 },
+      "childAttachments": [
+        { "attachmentId": "waist", "childPartId": "torso", "position": { "x": 163, "y": 378 } },
+        { "attachmentId": "hip-left", "childPartId": "thigh-left", "position": { "x": 210, "y": 469 } },
+        { "attachmentId": "hip-right", "childPartId": "thigh-right", "position": { "x": 137.5, "y": 469 } }
+      ]
+    },
+    {
+      "partId": "torso",
+      "file": "parts/torso.png",
+      "sourceRect": { "x": 59, "y": 203, "width": 208, "height": 179 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 208, "height": 179 } },
+      "joint": { "x": 163, "y": 378 },
+      "childAttachments": [
+        { "attachmentId": "neck", "childPartId": "head", "position": { "x": 163, "y": 210 } },
+        { "attachmentId": "shoulder-left", "childPartId": "upper-arm-left", "position": { "x": 254.5, "y": 234.3 } },
+        { "attachmentId": "shoulder-right", "childPartId": "upper-arm-right", "position": { "x": 84.5, "y": 233.7 } }
+      ]
+    },
+    {
+      "partId": "head",
+      "file": "parts/head.png",
+      "sourceRect": { "x": 100, "y": 63, "width": 126, "height": 155 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 126, "height": 155 } },
+      "joint": { "x": 163, "y": 210 },
+      "childAttachments": [
+        { "attachmentId": "hair-mount", "childPartId": "hair", "position": { "x": 163, "y": 90 } },
+        { "attachmentId": "cap-mount", "childPartId": "cap", "position": { "x": 169, "y": 73 } },
+        { "attachmentId": "eyewear-mount", "childPartId": "sunglasses", "position": { "x": 167.5, "y": 128 } }
+      ]
+    },
+    {
+      "partId": "upper-arm-left",
+      "file": "parts/upper-arm-left.png",
+      "sourceRect": { "x": 221, "y": 217, "width": 67, "height": 173 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 67, "height": 173 } },
+      "joint": { "x": 254.5, "y": 234.3 },
+      "childAttachments": [
+        { "attachmentId": "elbow-left", "childPartId": "forearm-left", "position": { "x": 276.5, "y": 374.7 } }
+      ]
+    },
+    {
+      "partId": "forearm-left",
+      "file": "parts/forearm-left.png",
+      "sourceRect": { "x": 249, "y": 360, "width": 55, "height": 147 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 55, "height": 147 } },
+      "joint": { "x": 276.5, "y": 374.7 },
+      "childAttachments": [
+        { "attachmentId": "wrist-left", "childPartId": "hand-left", "position": { "x": 292.5, "y": 486.7 } }
+      ]
+    },
+    {
+      "partId": "hand-left",
+      "file": "parts/hand-left.png",
+      "sourceRect": { "x": 267, "y": 476, "width": 51, "height": 107 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 51, "height": 107 } },
+      "joint": { "x": 292.5, "y": 486.7 }
+    },
+    {
+      "partId": "upper-arm-right",
+      "file": "parts/upper-arm-right.png",
+      "sourceRect": { "x": 37, "y": 216, "width": 95, "height": 177 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 95, "height": 146 } },
+      "joint": { "x": 84.5, "y": 233.7 },
+      "childAttachments": [
+        { "attachmentId": "elbow-right", "childPartId": "forearm-right", "position": { "x": 61.5, "y": 366 } }
+      ]
+    },
+    {
+      "partId": "forearm-right",
+      "file": "parts/forearm-right.png",
+      "sourceRect": { "x": 18, "y": 349, "width": 87, "height": 170 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 87, "height": 134 } },
+      "joint": { "x": 61.5, "y": 366 },
+      "childAttachments": [
+        { "attachmentId": "wrist-right", "childPartId": "hand-right", "position": { "x": 65.5, "y": 454.9 } }
+      ]
+    },
+    {
+      "partId": "hand-right",
+      "file": "parts/hand-right.png",
+      "sourceRect": { "x": 33, "y": 439, "width": 65, "height": 159 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 65, "height": 111 } },
+      "joint": { "x": 65.5, "y": 454.9 },
+      "childAttachments": [
+        { "attachmentId": "right-grip", "childPartId": "briefcase", "position": { "x": 75, "y": 537.95 } }
+      ]
+    },
+    {
+      "partId": "thigh-left",
+      "file": "parts/thigh-left.png",
+      "sourceRect": { "x": 178, "y": 461, "width": 64, "height": 176 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 64, "height": 145 } },
+      "joint": { "x": 210, "y": 469 },
+      "childAttachments": [
+        { "attachmentId": "knee-left", "childPartId": "shin-left", "position": { "x": 217, "y": 613.4 } }
+      ]
+    },
+    {
+      "partId": "shin-left",
+      "file": "parts/shin-left.png",
+      "sourceRect": { "x": 190, "y": 597, "width": 54, "height": 164 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 54, "height": 131 } },
+      "joint": { "x": 217, "y": 613.4 },
+      "childAttachments": [
+        { "attachmentId": "ankle-left", "childPartId": "foot-left", "position": { "x": 233.5, "y": 724 } }
+      ]
+    },
+    {
+      "partId": "foot-left",
+      "file": "parts/foot-left.png",
+      "sourceRect": { "x": 199, "y": 718, "width": 69, "height": 75 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 69, "height": 62 } },
+      "joint": { "x": 233.5, "y": 724 }
+    },
+    {
+      "partId": "thigh-right",
+      "file": "parts/thigh-right.png",
+      "sourceRect": { "x": 111, "y": 461, "width": 53, "height": 173 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 53, "height": 139 } },
+      "joint": { "x": 137.5, "y": 469 },
+      "childAttachments": [
+        { "attachmentId": "knee-right", "childPartId": "shin-right", "position": { "x": 136.5, "y": 605.6 } }
+      ]
+    },
+    {
+      "partId": "shin-right",
+      "file": "parts/shin-right.png",
+      "sourceRect": { "x": 111, "y": 590, "width": 51, "height": 156 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 51, "height": 120 } },
+      "joint": { "x": 136.5, "y": 605.6 },
+      "childAttachments": [
+        { "attachmentId": "ankle-right", "childPartId": "foot-right", "position": { "x": 121, "y": 706 } }
+      ]
+    },
+    {
+      "partId": "foot-right",
+      "file": "parts/foot-right.png",
+      "sourceRect": { "x": 91, "y": 700, "width": 60, "height": 71 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 60, "height": 59 } },
+      "joint": { "x": 121, "y": 706 }
+    },
+    {
+      "partId": "hair",
+      "file": "parts/hair.png",
+      "sourceRect": { "x": 99, "y": 52, "width": 128, "height": 106 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 128, "height": 106 } },
+      "joint": { "x": 163, "y": 90 },
+      "overrides": { "parentId": "head", "drawOrder": 18 }
+    },
+    {
+      "partId": "cap",
+      "file": "parts/cap.png",
+      "sourceRect": { "x": 106, "y": 15, "width": 126, "height": 76 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 126, "height": 76 } },
+      "joint": { "x": 169, "y": 73 },
+      "overrides": { "parentId": "head", "drawOrder": 19 }
+    },
+    {
+      "partId": "sunglasses",
+      "file": "parts/sunglasses.png",
+      "sourceRect": { "x": 116, "y": 113, "width": 103, "height": 30 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 103, "height": 30 } },
+      "joint": { "x": 167.5, "y": 128 },
+      "overrides": { "parentId": "head", "drawOrder": 20 }
+    },
+    {
+      "partId": "briefcase",
+      "file": "parts/briefcase.png",
+      "sourceRect": { "x": 0, "y": 518, "width": 150, "height": 133 },
+      "trim": { "offset": { "x": 0, "y": 0 }, "size": { "width": 150, "height": 133 } },
+      "joint": { "x": 75, "y": 537.95 },
+      "overrides": { "parentId": "hand-right", "drawOrder": 21 }
+    }
+  ]
+}

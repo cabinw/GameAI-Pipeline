@@ -2,6 +2,93 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-004.2 Red Cap Remade Asset Integration
+
+- Status: Complete
+- Started: 2026-07-23
+- Completed: 2026-07-23
+
+### Goal
+
+Integrate the supplied transparent Red Cap Remade art as a separate,
+reproducible Character Rig fixture and prove the generated real-art rig in
+Cocos Creator 3.8.8 Scene view and Game Preview without weakening the
+TASK-004/004.1 validation and replacement boundaries.
+
+### Scope
+
+- Audit every supplied PNG by strict decode, alpha, and non-transparent bounds.
+- Define an explicit, fail-closed filename-to-canonical-part mapping.
+- Keep `examples/red-cap-target-remade` as the canonical engine-neutral source
+  and maintain only the Cocos AssetDB-required import mirror under
+  `assets/gameai/red-cap-target-remade`.
+- Replace the incompatible supplied draft document with repository-versioned
+  Character Rig and Source Annotation contracts.
+- Generate, never hand-author, the remade Rig Layout from calibrated common
+  source-canvas joints and actual image geometry.
+- Extend the existing builder UI and tests for fixture selection, real manifest
+  completeness, AssetDB SpriteFrame resolution, and stable missing/ambiguous
+  art diagnostics.
+- Generate the remade root twice in the real editor, retain UI_3D,
+  RenderRoot2D, Sorting2D, camera compatibility, and safe replacement, then
+  capture Scene and Game Preview evidence.
+
+### Out of scope
+
+- Animation playback or generation.
+- Computer-vision joint inference, automatic cutting, or source-art repair.
+- Manual final hierarchy assembly or hand-authored Cocos UUIDs.
+- Deleting or replacing the deterministic colored-rectangle fixture.
+
+### Execution
+
+1. Record TASK-004.2 and this active plan before implementation.
+2. Decode and inventory the supplied art, compare duplicate locations, inspect
+   the assembled reference, and publish the explicit canonical mapping.
+3. Add fail-closed art discovery, audit diagnostics, and deterministic tests.
+4. Author the remade Character Rig and Source Annotation from actual geometry,
+   regenerate Rig Layout through `@gameai/rig-layout-generator`, and validate
+   through asset intake.
+5. Synchronize the required Cocos import mirror and let AssetDB author all
+   metadata and UUIDs.
+6. Extend the builder fixture selection and generate the remade rig twice in
+   the acceptance scene.
+7. Capture real Scene and Game Preview evidence, document calibration limits,
+   and update task results.
+8. Remove ignored build state, run frozen installation and
+   `CI=true pnpm verify`, review scope, commit, and push.
+
+### Done when
+
+- Every mapped real part is readable, transparent, non-empty, and represented
+  exactly once in the validated manifest.
+- Missing, duplicate, or ambiguous source art fails with a stable diagnostic.
+- The generated layout is byte-stable and derived from the remade annotation.
+- Every generated Visual resolves the intended SpriteFrame through AssetDB.
+- Two real-editor runs leave exactly one marked remade character root and do
+  not alter unrelated scene roots or cameras.
+- Scene and Game Preview show the complete remade character with reasonable
+  connected proportions, no colored placeholders, and no console errors.
+- Frozen installation and the full CI verification gate pass.
+
+### Result
+
+- Preserved the supplied 19-part art in a canonical fixture and added an
+  explicit mapping plus deterministic import-safe crops; the placeholder
+  fixture remains intact.
+- Added a calibrated 19-part contract/annotation and generator-produced layout,
+  then validated its complete manifest, transparency, content bounds, and
+  one-to-one AssetDB SpriteFrame resolution.
+- Added stable fail-closed source-art diagnostics and tests for missing and
+  ambiguous mappings, real manifest completeness, mirror integrity, layout
+  validity, and idempotent replacement.
+- Ran Cocos Creator 3.8.8 twice. The final run replaced the single marked root,
+  verified 19 SpriteFrames below RenderRoot2D on UI_3D, preserved four unrelated
+  roots and camera state, and produced Scene/Game evidence with zero console
+  counters.
+- Passed frozen installation and the complete 91-test
+  `CI=true pnpm verify` gate.
+
 ## Completed plan: TASK-004.1 Cocos Visible Rig Acceptance
 
 - Status: Complete

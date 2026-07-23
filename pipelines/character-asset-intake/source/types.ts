@@ -31,6 +31,8 @@ export interface CharacterAssetPart extends NormalizedAssetPath {
   width: number;
   height: number;
   hasAlpha: boolean;
+  hasTransparency: boolean;
+  transparentPixelCount: number;
   contentBounds: PixelBounds | null;
   originalRect: PixelBounds;
   trimOffset: { x: number; y: number };

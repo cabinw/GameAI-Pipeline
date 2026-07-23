@@ -15,6 +15,8 @@ export interface InspectedImage {
   width: number;
   height: number;
   hasAlpha: boolean;
+  hasTransparency: boolean;
+  transparentPixelCount: number;
   contentBounds: PixelBounds | null;
 }
 
@@ -66,6 +68,18 @@ function findAlphaBounds(
   return maxX < 0
     ? null
     : { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
+}
+
+function transparentPixelCount(
+  pixels: Uint8Array,
+  channels: number,
+): number {
+  const alphaIndex = channels - 1;
+  let count = 0;
+  for (let index = alphaIndex; index < pixels.length; index += channels) {
+    if ((pixels[index] ?? 255) < 255) count += 1;
+  }
+  return count;
 }
 
 export async function inspectImage(
@@ -127,6 +141,10 @@ export async function inspectImage(
       decoded.info.height,
       decoded.info.channels,
     );
+    const transparentPixels = transparentPixelCount(
+      decoded.data,
+      decoded.info.channels,
+    );
     const diagnostics: CharacterAssetDiagnostic[] = [];
 
     if (!hasAlpha) {
@@ -163,6 +181,8 @@ export async function inspectImage(
         width: metadata.width,
         height: metadata.height,
         hasAlpha,
+        hasTransparency: hasAlpha && transparentPixels > 0,
+        transparentPixelCount: transparentPixels,
         contentBounds,
       },
       diagnostics,

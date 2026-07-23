@@ -9,6 +9,7 @@ interface PanelElements {
   sourceRoot: HTMLInputElement;
   characterRig: HTMLInputElement;
   sourceAnnotation: HTMLInputElement;
+  assetMapping: HTMLInputElement;
   run: HTMLButtonElement;
   status: HTMLElement;
   output: HTMLElement;
@@ -23,10 +24,11 @@ module.exports = Editor.Panel.define({
     <section>
       <h2>Character Rig Builder</h2>
       <p>Validates and generates outside the scene, resolves SpriteFrames through AssetDB, then assembles a scoped rig.</p>
-      <label>Source root<input id="source-root" value="assets/gameai/red-cap-target"></label>
+      <label>Source root<input id="source-root" value="assets/gameai/red-cap-target-remade"></label>
       <label>Character Rig<input id="character-rig" value="character-rig.json"></label>
       <label>Source annotation<input id="source-annotation" value="source-annotation.json"></label>
-      <button id="run" type="button">Build Red Cap rig</button>
+      <label>Source asset map<input id="asset-mapping" value="source-asset-map.json"></label>
+      <button id="run" type="button">Build selected Red Cap rig</button>
       <p id="status" data-state="idle">Not run</p>
       <pre id="output"></pre>
     </section>
@@ -44,6 +46,7 @@ module.exports = Editor.Panel.define({
     sourceRoot: "#source-root",
     characterRig: "#character-rig",
     sourceAnnotation: "#source-annotation",
+    assetMapping: "#asset-mapping",
     run: "#run",
     status: "#status",
     output: "#output",
@@ -56,6 +59,7 @@ module.exports = Editor.Panel.define({
         sourceRoot: this.$.sourceRoot.value,
         characterRigFile: this.$.characterRig.value,
         sourceAnnotationFile: this.$.sourceAnnotation.value,
+        assetMappingFile: this.$.assetMapping.value,
       };
       this.$.run.disabled = true;
       this.$.status.dataset.state = "running";

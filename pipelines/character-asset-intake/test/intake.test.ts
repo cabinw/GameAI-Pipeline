@@ -139,6 +139,8 @@ test("loads the Red Cap fixture without mutation and returns a deterministic man
   assert.equal(first.manifest.parts[0]?.width, 168);
   assert.equal(first.manifest.parts[0]?.height, 142);
   assert.equal(first.manifest.parts[0]?.hasAlpha, true);
+  assert.equal(first.manifest.parts[0]?.hasTransparency, true);
+  assert.ok((first.manifest.parts[0]?.transparentPixelCount ?? 0) > 0);
   assert.deepEqual(first.manifest.parts[0]?.contentBounds, {
     x: 1,
     y: 1,
@@ -164,6 +166,8 @@ test("inspects a valid alpha WebP and calculates content bounds", async () => {
     assert.equal(result.value.width, 10);
     assert.equal(result.value.height, 8);
     assert.equal(result.value.hasAlpha, true);
+    assert.equal(result.value.hasTransparency, true);
+    assert.equal(result.value.transparentPixelCount, 56);
     assert.deepEqual(result.value.contentBounds, { x: 2, y: 2, width: 6, height: 4 });
   }
 });

@@ -14,6 +14,7 @@ import {
 } from "./diagnostics";
 import { executeCharacterRigBuild } from "./orchestrator";
 import { buildCocosSceneRigPlan } from "./scene-plan";
+import { auditSourceAssetMap } from "./source-asset-map";
 import type {
   BuildCharacterRigRequest,
   CharacterRigBuilderEvidence,
@@ -79,6 +80,13 @@ async function prepareSceneRig(
       correlationId: request.correlationId,
     });
   }
+
+  await auditSourceAssetMap({
+    sourceRoot,
+    mappingFile: request.assetMappingFile,
+    annotation: annotationDocument,
+    correlationId: request.correlationId,
+  });
 
   const parsedRig = parseCharacterRig(JSON.stringify(characterRigDocument));
   if (!parsedRig.ok) {

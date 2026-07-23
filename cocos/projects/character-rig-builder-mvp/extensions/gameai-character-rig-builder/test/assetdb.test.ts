@@ -28,6 +28,8 @@ function fakePart(resolvedPath: string): ManifestPart {
     width: 162,
     height: 204,
     hasAlpha: true,
+    hasTransparency: true,
+    transparentPixelCount: 1024,
     contentBounds: { x: 0, y: 0, width: 162, height: 204 },
     originalRect: { x: 430, y: 90, width: 170, height: 210 },
     trimOffset: { x: 8, y: 6 },

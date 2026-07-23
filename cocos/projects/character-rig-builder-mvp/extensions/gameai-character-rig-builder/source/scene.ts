@@ -92,6 +92,13 @@ function buildDetachedRoot(
   const characterRoot = new Node(plan.characterRootName);
   configureNode(characterRoot);
   characterRoot.addComponent(RenderRoot2D);
+  const rootTransform =
+    characterRoot.getComponent(UITransform) ?? characterRoot.addComponent(UITransform);
+  rootTransform.setAnchorPoint(0.5, 0.5);
+  rootTransform.setContentSize(
+    plan.sourceCanvas.width * plan.referenceScale,
+    plan.sourceCanvas.height * plan.referenceScale,
+  );
   const rigRoot = metadataNode(plan.rigRootName, characterRoot);
   const marker = metadataNode(plan.generatedMarkerName, characterRoot);
   metadataNode(`Character_${plan.characterId}`, marker);

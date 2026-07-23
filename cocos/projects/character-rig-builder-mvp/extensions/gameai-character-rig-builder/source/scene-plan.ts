@@ -101,6 +101,7 @@ export function buildCocosSceneRigPlan(input: ScenePlanInput): CocosSceneRigPlan
     generatedMarkerName: "__GameAI_Generated__",
     renderLayer: "UI_3D",
     schemaVersions: { ...input.manifest.schemaVersions },
+    sourceCanvas: { ...input.manifest.sourceCanvas },
     referenceScale: input.manifest.referenceScale,
     parts,
     sockets: input.manifest.sockets.map((socket) => ({

@@ -24,6 +24,13 @@ The package decodes bytes instead of trusting file extensions. PNG, JPEG, and We
 
 Character sprites must include an alpha channel. Alpha-bearing images are decoded to raw RGBA and scanned in row-major order. The inclusive union of pixels whose alpha is greater than zero becomes `contentBounds`. A fully transparent image emits both `IMAGE_FULLY_TRANSPARENT` and `IMAGE_EMPTY_CONTENT_BOUNDS`, because the image has no usable visible content or normalized bounds. JPEG metadata and pixels are inspected, but JPEG normally emits `IMAGE_HAS_NO_ALPHA` and therefore cannot produce a valid sprite manifest.
 
+The normalized part also records `hasTransparency` and
+`transparentPixelCount`. `hasAlpha` describes whether the decoded format has
+an alpha channel; `hasTransparency` proves that at least one decoded pixel is
+not fully opaque. This distinction lets real-art intake tests reject
+accidentally flattened PNGs without changing the existing alpha-channel
+contract.
+
 For each part:
 
 ```text
@@ -42,7 +49,9 @@ A successful `CharacterAssetManifest` contains:
 - `characterId` and both contract schema versions;
 - the real source root plus safe source-relative and resolved contract/image paths;
 - source canvas, reference scale, and draw-order policy;
-- source-order parts with format, decoded width/height, alpha presence, content bounds, hierarchy, original rectangle, trim offset, anchor, rest pose, and draw order;
+- source-order parts with format, decoded width/height, alpha-channel and
+  transparency state, transparent-pixel count, content bounds, hierarchy,
+  original rectangle, trim offset, anchor, rest pose, and draw order;
 - cloned sockets and hit areas.
 
 Part array order is the authored Rig Layout order. This preserves the specified secondary ordering when `drawOrderPolicy` is `shared`. Repeated reads of unchanged inputs return deeply equal manifests.

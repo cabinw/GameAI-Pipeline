@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="326" height="892" viewBox="0 0 326 892" role="img" aria-labelledby="title description">
+  <title id="title">Red Cap Target assembled rig acceptance preview</title>
+  <desc id="description">Trimmed source assets assembled on the source canvas. Red dots are proximal pivots; cyan rings are separately authored child attachment points.</desc>
+  <style>
+    image { image-rendering: auto; }
+    line { stroke: #00d8ff; stroke-width: 3; stroke-linecap: round; opacity: 0.9; }
+    .attachment { fill: none; stroke: #00d8ff; stroke-width: 3; }
+    .pivot { fill: #ff3158; stroke: #ffffff; stroke-width: 1.5; }
+  </style>
+  <rect width="326" height="892" fill="#20242d"/>
+  <g id="assembled-assets">
+    <image href="parts/upper-arm-left.png" x="221" y="217" width="67" height="173"><title>upper-arm-left</title></image>
+    <image href="parts/forearm-left.png" x="249" y="360" width="55" height="147"><title>forearm-left</title></image>
+    <image href="parts/hand-left.png" x="267" y="476" width="51" height="107"><title>hand-left</title></image>
+    <image href="parts/thigh-left.png" x="178" y="461" width="64" height="145"><title>thigh-left</title></image>
+    <image href="parts/shin-left.png" x="190" y="597" width="54" height="131"><title>shin-left</title></image>
+    <image href="parts/foot-left.png" x="199" y="718" width="69" height="62"><title>foot-left</title></image>
+    <image href="parts/pelvis.png" x="93" y="374" width="141" height="98"><title>pelvis</title></image>
+    <image href="parts/torso.png" x="59" y="203" width="208" height="179"><title>torso</title></image>
+    <image href="parts/thigh-right.png" x="111" y="461" width="53" height="139"><title>thigh-right</title></image>
+    <image href="parts/shin-right.png" x="111" y="590" width="51" height="120"><title>shin-right</title></image>
+    <image href="parts/foot-right.png" x="91" y="700" width="60" height="59"><title>foot-right</title></image>
+    <image href="parts/upper-arm-right.png" x="37" y="216" width="95" height="146"><title>upper-arm-right</title></image>
+    <image href="parts/forearm-right.png" x="18" y="349" width="87" height="134"><title>forearm-right</title></image>
+    <image href="parts/hand-right.png" x="33" y="439" width="65" height="111"><title>hand-right</title></image>
+    <image href="parts/head.png" x="100" y="63" width="126" height="155"><title>head</title></image>
+    <image href="parts/hair.png" x="99" y="52" width="128" height="106"><title>hair</title></image>
+    <image href="parts/cap.png" x="106" y="15" width="126" height="76"><title>cap</title></image>
+    <image href="parts/sunglasses.png" x="116" y="113" width="103" height="30"><title>sunglasses</title></image>
+    <image href="parts/briefcase.png" x="0" y="518" width="150" height="133"><title>briefcase</title></image>
+  </g>
+  <g id="rig-bones">
+    <line x1="254.5" y1="234.3" x2="276.5" y2="374.7"><title>upper-arm-left to forearm-left via elbow-left</title></line>
+    <line x1="276.5" y1="374.7" x2="292.5" y2="486.7"><title>forearm-left to hand-left via wrist-left</title></line>
+    <line x1="210" y1="469" x2="217" y2="613.4"><title>thigh-left to shin-left via knee-left</title></line>
+    <line x1="217" y1="613.4" x2="233.5" y2="724"><title>shin-left to foot-left via ankle-left</title></line>
+    <line x1="163" y1="378" x2="163" y2="378"><title>pelvis to torso via waist</title></line>
+    <line x1="163" y1="378" x2="210" y2="469"><title>pelvis to thigh-left via hip-left</title></line>
+    <line x1="163" y1="378" x2="137.5" y2="469"><title>pelvis to thigh-right via hip-right</title></line>
+    <line x1="163" y1="378" x2="163" y2="210"><title>torso to head via neck</title></line>
+    <line x1="163" y1="378" x2="254.5" y2="234.3"><title>torso to upper-arm-left via shoulder-left</title></line>
+    <line x1="163" y1="378" x2="84.5" y2="233.7"><title>torso to upper-arm-right via shoulder-right</title></line>
+    <line x1="137.5" y1="469" x2="136.5" y2="605.6"><title>thigh-right to shin-right via knee-right</title></line>
+    <line x1="136.5" y1="605.6" x2="121" y2="706"><title>shin-right to foot-right via ankle-right</title></line>
+    <line x1="84.5" y1="233.7" x2="61.5" y2="366"><title>upper-arm-right to forearm-right via elbow-right</title></line>
+    <line x1="61.5" y1="366" x2="65.5" y2="454.9"><title>forearm-right to hand-right via wrist-right</title></line>
+    <line x1="65.5" y1="454.9" x2="75" y2="537.95"><title>hand-right to briefcase via right-grip</title></line>
+    <line x1="163" y1="210" x2="163" y2="90"><title>head to hair via hair-mount</title></line>
+    <line x1="163" y1="210" x2="169" y2="73"><title>head to cap via cap-mount</title></line>
+    <line x1="163" y1="210" x2="167.5" y2="128"><title>head to sunglasses via eyewear-mount</title></line>
+  </g>
+  <g id="child-attachments">
+    <circle class="attachment" cx="276.5" cy="374.7" r="7"><title>upper-arm-left.elbow-left</title></circle>
+    <circle class="attachment" cx="292.5" cy="486.7" r="7"><title>forearm-left.wrist-left</title></circle>
+    <circle class="attachment" cx="217" cy="613.4" r="7"><title>thigh-left.knee-left</title></circle>
+    <circle class="attachment" cx="233.5" cy="724" r="7"><title>shin-left.ankle-left</title></circle>
+    <circle class="attachment" cx="163" cy="378" r="7"><title>pelvis.waist</title></circle>
+    <circle class="attachment" cx="210" cy="469" r="7"><title>pelvis.hip-left</title></circle>
+    <circle class="attachment" cx="137.5" cy="469" r="7"><title>pelvis.hip-right</title></circle>
+    <circle class="attachment" cx="163" cy="210" r="7"><title>torso.neck</title></circle>
+    <circle class="attachment" cx="254.5" cy="234.3" r="7"><title>torso.shoulder-left</title></circle>
+    <circle class="attachment" cx="84.5" cy="233.7" r="7"><title>torso.shoulder-right</title></circle>
+    <circle class="attachment" cx="136.5" cy="605.6" r="7"><title>thigh-right.knee-right</title></circle>
+    <circle class="attachment" cx="121" cy="706" r="7"><title>shin-right.ankle-right</title></circle>
+    <circle class="attachment" cx="61.5" cy="366" r="7"><title>upper-arm-right.elbow-right</title></circle>
+    <circle class="attachment" cx="65.5" cy="454.9" r="7"><title>forearm-right.wrist-right</title></circle>
+    <circle class="attachment" cx="75" cy="537.95" r="7"><title>hand-right.right-grip</title></circle>
+    <circle class="attachment" cx="163" cy="90" r="7"><title>head.hair-mount</title></circle>
+    <circle class="attachment" cx="169" cy="73" r="7"><title>head.cap-mount</title></circle>
+    <circle class="attachment" cx="167.5" cy="128" r="7"><title>head.eyewear-mount</title></circle>
+  </g>
+  <g id="proximal-pivots">
+    <circle class="pivot" cx="254.5" cy="234.3" r="3.5"><title>upper-arm-left proximal pivot</title></circle>
+    <circle class="pivot" cx="276.5" cy="374.7" r="3.5"><title>forearm-left proximal pivot</title></circle>
+    <circle class="pivot" cx="292.5" cy="486.7" r="3.5"><title>hand-left proximal pivot</title></circle>
+    <circle class="pivot" cx="210" cy="469" r="3.5"><title>thigh-left proximal pivot</title></circle>
+    <circle class="pivot" cx="217" cy="613.4" r="3.5"><title>shin-left proximal pivot</title></circle>
+    <circle class="pivot" cx="233.5" cy="724" r="3.5"><title>foot-left proximal pivot</title></circle>
+    <circle class="pivot" cx="163" cy="378" r="3.5"><title>pelvis proximal pivot</title></circle>
+    <circle class="pivot" cx="163" cy="378" r="3.5"><title>torso proximal pivot</title></circle>
+    <circle class="pivot" cx="137.5" cy="469" r="3.5"><title>thigh-right proximal pivot</title></circle>
+    <circle class="pivot" cx="136.5" cy="605.6" r="3.5"><title>shin-right proximal pivot</title></circle>
+    <circle class="pivot" cx="121" cy="706" r="3.5"><title>foot-right proximal pivot</title></circle>
+    <circle class="pivot" cx="84.5" cy="233.7" r="3.5"><title>upper-arm-right proximal pivot</title></circle>
+    <circle class="pivot" cx="61.5" cy="366" r="3.5"><title>forearm-right proximal pivot</title></circle>
+    <circle class="pivot" cx="65.5" cy="454.9" r="3.5"><title>hand-right proximal pivot</title></circle>
+    <circle class="pivot" cx="163" cy="210" r="3.5"><title>head proximal pivot</title></circle>
+    <circle class="pivot" cx="163" cy="90" r="3.5"><title>hair proximal pivot</title></circle>
+    <circle class="pivot" cx="169" cy="73" r="3.5"><title>cap proximal pivot</title></circle>
+    <circle class="pivot" cx="167.5" cy="128" r="3.5"><title>sunglasses proximal pivot</title></circle>
+    <circle class="pivot" cx="75" cy="537.95" r="3.5"><title>briefcase proximal pivot</title></circle>
+  </g>
+</svg>
