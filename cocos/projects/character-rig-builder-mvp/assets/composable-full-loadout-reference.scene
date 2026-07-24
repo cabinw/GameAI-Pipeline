@@ -60,7 +60,7 @@
     "_globals": {
       "__id__": 551
     },
-    "_id": "d98749fa-b3c4-45d6-a789-abcdef012345"
+    "_id": "2e0fbf5a-c769-43d6-8743-587c3d93c98e"
   },
   {
     "__type__": "cc.Node",
@@ -19126,10 +19126,13 @@
     "_id": "268oaRcWJDX49bXnNbH3+v"
   },
   {
-    "__type__": "a6541b3gJFCo9RWeJq83vAS",
+    "__type__": "c83e6PqIb5JVZNMf1hkxheW",
     "_name": "",
     "_objFlags": 0,
     "__editorExtras__": {},
+    "node": {
+      "__id__": 7
+    },
     "_enabled": true,
     "__prefab": null,
     "_id": "eesjdtFc5I4YnOEW6zQCcY"
