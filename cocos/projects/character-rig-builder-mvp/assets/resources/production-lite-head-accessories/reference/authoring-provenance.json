@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceDigest": "134258134d28dd26e3bd3cee59c8493150bba149a6e1b53d432c172f63b654fc",
+  "baseLayoutDigest": "98b47c90d52d0bb22fa001d370ac6d05454d249a0951ac6ea93735ddfce1d4aa",
+  "attachmentLayoutDigest": "f781e55390eea8b3236bbc6d6b77809ce5739394db1def44eb102c3abdba0d28",
+  "variants": {
+    "base": "f277f7cd4b3f83ff00f157b82cb306a0658ac15c8090798277ee5b7ec4cad09a",
+    "cap-only": "c65fe995769d82668bb2ad5840bfdccb5dc8c1639ec25385ea591726ac73e7db",
+    "sunglasses-only": "72bb284e37d65871e9baf40e6ea2907318ff0f4812849b232a2fcdb4455e96db",
+    "cap-and-sunglasses": "4b720933634fad761d42391043a6ab814b856c5a299f6c4d2d81ef767296f0bd"
+  },
+  "renderer": "sharp-svg-independent-authored-and-contract-reconstruction-paths",
+  "tolerance": {
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "boundsExpansionPixels": 0,
+    "seamMismatchPixels": 0
+  }
+}

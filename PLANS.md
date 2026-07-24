@@ -2,6 +2,135 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-010 Head Accessory Layering Reference
+
+- Status: Implementation complete; awaiting manual dynamic visual review
+- Started: 2026-07-24
+- Baseline: `main` at `e240020a18aca15c0f1ec1369c411b624b5bfa6e`
+- Branch: `feat/task-010-head-accessory-layering`
+- TASK-009 squash merge:
+  `e240020a18aca15c0f1ec1369c411b624b5bfa6e`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted TASK-009 production-lite character with only a layered
+red cap and sunglasses, proving a reusable engine-independent slot and
+attachment contract without modifying the accepted body rig, adding
+character-specific core behavior, or resuming original Red Cap reconstruction.
+
+### Scope
+
+- Add a versioned Attachment Layout contract with generic slot identity,
+  parent-part binding, local transforms, sprite file/anchor, global draw order,
+  default enabled state, and optional front/back layer role.
+- Define `headwear` and `face-accessory` slots on the existing TASK-009 head,
+  with a two-layer cap and one transparent sunglasses attachment.
+- Preserve the exact accepted TASK-009 source art, 17 body parts, Rig Layout,
+  Character Rig, and four clips unchanged.
+- Generate editable accessory source descriptions, byte-stable transparent
+  PNGs, the attachment contract, and four independently authored reference
+  composites for base, cap-only, sunglasses-only, and combined states.
+- Add generic contract parsing, compatibility checks, slot resolution,
+  enabled-state evaluation, transform inheritance, asset validation, and
+  exact zero-tolerance reconstruction.
+- Reuse the existing hierarchy evaluator and four TASK-009 clips; add one
+  data-only Head Accessory Stress clip that tilts/rotates the head and leans
+  the torso.
+- Add a dedicated Cocos Creator 3.8.x scene with reference, assembled,
+  overlay, skeleton, attachment sockets, bounds/pivots/layers, accessory state,
+  all five clips, exact reset, and complete requested toggles.
+- Run working-copy and tracked-files-only verification, record and inspect the
+  ignored real Web Preview MP4, commit and push the feature branch, and stop
+  before PR creation for manual visual review.
+
+### Out of scope
+
+Original Red Cap reconstruction or corrections, body redraw/restructure,
+jacket or clothing changes, briefcase, arbitrary accessory fitting, facial
+animation, IK, mesh deformation, root motion, foot locking, blending,
+Unity/Godot adapters, cross-engine compilation, Windows support, combat logic,
+cloud AI, or paid dependencies.
+
+### Contract decisions
+
+- Add a standalone `attachment-layout.schema.json` rather than changing Rig
+  Layout 1.0 or treating accessories as body joints.
+- A slot owns `slotId`, `parentPartId`, its parent-local position, rotation and
+  scale, and `defaultEnabled`.
+- An attachment owns `attachmentId`, `slotId`, a safe image file, attachment-
+  local position/rotation/scale, normalized anchor, global numeric draw order,
+  and optional `back`/`front` layer role.
+- Attachment Layout binds to one `layoutId` and compatible Rig Layout schema
+  version. Validation fails closed on incompatible versions, duplicate slots
+  or attachments, unknown slot/parent references, unsafe paths, invalid
+  transforms/anchors, or ambiguous draw order.
+- Enabled state is resolved by generic slot overrides. Disabling a slot does
+  not mutate the base rig or the attachment contract.
+- Combined body/accessory render order is sorted from contract values and then
+  normalized to engine-specific integer sorting indices by the thin adapter.
+
+### Execution
+
+1. Merge accepted TASK-009 through its gated squash workflow, fast-forward
+   `main`, create the requested branch, read governing contracts/ADRs and
+   TASK-007 through TASK-009, then record this plan and full task specification.
+2. Add Attachment Layout 1.0 schema/types/parser/semantic validation,
+   compatibility documentation, ADR, invalid fixtures, and regression tests.
+3. Author and generate the layered cap, sunglasses, slot/attachment data,
+   fifth clip, four references, exact reconstructions, reports, and Cocos
+   resource mirror without changing TASK-009 inputs or outputs.
+4. Implement generic slot resolution, state overrides, transform inheritance,
+   combined ordering, asset checks, and zero-tolerance variant verification.
+5. Build the dedicated Cocos scene/runtime from generated contract data and
+   test clip controls, accessory toggles, debug overlays, exact reset, and
+   sprite/skeleton/attachment transform parity.
+6. Run `CI=true pnpm verify` in the working tree and after a frozen install in
+   a tracked-files-only archive checkout.
+7. Record and inspect the required real Web Preview sequence, keep the MP4
+   ignored, complete acceptance documentation, review scope, commit, push,
+   re-check the protected archive, and stop for manual visual review.
+
+### Done when
+
+- Existing TASK-007/008/009 fixtures remain byte-compatible and pass without
+  requiring an attachment contract.
+- Attachment Layout validates generically and every requested invalid slot,
+  parent, file, transform, anchor, order, and compatibility case is covered.
+- The cap back/front and sunglasses are deterministic transparent PNGs whose
+  inherited transforms and enabled state come only from contract data.
+- Base, cap-only, sunglasses-only, and combined reconstructions match their
+  independently authored references with zero RGBA, alpha, seam, or bounds
+  tolerance.
+- Hair, head, cap layers, face, and sunglasses retain stable contract-defined
+  order through all five clips, including repeated Accessory Stress loops.
+- The Cocos scene exposes every requested view, playback/accessory control,
+  socket/debug toggle, and status field with no per-accessory placement
+  constants.
+- Both required CI verification runs pass from clean inputs.
+- The ignored acceptance MP4 exists, the branch is committed and pushed, no PR
+  is created, and the protected archive remains `ed0923b`.
+
+### Implementation result
+
+- Attachment Layout 1.0, generic slot resolution, enabled-state overrides,
+  affine transform inheritance, and combined body/accessory ordering are
+  implemented without Cocos or accessory-specific core branches.
+- Deterministic source descriptions generate cap-back, cap-front,
+  sunglasses, the Head Accessory Stress clip, and four authored references.
+- Base, cap-only, sunglasses-only, and combined variants reconstruct with
+  exactly zero RGBA, alpha, seam, and bounds-expansion difference.
+- The dedicated Creator scene imports all reference and attachment
+  SpriteFrames with `trimType: none`; live reference/assembled Rest views
+  align at the same position and scale.
+- `CI=true pnpm verify` passes 175 tests in the working copy.
+- The real 1280×720 Web Preview sequence was recorded to the ignored TASK-010
+  artifact path and sampled directly for every required state and control.
+- A frozen install and `CI=true pnpm verify` pass the same 175 tests from a
+  tracked-files-only archive tree. The implementation branch is committed and
+  pushed and is stopped for reviewer acceptance; no pull request was created.
+
 ## Completed plan: TASK-009 Production-Lite Layered Character Reference
 
 - Status: Complete; manual dynamic visual acceptance passed

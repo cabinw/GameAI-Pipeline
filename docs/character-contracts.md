@@ -6,6 +6,8 @@ TASK-001 defines the engine-neutral inputs that a future Character Rig Builder m
 
 - `schemas/character-rig.schema.json` describes character identity, the Rig Layout reference, required part IDs, and named animation target bindings.
 - `schemas/rig-layout.schema.json` describes source geometry, the rigid part hierarchy, rest pose, draw order, sockets, and hit areas.
+- `schemas/attachment-layout.schema.json` describes optional generic slots and
+  rigid sprite attachments bound to a compatible Rig Layout.
 - `examples/red-cap-target/` is the first textual golden fixture.
 - `@gameai/character-contracts` exports matching TypeScript types, parsers, canonical schema objects, semantic validators, and stable diagnostics.
 
@@ -121,6 +123,25 @@ Error-code string values are public compatibility surface. Messages and `details
 | `DUPLICATE_HIT_AREA_ID` | Hit-area IDs are not unique. |
 | `DUPLICATE_ANIMATION_TARGET_ID` | Animation target IDs are not unique. |
 | `MISSING_ANIMATION_TARGET` | A required target has no binding or its bound part is missing. |
+| `DUPLICATE_ATTACHMENT_SLOT_ID` | Attachment slot IDs are not unique. |
+| `DUPLICATE_ATTACHMENT_ID` | Attachment IDs are not unique. |
+| `UNKNOWN_ATTACHMENT_SLOT` | An attachment names a slot that is absent. |
+| `DUPLICATE_ATTACHMENT_DRAW_ORDER` | Attachment draw-order values are not unique. |
+| `INCOMPATIBLE_ATTACHMENT_RIG` | Attachment and Rig Layout identities or versions differ. |
+| `INVALID_ATTACHMENT_TRANSFORM` | A slot or attachment transform is non-finite or has zero scale. |
+
+## Attachment Layout
+
+Attachment Layout 1.0 is an optional engine-independent companion to Rig
+Layout. Slots declare `slotId`, `parentPartId`, a parent-local transform, and
+`defaultEnabled`. Attachments declare `attachmentId`, `slotId`, a safe PNG
+path, slot-local transform, normalized anchor, global numeric draw order, and
+an optional `back` or `front` role.
+
+`resolveAttachmentLayout` applies slot enabled-state overrides without
+mutating input data. `composeAttachmentWorldTransform` composes
+parent-world × slot-local × attachment-local affine transforms. Neither
+operation contains engine or item-specific behavior. See ADR-0012.
 
 ## Deliberate limitations
 

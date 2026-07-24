@@ -5,12 +5,16 @@ import { describe, it } from "node:test";
 
 import {
   ValidationErrorCode,
+  attachmentLayoutSchema,
   characterRigSchema,
+  composeAttachmentWorldTransform,
   isSupportedSchemaVersion,
+  parseAttachmentLayout,
   parseCharacterContract,
   parseCharacterRig,
   parseRigLayout,
   rigLayoutSchema,
+  resolveAttachmentLayout,
   type ValidationErrorCodeValue,
   type ValidationResult,
 } from "../source";
@@ -43,6 +47,126 @@ const invalidRigLayouts = readFixtureMap(
 const invalidCharacterRigs = readFixtureMap(
   "framework/character-contracts/test/fixtures/invalid-character-rigs.json",
 );
+const productionLiteRigLayoutText = readRepositoryFile(
+  "examples/production-lite-character/rig-layout.json",
+);
+const validAttachmentLayoutText = readRepositoryFile(
+  "examples/production-lite-head-accessories/attachment-layout.json",
+);
+
+describe("Attachment Layout contract", () => {
+  it("parses generic slots and resolves deterministic default/override state", () => {
+    const rigLayout = parseRigLayout(productionLiteRigLayoutText);
+    assert.equal(rigLayout.ok, true);
+    if (!rigLayout.ok) return;
+    const parsed = parseAttachmentLayout(validAttachmentLayoutText, rigLayout.value);
+    assert.equal(parsed.ok, true);
+    if (!parsed.ok) return;
+    assert.deepEqual(
+      parsed.value.slots.map((slot) => slot.slotId),
+      ["headwear", "face-accessory"],
+    );
+    const defaults = resolveAttachmentLayout(parsed.value);
+    assert.equal(defaults.every((attachment) => attachment.enabled), true);
+    const overridden = resolveAttachmentLayout(parsed.value, {
+      headwear: false,
+      "face-accessory": true,
+    });
+    assert.deepEqual(
+      overridden.map((attachment) => [
+        attachment.attachmentId,
+        attachment.enabled,
+      ]),
+      [
+        ["cap-back", false],
+        ["sunglasses", true],
+        ["cap-front", false],
+      ],
+    );
+  });
+
+  it("rejects duplicate slots, attachment IDs, slots, order, and unknown parents", () => {
+    const rigLayout = JSON.parse(productionLiteRigLayoutText);
+    const fixture = JSON.parse(validAttachmentLayoutText);
+    fixture.slots.push(structuredClone(fixture.slots[0]));
+    fixture.attachments.push(structuredClone(fixture.attachments[0]));
+    fixture.attachments[1].slotId = "unknown-slot";
+    fixture.attachments[2].drawOrder = fixture.attachments[0].drawOrder;
+    fixture.slots[1].parentPartId = "unknown-head";
+    const result = parseAttachmentLayout(JSON.stringify(fixture), rigLayout);
+    const codes = errorCodes(result);
+    for (const code of [
+      ValidationErrorCode.DUPLICATE_ATTACHMENT_SLOT_ID,
+      ValidationErrorCode.DUPLICATE_ATTACHMENT_ID,
+      ValidationErrorCode.UNKNOWN_ATTACHMENT_SLOT,
+      ValidationErrorCode.DUPLICATE_ATTACHMENT_DRAW_ORDER,
+      ValidationErrorCode.UNKNOWN_PARENT,
+    ]) {
+      assert.equal(codes.includes(code), true, code);
+    }
+  });
+
+  it("rejects incompatible rigs, unsafe files, anchors, and transforms", () => {
+    const rigLayout = JSON.parse(productionLiteRigLayoutText);
+    const incompatible = JSON.parse(validAttachmentLayoutText);
+    incompatible.rig.layoutId = "other-layout";
+    assert.equal(
+      errorCodes(
+        parseAttachmentLayout(JSON.stringify(incompatible), rigLayout),
+      ).includes(ValidationErrorCode.INCOMPATIBLE_ATTACHMENT_RIG),
+      true,
+    );
+    for (const [mutate, code] of [
+      [
+        (fixture: any) => {
+          fixture.attachments[0].file = "../cap.png";
+        },
+        ValidationErrorCode.INVALID_FILE_PATH,
+      ],
+      [
+        (fixture: any) => {
+          fixture.attachments[1].anchor.x = 2;
+        },
+        ValidationErrorCode.INVALID_NORMALIZED_ANCHOR,
+      ],
+      [
+        (fixture: any) => {
+          fixture.attachments[2].transform.scale.x = 0;
+        },
+        ValidationErrorCode.INVALID_ATTACHMENT_TRANSFORM,
+      ],
+    ] as const) {
+      const fixture = JSON.parse(validAttachmentLayoutText);
+      mutate(fixture);
+      assert.equal(
+        errorCodes(
+          parseAttachmentLayout(JSON.stringify(fixture), rigLayout),
+        ).includes(code),
+        true,
+        code,
+      );
+    }
+  });
+
+  it("composes parent, slot, and attachment transforms without engine values", () => {
+    assert.deepEqual(
+      composeAttachmentWorldTransform(
+        { a: 0, b: 1, c: -1, d: 0, tx: 10, ty: 20 },
+        {
+          position: { x: 0, y: 5 },
+          rotationDegrees: 0,
+          scale: { x: 1, y: 1 },
+        },
+        {
+          position: { x: 2, y: 0 },
+          rotationDegrees: 0,
+          scale: { x: 1, y: 1 },
+        },
+      ),
+      { a: 0, b: 1, c: -1, d: 0, tx: 5, ty: 22 },
+    );
+  });
+});
 
 describe("Red Cap Target character contract", () => {
   it("parses the complete textual fixture into typed contracts", () => {
@@ -212,7 +336,11 @@ describe("schema compatibility", () => {
   });
 
   it("keeps canonical schemas and package build copies byte-identical", () => {
-    for (const file of ["character-rig.schema.json", "rig-layout.schema.json"]) {
+    for (const file of [
+      "attachment-layout.schema.json",
+      "character-rig.schema.json",
+      "rig-layout.schema.json",
+    ]) {
       const canonical = readRepositoryFile(`schemas/${file}`);
       const built = readRepositoryFile(`framework/character-contracts/dist/schemas/${file}`);
       assert.equal(built, canonical);
@@ -220,6 +348,10 @@ describe("schema compatibility", () => {
   });
 
   it("exports both canonical schema identifiers", () => {
+    assert.equal(
+      attachmentLayoutSchema.$id,
+      "https://gameai-pipeline.dev/schemas/attachment-layout/v1.0.0",
+    );
     assert.equal(
       characterRigSchema.$id,
       "https://gameai-pipeline.dev/schemas/character-rig/v1.0.0",
@@ -233,10 +365,15 @@ describe("schema compatibility", () => {
   it("keeps the public error-code values stable", () => {
     assert.deepEqual(Object.values(ValidationErrorCode).sort(), [
       "DUPLICATE_ANIMATION_TARGET_ID",
+      "DUPLICATE_ATTACHMENT_DRAW_ORDER",
+      "DUPLICATE_ATTACHMENT_ID",
+      "DUPLICATE_ATTACHMENT_SLOT_ID",
       "DUPLICATE_DRAW_ORDER",
       "DUPLICATE_HIT_AREA_ID",
       "DUPLICATE_PART_ID",
       "DUPLICATE_SOCKET_ID",
+      "INCOMPATIBLE_ATTACHMENT_RIG",
+      "INVALID_ATTACHMENT_TRANSFORM",
       "INVALID_FILE_PATH",
       "INVALID_NORMALIZED_ANCHOR",
       "INVALID_RECTANGLE",
@@ -246,6 +383,7 @@ describe("schema compatibility", () => {
       "MISSING_REQUIRED_PART",
       "PARENT_CYCLE",
       "SCHEMA_VALIDATION_ERROR",
+      "UNKNOWN_ATTACHMENT_SLOT",
       "UNKNOWN_PARENT",
       "UNSUPPORTED_SCHEMA_VERSION",
     ]);

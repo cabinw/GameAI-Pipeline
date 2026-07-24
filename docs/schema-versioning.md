@@ -28,6 +28,15 @@ An animation additionally declares its compatible Rig Layout identity and
 version. The rig ID and implemented major/minor must match before animation
 normalization.
 
+The TASK-010 Attachment Layout validator implements:
+
+```text
+>=1.0.0 <1.1.0
+```
+
+An Attachment Layout binds to one Rig Layout identity and implemented
+major/minor version. Existing rigs do not require an attachment document.
+
 Source Canvas Annotation implements:
 
 ```text

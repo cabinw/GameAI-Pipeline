@@ -7,17 +7,30 @@ import {
   type ValidationIssue,
   type ValidationResult,
 } from "./errors";
-import { characterRigSchema, rigLayoutSchema } from "./schema-loader";
 import {
+  attachmentLayoutSchema,
+  characterRigSchema,
+  rigLayoutSchema,
+} from "./schema-loader";
+import {
+  validateAttachmentLayoutCompatibility,
+  validateAttachmentLayoutSemantics,
   validateCharacterContractSemantics,
   validateCharacterRigSemantics,
   validateRigLayoutSemantics,
 } from "./semantic-validator";
-import type { CharacterContract, CharacterRig, RigLayout } from "./types";
+import type {
+  AttachmentLayout,
+  CharacterContract,
+  CharacterRig,
+  RigLayout,
+} from "./types";
 
 const ajv = new Ajv({ allErrors: true, strict: true });
 const validateCharacterRigShape = ajv.compile<CharacterRig>(characterRigSchema);
 const validateRigLayoutShape = ajv.compile<RigLayout>(rigLayoutSchema);
+const validateAttachmentLayoutShape =
+  ajv.compile<AttachmentLayout>(attachmentLayoutSchema);
 
 function parseJson(text: string, document: ContractDocument): ValidationResult<unknown> {
   try {
@@ -53,6 +66,9 @@ function schemaErrorCode(path: string): ValidationIssue["code"] {
   if (path.includes("/anchor/")) {
     return ValidationErrorCode.INVALID_NORMALIZED_ANCHOR;
   }
+  if (path.includes("/transform/")) {
+    return ValidationErrorCode.INVALID_ATTACHMENT_TRANSFORM;
+  }
   if (
     path.includes("/originalRect/") ||
     path.includes("/trimOffset/") ||
@@ -67,6 +83,33 @@ function schemaErrorCode(path: string): ValidationIssue["code"] {
     return ValidationErrorCode.INVALID_FILE_PATH;
   }
   return ValidationErrorCode.SCHEMA_VALIDATION_ERROR;
+}
+
+export function parseAttachmentLayout(
+  text: string,
+  rigLayout?: RigLayout,
+): ValidationResult<AttachmentLayout> {
+  const parsed = parseJson(text, "attachmentLayout");
+  if (!parsed.ok) {
+    return parsed;
+  }
+  const shaped = validateShape(
+    parsed.value,
+    validateAttachmentLayoutShape,
+    "attachmentLayout",
+  );
+  if (!shaped.ok) {
+    return shaped;
+  }
+  const errors = [
+    ...validateAttachmentLayoutSemantics(shaped.value),
+    ...(rigLayout === undefined
+      ? []
+      : validateAttachmentLayoutCompatibility(shaped.value, rigLayout)),
+  ];
+  return errors.length === 0
+    ? { ok: true, value: shaped.value, errors: [] }
+    : { ok: false, errors: sortIssues(errors) };
 }
 
 function mapSchemaErrors(

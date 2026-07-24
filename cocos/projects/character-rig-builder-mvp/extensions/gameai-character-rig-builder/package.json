@@ -9,7 +9,7 @@
   "main": "./dist/main.js",
   "scene": "./dist/scene.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/generate-stickman-cocos-data.mjs && node scripts/generate-simple-sprite-cocos-data.mjs && node scripts/generate-production-lite-cocos-data.mjs && node scripts/generate-production-lite-scene.mjs",
+    "build": "tsc -p tsconfig.json && node scripts/generate-stickman-cocos-data.mjs && node scripts/generate-simple-sprite-cocos-data.mjs && node scripts/generate-production-lite-cocos-data.mjs && node scripts/generate-production-lite-scene.mjs && node scripts/generate-head-accessory-cocos-data.mjs && node scripts/generate-head-accessory-scene.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
   },

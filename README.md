@@ -105,6 +105,12 @@ clips, and reference/assembled/debug Cocos acceptance scene are documented in
 `examples/production-lite-character/README.md` and
 `docs/acceptance/TASK-009-production-lite-layered-character-reference.md`.
 
+TASK-010 reuses that accepted body unchanged and adds a generic Attachment
+Layout contract, deterministic two-layer cap and sunglasses, four exact
+enabled-state references, and a socket/debug Cocos scene. See
+`examples/production-lite-head-accessories/README.md` and
+`docs/acceptance/TASK-010-head-accessory-layering-reference.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -121,3 +127,6 @@ retaining the same engine-independent hierarchy, pivots, transforms, and
 animation sampling. TASK-009 advances the fixture to production-like organic
 sprites, explicit hair and limb layering, exact reference reconstruction, and
 controlled articulation stress without adding a new runtime.
+TASK-010 then proves optional contract-driven headwear and face accessories
+with inherited transforms and stable front/back occlusion, while original Red
+Cap reconstruction and cross-engine work remain deferred.
