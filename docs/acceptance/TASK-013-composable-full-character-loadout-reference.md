@@ -71,8 +71,9 @@ generated character root's vertical offset and extended past the Canvas top.
 The repaired runtime parents the HUD directly to the Canvas, gives its
 `UITransform` a top-left anchor, and deterministically places its 1230x155
 bounds at left `-615`, right `615`, top `346`, and bottom `191`. The documented
-25 px side and 14 px top insets keep all four status/shortcut rows within the
-Canvas and leave the 300x350 character views below the HUD.
+25 px side and 14 px top insets keep all nine explicit status/help rows within
+the Canvas and leave the authored visible character acceptance bounds below
+the HUD.
 
 The layout constants and bounds calculation live in the tested
 `composable-character-loadout-controls.ts` generator source. The generated
@@ -82,16 +83,26 @@ layout is reproducible and not a manual scene edit.
 Creator live Preview showed that adding a `Label` after configuring the same
 node's `UITransform` restored centered-anchor behavior. The lifecycle-safe
 structure therefore uses a Label-free `HUDContainer` for the Canvas-safe
-1230x155 region and creates a child `HUDLabel`. The Label is configured first
-with explicit `CLAMP` overflow and wrapping disabled; only then does the runtime
-retrieve its final `UITransform` and apply the top-left anchor, fixed size, and
-zero local position.
+1230x155 region and creates separate `HUDStatusLabel` and `HUDHelpLabel`
+children. Each Label is configured first with 14 px text, 17 px line height,
+explicit `CLAMP` overflow, and wrapping disabled; only then does the runtime
+retrieve its final `UITransform` and apply the top-left anchor, fixed region
+size, and deterministic local position.
 
 The runtime listens once for `Director.EVENT_AFTER_DRAW`, measures the actual
 container and label transforms after the first rendered frame, and logs the
 measured bounds. Any Canvas or container escape, or an insufficient vertical
 line budget, fails with `TASK_013_HUD_RUNTIME_BOUNDS_INVALID` and includes the
 measured values.
+
+The shared formatter returns three status rows and six help rows rather than
+one opaque string. Static help rows have an 80-character budget, runtime rows
+have a 140-character budget, and preset, prop, clip, playback, and time values
+are bounded without silently truncating semantic clip IDs. Preview initialization
+validates line identity/count, vertical capacity, status/help separation,
+container containment, and separation from the authored visible character
+bounds. Content failure uses `TASK_013_HUD_TEXT_OVERFLOW`; success logs
+`TASK_013_HUD_TEXT_LAYOUT` once with the resolved line count and budgets.
 
 ## Verification and evidence
 

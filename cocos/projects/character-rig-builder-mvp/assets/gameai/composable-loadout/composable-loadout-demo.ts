@@ -34,10 +34,13 @@ import type {
 import {
   calculateAnchoredRectangle,
   calculateComposableLoadoutHudBounds,
+  COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
+  formatComposableLoadoutHudLines,
   resolveComposableLoadoutControlClips,
   type ComposableLoadoutControl,
   validateComposableLoadoutHudRuntimeBounds,
+  validateComposableLoadoutHudTextLayout,
 } from "./composable-loadout-controls";
 import { COMPOSABLE_LOADOUT_PLAN } from "./composable-loadout-data";
 
@@ -58,9 +61,11 @@ export class GameAIComposableLoadoutDemo extends Component {
   private assembledView: Node | null = null;
   private overlayView: Node | null = null;
   private skeletonView: Node | null = null;
-  private status: Label | null = null;
+  private statusLabel: Label | null = null;
+  private helpLabel: Label | null = null;
   private hudContainer: Node | null = null;
-  private hudLabel: Node | null = null;
+  private hudStatusLabel: Node | null = null;
+  private hudHelpLabel: Node | null = null;
   private playback: RigAnimationPlayback | null = null;
   private clipsByControl:
     | Readonly<Record<ComposableLoadoutControl, NormalizedRigAnimation>>
@@ -68,7 +73,6 @@ export class GameAIComposableLoadoutDemo extends Component {
   private presetId = "full-loadout";
   private propState = "left-hand";
   private debugNodes = new Map<string, Node[]>();
-  private note = "";
 
   onLoad(): void {
     this.build();
@@ -311,42 +315,70 @@ export class GameAIComposableLoadoutDemo extends Component {
       COMPOSABLE_LOADOUT_HUD_LAYOUT.height,
     );
 
-    const labelNode = new Node(COMPOSABLE_LOADOUT_HUD_LAYOUT.labelName);
-    labelNode.layer = Layers.Enum.UI_2D;
-    labelNode.setParent(container);
-    this.status = labelNode.addComponent(Label);
-    this.status.fontSize = 15;
-    this.status.lineHeight = COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
-    this.status.horizontalAlign = HorizontalTextAlignment.LEFT;
-    this.status.verticalAlign = VerticalTextAlignment.TOP;
-    this.status.enableWrapText = false;
-    this.status.overflow = Label.Overflow.CLAMP;
-    this.status.color = new Color().fromHEX("#ffffff");
-    const labelTransform = labelNode.getComponent(UITransform);
-    if (labelTransform === null) {
-      throw new Error("TASK_013_HUD_LABEL_TRANSFORM_MISSING");
-    }
-    labelTransform.setAnchorPoint(
-      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorX,
-      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorY,
+    const statusHeight =
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.statusRows.length *
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+    const helpHeight =
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.helpRows.length *
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+    const status = this.hudRegion(
+      container,
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.statusLabelName,
+      statusHeight,
+      0,
     );
-    labelTransform.setContentSize(
-      COMPOSABLE_LOADOUT_HUD_LAYOUT.width,
-      COMPOSABLE_LOADOUT_HUD_LAYOUT.height,
+    const help = this.hudRegion(
+      container,
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.helpLabelName,
+      helpHeight,
+      -statusHeight,
     );
-    labelNode.setPosition(0, 0, 0);
     this.hudContainer = container;
-    this.hudLabel = labelNode;
+    this.hudStatusLabel = status.node;
+    this.hudHelpLabel = help.node;
+    this.statusLabel = status.label;
+    this.helpLabel = help.label;
     this.updateHud();
   }
 
+  private hudRegion(
+    container: Node,
+    name: string,
+    height: number,
+    y: number,
+  ): { readonly node: Node; readonly label: Label } {
+    const node = new Node(name);
+    node.layer = Layers.Enum.UI_2D;
+    node.setParent(container);
+    const label = node.addComponent(Label);
+    label.fontSize = COMPOSABLE_LOADOUT_HUD_LAYOUT.fontSize;
+    label.lineHeight = COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+    label.horizontalAlign = HorizontalTextAlignment.LEFT;
+    label.verticalAlign = VerticalTextAlignment.TOP;
+    label.enableWrapText = false;
+    label.overflow = Label.Overflow.CLAMP;
+    label.color = new Color().fromHEX("#ffffff");
+    const transform = node.getComponent(UITransform);
+    if (transform === null) {
+      throw new Error("TASK_013_HUD_LABEL_TRANSFORM_MISSING");
+    }
+    transform.setAnchorPoint(
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorX,
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorY,
+    );
+    transform.setContentSize(COMPOSABLE_LOADOUT_HUD_LAYOUT.width, height);
+    node.setPosition(0, y, 0);
+    return { node, label };
+  }
+
   private validateHudRuntimeBounds(): void {
-    if (!this.hudContainer || !this.hudLabel) {
+    if (!this.hudContainer || !this.hudStatusLabel || !this.hudHelpLabel) {
       throw new Error("TASK_013_HUD_RUNTIME_NODE_MISSING");
     }
     const containerTransform = this.hudContainer.getComponent(UITransform);
-    const labelTransform = this.hudLabel.getComponent(UITransform);
-    if (!containerTransform || !labelTransform) {
+    const statusTransform = this.hudStatusLabel.getComponent(UITransform);
+    const helpTransform = this.hudHelpLabel.getComponent(UITransform);
+    if (!containerTransform || !statusTransform || !helpTransform) {
       throw new Error("TASK_013_HUD_RUNTIME_TRANSFORM_MISSING");
     }
     const containerBounds = calculateAnchoredRectangle(
@@ -354,34 +386,72 @@ export class GameAIComposableLoadoutDemo extends Component {
       containerTransform.contentSize,
       containerTransform.anchorPoint,
     );
-    const labelBoundsInContainer = calculateAnchoredRectangle(
-      this.hudLabel.position,
-      labelTransform.contentSize,
-      labelTransform.anchorPoint,
+    const statusLabelBoundsInContainer = calculateAnchoredRectangle(
+      this.hudStatusLabel.position,
+      statusTransform.contentSize,
+      statusTransform.anchorPoint,
     );
-    const labelBounds = {
-      left: containerBounds.left + labelBoundsInContainer.left,
-      right: containerBounds.left + labelBoundsInContainer.right,
-      top: containerBounds.top + labelBoundsInContainer.top,
-      bottom: containerBounds.top + labelBoundsInContainer.bottom,
+    const helpLabelBoundsInContainer = calculateAnchoredRectangle(
+      this.hudHelpLabel.position,
+      helpTransform.contentSize,
+      helpTransform.anchorPoint,
+    );
+    const toWorldBounds = (
+      localBounds: ReturnType<typeof calculateAnchoredRectangle>,
+    ) => ({
+      left: containerBounds.left + localBounds.left,
+      right: containerBounds.left + localBounds.right,
+      top: containerBounds.top + localBounds.top,
+      bottom: containerBounds.top + localBounds.bottom,
+    });
+    const statusLabelBounds = toWorldBounds(statusLabelBoundsInContainer);
+    const helpLabelBounds = toWorldBounds(helpLabelBoundsInContainer);
+    const containerContentBounds = {
+      left: 0,
+      right: containerTransform.contentSize.width,
+      top: 0,
+      bottom: -containerTransform.contentSize.height,
     };
     const canvasSafeBounds = calculateComposableLoadoutHudBounds();
     const measurement = {
       canvasSafeBounds,
       containerBounds,
-      labelBounds,
-      labelBoundsInContainer,
-      containerContentBounds: {
-        left: 0,
-        right: containerTransform.contentSize.width,
-        top: 0,
-        bottom: -containerTransform.contentSize.height,
-      },
-      labelContentHeight: labelTransform.contentSize.height,
+      statusLabelBounds,
+      helpLabelBounds,
+      statusLabelBoundsInContainer,
+      helpLabelBoundsInContainer,
+      containerContentBounds,
+      statusLabelContentHeight: statusTransform.contentSize.height,
+      helpLabelContentHeight: helpTransform.contentSize.height,
     };
     validateComposableLoadoutHudRuntimeBounds(measurement);
     console.info(
       `TASK_013_HUD_RUNTIME_BOUNDS ${JSON.stringify(measurement)}`,
+    );
+    const lines = this.hudLines();
+    validateComposableLoadoutHudTextLayout({
+      lines,
+      containerBounds,
+      statusLabelBoundsInContainer,
+      helpLabelBoundsInContainer,
+      containerContentBounds,
+      characterAcceptanceBounds:
+        COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
+    });
+    console.info(
+      `TASK_013_HUD_TEXT_LAYOUT ${JSON.stringify({
+        lineCount: lines.length,
+        fontSize: COMPOSABLE_LOADOUT_HUD_LAYOUT.fontSize,
+        lineHeight: COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight,
+        maximumStatusLineCharacters:
+          COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumStatusLineCharacters,
+        maximumHelpLineCharacters:
+          COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumHelpLineCharacters,
+        statusLabelBounds,
+        helpLabelBounds,
+        characterAcceptanceBounds:
+          COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
+      })}`,
     );
   }
 
@@ -469,7 +539,6 @@ export class GameAIComposableLoadoutDemo extends Component {
     if (clip === undefined) return;
     this.playback = new RigAnimationPlayback(clip);
     this.apply(play ? this.playback.play() : this.playback.stop());
-    this.note = `semantic control ${control}`;
   }
 
   private exactReset(): void {
@@ -477,7 +546,6 @@ export class GameAIComposableLoadoutDemo extends Component {
     this.propState = "left-hand";
     this.selectClip(1, false);
     this.applyState();
-    this.note = "Exact Reset";
   }
 
   private applyState(): void {
@@ -528,7 +596,7 @@ export class GameAIComposableLoadoutDemo extends Component {
   private load(resourcePath: string, sprite: Sprite): void {
     resources.load(resourcePath, SpriteFrame, (error, frame) => {
       if (error) {
-        this.note = `LOAD ERROR ${resourcePath}`;
+        console.error(`TASK_013_RESOURCE_LOAD_ERROR ${resourcePath}`);
         return;
       }
       sprite.spriteFrame = frame;
@@ -544,14 +612,28 @@ export class GameAIComposableLoadoutDemo extends Component {
   }
 
   private updateHud(): void {
-    if (!this.status) return;
+    if (!this.statusLabel || !this.helpLabel) return;
+    const lines = this.hudLines();
+    this.statusLabel.string = lines
+      .filter((line) => line.region === "status")
+      .map((line) => line.text)
+      .join("\n");
+    this.helpLabel.string = lines
+      .filter((line) => line.region === "help")
+      .map((line) => line.text)
+      .join("\n");
+  }
+
+  private hudLines() {
     const clipId = this.playback?.animation.animationId ?? "none";
     const playbackState = this.playback?.status.toUpperCase() ?? "STOPPED";
     const time = this.playback?.time ?? 0;
-    this.status.string =
-      `TASK-013 · COMPOSABLE FULL CHARACTER LOADOUT\n` +
-      `PRESET ${this.presetId} · PROP ${this.propState} · CLIP ID ${clipId} · ${playbackState} ${time.toFixed(2)}\n` +
-      `GRIP PASS · SEAMS PASS · ACCESSORY SOCKETS PASS · GLOBAL LAYERS PASS · EXACT 0 RGBA / 0 ALPHA / 0 SEAM / 0 BOUNDS\n` +
-      `F1–F8 presets · Q/W/E prop · 1–5 clips · Space Pause/Resume · Esc exact Reset · R/A/O views · J/B/P/L/G/T/M/S/K/Y debug · ${this.note}`;
+    return formatComposableLoadoutHudLines({
+      presetId: this.presetId,
+      propState: this.propState,
+      clipId,
+      playbackState,
+      timeSeconds: time,
+    });
   }
 }

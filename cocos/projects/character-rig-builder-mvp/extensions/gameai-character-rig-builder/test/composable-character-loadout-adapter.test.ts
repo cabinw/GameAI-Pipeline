@@ -17,11 +17,16 @@ import {
 import { buildCocosComposableCharacterLoadoutPlan } from "../source/composable-character-loadout-adapter";
 import {
   calculateComposableLoadoutHudBounds,
+  COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
+  formatComposableLoadoutHudLines,
   ComposableLoadoutControlError,
   resolveComposableLoadoutControlClips,
   TASK_013_HUD_RUNTIME_BOUNDS_INVALID,
+  TASK_013_HUD_TEXT_OVERFLOW,
+  validateComposableLoadoutHudLines,
   validateComposableLoadoutHudRuntimeBounds,
+  validateComposableLoadoutHudTextLayout,
 } from "../source/composable-character-loadout-controls";
 
 const repositoryRoot = path.resolve(__dirname, "../../../../../../../");
@@ -186,8 +191,15 @@ test("TASK-013 HUD declares non-overlapping in-bounds status rows", () => {
     "task-title",
     "runtime-status",
     "validation-status",
-    "shortcuts",
+    "preset-prop-controls",
+    "clip-controls",
+    "playback-controls",
+    "view-controls",
+    "debug-controls-primary",
+    "debug-controls-secondary",
   ]);
+  assert.equal(layout.fontSize, 14);
+  assert.equal(layout.lineHeight, 17);
   assert.equal(bounds.rowBounds.length, layout.rows.length);
   for (const [index, row] of bounds.rowBounds.entries()) {
     assert.ok(row.top <= bounds.top, row.rowId);
@@ -200,6 +212,10 @@ test("TASK-013 HUD declares non-overlapping in-bounds status rows", () => {
   assert.ok(
     layout.rows.length * layout.lineHeight <= layout.height,
     "all rows fit inside HUD content height",
+  );
+  assert.ok(
+    bounds.bottom > COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS.top,
+    "HUD remains above the configured visible character acceptance bounds",
   );
 });
 
@@ -216,14 +232,41 @@ test("TASK-013 runtime HUD guard accepts final bounds and rejects the observed c
     top: 0,
     bottom: -155,
   };
+  const statusLabelBoundsInContainer = {
+    left: 0,
+    right: 1230,
+    top: 0,
+    bottom: -51,
+  };
+  const helpLabelBoundsInContainer = {
+    left: 0,
+    right: 1230,
+    top: -51,
+    bottom: -153,
+  };
+  const statusLabelBounds = {
+    left: -615,
+    right: 615,
+    top: 346,
+    bottom: 295,
+  };
+  const helpLabelBounds = {
+    left: -615,
+    right: 615,
+    top: 295,
+    bottom: 193,
+  };
   assert.doesNotThrow(() =>
     validateComposableLoadoutHudRuntimeBounds({
       canvasSafeBounds: expected,
       containerBounds: expected,
-      labelBounds: expected,
-      labelBoundsInContainer: containerContentBounds,
+      statusLabelBounds,
+      helpLabelBounds,
+      statusLabelBoundsInContainer,
+      helpLabelBoundsInContainer,
       containerContentBounds,
-      labelContentHeight: 155,
+      statusLabelContentHeight: 51,
+      helpLabelContentHeight: 102,
     }),
   );
   assert.throws(
@@ -231,26 +274,193 @@ test("TASK-013 runtime HUD guard accepts final bounds and rejects the observed c
       validateComposableLoadoutHudRuntimeBounds({
         canvasSafeBounds: expected,
         containerBounds: expected,
-        labelBounds: {
+        statusLabelBounds: {
           left: -1230,
           right: 0,
           top: 423.5,
-          bottom: 268.5,
+          bottom: 372.5,
         },
-        labelBoundsInContainer: {
+        helpLabelBounds,
+        statusLabelBoundsInContainer: {
           left: -615,
           right: 615,
           top: 77.5,
-          bottom: -77.5,
+          bottom: 26.5,
         },
+        helpLabelBoundsInContainer,
         containerContentBounds,
-        labelContentHeight: 155,
+        statusLabelContentHeight: 51,
+        helpLabelContentHeight: 102,
       }),
     (error) =>
       error instanceof Error &&
       error.message.startsWith(TASK_013_HUD_RUNTIME_BOUNDS_INVALID) &&
       error.message.includes("-1230") &&
       error.message.includes("423.5"),
+  );
+});
+
+test("TASK-013 HUD formatter returns every required logical row within budgets", () => {
+  const lines = formatComposableLoadoutHudLines({
+    presetId: "full-loadout",
+    propState: "left-hand",
+    clipId: "production-lite-full-loadout-integration-stress",
+    playbackState: "PLAYING",
+    timeSeconds: 12.5,
+  });
+  assert.deepEqual(
+    lines.map((line) => line.rowId),
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.rows,
+  );
+  assert.equal(lines.length, 9);
+  assert.equal(lines.filter((line) => line.region === "status").length, 3);
+  assert.equal(lines.filter((line) => line.region === "help").length, 6);
+  assert.equal(
+    lines.some((line) =>
+      line.text.includes("production-lite-full-loadout-integration-stress"),
+    ),
+    true,
+    "actual semantic clip ID is preserved",
+  );
+  for (const line of lines) {
+    const maximum =
+      line.region === "status"
+        ? COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumStatusLineCharacters
+        : COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumHelpLineCharacters;
+    assert.ok(line.text.length <= maximum, `${line.rowId}: ${line.text}`);
+    assert.equal(line.text.includes("\n"), false, line.rowId);
+  }
+});
+
+test("TASK-013 HUD formatter documents exact runtime keys", () => {
+  const lines = formatComposableLoadoutHudLines({
+    presetId: "full-loadout",
+    propState: "left-hand",
+    clipId: "production-lite-full-loadout-rest",
+    playbackState: "STOPPED",
+    timeSeconds: 0,
+  });
+  const byId = Object.fromEntries(
+    lines.map((line) => [line.rowId, line.text]),
+  );
+  assert.equal(
+    byId["preset-prop-controls"],
+    "PRESETS F1–F8 · PROP Q None · W Left · E Right",
+  );
+  assert.equal(
+    byId["clip-controls"],
+    "CLIPS 1 Rest · 2 Walk · 3 Wave · 4 Swing · 5 Stress",
+  );
+  assert.equal(
+    byId["playback-controls"],
+    "PLAY Space Pause/Resume · Esc Exact Reset",
+  );
+  assert.equal(
+    byId["view-controls"],
+    "VIEWS R Reference · A Assembled · O Overlay",
+  );
+  assert.equal(
+    byId["debug-controls-primary"],
+    "DEBUG J Joints · B Bounds · P Pivots · L Links · G Layers",
+  );
+  assert.equal(
+    byId["debug-controls-secondary"],
+    "DEBUG T Slots · M Seams · S Sockets · K Skeleton · Y Grip",
+  );
+});
+
+test("TASK-013 HUD rejects the old clipped shortcut row and oversized semantic IDs", () => {
+  const valid = formatComposableLoadoutHudLines({
+    presetId: "full-loadout",
+    propState: "left-hand",
+    clipId: "production-lite-full-loadout-rest",
+    playbackState: "STOPPED",
+    timeSeconds: 0,
+  });
+  const oldShortcut =
+    "F1–F8 presets · Q/W/E prop · 1–5 clips · Space Pause/Resume · " +
+    "Esc exact Reset · R/A/O views · J/B/P/L/G/T/M/S/K/Y debug · note";
+  const invalid = valid.map((line) =>
+    line.rowId === "preset-prop-controls"
+      ? { ...line, text: oldShortcut }
+      : line,
+  );
+  assert.throws(
+    () => validateComposableLoadoutHudLines(invalid),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_HUD_TEXT_OVERFLOW) &&
+      error.message.includes("maximumHelpLineCharacters"),
+  );
+  assert.throws(
+    () =>
+      formatComposableLoadoutHudLines({
+        presetId: "full-loadout",
+        propState: "left-hand",
+        clipId: `production-lite-${"x".repeat(80)}`,
+        playbackState: "STOPPED",
+        timeSeconds: 0,
+      }),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_HUD_TEXT_OVERFLOW) &&
+      error.message.includes("clipId"),
+  );
+});
+
+test("TASK-013 HUD content guard keeps status/help regions separate and above the character", () => {
+  const lines = formatComposableLoadoutHudLines({
+    presetId: "full-loadout",
+    propState: "left-hand",
+    clipId: "production-lite-full-loadout-rest",
+    playbackState: "STOPPED",
+    timeSeconds: 0,
+  });
+  const validMeasurement = {
+    lines,
+    containerBounds: {
+      left: -615,
+      right: 615,
+      top: 346,
+      bottom: 191,
+    },
+    statusLabelBoundsInContainer: {
+      left: 0,
+      right: 1230,
+      top: 0,
+      bottom: -51,
+    },
+    helpLabelBoundsInContainer: {
+      left: 0,
+      right: 1230,
+      top: -51,
+      bottom: -153,
+    },
+    containerContentBounds: {
+      left: 0,
+      right: 1230,
+      top: 0,
+      bottom: -155,
+    },
+    characterAcceptanceBounds:
+      COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
+  };
+  assert.doesNotThrow(() =>
+    validateComposableLoadoutHudTextLayout(validMeasurement),
+  );
+  assert.throws(
+    () =>
+      validateComposableLoadoutHudTextLayout({
+        ...validMeasurement,
+        helpLabelBoundsInContainer: {
+          ...validMeasurement.helpLabelBoundsInContainer,
+          top: -40,
+        },
+      }),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_HUD_TEXT_OVERFLOW) &&
+      error.message.includes("statusAndHelpDoNotOverlap"),
   );
 });
 
@@ -313,25 +523,51 @@ test("generated TASK-013 runtime scene graph stabilizes Label-owned transform st
   const containerCreation = runtime.indexOf(
     "new Node(COMPOSABLE_LOADOUT_HUD_LAYOUT.containerName)",
   );
-  const labelCreation = runtime.indexOf(
-    "new Node(COMPOSABLE_LOADOUT_HUD_LAYOUT.labelName)",
+  const statusRegion = runtime.indexOf(
+    "COMPOSABLE_LOADOUT_HUD_LAYOUT.statusLabelName",
   );
-  const labelParenting = runtime.indexOf("labelNode.setParent(container)");
-  const labelCreationCall = runtime.indexOf("labelNode.addComponent(Label)");
+  const helpRegion = runtime.indexOf(
+    "COMPOSABLE_LOADOUT_HUD_LAYOUT.helpLabelName",
+  );
+  const hudRegionMethod = runtime.indexOf("private hudRegion");
+  const labelCreation = runtime.indexOf(
+    "const node = new Node(name)",
+    hudRegionMethod,
+  );
+  const labelParenting = runtime.indexOf(
+    "node.setParent(container)",
+    hudRegionMethod,
+  );
+  const labelCreationCall = runtime.indexOf(
+    "node.addComponent(Label)",
+    hudRegionMethod,
+  );
   const labelConfiguration = runtime.indexOf(
-    "this.status.overflow = Label.Overflow.CLAMP",
+    "label.overflow = Label.Overflow.CLAMP",
+    hudRegionMethod,
   );
   const finalTransform = runtime.indexOf(
-    "labelNode.getComponent(UITransform)",
+    "node.getComponent(UITransform)",
+    hudRegionMethod,
   );
   const finalAnchor = runtime.indexOf(
-    "labelTransform.setAnchorPoint",
+    "transform.setAnchorPoint",
+    hudRegionMethod,
   );
-  const finalSize = runtime.indexOf("labelTransform.setContentSize");
-  const finalPosition = runtime.indexOf("labelNode.setPosition(0, 0, 0)");
-  const finalString = runtime.indexOf("this.updateHud()", finalPosition);
+  const finalSize = runtime.indexOf(
+    "transform.setContentSize",
+    hudRegionMethod,
+  );
+  const finalPosition = runtime.indexOf(
+    "node.setPosition(0, y, 0)",
+    hudRegionMethod,
+  );
+  const finalString = runtime.indexOf("this.updateHud()", helpRegion);
   assert.ok(containerCreation >= 0);
-  assert.ok(labelCreation > containerCreation);
+  assert.ok(statusRegion > containerCreation);
+  assert.ok(helpRegion > statusRegion);
+  assert.ok(finalString > helpRegion);
+  assert.ok(labelCreation > finalString);
   assert.ok(labelParenting > labelCreation);
   assert.ok(labelCreationCall > labelParenting);
   assert.ok(labelConfiguration > labelCreationCall);
@@ -339,11 +575,17 @@ test("generated TASK-013 runtime scene graph stabilizes Label-owned transform st
   assert.ok(finalAnchor > finalTransform);
   assert.ok(finalSize > finalAnchor);
   assert.ok(finalPosition > finalSize);
-  assert.ok(finalString > finalPosition);
   assert.equal(runtime.includes("container.addComponent(Label)"), false);
   assert.equal(generatedControls.includes('containerName: "HUDContainer"'), true);
-  assert.equal(generatedControls.includes('labelName: "HUDLabel"'), true);
-  assert.equal(runtime.includes("this.status.enableWrapText = false"), true);
+  assert.equal(
+    generatedControls.includes('statusLabelName: "HUDStatusLabel"'),
+    true,
+  );
+  assert.equal(
+    generatedControls.includes('helpLabelName: "HUDHelpLabel"'),
+    true,
+  );
+  assert.equal(runtime.includes("label.enableWrapText = false"), true);
   assert.equal(runtime.includes("Label.Overflow.CLAMP"), true);
   assert.equal(runtime.includes("Director.EVENT_AFTER_DRAW"), true);
   assert.equal(
@@ -354,11 +596,22 @@ test("generated TASK-013 runtime scene graph stabilizes Label-owned transform st
     runtime.includes("TASK_013_HUD_RUNTIME_BOUNDS"),
     true,
   );
+  assert.equal(
+    runtime.includes("validateComposableLoadoutHudTextLayout"),
+    true,
+  );
+  assert.equal(runtime.includes("TASK_013_HUD_TEXT_LAYOUT"), true);
+  assert.equal(
+    runtime.includes(
+      "F1–F8 presets · Q/W/E prop · 1–5 clips · Space Pause/Resume",
+    ),
+    false,
+  );
   assert.equal(scene.includes("TASK-013"), true);
   assert.equal(
     scene.includes("c83e6PqIb5JVZNMf1hkxheW"),
     true,
-    "generated scene retains the runtime component that emits HUDContainer/HUDLabel",
+    "generated scene retains the runtime component that emits the split HUD labels",
   );
 });
 
@@ -420,23 +673,46 @@ test("integrated Cocos scene exposes the complete loadout and debug surface", ()
     "sockets",
     "grip markers",
     "skeleton",
-    "Exact Reset",
+    "this.exactReset()",
     "playback?.animation.animationId",
     "calculateComposableLoadoutHudBounds",
+    "formatComposableLoadoutHudLines",
+    "validateComposableLoadoutHudTextLayout",
     "setAnchorPoint",
     "HorizontalTextAlignment.LEFT",
     "VerticalTextAlignment.TOP",
-    "PRESET ${this.presetId}",
-    "PROP ${this.propState}",
-    "CLIP ID ${clipId}",
-    "GRIP PASS",
-    "SEAMS PASS",
-    "ACCESSORY SOCKETS PASS",
-    "GLOBAL LAYERS PASS",
-    "F1–F8 presets",
     "Label.Overflow.CLAMP",
   ]) {
     assert.equal(runtime.includes(token), true, token);
+  }
+  for (const key of [
+    "KeyCode.F1",
+    "KeyCode.F8",
+    "KeyCode.KEY_Q",
+    "KeyCode.KEY_W",
+    "KeyCode.KEY_E",
+    "KeyCode.DIGIT_1",
+    "KeyCode.DIGIT_2",
+    "KeyCode.DIGIT_3",
+    "KeyCode.DIGIT_4",
+    "KeyCode.DIGIT_5",
+    "KeyCode.SPACE",
+    "KeyCode.ESCAPE",
+    "KeyCode.KEY_R",
+    "KeyCode.KEY_A",
+    "KeyCode.KEY_O",
+    "KeyCode.KEY_J",
+    "KeyCode.KEY_B",
+    "KeyCode.KEY_P",
+    "KeyCode.KEY_L",
+    "KeyCode.KEY_G",
+    "KeyCode.KEY_T",
+    "KeyCode.KEY_M",
+    "KeyCode.KEY_S",
+    "KeyCode.KEY_K",
+    "KeyCode.KEY_Y",
+  ]) {
+    assert.equal(runtime.includes(key), true, key);
   }
   assert.equal(scene.includes("composable-full-loadout-reference"), true);
   assert.equal(scene.includes("TASK-013"), true);

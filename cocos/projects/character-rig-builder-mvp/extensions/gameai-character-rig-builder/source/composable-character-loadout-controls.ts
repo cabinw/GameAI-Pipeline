@@ -9,9 +9,30 @@ export const COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS = {
 export type ComposableLoadoutControl =
   keyof typeof COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS;
 
+export const COMPOSABLE_LOADOUT_HUD_STATUS_ROWS = [
+  "task-title",
+  "runtime-status",
+  "validation-status",
+] as const;
+
+export const COMPOSABLE_LOADOUT_HUD_HELP_ROWS = [
+  "preset-prop-controls",
+  "clip-controls",
+  "playback-controls",
+  "view-controls",
+  "debug-controls-primary",
+  "debug-controls-secondary",
+] as const;
+
+export const COMPOSABLE_LOADOUT_HUD_ROWS = [
+  ...COMPOSABLE_LOADOUT_HUD_STATUS_ROWS,
+  ...COMPOSABLE_LOADOUT_HUD_HELP_ROWS,
+] as const;
+
 export const COMPOSABLE_LOADOUT_HUD_LAYOUT = {
   containerName: "HUDContainer",
-  labelName: "HUDLabel",
+  statusLabelName: "HUDStatusLabel",
+  helpLabelName: "HUDHelpLabel",
   designWidth: 1280,
   designHeight: 720,
   width: 1230,
@@ -20,14 +41,42 @@ export const COMPOSABLE_LOADOUT_HUD_LAYOUT = {
   anchorY: 1,
   leftInset: 25,
   topInset: 14,
-  lineHeight: 20,
-  rows: [
-    "task-title",
-    "runtime-status",
-    "validation-status",
-    "shortcuts",
-  ],
+  fontSize: 14,
+  lineHeight: 17,
+  maximumStatusLineCharacters: 140,
+  maximumHelpLineCharacters: 80,
+  maximumPresetIdCharacters: 32,
+  maximumPropStateCharacters: 16,
+  maximumClipIdCharacters: 64,
+  maximumPlaybackStateCharacters: 12,
+  statusRows: COMPOSABLE_LOADOUT_HUD_STATUS_ROWS,
+  helpRows: COMPOSABLE_LOADOUT_HUD_HELP_ROWS,
+  rows: COMPOSABLE_LOADOUT_HUD_ROWS,
 } as const;
+
+export const COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS = {
+  left: -457,
+  right: 17,
+  top: 180,
+  bottom: -124,
+} as const;
+
+export type ComposableLoadoutHudRowId =
+  (typeof COMPOSABLE_LOADOUT_HUD_ROWS)[number];
+
+export interface ComposableLoadoutHudLine {
+  readonly rowId: ComposableLoadoutHudRowId;
+  readonly region: "status" | "help";
+  readonly text: string;
+}
+
+export interface ComposableLoadoutHudState {
+  readonly presetId: string;
+  readonly propState: string;
+  readonly clipId: string;
+  readonly playbackState: string;
+  readonly timeSeconds: number;
+}
 
 export interface ComposableLoadoutHudRectangle {
   readonly left: number;
@@ -43,7 +92,7 @@ export interface ComposableLoadoutHudBounds {
   readonly top: number;
   readonly bottom: number;
   readonly rowBounds: readonly {
-    readonly rowId: (typeof COMPOSABLE_LOADOUT_HUD_LAYOUT.rows)[number];
+    readonly rowId: ComposableLoadoutHudRowId;
     readonly top: number;
     readonly bottom: number;
   }[];
@@ -51,6 +100,159 @@ export interface ComposableLoadoutHudBounds {
 
 export const TASK_013_HUD_RUNTIME_BOUNDS_INVALID =
   "TASK_013_HUD_RUNTIME_BOUNDS_INVALID";
+export const TASK_013_HUD_TEXT_OVERFLOW = "TASK_013_HUD_TEXT_OVERFLOW";
+
+const COMPOSABLE_LOADOUT_STATIC_HELP_LINES = [
+  {
+    rowId: "preset-prop-controls",
+    text: "PRESETS F1–F8 · PROP Q None · W Left · E Right",
+  },
+  {
+    rowId: "clip-controls",
+    text: "CLIPS 1 Rest · 2 Walk · 3 Wave · 4 Swing · 5 Stress",
+  },
+  {
+    rowId: "playback-controls",
+    text: "PLAY Space Pause/Resume · Esc Exact Reset",
+  },
+  {
+    rowId: "view-controls",
+    text: "VIEWS R Reference · A Assembled · O Overlay",
+  },
+  {
+    rowId: "debug-controls-primary",
+    text: "DEBUG J Joints · B Bounds · P Pivots · L Links · G Layers",
+  },
+  {
+    rowId: "debug-controls-secondary",
+    text: "DEBUG T Slots · M Seams · S Sockets · K Skeleton · Y Grip",
+  },
+] as const;
+
+function assertBoundedHudValue(
+  name: string,
+  value: string,
+  maximumCharacters: number,
+): void {
+  if (
+    value.length === 0 ||
+    value.length > maximumCharacters ||
+    value.includes("\n") ||
+    value.includes("\r")
+  ) {
+    throw new Error(
+      `${TASK_013_HUD_TEXT_OVERFLOW}: ${JSON.stringify({
+        name,
+        value,
+        maximumCharacters,
+      })}`,
+    );
+  }
+}
+
+export function validateComposableLoadoutHudLines(
+  lines: readonly ComposableLoadoutHudLine[],
+): void {
+  const expectedRows = COMPOSABLE_LOADOUT_HUD_ROWS;
+  const rowIds = lines.map((line) => line.rowId);
+  const requiredHeight =
+    expectedRows.length * COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+  const invalidLine = lines.find((line) => {
+    const maximumCharacters =
+      line.region === "status"
+        ? COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumStatusLineCharacters
+        : COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumHelpLineCharacters;
+    return (
+      line.text.length === 0 ||
+      line.text.length > maximumCharacters ||
+      line.text.includes("\n") ||
+      line.text.includes("\r")
+    );
+  });
+  if (
+    lines.length !== expectedRows.length ||
+    rowIds.some((rowId, index) => rowId !== expectedRows[index]) ||
+    requiredHeight > COMPOSABLE_LOADOUT_HUD_LAYOUT.height ||
+    invalidLine !== undefined
+  ) {
+    throw new Error(
+      `${TASK_013_HUD_TEXT_OVERFLOW}: ${JSON.stringify({
+        expectedRows,
+        actualRows: rowIds,
+        requiredHeight,
+        availableHeight: COMPOSABLE_LOADOUT_HUD_LAYOUT.height,
+        maximumStatusLineCharacters:
+          COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumStatusLineCharacters,
+        maximumHelpLineCharacters:
+          COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumHelpLineCharacters,
+        invalidLine,
+      })}`,
+    );
+  }
+}
+
+export function formatComposableLoadoutHudLines(
+  state: ComposableLoadoutHudState,
+): readonly ComposableLoadoutHudLine[] {
+  assertBoundedHudValue(
+    "presetId",
+    state.presetId,
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumPresetIdCharacters,
+  );
+  assertBoundedHudValue(
+    "propState",
+    state.propState,
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumPropStateCharacters,
+  );
+  assertBoundedHudValue(
+    "clipId",
+    state.clipId,
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumClipIdCharacters,
+  );
+  assertBoundedHudValue(
+    "playbackState",
+    state.playbackState,
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumPlaybackStateCharacters,
+  );
+  if (
+    !Number.isFinite(state.timeSeconds) ||
+    state.timeSeconds < 0 ||
+    state.timeSeconds > 9999.99
+  ) {
+    throw new Error(
+      `${TASK_013_HUD_TEXT_OVERFLOW}: ${JSON.stringify({
+        name: "timeSeconds",
+        value: state.timeSeconds,
+        maximum: 9999.99,
+      })}`,
+    );
+  }
+  const lines: readonly ComposableLoadoutHudLine[] = [
+    {
+      rowId: "task-title",
+      region: "status",
+      text: "TASK-013 · COMPOSABLE FULL CHARACTER LOADOUT",
+    },
+    {
+      rowId: "runtime-status",
+      region: "status",
+      text:
+        `PRESET ${state.presetId} · PROP ${state.propState} · ` +
+        `CLIP ${state.clipId} · ${state.playbackState} ${state.timeSeconds.toFixed(2)}s`,
+    },
+    {
+      rowId: "validation-status",
+      region: "status",
+      text: "GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
+    },
+    ...COMPOSABLE_LOADOUT_STATIC_HELP_LINES.map((line) => ({
+      ...line,
+      region: "help" as const,
+    })),
+  ];
+  validateComposableLoadoutHudLines(lines);
+  return lines;
+}
 
 export function calculateAnchoredRectangle(
   position: { readonly x: number; readonly y: number },
@@ -70,10 +272,13 @@ export function calculateAnchoredRectangle(
 export interface ComposableLoadoutHudRuntimeMeasurement {
   readonly canvasSafeBounds: ComposableLoadoutHudRectangle;
   readonly containerBounds: ComposableLoadoutHudRectangle;
-  readonly labelBounds: ComposableLoadoutHudRectangle;
-  readonly labelBoundsInContainer: ComposableLoadoutHudRectangle;
+  readonly statusLabelBounds: ComposableLoadoutHudRectangle;
+  readonly helpLabelBounds: ComposableLoadoutHudRectangle;
+  readonly statusLabelBoundsInContainer: ComposableLoadoutHudRectangle;
+  readonly helpLabelBoundsInContainer: ComposableLoadoutHudRectangle;
   readonly containerContentBounds: ComposableLoadoutHudRectangle;
-  readonly labelContentHeight: number;
+  readonly statusLabelContentHeight: number;
+  readonly helpLabelContentHeight: number;
 }
 
 export function validateComposableLoadoutHudRuntimeBounds(
@@ -82,10 +287,13 @@ export function validateComposableLoadoutHudRuntimeBounds(
   const {
     canvasSafeBounds,
     containerBounds,
-    labelBounds,
-    labelBoundsInContainer,
+    statusLabelBounds,
+    helpLabelBounds,
+    statusLabelBoundsInContainer,
+    helpLabelBoundsInContainer,
     containerContentBounds,
-    labelContentHeight,
+    statusLabelContentHeight,
+    helpLabelContentHeight,
   } = measurement;
   const inside = (
     inner: ComposableLoadoutHudRectangle,
@@ -95,19 +303,77 @@ export function validateComposableLoadoutHudRuntimeBounds(
     inner.right <= outer.right &&
     inner.top <= outer.top &&
     inner.bottom >= outer.bottom;
-  const requiredContentHeight =
-    COMPOSABLE_LOADOUT_HUD_LAYOUT.rows.length *
+  const requiredStatusHeight =
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.statusRows.length *
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+  const requiredHelpHeight =
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.helpRows.length *
     COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
   if (
     !inside(containerBounds, canvasSafeBounds) ||
-    !inside(labelBounds, canvasSafeBounds) ||
-    !inside(labelBoundsInContainer, containerContentBounds) ||
-    labelContentHeight < requiredContentHeight
+    !inside(statusLabelBounds, canvasSafeBounds) ||
+    !inside(helpLabelBounds, canvasSafeBounds) ||
+    !inside(statusLabelBoundsInContainer, containerContentBounds) ||
+    !inside(helpLabelBoundsInContainer, containerContentBounds) ||
+    statusLabelBounds.bottom < helpLabelBounds.top ||
+    statusLabelBoundsInContainer.bottom < helpLabelBoundsInContainer.top ||
+    statusLabelContentHeight < requiredStatusHeight ||
+    helpLabelContentHeight < requiredHelpHeight
   ) {
     throw new Error(
       `${TASK_013_HUD_RUNTIME_BOUNDS_INVALID}: ${JSON.stringify({
         ...measurement,
-        requiredContentHeight,
+        requiredStatusHeight,
+        requiredHelpHeight,
+      })}`,
+    );
+  }
+}
+
+export interface ComposableLoadoutHudTextLayoutMeasurement {
+  readonly lines: readonly ComposableLoadoutHudLine[];
+  readonly containerBounds: ComposableLoadoutHudRectangle;
+  readonly statusLabelBoundsInContainer: ComposableLoadoutHudRectangle;
+  readonly helpLabelBoundsInContainer: ComposableLoadoutHudRectangle;
+  readonly containerContentBounds: ComposableLoadoutHudRectangle;
+  readonly characterAcceptanceBounds: ComposableLoadoutHudRectangle;
+}
+
+export function validateComposableLoadoutHudTextLayout(
+  measurement: ComposableLoadoutHudTextLayoutMeasurement,
+): void {
+  validateComposableLoadoutHudLines(measurement.lines);
+  const inside = (
+    inner: ComposableLoadoutHudRectangle,
+    outer: ComposableLoadoutHudRectangle,
+  ) =>
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.top <= outer.top &&
+    inner.bottom >= outer.bottom;
+  const statusAndHelpDoNotOverlap =
+    measurement.statusLabelBoundsInContainer.bottom >=
+    measurement.helpLabelBoundsInContainer.top;
+  const hudDoesNotOverlapCharacter =
+    measurement.containerBounds.bottom >
+    measurement.characterAcceptanceBounds.top;
+  if (
+    !inside(
+      measurement.statusLabelBoundsInContainer,
+      measurement.containerContentBounds,
+    ) ||
+    !inside(
+      measurement.helpLabelBoundsInContainer,
+      measurement.containerContentBounds,
+    ) ||
+    !statusAndHelpDoNotOverlap ||
+    !hudDoesNotOverlapCharacter
+  ) {
+    throw new Error(
+      `${TASK_013_HUD_TEXT_OVERFLOW}: ${JSON.stringify({
+        ...measurement,
+        statusAndHelpDoNotOverlap,
+        hudDoesNotOverlapCharacter,
       })}`,
     );
   }
