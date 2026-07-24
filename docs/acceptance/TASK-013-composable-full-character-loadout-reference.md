@@ -64,6 +64,21 @@ character-pipeline scene, duplicate UUIDs, missing script classes, scene/root
 identity, generator idempotence, metadata preservation, and the rejected
 synthetic identifiers.
 
+### Creator 3.8.8 HUD safe-area repair
+
+The live 1280x720 Preview also exposed that a centered 155 px HUD inherited the
+generated character root's vertical offset and extended past the Canvas top.
+The repaired runtime parents the HUD directly to the Canvas, gives its
+`UITransform` a top-left anchor, and deterministically places its 1230x155
+bounds at left `-615`, right `615`, top `346`, and bottom `191`. The documented
+25 px side and 14 px top insets keep all four status/shortcut rows within the
+Canvas and leave the 300x350 character views below the HUD.
+
+The layout constants and bounds calculation live in the tested
+`composable-character-loadout-controls.ts` generator source. The generated
+Cocos controls mirror is byte-checked against that source, so the final runtime
+layout is reproducible and not a manual scene edit.
+
 ## Verification and evidence
 
 Working-copy `CI=true pnpm verify` and tracked-files-only frozen installation

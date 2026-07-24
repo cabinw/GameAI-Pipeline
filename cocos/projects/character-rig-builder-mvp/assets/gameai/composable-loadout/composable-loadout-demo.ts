@@ -4,6 +4,7 @@ import {
   Component,
   EventKeyboard,
   Graphics,
+  HorizontalTextAlignment,
   input,
   Input,
   KeyCode,
@@ -16,6 +17,7 @@ import {
   SpriteFrame,
   UIOpacity,
   UITransform,
+  VerticalTextAlignment,
 } from "cc";
 import {
   RigAnimationPlayback,
@@ -28,6 +30,8 @@ import type {
 } from "@gameai/rig-animation/dist/runtime-esm/runtime.js";
 
 import {
+  calculateComposableLoadoutHudBounds,
+  COMPOSABLE_LOADOUT_HUD_LAYOUT,
   resolveComposableLoadoutControlClips,
   type ComposableLoadoutControl,
 } from "./composable-loadout-controls";
@@ -122,7 +126,7 @@ export class GameAIComposableLoadoutDemo extends Component {
       this.labelMarker(sprite, "parent links", part.parentId ?? "root");
     }
     this.addAttachments(spriteJoints);
-    this.hud(root);
+    this.hud(this.node);
     this.applyState();
     this.updateDebug();
   }
@@ -284,11 +288,22 @@ export class GameAIComposableLoadoutDemo extends Component {
     const node = new Node("HUD");
     node.layer = Layers.Enum.UI_2D;
     node.setParent(parent);
-    node.setPosition(-615, 330, 0);
-    node.addComponent(UITransform).setContentSize(1230, 155);
+    const bounds = calculateComposableLoadoutHudBounds();
+    node.setPosition(bounds.position.x, bounds.position.y, 0);
+    const transform = node.addComponent(UITransform);
+    transform.setAnchorPoint(
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorX,
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorY,
+    );
+    transform.setContentSize(
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.width,
+      COMPOSABLE_LOADOUT_HUD_LAYOUT.height,
+    );
     this.status = node.addComponent(Label);
     this.status.fontSize = 15;
-    this.status.lineHeight = 20;
+    this.status.lineHeight = COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+    this.status.horizontalAlign = HorizontalTextAlignment.LEFT;
+    this.status.verticalAlign = VerticalTextAlignment.TOP;
     this.status.color = new Color().fromHEX("#ffffff");
   }
 

@@ -62,8 +62,18 @@ declare module "cc" {
     string: string;
     fontSize: number;
     lineHeight: number;
+    horizontalAlign: number;
+    verticalAlign: number;
     color: Color;
   }
+
+  export const HorizontalTextAlignment: {
+    readonly LEFT: number;
+  };
+
+  export const VerticalTextAlignment: {
+    readonly TOP: number;
+  };
 
   export class Sorting2D extends Component {
     sortingOrder: number;
@@ -88,6 +98,7 @@ declare module "cc" {
   };
 
   export class UITransform extends Component {
+    setAnchorPoint(x: number, y: number): void;
     setContentSize(width: number, height: number): void;
   }
 

@@ -16,6 +16,8 @@ import {
 
 import { buildCocosComposableCharacterLoadoutPlan } from "../source/composable-character-loadout-adapter";
 import {
+  calculateComposableLoadoutHudBounds,
+  COMPOSABLE_LOADOUT_HUD_LAYOUT,
   ComposableLoadoutControlError,
   resolveComposableLoadoutControlClips,
 } from "../source/composable-character-loadout-controls";
@@ -151,6 +153,88 @@ test("exact Reset is stopped at 0.00 with the authored Rest sample", () => {
   assert.deepEqual(reset, authored);
 });
 
+test("TASK-013 HUD stays inside the 1280x720 design Canvas", () => {
+  const layout = COMPOSABLE_LOADOUT_HUD_LAYOUT;
+  const bounds = calculateComposableLoadoutHudBounds(
+    layout.designWidth,
+    layout.designHeight,
+  );
+  const canvas = {
+    left: -layout.designWidth / 2,
+    right: layout.designWidth / 2,
+    top: layout.designHeight / 2,
+    bottom: -layout.designHeight / 2,
+  };
+  assert.equal(bounds.position.x, -615);
+  assert.equal(bounds.position.y, 346);
+  assert.equal(bounds.left, -615);
+  assert.equal(bounds.right, 615);
+  assert.equal(bounds.top, 346);
+  assert.equal(bounds.bottom, 191);
+  assert.ok(bounds.left >= canvas.left);
+  assert.ok(bounds.right <= canvas.right);
+  assert.ok(bounds.top <= canvas.top);
+  assert.ok(bounds.bottom >= canvas.bottom);
+});
+
+test("TASK-013 HUD declares non-overlapping in-bounds status rows", () => {
+  const layout = COMPOSABLE_LOADOUT_HUD_LAYOUT;
+  const bounds = calculateComposableLoadoutHudBounds();
+  assert.deepEqual(layout.rows, [
+    "task-title",
+    "runtime-status",
+    "validation-status",
+    "shortcuts",
+  ]);
+  assert.equal(bounds.rowBounds.length, layout.rows.length);
+  for (const [index, row] of bounds.rowBounds.entries()) {
+    assert.ok(row.top <= bounds.top, row.rowId);
+    assert.ok(row.bottom >= bounds.bottom, row.rowId);
+    assert.ok(row.top > row.bottom, row.rowId);
+    if (index > 0) {
+      assert.equal(bounds.rowBounds[index - 1]!.bottom, row.top, row.rowId);
+    }
+  }
+  assert.ok(
+    layout.rows.length * layout.lineHeight <= layout.height,
+    "all rows fit inside HUD content height",
+  );
+});
+
+test("generated TASK-013 runtime owns the repaired HUD configuration", () => {
+  const sourceControls = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/source/composable-character-loadout-controls.ts",
+    ),
+    "utf8",
+  );
+  const generatedControls = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-controls.ts",
+    ),
+    "utf8",
+  );
+  assert.equal(
+    generatedControls,
+    `// Generated from the tested semantic control resolver. Do not hand-edit.\n${sourceControls}`,
+  );
+  const runtime = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-demo.ts",
+    ),
+    "utf8",
+  );
+  assert.equal(
+    runtime.includes('from "./composable-loadout-controls"'),
+    true,
+  );
+  assert.equal(runtime.includes("this.hud(this.node)"), true);
+  assert.equal(runtime.includes("this.hud(root)"), false);
+});
+
 test("generic adapter source contains no fixture attachment names", () => {
   const source = readFileSync(
     path.join(
@@ -211,6 +295,18 @@ test("integrated Cocos scene exposes the complete loadout and debug surface", ()
     "skeleton",
     "Exact Reset",
     "playback?.animation.animationId",
+    "calculateComposableLoadoutHudBounds",
+    "setAnchorPoint",
+    "HorizontalTextAlignment.LEFT",
+    "VerticalTextAlignment.TOP",
+    "PRESET ${this.presetId}",
+    "PROP ${this.propState}",
+    "CLIP ID ${clipId}",
+    "GRIP PASS",
+    "SEAMS PASS",
+    "ACCESSORY SOCKETS PASS",
+    "GLOBAL LAYERS PASS",
+    "F1–F8 presets",
   ]) {
     assert.equal(runtime.includes(token), true, token);
   }
