@@ -42,6 +42,15 @@ overlays, and prop states. The scene exposes reference, assembled, overlay,
 skeleton, socket, grip, pivot, bounds, parent-link, and layer views. All
 keyboard controls are shown in the HUD.
 
+Numeric controls resolve explicit semantic animation IDs rather than generated
+array positions: `1` Rest (`production-lite-prop-rest`), `2` Walk
+(`production-lite-prop-walk`), `3` Prop Swing
+(`production-lite-prop-swing`), and `4` Prop Stress
+(`production-lite-prop-stress`). Missing or duplicate required IDs fail with
+stable `PROP_DEMO_REQUIRED_CLIP_MISSING` or
+`PROP_DEMO_REQUIRED_CLIP_DUPLICATE` diagnostics. The HUD reads the identity
+from the active runtime playback clip.
+
 ## Evidence workflow
 
 Authoritative local evidence is ignored under `artifacts/TASK-012`. Temporary

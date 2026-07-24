@@ -2,11 +2,11 @@
 
 ## Status
 
-Implementation complete on 2026-07-24 and stopped for external visual review.
-Working-copy and tracked-files-only frozen verification pass 200 tests. The
-feature branch is pushed without a pull request. Local acceptance videos are
-ignored, and their copies plus manifest remain on `evidence/task-012` at
-`5984d3428d64769539ea2db5319a33d2a3cffee7`.
+Focused semantic-control correction verified after external review found that
+generated clip ordering did not match the documented numeric controls.
+Working-copy and tracked-files-only frozen verification pass 208 tests. The
+historical feature and evidence commits remain immutable while the focused
+feature commit and replacement evidence are appended.
 
 ## Baseline and branch
 
@@ -52,6 +52,10 @@ artwork.
 - Add a thin generic Cocos 3.8.x adapter, generated data/resources, acceptance
   scene, reference/assembled/overlay modes, socket/grip/pivot/bounds/link/
   layer/skeleton views, and documented on-screen controls.
+- Resolve numeric controls by required semantic animation ID, independent of
+  clip-array order: `1` Rest, `2` Walk, `3` Prop Swing, and `4` Prop Stress.
+  Missing and duplicate required IDs must fail with stable diagnostics, and
+  the displayed clip identity must come from active runtime playback.
 
 ## Automated acceptance
 

@@ -2,6 +2,57 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active correction: TASK-012 Semantic Prop Demo Controls
+
+- Status: Implementation verified; replacement evidence in progress
+- Started: 2026-07-24
+- Branch: `feat/task-012-one-handed-prop-reference`
+- Immutable feature baseline:
+  `9cf8e2562fc4ccc3149a7d49e3a5dc3ab411b145`
+- Protected `main`: `ebaa7ba90ee1bc42318867a365abebced05afa78`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Correct the TASK-012 Cocos acceptance controls so keys 1 through 4 resolve
+Rest, Walk, Prop Swing, and Prop Stress by explicit semantic animation ID,
+independent of generated clip-array order. Reject missing or duplicate
+required IDs with stable errors, retain the active playback animation as the
+only displayed clip identity, and replace both recordings affected by the
+original index mapping.
+
+### Execution
+
+1. Add a pure semantic control resolver with stable missing/duplicate
+   diagnostics and use it from the Cocos acceptance runtime.
+2. Add regression coverage for every key, reordered clips, missing and
+   duplicate IDs, handler wiring, and playback-derived HUD identity.
+3. Synchronize TASK-012 task and acceptance documentation.
+4. Run working-copy and tracked-files-only frozen verification.
+5. Append and push one focused feature commit without rewriting the existing
+   feature commit.
+6. Capture, inspect, fully decode, hash, and publish two replacement videos;
+   append one evidence commit while preserving both original files and
+   evidence history.
+
+### Done when
+
+- Keys 1–4 visibly activate the documented semantic clips even when generated
+  input order differs.
+- Required clip omissions and duplicates fail with stable diagnostics.
+- Both verification modes pass with all existing tests preserved.
+- Both v2 videos are ignored locally, independently decodable H.264
+  1280×720/30 fps/yuv420p, and recorded in the appended evidence manifest.
+- No PR exists and `main`, the protected archive, and both historical commits
+  remain unchanged.
+
+### Verification
+
+- Working-copy `CI=true pnpm verify`: PASS, 208 tests.
+- Tracked-files-only archive after `pnpm install --frozen-lockfile`:
+  `CI=true pnpm verify` PASS, 208 tests.
+
 ## Completed plan: TASK-012 One-Handed Prop Attachment Reference
 
 - Status: Complete; awaiting external visual review

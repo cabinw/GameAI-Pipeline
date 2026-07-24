@@ -27,6 +27,10 @@ import type {
   RigAnimationSample,
 } from "@gameai/rig-animation/dist/runtime-esm/runtime.js";
 
+import {
+  resolveOneHandedPropControlClips,
+  type OneHandedPropControl,
+} from "./one-handed-prop-controls";
 import { ONE_HANDED_PROP_PLAN } from "./one-handed-prop-data";
 
 const { ccclass, executeInEditMode, property } = _decorator;
@@ -60,6 +64,9 @@ export class GameAIOneHandedPropDemo extends Component {
   private overlayDisplay: Node | null = null;
   private playback: RigAnimationPlayback | null = null;
   private clips: readonly NormalizedRigAnimation[] = [];
+  private clipsByControl:
+    | Readonly<Record<OneHandedPropControl, NormalizedRigAnimation>>
+    | null = null;
   private status: Label | null = null;
   private debug: Label | null = null;
   private joints: Node[] = [];
@@ -78,7 +85,7 @@ export class GameAIOneHandedPropDemo extends Component {
   }
 
   start(): void {
-    this.selectClip(0, false);
+    this.selectClip(1, false);
   }
 
   update(delta: number): void {
@@ -95,6 +102,7 @@ export class GameAIOneHandedPropDemo extends Component {
   private build(): void {
     this.node.children.find((child) => child.name === "PropGenerated")?.destroy();
     this.clips = ONE_HANDED_PROP_PLAN.base.clips as unknown as NormalizedRigAnimation[];
+    this.clipsByControl = resolveOneHandedPropControlClips(this.clips);
     const root = new Node("PropGenerated");
     root.layer = Layers.Enum.UI_2D;
     root.setParent(this.node);
@@ -382,8 +390,11 @@ export class GameAIOneHandedPropDemo extends Component {
     });
   }
 
-  private selectClip(index: number, play = true): void {
-    this.playback = new RigAnimationPlayback(this.clips[index]!);
+  private selectClip(control: OneHandedPropControl, play = true): void {
+    if (this.clipsByControl === null) {
+      throw new Error("PROP_DEMO_CONTROL_CLIPS_UNRESOLVED");
+    }
+    this.playback = new RigAnimationPlayback(this.clipsByControl[control]);
     this.apply(play ? this.playback.play() : this.playback.stop());
     this.note = "";
     this.updateStatus();
@@ -472,10 +483,10 @@ export class GameAIOneHandedPropDemo extends Component {
   }
 
   private readonly onKeyDown = (event: EventKeyboard): void => {
-    if (event.keyCode === KeyCode.DIGIT_1) this.selectClip(0);
-    else if (event.keyCode === KeyCode.DIGIT_2) this.selectClip(1);
-    else if (event.keyCode === KeyCode.DIGIT_3) this.selectClip(2);
-    else if (event.keyCode === KeyCode.DIGIT_4) this.selectClip(3);
+    if (event.keyCode === KeyCode.DIGIT_1) this.selectClip(1);
+    else if (event.keyCode === KeyCode.DIGIT_2) this.selectClip(2);
+    else if (event.keyCode === KeyCode.DIGIT_3) this.selectClip(3);
+    else if (event.keyCode === KeyCode.DIGIT_4) this.selectClip(4);
     else if (event.keyCode === KeyCode.SPACE && this.playback !== null) {
       this.apply(
         this.playback.status === "playing"

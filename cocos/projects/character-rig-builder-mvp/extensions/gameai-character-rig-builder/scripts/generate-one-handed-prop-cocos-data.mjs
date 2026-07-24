@@ -52,8 +52,16 @@ const plan = buildCocosOneHandedPropPlan(
   baseDimensions,
   attachmentDimensions,
 );
+const controlsSource = await readFile(
+  path.join(extensionRoot, "source/one-handed-prop-controls.ts"),
+  "utf8",
+);
 await mkdir(runtimeRoot, { recursive: true });
 await writeFile(
   path.join(runtimeRoot, "one-handed-prop-data.ts"),
   `// Generated from TASK-009 and TASK-012 contracts. Do not hand-edit.\nexport const ONE_HANDED_PROP_PLAN = ${JSON.stringify(plan, null, 2)} as const;\n`,
+);
+await writeFile(
+  path.join(runtimeRoot, "one-handed-prop-controls.ts"),
+  `// Generated from the tested TASK-012 semantic control resolver. Do not hand-edit.\n${controlsSource}`,
 );
