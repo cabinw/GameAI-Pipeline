@@ -10,6 +10,12 @@ export { normalizeRigAnimation } from "./normalizer";
 export { parseRigAnimation } from "./parser";
 export { RigAnimationPlayback } from "./playback";
 export {
+  evaluateRigPose,
+  multiplyAffineTransforms,
+  transformPoint,
+  validateRigHierarchy,
+} from "./hierarchy";
+export {
   canonicalSampleTime,
   composeJointPose,
   sampleRigAnimation,

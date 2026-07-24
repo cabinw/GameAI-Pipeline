@@ -32,6 +32,10 @@ importers:
       '@gameai/rig-animation':
         specifier: workspace:*
         version: link:../../../pipelines/rig-animation
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
 
   cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder:
     dependencies:

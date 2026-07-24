@@ -42,3 +42,5 @@ jobs:
 
       - name: Verify workspace
         run: pnpm verify
+        env:
+          CI: "true"

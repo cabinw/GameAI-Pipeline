@@ -31,6 +31,12 @@ function errorCodes(result: ValidationResult<unknown>): ValidationErrorCodeValue
 
 const validCharacterRigText = readRepositoryFile("examples/red-cap-target/character-rig.json");
 const validRigLayoutText = readRepositoryFile("examples/red-cap-target/rig-layout.json");
+const stickmanCharacterRigText = readRepositoryFile(
+  "examples/stickman-reference/character-rig.json",
+);
+const stickmanRigLayoutText = readRepositoryFile(
+  "examples/stickman-reference/rig-layout.json",
+);
 const invalidRigLayouts = readFixtureMap(
   "framework/character-contracts/test/fixtures/invalid-rig-layouts.json",
 );
@@ -58,6 +64,39 @@ describe("Red Cap Target character contract", () => {
   it("returns a generic schema code for malformed document shape", () => {
     const result = parseCharacterRig('{"schemaVersion":"1.0.0"}');
     assert.equal(errorCodes(result).includes(ValidationErrorCode.SCHEMA_VALIDATION_ERROR), true);
+  });
+});
+
+describe("minimal stickman reference contract", () => {
+  it("validates all 16 stable parts, one root, pivots, rest transforms, and draw order", () => {
+    const result = parseCharacterContract(
+      stickmanCharacterRigText,
+      stickmanRigLayoutText,
+    );
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(result.value.characterRig.characterId, "stickman-reference");
+    assert.equal(result.value.rigLayout.parts.length, 16);
+    assert.deepEqual(
+      result.value.rigLayout.parts.filter((part) => part.parentId === null).map(
+        (part) => part.partId,
+      ),
+      ["root"],
+    );
+    assert.equal(
+      new Set(result.value.rigLayout.parts.map((part) => part.drawOrder)).size,
+      16,
+    );
+    assert.ok(
+      result.value.rigLayout.parts.every(
+        (part) =>
+          Number.isFinite(part.anchor.x) &&
+          Number.isFinite(part.anchor.y) &&
+          Number.isFinite(part.restPose.position.x) &&
+          Number.isFinite(part.restPose.position.y) &&
+          Number.isFinite(part.restPose.rotationDegrees),
+      ),
+    );
   });
 });
 

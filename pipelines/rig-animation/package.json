@@ -11,7 +11,8 @@
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.runtime.json && node scripts/mark-runtime-esm.mjs && node scripts/copy-schema.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "evidence:red-cap-idle": "node scripts/generate-red-cap-idle-evidence.mjs",
-    "test": "pnpm run build && pnpm run evidence:red-cap-idle && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
+    "evidence:stickman": "node scripts/generate-stickman-evidence.mjs",
+    "test": "pnpm run build && pnpm run evidence:red-cap-idle && pnpm run evidence:stickman && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
   },
   "dependencies": {
     "ajv": "catalog:"

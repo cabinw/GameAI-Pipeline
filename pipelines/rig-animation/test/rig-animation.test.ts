@@ -7,11 +7,16 @@ import {
   RigAnimationErrorCode,
   RigAnimationPlayback,
   composeJointPose,
+  evaluateRigPose,
   normalizeRigAnimation,
   parseRigAnimation,
   sampleRigAnimation,
+  transformPoint,
+  validateRigHierarchy,
   validateRigAnimationSemantics,
   type RigAnimation,
+  type RigAnimationSample,
+  type RigHierarchyJoint,
 } from "../source";
 
 const packageRoot = path.resolve(__dirname, "../..");
@@ -328,5 +333,238 @@ test("repeated loops never drift and sampling is frame-rate independent", async 
   assert.deepEqual(
     manyLoops.sample().joints,
     sampleRigAnimation(normalized, 0).joints,
+  );
+});
+
+interface StickmanLayoutPart {
+  partId: string;
+  parentId: string | null;
+  restPose: {
+    position: { x: number; y: number };
+    rotationDegrees: number;
+    scale: { x: number; y: number };
+  };
+}
+
+async function stickmanHierarchy(): Promise<RigHierarchyJoint[]> {
+  const layout = JSON.parse(
+    await readFile(
+      path.join(repositoryRoot, "examples/stickman-reference/rig-layout.json"),
+      "utf8",
+    ),
+  ) as { parts: StickmanLayoutPart[] };
+  return layout.parts.map((part) => ({
+    jointId: part.partId,
+    parentId: part.parentId,
+    restPose: part.restPose,
+  }));
+}
+
+async function stickmanClip(name: string): Promise<RigAnimation> {
+  const hierarchy = await stickmanHierarchy();
+  const source = await readFile(
+    path.join(
+      repositoryRoot,
+      "examples/stickman-reference/animations",
+      `${name}.json`,
+    ),
+    "utf8",
+  );
+  const result = parseRigAnimation(source, {
+    rigId: "stickman-reference-layout",
+    rigSchemaVersion: "1.0.0",
+    jointIds: new Set(hierarchy.map((joint) => joint.jointId)),
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) throw new Error("stickman clip did not parse");
+  return result.value;
+}
+
+function sampleWithRotations(
+  rotations: Readonly<Record<string, number>>,
+): RigAnimationSample {
+  return {
+    animationId: "test-pose",
+    inputTime: 0,
+    sampleTime: 0,
+    joints: Object.fromEntries(
+      Object.entries(rotations).map(([jointId, rotationDegrees]) => [
+        jointId,
+        { rotationDegrees },
+      ]),
+    ),
+  };
+}
+
+test("validates and samples all three stickman clips deterministically", async () => {
+  for (const name of ["rest-idle", "arm-wave", "walk-cycle"]) {
+    const normalized = normalizeRigAnimation(await stickmanClip(name));
+    assert.deepEqual(
+      sampleRigAnimation(normalized, normalized.duration * 3.25),
+      sampleRigAnimation(normalized, normalized.duration * 3.25),
+    );
+    assert.deepEqual(
+      sampleRigAnimation(normalized, normalized.duration).joints,
+      sampleRigAnimation(normalized, 0).joints,
+    );
+  }
+});
+
+test("reproduces exact authored local and world rest transforms at idle time zero", async () => {
+  const hierarchy = await stickmanHierarchy();
+  const authoredRest = evaluateRigPose(hierarchy);
+  const idleAtZero = sampleRigAnimation(
+    normalizeRigAnimation(await stickmanClip("rest-idle")),
+    0,
+  );
+  assert.deepEqual(evaluateRigPose(hierarchy, idleAtZero), authoredRest);
+  assert.deepEqual(authoredRest.joints.root?.worldPivot, { x: 0, y: -130 });
+  assert.deepEqual(authoredRest.joints.torso?.worldPivot, { x: 0, y: -112 });
+  assert.deepEqual(authoredRest.joints.head?.worldPivot, { x: 0, y: -40 });
+  assert.deepEqual(authoredRest.joints["lower-arm-left"]?.worldPivot, {
+    x: -31,
+    y: -108,
+  });
+});
+
+test("parent rotation moves descendants around the intended shoulder pivot", async () => {
+  const hierarchy = await stickmanHierarchy();
+  const rest = evaluateRigPose(hierarchy);
+  const rotated = evaluateRigPose(
+    hierarchy,
+    sampleWithRotations({ "upper-arm-right": 90 }),
+  );
+  assert.deepEqual(
+    rotated.joints["upper-arm-right"]?.worldPivot,
+    rest.joints["upper-arm-right"]?.worldPivot,
+  );
+  assert.deepEqual(rotated.joints["lower-arm-right"]?.worldPivot, {
+    x: 83,
+    y: -56,
+  });
+  assert.deepEqual(rotated.joints["hand-right"]?.worldPivot, {
+    x: 131,
+    y: -56,
+  });
+});
+
+test("elbows and knees rotate at fixed pivots while distal joints move", async () => {
+  const hierarchy = await stickmanHierarchy();
+  const rest = evaluateRigPose(hierarchy);
+  const bent = evaluateRigPose(
+    hierarchy,
+    sampleWithRotations({
+      "lower-arm-right": 90,
+      "shin-left": -90,
+    }),
+  );
+  assert.deepEqual(
+    bent.joints["lower-arm-right"]?.worldPivot,
+    rest.joints["lower-arm-right"]?.worldPivot,
+  );
+  assert.deepEqual(bent.joints["hand-right"]?.worldPivot, {
+    x: 79,
+    y: -108,
+  });
+  assert.deepEqual(
+    bent.joints["shin-left"]?.worldPivot,
+    rest.joints["shin-left"]?.worldPivot,
+  );
+  assert.deepEqual(bent.joints["foot-left"]?.worldPivot, {
+    x: -72,
+    y: -198,
+  });
+});
+
+test("interpolates the arm wave at absolute time without frame dependence", async () => {
+  const wave = normalizeRigAnimation(await stickmanClip("arm-wave"));
+  const quarterRaise = sampleRigAnimation(wave, 0.2);
+  assert.equal(
+    quarterRaise.joints["upper-arm-right"]?.rotationDegrees,
+    50,
+  );
+  assert.equal(
+    sampleRigAnimation(wave, 0.4).joints["upper-arm-right"]?.rotationDegrees,
+    100,
+  );
+});
+
+test("rejects invalid parents and cycles with stable hierarchy diagnostics", async () => {
+  const hierarchy = await stickmanHierarchy();
+  const unknownParent = hierarchy.map((joint) =>
+    joint.jointId === "head" ? { ...joint, parentId: "missing" } : joint,
+  );
+  assert.ok(
+    validateRigHierarchy(unknownParent).some(
+      (diagnostic) => diagnostic.code === "UNKNOWN_HIERARCHY_PARENT",
+    ),
+  );
+
+  const cycle = hierarchy.map((joint) =>
+    joint.jointId === "root" ? { ...joint, parentId: "head" } : joint,
+  );
+  assert.ok(
+    validateRigHierarchy(cycle).some(
+      (diagnostic) => diagnostic.code === "HIERARCHY_PARENT_CYCLE",
+    ),
+  );
+  assert.ok(
+    validateRigHierarchy(cycle).some(
+      (diagnostic) => diagnostic.code === "INVALID_HIERARCHY_ROOT_COUNT",
+    ),
+  );
+});
+
+test("uses explicit and consistent mirrored limb semantics", async () => {
+  const hierarchy = await stickmanHierarchy();
+  const rest = evaluateRigPose(hierarchy);
+  const leftShoulder = rest.joints["upper-arm-left"]!.worldPivot;
+  const rightShoulder = rest.joints["upper-arm-right"]!.worldPivot;
+  assert.equal(leftShoulder.x, -rightShoulder.x);
+  assert.equal(leftShoulder.y, rightShoulder.y);
+
+  const walkStart = sampleRigAnimation(
+    normalizeRigAnimation(await stickmanClip("walk-cycle")),
+    0,
+  );
+  assert.equal(
+    walkStart.joints["upper-arm-left"]?.rotationDegrees,
+    -walkStart.joints["upper-arm-right"]!.rotationDegrees!,
+  );
+  assert.equal(
+    walkStart.joints["thigh-left"]?.rotationDegrees,
+    -walkStart.joints["thigh-right"]!.rotationDegrees!,
+  );
+
+  const mirrored: RigHierarchyJoint[] = [
+    {
+      jointId: "root",
+      parentId: null,
+      restPose: {
+        position: { x: 0, y: 0 },
+        rotationDegrees: 0,
+        scale: { x: -1, y: 1 },
+      },
+    },
+    {
+      jointId: "child",
+      parentId: "root",
+      restPose: {
+        position: { x: 10, y: 3 },
+        rotationDegrees: 0,
+        scale: { x: 1, y: 1 },
+      },
+    },
+  ];
+  assert.deepEqual(evaluateRigPose(mirrored).joints.child?.worldPivot, {
+    x: -10,
+    y: 3,
+  });
+  assert.deepEqual(
+    transformPoint(
+      evaluateRigPose(mirrored).joints.root!.worldTransform,
+      { x: 4, y: 2 },
+    ),
+    { x: -4, y: 2 },
   );
 });
