@@ -189,6 +189,7 @@ declare module "cc" {
   }
 
   export const director: {
+    getScene(): { readonly name: string } | null;
     once(
       eventType: string,
       callback: () => void,

@@ -36,19 +36,22 @@ import {
   calculateComposableLoadoutHudBounds,
   COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
+  deriveComposableLoadoutResourceManifest,
   formatComposableLoadoutHudLines,
   resolveComposableLoadoutControlClips,
+  TASK_013_RESOURCE_LOAD_FAILED,
   type ComposableLoadoutControl,
   validateComposableLoadoutHudRuntimeBounds,
   validateComposableLoadoutHudTextLayout,
 } from "./composable-loadout-controls";
 import { COMPOSABLE_LOADOUT_PLAN } from "./composable-loadout-data";
 
-const { ccclass, executeInEditMode } = _decorator;
+const { ccclass } = _decorator;
 type PartPlan = (typeof COMPOSABLE_LOADOUT_PLAN.base.parts)[number];
+const COMPOSABLE_LOADOUT_RESOURCE_MANIFEST =
+  deriveComposableLoadoutResourceManifest(COMPOSABLE_LOADOUT_PLAN);
 
 @ccclass("GameAIComposableLoadoutDemo")
-@executeInEditMode
 export class GameAIComposableLoadoutDemo extends Component {
   private bindings = new Map<
     string,
@@ -73,20 +76,18 @@ export class GameAIComposableLoadoutDemo extends Component {
   private presetId = "full-loadout";
   private propState = "left-hand";
   private debugNodes = new Map<string, Node[]>();
+  private resourceFrames = new Map<string, SpriteFrame>();
+  private requestedResourcePaths = new Set<string>();
+  private failedResourcePaths = new Set<string>();
+  private resourceLoadedCount = 0;
+  private resourceFailedCount = 0;
+  private resourceDuplicateRequestCount = 0;
+  private resourceLoadAttempt = 0;
 
   onLoad(): void {
-    this.build();
+    this.hud(this.node);
     input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-  }
-
-  start(): void {
-    this.selectClip(1, false);
-    this.exactReset();
-    director.once(
-      Director.EVENT_AFTER_DRAW,
-      this.validateHudRuntimeBounds,
-      this,
-    );
+    this.loadResources();
   }
 
   update(delta: number): void {
@@ -97,7 +98,77 @@ export class GameAIComposableLoadoutDemo extends Component {
   }
 
   onDestroy(): void {
+    this.resourceLoadAttempt += 1;
     input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+  }
+
+  private loadResources(): void {
+    const attempt = ++this.resourceLoadAttempt;
+    this.resourceFrames.clear();
+    this.requestedResourcePaths.clear();
+    this.failedResourcePaths.clear();
+    this.resourceLoadedCount = 0;
+    this.resourceFailedCount = 0;
+    this.resourceDuplicateRequestCount = 0;
+    this.updateHud();
+    for (const entry of COMPOSABLE_LOADOUT_RESOURCE_MANIFEST) {
+      if (this.requestedResourcePaths.has(entry.resourcePath)) {
+        this.resourceDuplicateRequestCount += 1;
+        continue;
+      }
+      this.requestedResourcePaths.add(entry.resourcePath);
+      resources.load(entry.resourcePath, SpriteFrame, (error, frame) => {
+        if (attempt !== this.resourceLoadAttempt) return;
+        if (error || frame === null) {
+          const resourceError =
+            error ?? new Error("Cocos returned a null SpriteFrame without an error");
+          this.resourceFailedCount += 1;
+          if (!this.failedResourcePaths.has(entry.resourcePath)) {
+            this.failedResourcePaths.add(entry.resourcePath);
+            const detail = resourceError as Error & { readonly code?: unknown };
+            console.error(
+              `${TASK_013_RESOURCE_LOAD_FAILED}: ${JSON.stringify({
+                resourcePath: entry.resourcePath,
+                errorName: detail.name,
+                errorMessage: detail.message,
+                errorCode: detail.code ?? null,
+                lifecycle: "onLoad>loadResources",
+                sceneName: director.getScene()?.name ?? "none",
+                nodeName: this.node.name,
+              })}`,
+            );
+          }
+        } else {
+          this.resourceFrames.set(entry.resourcePath, frame);
+          this.resourceLoadedCount += 1;
+        }
+        this.updateHud();
+        if (
+          this.resourceLoadedCount + this.resourceFailedCount ===
+          COMPOSABLE_LOADOUT_RESOURCE_MANIFEST.length
+        ) {
+          this.finishResourceLoad();
+        }
+      });
+    }
+  }
+
+  private finishResourceLoad(): void {
+    if (
+      this.resourceFailedCount > 0 ||
+      this.resourceLoadedCount !==
+        COMPOSABLE_LOADOUT_RESOURCE_MANIFEST.length
+    ) {
+      return;
+    }
+    this.build();
+    this.selectClip(1, false);
+    this.exactReset();
+    director.once(
+      Director.EVENT_AFTER_DRAW,
+      this.validateHudRuntimeBounds,
+      this,
+    );
   }
 
   private build(): void {
@@ -141,7 +212,6 @@ export class GameAIComposableLoadoutDemo extends Component {
       this.labelMarker(sprite, "parent links", part.parentId ?? "root");
     }
     this.addAttachments(spriteJoints);
-    this.hud(this.node);
     this.applyState();
     this.updateDebug();
   }
@@ -198,7 +268,7 @@ export class GameAIComposableLoadoutDemo extends Component {
     const sprite = visual.addComponent(Sprite);
     sprite.sizeMode = Sprite.SizeMode.CUSTOM;
     visual.addComponent(Sorting2D).sortingOrder = part.sortingOrder;
-    this.load(part.resourcePath, sprite);
+    this.assignResource(part.resourcePath, sprite);
     this.marker(
       visual,
       "bounds",
@@ -246,7 +316,7 @@ export class GameAIComposableLoadoutDemo extends Component {
       const sprite = visual.addComponent(Sprite);
       sprite.sizeMode = Sprite.SizeMode.CUSTOM;
       visual.addComponent(Sorting2D).sortingOrder = attachment.sortingOrder;
-      this.load(attachment.resourcePath, sprite);
+      this.assignResource(attachment.resourcePath, sprite);
       this.attachments.set(attachment.attachmentId, pivot);
       this.labelMarker(
         pivot,
@@ -300,6 +370,11 @@ export class GameAIComposableLoadoutDemo extends Component {
   }
 
   private hud(parent: Node): void {
+    parent.children
+      .find(
+        (child) => child.name === COMPOSABLE_LOADOUT_HUD_LAYOUT.containerName,
+      )
+      ?.destroy();
     const container = new Node(COMPOSABLE_LOADOUT_HUD_LAYOUT.containerName);
     container.layer = Layers.Enum.UI_2D;
     container.setParent(parent);
@@ -566,8 +641,8 @@ export class GameAIComposableLoadoutDemo extends Component {
         referenceId as keyof typeof COMPOSABLE_LOADOUT_PLAN.referenceResourcePaths
       ];
     if (path !== undefined) {
-      if (this.referenceSprite) this.load(path, this.referenceSprite);
-      if (this.overlaySprite) this.load(path, this.overlaySprite);
+      if (this.referenceSprite) this.assignResource(path, this.referenceSprite);
+      if (this.overlaySprite) this.assignResource(path, this.overlaySprite);
     }
     this.updateHud();
   }
@@ -593,14 +668,18 @@ export class GameAIComposableLoadoutDemo extends Component {
     node.setScale(pose.scale.x, pose.scale.y, 1);
   }
 
-  private load(resourcePath: string, sprite: Sprite): void {
-    resources.load(resourcePath, SpriteFrame, (error, frame) => {
-      if (error) {
-        console.error(`TASK_013_RESOURCE_LOAD_ERROR ${resourcePath}`);
-        return;
-      }
-      sprite.spriteFrame = frame;
-    });
+  private assignResource(resourcePath: string, sprite: Sprite): void {
+    const frame = this.resourceFrames.get(resourcePath);
+    if (frame === undefined) {
+      throw new Error(
+        `${TASK_013_RESOURCE_LOAD_FAILED}: ${JSON.stringify({
+          resourcePath,
+          errorMessage: "SpriteFrame missing from completed resource manifest",
+          lifecycle: "assignResource",
+        })}`,
+      );
+    }
+    sprite.spriteFrame = frame;
   }
 
   private updateDebug(): void {
@@ -634,6 +713,12 @@ export class GameAIComposableLoadoutDemo extends Component {
       clipId,
       playbackState,
       timeSeconds: time,
+      resourceExpectedCount:
+        COMPOSABLE_LOADOUT_RESOURCE_MANIFEST.length,
+      resourceLoadedCount: this.resourceLoadedCount,
+      resourceFailedCount: this.resourceFailedCount,
+      resourceDuplicateRequestCount:
+        this.resourceDuplicateRequestCount,
     });
   }
 }

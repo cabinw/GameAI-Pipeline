@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
@@ -19,15 +19,23 @@ import {
   calculateComposableLoadoutHudBounds,
   COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
+  deriveComposableLoadoutResourceManifest,
   formatComposableLoadoutHudLines,
   ComposableLoadoutControlError,
   resolveComposableLoadoutControlClips,
+  TASK_013_RESOURCE_LOAD_FAILED,
+  TASK_013_RESOURCE_MANIFEST_INVALID,
   TASK_013_HUD_RUNTIME_BOUNDS_INVALID,
   TASK_013_HUD_TEXT_OVERFLOW,
   validateComposableLoadoutHudLines,
   validateComposableLoadoutHudRuntimeBounds,
   validateComposableLoadoutHudTextLayout,
 } from "../source/composable-character-loadout-controls";
+import {
+  composableLoadoutResourcePngPath,
+  validateComposableLoadoutResourceObservations,
+  type ComposableLoadoutResourceObservation,
+} from "../source/composable-character-loadout-resource-manifest";
 
 const repositoryRoot = path.resolve(__dirname, "../../../../../../../");
 const fixtureRoot = path.join(
@@ -80,26 +88,34 @@ const attachmentDimensions = Object.fromEntries(
     (attachment: any) => [attachment.attachmentId, attachment.size],
   ),
 );
+const completeHudResourceState = {
+  resourceExpectedCount: 43,
+  resourceLoadedCount: 43,
+  resourceFailedCount: 0,
+  resourceDuplicateRequestCount: 0,
+} as const;
+const exactReferenceStateIds = [
+  "base-only",
+  "accessories-only",
+  "garment-only",
+  "prop-only",
+  "garment-accessories",
+  "garment-prop",
+  "accessories-prop",
+  "full-loadout",
+] as const;
+const composablePlan = buildCocosComposableCharacterLoadoutPlan(
+  rig,
+  contract,
+  clips,
+  baseDimensions,
+  attachmentDimensions,
+  "production-lite-full-loadout",
+  exactReferenceStateIds,
+);
 
 test("generic Cocos adapter consumes one resolved loadout result for every state", () => {
-  const plan = buildCocosComposableCharacterLoadoutPlan(
-    rig,
-    contract,
-    clips,
-    baseDimensions,
-    attachmentDimensions,
-    "production-lite-full-loadout",
-    [
-      "base-only",
-      "accessories-only",
-      "garment-only",
-      "prop-only",
-      "garment-accessories",
-      "garment-prop",
-      "accessories-prop",
-      "full-loadout",
-    ],
-  );
+  const plan = composablePlan;
   assert.equal(plan.planVersion, "1.0.0");
   assert.equal(Object.keys(plan.reconstructionStatus).length, 8);
   assert.equal(plan.states["base-only"]!.enabledAttachmentIds.length, 0);
@@ -121,6 +137,163 @@ test("generic Cocos adapter consumes one resolved loadout result for every state
     [...plan.base.parts.map((part) => part.sortingOrder)].sort(
       (left, right) => left - right,
     ),
+  );
+});
+
+test("TASK-013 resource manifest resolves every tracked SpriteFrame resource", () => {
+  const manifest = deriveComposableLoadoutResourceManifest(composablePlan);
+  assert.equal(manifest.length, 43);
+  assert.equal(
+    manifest.filter((entry) => entry.category === "base-part").length,
+    17,
+  );
+  assert.equal(
+    manifest.filter((entry) => entry.category === "attachment").length,
+    18,
+  );
+  assert.equal(
+    manifest.filter((entry) => entry.category === "reference").length,
+    8,
+  );
+  assert.equal(new Set(manifest.map((entry) => entry.resourcePath)).size, 43);
+  const resourcesRoot = path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/assets/resources",
+  );
+  const observations = manifest.map((entry) => {
+    const relativePng = composableLoadoutResourcePngPath(entry.resourcePath);
+    const png = path.join(resourcesRoot, relativePng);
+    const metaFile = `${png}.meta`;
+    const pngExists = existsSync(png);
+    const metaExists = existsSync(metaFile);
+    if (!metaExists) {
+      return {
+        resourcePath: entry.resourcePath,
+        pngExists,
+        metaExists,
+        assetUuid: null,
+        spriteFrameName: null,
+        spriteFrameUuid: null,
+      };
+    }
+    const meta = JSON.parse(readFileSync(metaFile, "utf8")) as {
+      readonly uuid?: unknown;
+      readonly subMetas?: Readonly<
+        Record<
+          string,
+          {
+            readonly importer?: unknown;
+            readonly name?: unknown;
+            readonly uuid?: unknown;
+          }
+        >
+      >;
+    };
+    const spriteFrame = Object.values(meta.subMetas ?? {}).find(
+      (subMeta) =>
+        subMeta.name === "spriteFrame" &&
+        subMeta.importer === "sprite-frame",
+    );
+    return {
+      resourcePath: entry.resourcePath,
+      pngExists,
+      metaExists,
+      assetUuid: typeof meta.uuid === "string" ? meta.uuid : null,
+      spriteFrameName:
+        typeof spriteFrame?.name === "string" ? spriteFrame.name : null,
+      spriteFrameUuid:
+        typeof spriteFrame?.uuid === "string" ? spriteFrame.uuid : null,
+    };
+  });
+  assert.doesNotThrow(() =>
+    validateComposableLoadoutResourceObservations(manifest, observations),
+  );
+});
+
+test("TASK-013 resource manifest rejects missing files, bad subMeta, suffix, and duplicate UUIDs", () => {
+  const manifest = deriveComposableLoadoutResourceManifest(composablePlan);
+  const valid = manifest.map(
+    (entry, index): ComposableLoadoutResourceObservation => ({
+      resourcePath: entry.resourcePath,
+      pngExists: true,
+      metaExists: true,
+      assetUuid: `asset-${index}`,
+      spriteFrameName: "spriteFrame",
+      spriteFrameUuid: `sprite-${index}`,
+    }),
+  );
+  const rejects = (
+    observations: readonly ComposableLoadoutResourceObservation[],
+    reason: string,
+  ) =>
+    assert.throws(
+      () =>
+        validateComposableLoadoutResourceObservations(
+          manifest,
+          observations,
+        ),
+      (error) =>
+        error instanceof Error &&
+        error.message.startsWith(TASK_013_RESOURCE_MANIFEST_INVALID) &&
+        error.message.includes(reason),
+    );
+  rejects(
+    valid.map((entry, index) =>
+      index === 0 ? { ...entry, pngExists: false } : entry,
+    ),
+    "MISSING_PNG",
+  );
+  rejects(
+    valid.map((entry, index) =>
+      index === 0 ? { ...entry, metaExists: false } : entry,
+    ),
+    "MISSING_META",
+  );
+  rejects(
+    valid.map((entry, index) =>
+      index === 0 ? { ...entry, spriteFrameName: null } : entry,
+    ),
+    "MISSING_SPRITE_FRAME_SUBMETA",
+  );
+  rejects(
+    valid.map((entry, index) =>
+      index === 1
+        ? { ...entry, assetUuid: valid[0]!.assetUuid }
+        : entry,
+    ),
+    "duplicateAssetUuids",
+  );
+  rejects(
+    valid.map((entry, index) =>
+      index === 1
+        ? { ...entry, spriteFrameUuid: valid[0]!.spriteFrameUuid }
+        : entry,
+    ),
+    "duplicateSpriteFrameUuids",
+  );
+  assert.throws(
+    () => composableLoadoutResourcePngPath("parts/head.png/spriteFrame"),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_RESOURCE_MANIFEST_INVALID) &&
+      error.message.includes("INCORRECT_RESOURCE_SUFFIX"),
+  );
+  assert.throws(
+    () =>
+      deriveComposableLoadoutResourceManifest({
+        ...composablePlan,
+        attachments: [
+          ...composablePlan.attachments,
+          {
+            ...composablePlan.attachments[0]!,
+            attachmentId: "duplicate-logical-resource",
+          },
+        ],
+      }),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_RESOURCE_MANIFEST_INVALID) &&
+      error.message.includes("duplicatePaths"),
   );
 });
 
@@ -302,6 +475,7 @@ test("TASK-013 runtime HUD guard accepts final bounds and rejects the observed c
 
 test("TASK-013 HUD formatter returns every required logical row within budgets", () => {
   const lines = formatComposableLoadoutHudLines({
+    ...completeHudResourceState,
     presetId: "full-loadout",
     propState: "left-hand",
     clipId: "production-lite-full-loadout-integration-stress",
@@ -322,6 +496,10 @@ test("TASK-013 HUD formatter returns every required logical row within budgets",
     true,
     "actual semantic clip ID is preserved",
   );
+  assert.equal(
+    lines.find((line) => line.rowId === "validation-status")?.text,
+    "RESOURCES 43/43 PASS · GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
+  );
   for (const line of lines) {
     const maximum =
       line.region === "status"
@@ -332,8 +510,39 @@ test("TASK-013 HUD formatter returns every required logical row within budgets",
   }
 });
 
+test("TASK-013 HUD reports deterministic resource loading and failure states", () => {
+  const state = {
+    presetId: "full-loadout",
+    propState: "left-hand",
+    clipId: "production-lite-full-loadout-rest",
+    playbackState: "STOPPED",
+    timeSeconds: 0,
+    resourceExpectedCount: 43,
+    resourceDuplicateRequestCount: 0,
+  } as const;
+  const loading = formatComposableLoadoutHudLines({
+    ...state,
+    resourceLoadedCount: 17,
+    resourceFailedCount: 0,
+  });
+  const failed = formatComposableLoadoutHudLines({
+    ...state,
+    resourceLoadedCount: 42,
+    resourceFailedCount: 1,
+  });
+  assert.equal(
+    loading.find((line) => line.rowId === "validation-status")?.text,
+    "RESOURCES 17/43 LOADING · GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
+  );
+  assert.equal(
+    failed.find((line) => line.rowId === "validation-status")?.text,
+    "RESOURCES 42/43 FAIL · GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
+  );
+});
+
 test("TASK-013 HUD formatter documents exact runtime keys", () => {
   const lines = formatComposableLoadoutHudLines({
+    ...completeHudResourceState,
     presetId: "full-loadout",
     propState: "left-hand",
     clipId: "production-lite-full-loadout-rest",
@@ -371,6 +580,7 @@ test("TASK-013 HUD formatter documents exact runtime keys", () => {
 
 test("TASK-013 HUD rejects the old clipped shortcut row and oversized semantic IDs", () => {
   const valid = formatComposableLoadoutHudLines({
+    ...completeHudResourceState,
     presetId: "full-loadout",
     propState: "left-hand",
     clipId: "production-lite-full-loadout-rest",
@@ -395,6 +605,7 @@ test("TASK-013 HUD rejects the old clipped shortcut row and oversized semantic I
   assert.throws(
     () =>
       formatComposableLoadoutHudLines({
+        ...completeHudResourceState,
         presetId: "full-loadout",
         propState: "left-hand",
         clipId: `production-lite-${"x".repeat(80)}`,
@@ -410,6 +621,7 @@ test("TASK-013 HUD rejects the old clipped shortcut row and oversized semantic I
 
 test("TASK-013 HUD content guard keeps status/help regions separate and above the character", () => {
   const lines = formatComposableLoadoutHudLines({
+    ...completeHudResourceState,
     presetId: "full-loadout",
     propState: "left-hand",
     clipId: "production-lite-full-loadout-rest",
@@ -496,6 +708,58 @@ test("generated TASK-013 runtime owns the repaired HUD configuration", () => {
   );
   assert.equal(runtime.includes("this.hud(this.node)"), true);
   assert.equal(runtime.includes("this.hud(root)"), false);
+});
+
+test("TASK-013 separates runtime resource loading from Creator edit mode", () => {
+  const runtime = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-demo.ts",
+    ),
+    "utf8",
+  );
+  const controls = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-controls.ts",
+    ),
+    "utf8",
+  );
+  assert.equal(runtime.includes("@executeInEditMode"), false);
+  assert.equal(runtime.includes("executeInEditMode"), false);
+  assert.equal(runtime.split("resources.load(").length - 1, 1);
+  assert.equal(runtime.includes("private loadResources()"), true);
+  assert.equal(runtime.includes("private finishResourceLoad()"), true);
+  assert.equal(runtime.includes("private assignResource("), true);
+  assert.equal(
+    runtime.includes("COMPOSABLE_LOADOUT_RESOURCE_MANIFEST.length"),
+    true,
+  );
+  assert.equal(runtime.includes("resourceLoadedCount"), true);
+  assert.equal(runtime.includes("resourceFailedCount"), true);
+  assert.equal(runtime.includes("resourceDuplicateRequestCount"), true);
+  assert.equal(runtime.includes("failedResourcePaths"), true);
+  assert.equal(runtime.includes(TASK_013_RESOURCE_LOAD_FAILED), true);
+  assert.equal(runtime.includes("console.error("), true);
+  assert.equal(runtime.includes("console.warn("), false);
+  assert.equal(runtime.includes("TASK_013_RESOURCE_LOAD_ERROR"), false);
+  assert.equal(runtime.includes("this.resourceLoadAttempt += 1"), true);
+  assert.equal(
+    controls.includes(
+      "RESOURCES ${state.resourceLoadedCount}/${state.resourceExpectedCount}",
+    ),
+    true,
+  );
+  const onLoad = runtime.indexOf("onLoad(): void");
+  const hud = runtime.indexOf("this.hud(this.node)", onLoad);
+  const load = runtime.indexOf("this.loadResources()", onLoad);
+  const finish = runtime.indexOf("private finishResourceLoad");
+  const build = runtime.indexOf("this.build()", finish);
+  assert.ok(onLoad >= 0);
+  assert.ok(hud > onLoad);
+  assert.ok(load > hud);
+  assert.ok(finish > load);
+  assert.ok(build > finish);
 });
 
 test("generated TASK-013 runtime scene graph stabilizes Label-owned transform state", () => {

@@ -1,10 +1,15 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import sharp from "sharp";
 
 import { buildCocosComposableCharacterLoadoutPlan } from "../dist/composable-character-loadout-adapter.js";
+import { deriveComposableLoadoutResourceManifest } from "../dist/composable-character-loadout-controls.js";
+import {
+  composableLoadoutResourcePngPath,
+  validateComposableLoadoutResourceObservations,
+} from "../dist/composable-character-loadout-resource-manifest.js";
 
 const extensionRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(extensionRoot, "../../../../..");
@@ -16,6 +21,10 @@ const fixtureRoot = path.join(
 const runtimeRoot = path.join(
   repositoryRoot,
   "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout",
+);
+const cocosResourcesRoot = path.join(
+  repositoryRoot,
+  "cocos/projects/character-rig-builder-mvp/assets/resources",
 );
 const json = async (file) =>
   JSON.parse(await readFile(path.join(fixtureRoot, file), "utf8"));
@@ -68,6 +77,55 @@ const plan = buildCocosComposableCharacterLoadoutPlan(
   attachmentDimensions,
   "production-lite-full-loadout",
   source.exactRestStateIds,
+);
+const resourceManifest = deriveComposableLoadoutResourceManifest(plan);
+const exists = async (file) => {
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
+  }
+};
+const resourceObservations = await Promise.all(
+  resourceManifest.map(async (entry) => {
+    const relativePng = composableLoadoutResourcePngPath(entry.resourcePath);
+    const png = path.join(cocosResourcesRoot, relativePng);
+    const metaFile = `${png}.meta`;
+    const pngExists = await exists(png);
+    const metaExists = await exists(metaFile);
+    if (!metaExists) {
+      return {
+        resourcePath: entry.resourcePath,
+        pngExists,
+        metaExists,
+        assetUuid: null,
+        spriteFrameName: null,
+        spriteFrameUuid: null,
+      };
+    }
+    const meta = JSON.parse(await readFile(metaFile, "utf8"));
+    const spriteFrame = Object.values(meta.subMetas ?? {}).find(
+      (subMeta) =>
+        subMeta &&
+        typeof subMeta === "object" &&
+        subMeta.name === "spriteFrame" &&
+        subMeta.importer === "sprite-frame",
+    );
+    return {
+      resourcePath: entry.resourcePath,
+      pngExists,
+      metaExists,
+      assetUuid: typeof meta.uuid === "string" ? meta.uuid : null,
+      spriteFrameName: spriteFrame?.name ?? null,
+      spriteFrameUuid:
+        typeof spriteFrame?.uuid === "string" ? spriteFrame.uuid : null,
+    };
+  }),
+);
+validateComposableLoadoutResourceObservations(
+  resourceManifest,
+  resourceObservations,
 );
 const controls = await readFile(
   path.join(extensionRoot, "source/composable-character-loadout-controls.ts"),

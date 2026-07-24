@@ -9,6 +9,85 @@ export const COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS = {
 export type ComposableLoadoutControl =
   keyof typeof COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS;
 
+export type ComposableLoadoutResourceCategory =
+  | "base-part"
+  | "attachment"
+  | "reference";
+
+export interface ComposableLoadoutResourceManifestEntry {
+  readonly resourcePath: string;
+  readonly category: ComposableLoadoutResourceCategory;
+  readonly semanticId: string;
+}
+
+export const TASK_013_RESOURCE_MANIFEST_INVALID =
+  "TASK_013_RESOURCE_MANIFEST_INVALID";
+export const TASK_013_RESOURCE_LOAD_FAILED =
+  "TASK_013_RESOURCE_LOAD_FAILED";
+
+export function deriveComposableLoadoutResourceManifest(plan: {
+  readonly base: {
+    readonly parts: readonly {
+      readonly jointId: string;
+      readonly resourcePath: string;
+    }[];
+  };
+  readonly attachments: readonly {
+    readonly attachmentId: string;
+    readonly resourcePath: string;
+  }[];
+  readonly referenceResourcePaths: Readonly<Record<string, string>>;
+}): readonly ComposableLoadoutResourceManifestEntry[] {
+  const manifest: readonly ComposableLoadoutResourceManifestEntry[] = [
+    ...plan.base.parts.map((part) => ({
+      resourcePath: part.resourcePath,
+      category: "base-part" as const,
+      semanticId: part.jointId,
+    })),
+    ...plan.attachments.map((attachment) => ({
+      resourcePath: attachment.resourcePath,
+      category: "attachment" as const,
+      semanticId: attachment.attachmentId,
+    })),
+    ...Object.entries(plan.referenceResourcePaths).map(
+      ([semanticId, resourcePath]) => ({
+        resourcePath,
+        category: "reference" as const,
+        semanticId,
+      }),
+    ),
+  ].sort(
+    (left, right) =>
+      left.resourcePath.localeCompare(right.resourcePath) ||
+      left.semanticId.localeCompare(right.semanticId),
+  );
+  const duplicatePaths = manifest
+    .filter(
+      (entry, index) =>
+        manifest.findIndex(
+          (candidate) => candidate.resourcePath === entry.resourcePath,
+        ) !== index,
+    )
+    .map((entry) => entry.resourcePath);
+  const invalidSuffix = manifest
+    .filter(
+      (entry) =>
+        !entry.resourcePath.endsWith("/spriteFrame") ||
+        entry.resourcePath.includes(".png"),
+    )
+    .map((entry) => entry.resourcePath);
+  if (manifest.length === 0 || duplicatePaths.length > 0 || invalidSuffix.length > 0) {
+    throw new Error(
+      `${TASK_013_RESOURCE_MANIFEST_INVALID}: ${JSON.stringify({
+        manifestLength: manifest.length,
+        duplicatePaths,
+        invalidSuffix,
+      })}`,
+    );
+  }
+  return Object.freeze(manifest);
+}
+
 export const COMPOSABLE_LOADOUT_HUD_STATUS_ROWS = [
   "task-title",
   "runtime-status",
@@ -76,6 +155,10 @@ export interface ComposableLoadoutHudState {
   readonly clipId: string;
   readonly playbackState: string;
   readonly timeSeconds: number;
+  readonly resourceExpectedCount: number;
+  readonly resourceLoadedCount: number;
+  readonly resourceFailedCount: number;
+  readonly resourceDuplicateRequestCount: number;
 }
 
 export interface ComposableLoadoutHudRectangle {
@@ -227,6 +310,37 @@ export function formatComposableLoadoutHudLines(
       })}`,
     );
   }
+  const resourceCounts = [
+    state.resourceExpectedCount,
+    state.resourceLoadedCount,
+    state.resourceFailedCount,
+    state.resourceDuplicateRequestCount,
+  ];
+  if (
+    resourceCounts.some(
+      (count) => !Number.isInteger(count) || count < 0,
+    ) ||
+    state.resourceExpectedCount === 0 ||
+    state.resourceLoadedCount + state.resourceFailedCount >
+      state.resourceExpectedCount
+  ) {
+    throw new Error(
+      `${TASK_013_HUD_TEXT_OVERFLOW}: ${JSON.stringify({
+        name: "resourceCounts",
+        resourceExpectedCount: state.resourceExpectedCount,
+        resourceLoadedCount: state.resourceLoadedCount,
+        resourceFailedCount: state.resourceFailedCount,
+        resourceDuplicateRequestCount:
+          state.resourceDuplicateRequestCount,
+      })}`,
+    );
+  }
+  const resourceStatus =
+    state.resourceFailedCount > 0
+      ? "FAIL"
+      : state.resourceLoadedCount === state.resourceExpectedCount
+        ? "PASS"
+        : "LOADING";
   const lines: readonly ComposableLoadoutHudLine[] = [
     {
       rowId: "task-title",
@@ -243,7 +357,9 @@ export function formatComposableLoadoutHudLines(
     {
       rowId: "validation-status",
       region: "status",
-      text: "GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
+      text:
+        `RESOURCES ${state.resourceLoadedCount}/${state.resourceExpectedCount} ${resourceStatus} · ` +
+        "GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
     },
     ...COMPOSABLE_LOADOUT_STATIC_HELP_LINES.map((line) => ({
       ...line,

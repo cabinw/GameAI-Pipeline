@@ -104,10 +104,35 @@ container containment, and separation from the authored visible character
 bounds. Content failure uses `TASK_013_HUD_TEXT_OVERFLOW`; success logs
 `TASK_013_HUD_TEXT_LAYOUT` once with the resolved line count and budgets.
 
+### Creator 3.8.8 resource-loading repair
+
+The acceptance component previously retained `@executeInEditMode`. Opening the
+scene therefore ran runtime `resources.load()` calls inside Creator's editor
+lifecycle, where each `/spriteFrame` path request failed with `Can not parse
+this input`. Web Preview loaded the same paths without error, confirming that
+the PNG and SpriteFrame imports were valid and that the failure was confined
+to the editor/runtime lifecycle boundary.
+
+The runtime-only component no longer executes in edit mode. A deterministic
+manifest is derived from the generic adapter plan and contains 43 unique,
+sorted SpriteFrame paths: 17 base parts, 18 attachments, and eight authored
+references. Generation validates every corresponding tracked PNG and `.meta`,
+the `spriteFrame` subMeta name and UUID, the `/spriteFrame` suffix, and unique
+asset and SpriteFrame UUIDs.
+
+Preview requests each manifest path once, records expected, loaded, failed,
+duplicate-request, and failed-path state, and does not build the character
+until all 43 resources succeed. State and view controls reuse the completed
+SpriteFrame map. A failed path is logged once with stable code
+`TASK_013_RESOURCE_LOAD_FAILED` and includes the actual Cocos error details,
+scene, node, path, and lifecycle. The HUD reports
+`RESOURCES N/43 LOADING|PASS|FAIL`; a completed load displays
+`RESOURCES 43/43 PASS`.
+
 ## Verification and evidence
 
 Working-copy `CI=true pnpm verify` and tracked-files-only frozen installation
-plus `CI=true pnpm verify` both pass 222 tests. Video metadata/hashes, evidence
+plus `CI=true pnpm verify` both pass 241 tests. Video metadata/hashes, evidence
 commit, and review URLs are published in the temporary evidence manifest.
 `evidence/task-013` remains until external visual acceptance. No MP4 is
 tracked on the feature branch.
