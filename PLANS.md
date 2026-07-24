@@ -4,7 +4,7 @@ Use this file for active multi-file or architectural work. Keep one active plan 
 
 ## Completed plan: TASK-009 Production-Lite Layered Character Reference
 
-- Status: Complete
+- Status: Complete; manual dynamic visual acceptance passed
 - Started: 2026-07-24
 - Completed: 2026-07-24
 - Baseline: `c196602a38e5a1752995e9bc6d398e8d53e5348b`
@@ -37,8 +37,8 @@ rig evaluator under four animation clips.
   reconstruction-mutation, overlap-range, transform-parity, reset,
   core-isolation, and clean-checkout tests.
 - Run working-copy and tracked-files-only verification, record the ignored
-  real Web Preview MP4, commit and push the feature branch, and stop before PR
-  creation for manual visual review.
+  real Web Preview MP4, commit and push the feature branch, and require manual
+  dynamic visual acceptance before opening a Draft PR.
 
 ### Out of scope
 
@@ -67,6 +67,8 @@ dependencies, or combat logic.
 7. Record and inspect the required real Web Preview flow, leave the MP4
    ignored, complete acceptance documentation, review the scoped diff, commit,
    push, re-check the protected archive, and stop for manual visual review.
+8. After the reviewer explicitly passes dynamic visual acceptance, record the
+   result, repeat both verification modes, and open a Draft PR without merging.
 
 ### Done when
 
@@ -83,7 +85,8 @@ dependencies, or combat logic.
   status field with the complete character visible.
 - Both required CI verification runs pass from clean inputs.
 - The ignored acceptance video exists, the branch is committed and pushed,
-  no PR is created, and the protected archive still resolves to `ed0923b`.
+  manual dynamic visual acceptance passes, a Draft PR is opened without
+  merging, and the protected archive still resolves to `ed0923b`.
 
 ### Result
 
@@ -105,9 +108,17 @@ dependencies, or combat logic.
   `artifacts/TASK-009/task-009-dynamic-acceptance.mp4`; SHA-256 is
   `ef11962dfa4ce582eebf97b5b4f25c9c2b9571cc717ec8adee8e7855828a8fc2`.
 - Committed and pushed `feat/task-009-layered-character-reference` without
-  creating a pull request; the protected TASK-007 archive was not changed.
+  changing the protected TASK-007 archive.
+- Manual dynamic visual acceptance passed: reference/assembled alignment,
+  hair layering and head inheritance, joint pivots and continuity, stable limb
+  crossings, drift-free loops, exact Reset, and every debug overlay were
+  verified in the real Cocos Web Preview.
 - The accepted limitations are rigid sprites, in-place walk/foot sliding, no
-  IK/root motion/foot locking/blending/deformation, and a Cocos-only adapter.
+  IK/root motion/foot locking/blending/deformation, dense all-overlay labels,
+  a Cocos-only adapter, and production-lite artwork that is not final game
+  art.
+- Manual acceptance authorizes a Draft PR into `main`; automatic merge remains
+  prohibited, and Red Cap reconstruction plus cross-engine work stay deferred.
 
 ## Completed plan: TASK-008 Simple Sprite Character Bridge
 

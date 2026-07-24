@@ -2,13 +2,14 @@
 
 ## Result
 
-Accepted for manual visual review on 2026-07-24 in Cocos Creator 3.8.8 and
-its 1280×720 Web Game Preview. Deterministic generation, contract-only
+Manual dynamic visual acceptance passed on 2026-07-24 in Cocos Creator 3.8.8
+and its 1280×720 Web Game Preview. Deterministic generation, contract-only
 reconstruction, layered SpriteFrame rendering, shared evaluator animation,
-debug controls, and the requested dynamic evidence pass.
+debug controls, and the requested dynamic evidence all pass.
 
-The feature branch is committed and pushed. TASK-009 did not create a pull
-request and does not authorize merge.
+The accepted feature branch may proceed to a Draft Pull Request into `main`.
+It is not authorized for automatic merge. Red Cap reconstruction and
+cross-engine work remain deferred.
 
 ## Automated evidence
 
@@ -52,20 +53,21 @@ reconstructed bounds:    x=173 y=48 width=269 height=608
 The committed tolerance is zero for RGBA mismatches, alpha mismatches, seam
 mismatches, and bounds expansion. It was not widened during acceptance.
 
-## Visual inspection
+## Manual dynamic visual acceptance
 
-The real Web Preview was inspected for:
+The reviewer explicitly passed the real Web Preview after verifying:
 
-- authored reference alone, assembled Rest Pose alone, and their translucent
-  overlay;
-- hair-back/head/hair-front and rear/torso/front limb order;
-- two Arm Wave loops, a paused held pose, and continuous Resume;
-- more than three Walk loops with stable layer ordering;
-- Stress articulation at shoulders, elbows, hips, knees, ankles, and feet;
-- exact Reset to stopped time zero and the authored Rest Pose;
-- independently switchable joints, bounds, pivots, links, layer labels, and
-  skeleton/debug geometry; and
-- complete character and HUD visibility throughout.
+- the authored reference and assembled Rest Pose align without visible
+  ghosting or displacement;
+- Hair Back, Head, and Hair Front retain the intended draw order, and both
+  hair layers follow the head;
+- Wave, Walk, and Stress preserve joint continuity at shoulders, elbows,
+  hips, knees, ankles, and feet with correct pivots;
+- limb crossings do not flicker or alter draw order;
+- repeated loops accumulate no transform drift;
+- Reset restores the exact authored Rest Pose; and
+- joints, bounds, pivots, links, layer labels, and skeleton/debug geometry
+  align with the rendered sprites.
 
 No runtime error overlay was visible in the accepted preview.
 
@@ -84,7 +86,17 @@ ef11962dfa4ce582eebf97b5b4f25c9c2b9571cc717ec8adee8e7855828a8fc2
 ```
 
 The video is excluded through the local `.git/info/exclude` `artifacts/`
-rule and is not committed.
+rule and is not committed. An uploaded review copy may be transcoded by its
+hosting or messaging service, so its container metadata, byte size, duration,
+or hash may differ. The authoritative original remains the local H.264 file:
+
+```text
+duration:    40.0 seconds
+dimensions:  1280×720
+frame rate:  30 fps
+byte size:   1,050,530
+SHA-256:     ef11962dfa4ce582eebf97b5b4f25c9c2b9571cc717ec8adee8e7855828a8fc2
+```
 
 ## Exact preview instructions
 
@@ -108,4 +120,5 @@ rule and is not committed.
 - The verification adapter is Cocos-only; it is not a Unity/Godot adapter or
   cross-engine compiler.
 - Debug labels are intentionally dense when all diagnostics are enabled.
+- The production-lite fixture is validation artwork, not final game artwork.
 - The acceptance video captures the Web Preview canvas and has no audio.
