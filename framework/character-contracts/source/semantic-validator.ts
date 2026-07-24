@@ -109,6 +109,35 @@ export function validateAttachmentLayoutSemantics(
       ),
     );
   }
+  const wearableSetIds = new Set(
+    (layout.wearableSets ?? []).map((set) => set.wearableSetId),
+  );
+  for (const wearableSetId of findDuplicateValues(
+    (layout.wearableSets ?? []).map((set) => set.wearableSetId),
+  )) {
+    issues.push(
+      issue(
+        ValidationErrorCode.DUPLICATE_WEARABLE_SET_ID,
+        "attachmentLayout",
+        "/wearableSets",
+        `Wearable set ${wearableSetId} is declared more than once.`,
+        { wearableSetId },
+      ),
+    );
+  }
+  for (const seamId of findDuplicateValues(
+    (layout.seams ?? []).map((seam) => seam.seamId),
+  )) {
+    issues.push(
+      issue(
+        ValidationErrorCode.DUPLICATE_ATTACHMENT_SEAM_ID,
+        "attachmentLayout",
+        "/seams",
+        `Attachment seam ${seamId} is declared more than once.`,
+        { seamId },
+      ),
+    );
+  }
   for (const drawOrder of findDuplicateValues(
     layout.attachments.map((attachment) => String(attachment.drawOrder)),
   )) {
@@ -169,6 +198,23 @@ export function validateAttachmentLayoutSemantics(
         ),
       );
     }
+    if (
+      attachment.wearableSetId !== undefined &&
+      !wearableSetIds.has(attachment.wearableSetId)
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNKNOWN_WEARABLE_SET,
+          "attachmentLayout",
+          `/attachments/${index}/wearableSetId`,
+          `Attachment ${attachment.attachmentId} references unknown wearable set ${attachment.wearableSetId}.`,
+          {
+            attachmentId: attachment.attachmentId,
+            wearableSetId: attachment.wearableSetId,
+          },
+        ),
+      );
+    }
   });
   return sortIssues(issues);
 }
@@ -197,6 +243,9 @@ export function validateAttachmentLayoutCompatibility(
     );
   }
   const partIds = new Set(rigLayout.parts.map((part) => part.partId));
+  const attachmentIds = new Set(
+    attachmentLayout.attachments.map((attachment) => attachment.attachmentId),
+  );
   attachmentLayout.slots.forEach((slot, index) => {
     if (!partIds.has(slot.parentPartId)) {
       issues.push(
@@ -208,6 +257,24 @@ export function validateAttachmentLayoutCompatibility(
           { slotId: slot.slotId, parentPartId: slot.parentPartId },
         ),
       );
+    }
+  });
+  attachmentLayout.seams?.forEach((seam, index) => {
+    for (const [field, itemId] of [
+      ["firstItemId", seam.firstItemId],
+      ["secondItemId", seam.secondItemId],
+    ] as const) {
+      if (!partIds.has(itemId) && !attachmentIds.has(itemId)) {
+        issues.push(
+          issue(
+            ValidationErrorCode.UNKNOWN_ATTACHMENT_SEAM_ITEM,
+            "contract",
+            `/attachmentLayout/seams/${index}/${field}`,
+            `Attachment seam ${seam.seamId} references unknown item ${itemId}.`,
+            { seamId: seam.seamId, itemId },
+          ),
+        );
+      }
     }
   });
   return sortIssues(issues);

@@ -143,6 +143,13 @@ mutating input data. `composeAttachmentWorldTransform` composes
 parent-world × slot-local × attachment-local affine transforms. Neither
 operation contains engine or item-specific behavior. See ADR-0012.
 
+TASK-011 adds optional backward-compatible wearable composition. A
+`wearableSet` declares a stable ID and default enabled state; attachments may
+name that ID, and one set override controls every member in addition to its
+ordinary slot state. Optional seam constraints pair two rig or attachment
+items with authored local coverage regions and a minimum overlap. Generic
+validation rejects duplicate/unknown set and seam references.
+
 ## Deliberate limitations
 
 - Referenced image and JSON files are not opened or checked for existence in TASK-001.

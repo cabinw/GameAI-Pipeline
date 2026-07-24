@@ -80,6 +80,7 @@ export async function reconstructAttachmentVariant(
   slotOverrides: Readonly<Record<string, boolean>>,
   referencePng: Buffer,
   tolerance: ReconstructionTolerance = ZERO_TOLERANCE,
+  wearableSetOverrides: Readonly<Record<string, boolean>> = {},
 ): Promise<ReconstructionResult> {
   const diagnostics: string[] = [];
   const hierarchy: RigHierarchyJoint[] = rigLayout.parts.map((part) => ({
@@ -142,6 +143,7 @@ export async function reconstructAttachmentVariant(
     for (const attachment of resolveAttachmentLayout(
       attachmentLayout,
       slotOverrides,
+      wearableSetOverrides,
     )) {
       if (!attachment.enabled) continue;
       let png: Buffer;
