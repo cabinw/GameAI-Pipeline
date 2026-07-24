@@ -51,23 +51,67 @@ stable `PROP_DEMO_REQUIRED_CLIP_MISSING` or
 `PROP_DEMO_REQUIRED_CLIP_DUPLICATE` diagnostics. The HUD reads the identity
 from the active runtime playback clip.
 
-## Evidence workflow
+## Acceptance publication
 
 Authoritative local evidence is ignored under `artifacts/TASK-012`. Temporary
-branch `evidence/task-012` contains independently decodable H.264 1280×720
-copies and `manifest.json` with byte size, duration, codec, frame rate,
-resolution, and SHA-256. The branch must remain until external visual review.
+branch `evidence/task-012` temporarily published independently decodable H.264
+1280×720 copies and `manifest.json` with byte size, duration, codec, frame
+rate, resolution, and SHA-256.
 
-Published evidence commit:
-`5984d3428d64769539ea2db5319a33d2a3cffee7`.
+- Implementation commit:
+  `9cf8e2562fc4ccc3149a7d49e3a5dc3ab411b145`.
+- Focused semantic-control fix:
+  `10ad18407e94d460e22c21cc28ad330ee5e2d94e`.
+- Original evidence commit:
+  `5984d3428d64769539ea2db5319a33d2a3cffee7`.
+- Corrected evidence commit:
+  `3fbc66b93ce2555074abc74bee74bf973a2190e3`.
 
-- Variants/motion: 33.066667 s, 1,861,281 bytes, H.264 High, 30 fps,
-  `aef9c6c94d8453210ccbaf50170ec574ac88a4284ab08dd12b21a7edd4487bd8`
-- Prop Stress/debug: 33.666667 s, 3,009,178 bytes, H.264 High, 30 fps,
-  `8ecd4d037f33a6c91ce45bf335b119c3dfff3d67cec205bc4d47418930dcde84`
+The original recordings are superseded because they were captured while
+numeric controls still selected generated clip-array positions:
+
+- Original variants/motion: 33.066667 s, 1,861,281 bytes, H.264 High,
+  1280×720, 30 fps, yuv420p,
+  `aef9c6c94d8453210ccbaf50170ec574ac88a4284ab08dd12b21a7edd4487bd8`.
+- Original Prop Stress/debug: 33.666667 s, 3,009,178 bytes, H.264 High,
+  1280×720, 30 fps, yuv420p,
+  `8ecd4d037f33a6c91ce45bf335b119c3dfff3d67cec205bc4d47418930dcde84`.
+
+External manual visual acceptance passed on 2026-07-24 using:
+
+- Accepted variants/motion v2: 41.633333 s, 2,198,708 bytes, H.264 High,
+  1280×720, 30 fps, yuv420p,
+  `a73da69d192e699d8f0bb83d03956e685521ebe8b91a2a2584df6d8ad8cc9ba6`.
+- Accepted Prop Stress/debug v2: 40.633333 s, 3,132,384 bytes, H.264 High,
+  1280×720, 30 fps, yuv420p,
+  `f447c623a33647e471fd1c8be1b7aded3e72c918e7c6aa41c0f3602537667579`.
+
+The reviewer matched both hashes, completed full FFmpeg decoding, and
+confirmed no-prop/left/right variants; authored, assembled, and overlay
+views; semantic key identities for Rest, Walk, Swing, and Stress; grip and
+hand-overlay stability; wrist/elbow/torso-crossing/extreme Stress motion;
+pause/resume; every requested debug view; and exact Reset to `STOPPED 0.00s`
+in authored Rest. No persistent prop detachment, layer switching, or broken
+articulation was observed.
+
+### Acceptance issue and correction
+
+The original runtime mapped numeric keys through clip-array indices, while
+generated ordering was Rest, Stress, Swing, Walk and documented ordering was
+Rest, Walk, Swing, Stress. The focused fix resolves keys through required
+semantic clip IDs and fails stably for missing or duplicate IDs. Regression
+tests protect all four controls from array reordering and prove the displayed
+identity comes from active playback. Both original videos are superseded
+because they captured the mismatched controls.
+
+After the acceptance commit, Draft PR, and successful GitHub Actions verify
+are published, temporary local and remote `evidence/task-012` branches are
+deleted. The accepted evidence remains identified by immutable commit and
+hashes in this publication.
 
 ## Accepted limitations
 
-Authored fitting only; rigid sprites; in-place walk; no IK, inverse grip
-solving, hand switching during a clip, two-handed weapons, combat, physics,
-mesh deformation, Unity/Godot adapters, or original Red Cap reconstruction.
+Authored fitting only; rigid sprites and authored layering; in-place walk;
+Cocos-only adapter; no IK, inverse grip solving, hand switching during a
+clip, two-handed weapons, combat, physics, mesh deformation, Unity/Godot
+adapters, or original Red Cap reconstruction.

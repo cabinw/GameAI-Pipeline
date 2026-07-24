@@ -2,13 +2,16 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active correction: TASK-012 Semantic Prop Demo Controls
+## Completed correction: TASK-012 Semantic Prop Demo Controls
 
-- Status: Implementation verified; replacement evidence in progress
+- Status: Complete; external manual visual acceptance passed
 - Started: 2026-07-24
+- Completed: 2026-07-24
 - Branch: `feat/task-012-one-handed-prop-reference`
-- Immutable feature baseline:
+- Original implementation commit:
   `9cf8e2562fc4ccc3149a7d49e3a5dc3ab411b145`
+- Focused control fix commit:
+  `10ad18407e94d460e22c21cc28ad330ee5e2d94e`
 - Protected `main`: `ebaa7ba90ee1bc42318867a365abebced05afa78`
 - Protected archive: `archive/old-task-007-cross-engine` at
   `ed0923b466e457da7ce9932e0daf6644aa29df39`
@@ -44,8 +47,9 @@ original index mapping.
 - Both verification modes pass with all existing tests preserved.
 - Both v2 videos are ignored locally, independently decodable H.264
   1280×720/30 fps/yuv420p, and recorded in the appended evidence manifest.
-- No PR exists and `main`, the protected archive, and both historical commits
-  remain unchanged.
+- A Draft PR targets `main`; the temporary evidence branch is deleted only
+  after the acceptance commit and GitHub Actions verify are published.
+- `main`, the protected archive, and all historical commits remain unchanged.
 
 ### Verification
 
@@ -53,9 +57,33 @@ original index mapping.
 - Tracked-files-only archive after `pnpm install --frozen-lockfile`:
   `CI=true pnpm verify` PASS, 208 tests.
 
+### Acceptance publication
+
+- Original evidence commit:
+  `5984d3428d64769539ea2db5319a33d2a3cffee7`.
+- Corrected evidence commit:
+  `3fbc66b93ce2555074abc74bee74bf973a2190e3`.
+- The original variants/motion and Stress/debug recordings are superseded
+  because the positional key mapping activated clips from generated array
+  order rather than the documented control order.
+- Accepted variants/motion v2: 41.633333 s, 2,198,708 bytes, H.264 High,
+  1280×720, 30 fps, yuv420p,
+  `a73da69d192e699d8f0bb83d03956e685521ebe8b91a2a2584df6d8ad8cc9ba6`.
+- Accepted Prop Stress/debug v2: 40.633333 s, 3,132,384 bytes, H.264 High,
+  1280×720, 30 fps, yuv420p,
+  `f447c623a33647e471fd1c8be1b7aded3e72c918e7c6aa41c0f3602537667579`.
+- External manual review matched both hashes, completed full FFmpeg decoding,
+  verified keys 1–4 against their semantic clip identities, accepted all
+  prop variants, comparison modes, grip/overlay stability, Stress motion,
+  pause/resume, debug views, and exact stopped Rest reset, and reported no
+  persistent detachment, layer switching, or broken articulation.
+- The focused fix replaces positional lookup with required semantic clip-ID
+  resolution. Regression tests cover all four controls, reordered input,
+  missing and duplicate IDs, and playback-derived HUD identity.
+
 ## Completed plan: TASK-012 One-Handed Prop Attachment Reference
 
-- Status: Complete; awaiting external visual review
+- Status: Complete; external manual visual acceptance passed
 - Started: 2026-07-24
 - Completed: 2026-07-24
 - Baseline: `main` at `ebaa7ba90ee1bc42318867a365abebced05afa78`
@@ -146,12 +174,15 @@ item-neutral core semantics.
 - The generic Cocos plan, resources, 3.8.x acceptance scene, runtime controls,
   and socket/grip/pivot/bounds/link/layer/skeleton diagnostics require no
   generated editor temp state or absolute machine path.
-- Working-copy and tracked-files-only frozen verification both pass 200 tests.
+- Original implementation commit `9cf8e2562fc4ccc3149a7d49e3a5dc3ab411b145`
+  is followed by focused semantic-control fix
+  `10ad18407e94d460e22c21cc28ad330ee5e2d94e`; neither history was rewritten.
+- Working-copy and tracked-files-only frozen verification both pass 208 tests.
   Existing tests and accepted body/accessory/garment sources remain intact.
-- Two ignored, independently decodable H.264 High/yuv420p 1280×720 30 fps
-  videos were captured from the live Web Preview. Evidence branch
-  `evidence/task-012` is preserved at
-  `5984d3428d64769539ea2db5319a33d2a3cffee7`.
+- External manual visual acceptance passed against corrected evidence commit
+  `3fbc66b93ce2555074abc74bee74bf973a2190e3`, which follows original evidence
+  commit `5984d3428d64769539ea2db5319a33d2a3cffee7`. The temporary evidence branch
+  is deleted after acceptance publication and successful Draft PR CI.
 - Accepted limitations are authored fitting, rigid sprites, in-place walk, a
   Cocos-only adapter, and no IK, inverse solving, in-clip hand switching,
   two-handed weapons, combat, physics, mesh deformation, other-engine
