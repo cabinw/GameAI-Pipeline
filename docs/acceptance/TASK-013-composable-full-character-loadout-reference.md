@@ -129,10 +129,26 @@ scene, node, path, and lifecycle. The HUD reports
 `RESOURCES N/43 LOADING|PASS|FAIL`; a completed load displays
 `RESOURCES 43/43 PASS`.
 
+### Creator 3.8.8 shared control-binding repair
+
+Live acceptance found that the debug-help text and keyboard dispatcher used
+separate hand-authored mappings. The HUD documented `K Skeleton` and `Y Grip`,
+while the runtime handled those two keys in the opposite order. The repaired
+control contract declares every TASK-013 input once with a semantic action ID,
+displayed key, Cocos `KeyCode`, HUD group and label, deterministic display
+order, and typed runtime action.
+
+Both the HUD rows and runtime dispatcher consume that same validated table.
+Validation rejects missing required controls and duplicate displayed keys,
+Cocos key codes, semantic action IDs, or runtime actions. Tests cover all
+31 controls, reordered declarations, HUD derivation, semantic dispatch, and
+the canonical non-crossed mapping: `K` toggles Skeleton and `Y` toggles Grip
+markers.
+
 ## Verification and evidence
 
 Working-copy `CI=true pnpm verify` and tracked-files-only frozen installation
-plus `CI=true pnpm verify` both pass 241 tests. Video metadata/hashes, evidence
+plus `CI=true pnpm verify` both pass 245 tests. Video metadata/hashes, evidence
 commit, and review URLs are published in the temporary evidence manifest.
 `evidence/task-013` remains until external visual acceptance. No MP4 is
 tracked on the feature branch.

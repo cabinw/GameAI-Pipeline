@@ -35,12 +35,14 @@ import {
   calculateAnchoredRectangle,
   calculateComposableLoadoutHudBounds,
   COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
+  COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
   deriveComposableLoadoutResourceManifest,
   formatComposableLoadoutHudLines,
   resolveComposableLoadoutControlClips,
   TASK_013_RESOURCE_LOAD_FAILED,
   type ComposableLoadoutControl,
+  type ComposableLoadoutControlRuntimeAction,
   validateComposableLoadoutHudRuntimeBounds,
   validateComposableLoadoutHudTextLayout,
 } from "./composable-loadout-controls";
@@ -50,6 +52,12 @@ const { ccclass } = _decorator;
 type PartPlan = (typeof COMPOSABLE_LOADOUT_PLAN.base.parts)[number];
 const COMPOSABLE_LOADOUT_RESOURCE_MANIFEST =
   deriveComposableLoadoutResourceManifest(COMPOSABLE_LOADOUT_PLAN);
+const COMPOSABLE_LOADOUT_BINDINGS_BY_KEY_CODE = new Map(
+  COMPOSABLE_LOADOUT_CONTROL_BINDINGS.map((binding) => [
+    KeyCode[binding.cocosKeyCode],
+    binding,
+  ]),
+);
 
 @ccclass("GameAIComposableLoadoutDemo")
 export class GameAIComposableLoadoutDemo extends Component {
@@ -531,69 +539,58 @@ export class GameAIComposableLoadoutDemo extends Component {
   }
 
   private onKeyDown(event: EventKeyboard): void {
-    const numeric: Partial<Record<number, ComposableLoadoutControl>> = {
-      [KeyCode.DIGIT_1]: 1,
-      [KeyCode.DIGIT_2]: 2,
-      [KeyCode.DIGIT_3]: 3,
-      [KeyCode.DIGIT_4]: 4,
-      [KeyCode.DIGIT_5]: 5,
-    };
-    const control = numeric[event.keyCode];
-    if (control !== undefined) {
-      this.selectClip(control, true);
-      return;
+    const binding = COMPOSABLE_LOADOUT_BINDINGS_BY_KEY_CODE.get(event.keyCode);
+    if (binding !== undefined) {
+      this.executeControlAction(binding.runtimeAction);
     }
-    const presets = [
-      "base-only",
-      "accessories-only",
-      "garment-only",
-      "prop-only",
-      "garment-accessories",
-      "garment-prop",
-      "accessories-prop",
-      "full-loadout",
-    ];
-    if (event.keyCode >= KeyCode.F1 && event.keyCode <= KeyCode.F8) {
-      this.presetId = presets[event.keyCode - KeyCode.F1]!;
+  }
+
+  private executeControlAction(
+    action: ComposableLoadoutControlRuntimeAction,
+  ): void {
+    if (action.kind === "set-preset") {
+      this.presetId = action.presetId;
       this.applyState();
       return;
     }
-    if (event.keyCode === KeyCode.KEY_Q) this.setPropState("no-prop");
-    if (event.keyCode === KeyCode.KEY_W) this.setPropState("left-hand");
-    if (event.keyCode === KeyCode.KEY_E) this.setPropState("right-hand");
-    if (event.keyCode === KeyCode.SPACE) {
+    if (action.kind === "set-prop-state") {
+      this.setPropState(action.propState);
+      return;
+    }
+    if (action.kind === "select-clip") {
+      this.selectClip(action.control, true);
+      return;
+    }
+    if (action.kind === "toggle-playback") {
       if (this.playback?.status === "playing") this.playback.pause();
       else this.playback?.play();
+      return;
     }
-    if (event.keyCode === KeyCode.ESCAPE) this.exactReset();
-    if (event.keyCode === KeyCode.KEY_R && this.referenceView) {
-      this.referenceView.active = !this.referenceView.active;
+    if (action.kind === "exact-reset") {
+      this.exactReset();
+      return;
     }
-    if (event.keyCode === KeyCode.KEY_A && this.assembledView) {
-      this.assembledView.active = !this.assembledView.active;
+    if (action.kind === "toggle-view") {
+      const view =
+        action.view === "reference"
+          ? this.referenceView
+          : action.view === "assembled"
+            ? this.assembledView
+            : this.overlayView;
+      if (view !== null) view.active = !view.active;
+      return;
     }
-    if (event.keyCode === KeyCode.KEY_O && this.overlayView) {
-      this.overlayView.active = !this.overlayView.active;
-    }
-    const toggles: Partial<Record<number, string>> = {
-      [KeyCode.KEY_J]: "joints",
-      [KeyCode.KEY_B]: "bounds",
-      [KeyCode.KEY_P]: "pivots",
-      [KeyCode.KEY_L]: "parent links",
-      [KeyCode.KEY_G]: "global layer labels",
-      [KeyCode.KEY_T]: "attachment slots",
-      [KeyCode.KEY_M]: "garment seams",
-      [KeyCode.KEY_S]: "sockets",
-      [KeyCode.KEY_K]: "grip markers",
-      [KeyCode.KEY_Y]: "skeleton",
-    };
-    const group = toggles[event.keyCode];
-    if (group !== undefined) {
-      const nodes = this.debugNodes.get(group) ?? [];
+    if (action.kind === "toggle-debug") {
+      const nodes = this.debugNodes.get(action.group) ?? [];
       const active = !(nodes[0]?.active ?? false);
       for (const node of nodes) node.active = active;
-      if (group === "skeleton" && this.skeletonView) this.skeletonView.active = active;
+      if (action.group === "skeleton" && this.skeletonView) {
+        this.skeletonView.active = active;
+      }
+      return;
     }
+    const exhaustive: never = action;
+    throw new Error(`Unsupported TASK-013 control action: ${String(exhaustive)}`);
   }
 
   private setPropState(state: "no-prop" | "left-hand" | "right-hand"): void {

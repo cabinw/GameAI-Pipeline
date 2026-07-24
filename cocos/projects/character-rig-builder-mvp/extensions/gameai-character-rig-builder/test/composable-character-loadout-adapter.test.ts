@@ -18,11 +18,14 @@ import { buildCocosComposableCharacterLoadoutPlan } from "../source/composable-c
 import {
   calculateComposableLoadoutHudBounds,
   COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
+  COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
   deriveComposableLoadoutResourceManifest,
+  formatComposableLoadoutControlHelpLines,
   formatComposableLoadoutHudLines,
   ComposableLoadoutControlError,
   resolveComposableLoadoutControlClips,
+  TASK_013_CONTROL_BINDINGS_INVALID,
   TASK_013_RESOURCE_LOAD_FAILED,
   TASK_013_RESOURCE_MANIFEST_INVALID,
   TASK_013_HUD_RUNTIME_BOUNDS_INVALID,
@@ -30,6 +33,8 @@ import {
   validateComposableLoadoutHudLines,
   validateComposableLoadoutHudRuntimeBounds,
   validateComposableLoadoutHudTextLayout,
+  validateComposableLoadoutControlBindings,
+  type ComposableLoadoutControlBinding,
 } from "../source/composable-character-loadout-controls";
 import {
   composableLoadoutResourcePngPath,
@@ -317,6 +322,227 @@ test("semantic controls ignore animation-array order and reject missing/duplicat
       error instanceof ComposableLoadoutControlError &&
       error.code === "LOADOUT_REQUIRED_CLIP_DUPLICATE",
   );
+});
+
+test("TASK-013 shared bindings define every documented control and canonical K/Y actions", () => {
+  const actual = Object.fromEntries(
+    COMPOSABLE_LOADOUT_CONTROL_BINDINGS.map((entry) => [
+      entry.displayedKey,
+      {
+        cocosKeyCode: entry.cocosKeyCode,
+        runtimeAction: entry.runtimeAction,
+      },
+    ]),
+  );
+  assert.deepEqual(actual, {
+    F1: {
+      cocosKeyCode: "F1",
+      runtimeAction: { kind: "set-preset", presetId: "base-only" },
+    },
+    F2: {
+      cocosKeyCode: "F2",
+      runtimeAction: { kind: "set-preset", presetId: "accessories-only" },
+    },
+    F3: {
+      cocosKeyCode: "F3",
+      runtimeAction: { kind: "set-preset", presetId: "garment-only" },
+    },
+    F4: {
+      cocosKeyCode: "F4",
+      runtimeAction: { kind: "set-preset", presetId: "prop-only" },
+    },
+    F5: {
+      cocosKeyCode: "F5",
+      runtimeAction: {
+        kind: "set-preset",
+        presetId: "garment-accessories",
+      },
+    },
+    F6: {
+      cocosKeyCode: "F6",
+      runtimeAction: { kind: "set-preset", presetId: "garment-prop" },
+    },
+    F7: {
+      cocosKeyCode: "F7",
+      runtimeAction: { kind: "set-preset", presetId: "accessories-prop" },
+    },
+    F8: {
+      cocosKeyCode: "F8",
+      runtimeAction: { kind: "set-preset", presetId: "full-loadout" },
+    },
+    Q: {
+      cocosKeyCode: "KEY_Q",
+      runtimeAction: { kind: "set-prop-state", propState: "no-prop" },
+    },
+    W: {
+      cocosKeyCode: "KEY_W",
+      runtimeAction: { kind: "set-prop-state", propState: "left-hand" },
+    },
+    E: {
+      cocosKeyCode: "KEY_E",
+      runtimeAction: { kind: "set-prop-state", propState: "right-hand" },
+    },
+    "1": {
+      cocosKeyCode: "DIGIT_1",
+      runtimeAction: { kind: "select-clip", control: 1 },
+    },
+    "2": {
+      cocosKeyCode: "DIGIT_2",
+      runtimeAction: { kind: "select-clip", control: 2 },
+    },
+    "3": {
+      cocosKeyCode: "DIGIT_3",
+      runtimeAction: { kind: "select-clip", control: 3 },
+    },
+    "4": {
+      cocosKeyCode: "DIGIT_4",
+      runtimeAction: { kind: "select-clip", control: 4 },
+    },
+    "5": {
+      cocosKeyCode: "DIGIT_5",
+      runtimeAction: { kind: "select-clip", control: 5 },
+    },
+    Space: {
+      cocosKeyCode: "SPACE",
+      runtimeAction: { kind: "toggle-playback" },
+    },
+    Esc: {
+      cocosKeyCode: "ESCAPE",
+      runtimeAction: { kind: "exact-reset" },
+    },
+    R: {
+      cocosKeyCode: "KEY_R",
+      runtimeAction: { kind: "toggle-view", view: "reference" },
+    },
+    A: {
+      cocosKeyCode: "KEY_A",
+      runtimeAction: { kind: "toggle-view", view: "assembled" },
+    },
+    O: {
+      cocosKeyCode: "KEY_O",
+      runtimeAction: { kind: "toggle-view", view: "overlay" },
+    },
+    J: {
+      cocosKeyCode: "KEY_J",
+      runtimeAction: { kind: "toggle-debug", group: "joints" },
+    },
+    B: {
+      cocosKeyCode: "KEY_B",
+      runtimeAction: { kind: "toggle-debug", group: "bounds" },
+    },
+    P: {
+      cocosKeyCode: "KEY_P",
+      runtimeAction: { kind: "toggle-debug", group: "pivots" },
+    },
+    L: {
+      cocosKeyCode: "KEY_L",
+      runtimeAction: { kind: "toggle-debug", group: "parent links" },
+    },
+    G: {
+      cocosKeyCode: "KEY_G",
+      runtimeAction: { kind: "toggle-debug", group: "global layer labels" },
+    },
+    T: {
+      cocosKeyCode: "KEY_T",
+      runtimeAction: { kind: "toggle-debug", group: "attachment slots" },
+    },
+    M: {
+      cocosKeyCode: "KEY_M",
+      runtimeAction: { kind: "toggle-debug", group: "garment seams" },
+    },
+    S: {
+      cocosKeyCode: "KEY_S",
+      runtimeAction: { kind: "toggle-debug", group: "sockets" },
+    },
+    K: {
+      cocosKeyCode: "KEY_K",
+      runtimeAction: { kind: "toggle-debug", group: "skeleton" },
+    },
+    Y: {
+      cocosKeyCode: "KEY_Y",
+      runtimeAction: { kind: "toggle-debug", group: "grip markers" },
+    },
+  });
+  assert.notDeepEqual(actual.K.runtimeAction, {
+    kind: "toggle-debug",
+    group: "grip markers",
+  });
+  assert.notDeepEqual(actual.Y.runtimeAction, {
+    kind: "toggle-debug",
+    group: "skeleton",
+  });
+});
+
+test("TASK-013 HUD help derives from the same bindings independent of declaration order", () => {
+  const canonical = formatComposableLoadoutControlHelpLines();
+  assert.deepEqual(
+    formatComposableLoadoutControlHelpLines([
+      ...COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
+    ].reverse()),
+    canonical,
+  );
+  const byId = Object.fromEntries(
+    canonical.map((line) => [line.rowId, line.text]),
+  );
+  assert.equal(
+    byId["debug-controls-secondary"],
+    "DEBUG T Slots · M Seams · S Sockets · K Skeleton · Y Grip",
+  );
+  const relabeled = COMPOSABLE_LOADOUT_CONTROL_BINDINGS.map((entry) =>
+    entry.semanticActionId === "debug.skeleton"
+      ? { ...entry, hudLabel: "Bones" }
+      : entry,
+  );
+  assert.equal(
+    formatComposableLoadoutControlHelpLines(relabeled).find(
+      (line) => line.rowId === "debug-controls-secondary",
+    )?.text,
+    "DEBUG T Slots · M Seams · S Sockets · K Bones · Y Grip",
+  );
+});
+
+test("TASK-013 shared bindings reject duplicate keys/actions and missing controls", () => {
+  const mutate = (
+    semanticActionId: string,
+    update: Partial<ComposableLoadoutControlBinding>,
+  ) =>
+    COMPOSABLE_LOADOUT_CONTROL_BINDINGS.map((entry) =>
+      entry.semanticActionId === semanticActionId
+        ? { ...entry, ...update }
+        : entry,
+    );
+  const rejects = (
+    bindings: readonly ComposableLoadoutControlBinding[],
+    detail: string,
+  ) =>
+    assert.throws(
+      () => validateComposableLoadoutControlBindings(bindings),
+      (error) =>
+        error instanceof Error &&
+        error.message.startsWith(TASK_013_CONTROL_BINDINGS_INVALID) &&
+        error.message.includes(detail),
+    );
+  rejects(
+    mutate("debug.prop-grip-markers", { displayedKey: "K" }),
+    "duplicateDisplayedKeys",
+  );
+  rejects(
+    mutate("debug.prop-grip-markers", { cocosKeyCode: "KEY_K" }),
+    "duplicateCocosKeyCodes",
+  );
+  rejects(
+    mutate("debug.prop-grip-markers", {
+      semanticActionId: "debug.skeleton",
+    }),
+    "duplicateSemanticActions",
+  );
+  rejects(
+    mutate("debug.prop-grip-markers", {
+      runtimeAction: { kind: "toggle-debug", group: "skeleton" },
+    }),
+    "duplicateRuntimeActions",
+  );
+  rejects(COMPOSABLE_LOADOUT_CONTROL_BINDINGS.slice(1), "missingRequiredActions");
 });
 
 test("exact Reset is stopped at 0.00 with the authored Rest sample", () => {
@@ -710,6 +936,35 @@ test("generated TASK-013 runtime owns the repaired HUD configuration", () => {
   assert.equal(runtime.includes("this.hud(root)"), false);
 });
 
+test("TASK-013 runtime dispatch and HUD consume the shared semantic bindings", () => {
+  const runtime = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-demo.ts",
+    ),
+    "utf8",
+  );
+  const controls = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-controls.ts",
+    ),
+    "utf8",
+  );
+  assert.equal(
+    runtime.includes("COMPOSABLE_LOADOUT_BINDINGS_BY_KEY_CODE.get(event.keyCode)"),
+    true,
+  );
+  assert.equal(runtime.includes("executeControlAction(binding.runtimeAction)"), true);
+  assert.equal(runtime.includes("const toggles:"), false);
+  assert.equal(runtime.includes("event.keyCode === KeyCode."), false);
+  assert.equal(controls.includes("COMPOSABLE_LOADOUT_STATIC_HELP_LINES"), false);
+  assert.equal(
+    controls.includes("formatComposableLoadoutControlHelpLines()"),
+    true,
+  );
+});
+
 test("TASK-013 separates runtime resource loading from Creator edit mode", () => {
   const runtime = readFileSync(
     path.join(
@@ -915,17 +1170,6 @@ test("integrated Cocos scene exposes the complete loadout and debug surface", ()
     "utf8",
   );
   for (const token of [
-    "base-only",
-    "accessories-only",
-    "garment-only",
-    "prop-only",
-    "garment-accessories",
-    "garment-prop",
-    "accessories-prop",
-    "full-loadout",
-    "full-loadout-no-prop",
-    "full-loadout-left",
-    "full-loadout-right",
     "ReferenceAssembledOverlay",
     "joints",
     "bounds",
@@ -946,37 +1190,10 @@ test("integrated Cocos scene exposes the complete loadout and debug surface", ()
     "HorizontalTextAlignment.LEFT",
     "VerticalTextAlignment.TOP",
     "Label.Overflow.CLAMP",
+    "COMPOSABLE_LOADOUT_CONTROL_BINDINGS",
+    "executeControlAction",
   ]) {
     assert.equal(runtime.includes(token), true, token);
-  }
-  for (const key of [
-    "KeyCode.F1",
-    "KeyCode.F8",
-    "KeyCode.KEY_Q",
-    "KeyCode.KEY_W",
-    "KeyCode.KEY_E",
-    "KeyCode.DIGIT_1",
-    "KeyCode.DIGIT_2",
-    "KeyCode.DIGIT_3",
-    "KeyCode.DIGIT_4",
-    "KeyCode.DIGIT_5",
-    "KeyCode.SPACE",
-    "KeyCode.ESCAPE",
-    "KeyCode.KEY_R",
-    "KeyCode.KEY_A",
-    "KeyCode.KEY_O",
-    "KeyCode.KEY_J",
-    "KeyCode.KEY_B",
-    "KeyCode.KEY_P",
-    "KeyCode.KEY_L",
-    "KeyCode.KEY_G",
-    "KeyCode.KEY_T",
-    "KeyCode.KEY_M",
-    "KeyCode.KEY_S",
-    "KeyCode.KEY_K",
-    "KeyCode.KEY_Y",
-  ]) {
-    assert.equal(runtime.includes(key), true, key);
   }
   assert.equal(scene.includes("composable-full-loadout-reference"), true);
   assert.equal(scene.includes("TASK-013"), true);

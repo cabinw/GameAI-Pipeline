@@ -10,6 +10,405 @@ export const COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS = {
 export type ComposableLoadoutControl =
   keyof typeof COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS;
 
+export type ComposableLoadoutCocosKeyCode =
+  | "F1"
+  | "F2"
+  | "F3"
+  | "F4"
+  | "F5"
+  | "F6"
+  | "F7"
+  | "F8"
+  | "KEY_Q"
+  | "KEY_W"
+  | "KEY_E"
+  | "DIGIT_1"
+  | "DIGIT_2"
+  | "DIGIT_3"
+  | "DIGIT_4"
+  | "DIGIT_5"
+  | "SPACE"
+  | "ESCAPE"
+  | "KEY_R"
+  | "KEY_A"
+  | "KEY_O"
+  | "KEY_J"
+  | "KEY_B"
+  | "KEY_P"
+  | "KEY_L"
+  | "KEY_G"
+  | "KEY_T"
+  | "KEY_M"
+  | "KEY_S"
+  | "KEY_K"
+  | "KEY_Y";
+
+export type ComposableLoadoutDebugGroup =
+  | "joints"
+  | "bounds"
+  | "pivots"
+  | "parent links"
+  | "global layer labels"
+  | "attachment slots"
+  | "garment seams"
+  | "sockets"
+  | "skeleton"
+  | "grip markers";
+
+export type ComposableLoadoutControlRuntimeAction =
+  | { readonly kind: "set-preset"; readonly presetId: string }
+  | {
+      readonly kind: "set-prop-state";
+      readonly propState: "no-prop" | "left-hand" | "right-hand";
+    }
+  | {
+      readonly kind: "select-clip";
+      readonly control: ComposableLoadoutControl;
+    }
+  | { readonly kind: "toggle-playback" }
+  | { readonly kind: "exact-reset" }
+  | {
+      readonly kind: "toggle-view";
+      readonly view: "reference" | "assembled" | "overlay";
+    }
+  | {
+      readonly kind: "toggle-debug";
+      readonly group: ComposableLoadoutDebugGroup;
+    };
+
+export type ComposableLoadoutControlHudGroup =
+  | "preset"
+  | "prop"
+  | "clip"
+  | "playback"
+  | "view"
+  | "debug-primary"
+  | "debug-secondary";
+
+export interface ComposableLoadoutControlBinding {
+  readonly semanticActionId: string;
+  readonly displayedKey: string;
+  readonly cocosKeyCode: ComposableLoadoutCocosKeyCode;
+  readonly hudLabel: string;
+  readonly hudGroup: ComposableLoadoutControlHudGroup;
+  readonly hudOrder: number;
+  readonly runtimeAction: ComposableLoadoutControlRuntimeAction;
+}
+
+export const TASK_013_CONTROL_BINDINGS_INVALID =
+  "TASK_013_CONTROL_BINDINGS_INVALID";
+
+const REQUIRED_COMPOSABLE_LOADOUT_ACTION_IDS = [
+  "preset.base-only",
+  "preset.accessories-only",
+  "preset.garment-only",
+  "preset.prop-only",
+  "preset.garment-accessories",
+  "preset.garment-prop",
+  "preset.accessories-prop",
+  "preset.full-loadout",
+  "prop.no-prop",
+  "prop.left-hand",
+  "prop.right-hand",
+  "clip.rest",
+  "clip.walk",
+  "clip.wave",
+  "clip.prop-swing",
+  "clip.integration-stress",
+  "playback.pause-resume",
+  "playback.exact-reset",
+  "view.reference",
+  "view.assembled",
+  "view.overlay",
+  "debug.joints",
+  "debug.bounds",
+  "debug.pivots",
+  "debug.parent-links",
+  "debug.global-layers",
+  "debug.attachment-slots",
+  "debug.garment-seams",
+  "debug.accessory-sockets",
+  "debug.skeleton",
+  "debug.prop-grip-markers",
+] as const;
+
+const RAW_COMPOSABLE_LOADOUT_CONTROL_BINDINGS: readonly ComposableLoadoutControlBinding[] =
+  [
+    binding("preset.base-only", "F1", "F1", "Base", "preset", 1, {
+      kind: "set-preset",
+      presetId: "base-only",
+    }),
+    binding("preset.accessories-only", "F2", "F2", "Accessories", "preset", 2, {
+      kind: "set-preset",
+      presetId: "accessories-only",
+    }),
+    binding("preset.garment-only", "F3", "F3", "Garment", "preset", 3, {
+      kind: "set-preset",
+      presetId: "garment-only",
+    }),
+    binding("preset.prop-only", "F4", "F4", "Prop", "preset", 4, {
+      kind: "set-preset",
+      presetId: "prop-only",
+    }),
+    binding(
+      "preset.garment-accessories",
+      "F5",
+      "F5",
+      "Garment + accessories",
+      "preset",
+      5,
+      { kind: "set-preset", presetId: "garment-accessories" },
+    ),
+    binding("preset.garment-prop", "F6", "F6", "Garment + prop", "preset", 6, {
+      kind: "set-preset",
+      presetId: "garment-prop",
+    }),
+    binding(
+      "preset.accessories-prop",
+      "F7",
+      "F7",
+      "Accessories + prop",
+      "preset",
+      7,
+      { kind: "set-preset", presetId: "accessories-prop" },
+    ),
+    binding("preset.full-loadout", "F8", "F8", "Full", "preset", 8, {
+      kind: "set-preset",
+      presetId: "full-loadout",
+    }),
+    binding("prop.no-prop", "Q", "KEY_Q", "None", "prop", 1, {
+      kind: "set-prop-state",
+      propState: "no-prop",
+    }),
+    binding("prop.left-hand", "W", "KEY_W", "Left", "prop", 2, {
+      kind: "set-prop-state",
+      propState: "left-hand",
+    }),
+    binding("prop.right-hand", "E", "KEY_E", "Right", "prop", 3, {
+      kind: "set-prop-state",
+      propState: "right-hand",
+    }),
+    binding("clip.rest", "1", "DIGIT_1", "Rest", "clip", 1, {
+      kind: "select-clip",
+      control: 1,
+    }),
+    binding("clip.walk", "2", "DIGIT_2", "Walk", "clip", 2, {
+      kind: "select-clip",
+      control: 2,
+    }),
+    binding("clip.wave", "3", "DIGIT_3", "Wave", "clip", 3, {
+      kind: "select-clip",
+      control: 3,
+    }),
+    binding("clip.prop-swing", "4", "DIGIT_4", "Swing", "clip", 4, {
+      kind: "select-clip",
+      control: 4,
+    }),
+    binding(
+      "clip.integration-stress",
+      "5",
+      "DIGIT_5",
+      "Stress",
+      "clip",
+      5,
+      { kind: "select-clip", control: 5 },
+    ),
+    binding(
+      "playback.pause-resume",
+      "Space",
+      "SPACE",
+      "Pause/Resume",
+      "playback",
+      1,
+      { kind: "toggle-playback" },
+    ),
+    binding(
+      "playback.exact-reset",
+      "Esc",
+      "ESCAPE",
+      "Exact Reset",
+      "playback",
+      2,
+      { kind: "exact-reset" },
+    ),
+    binding("view.reference", "R", "KEY_R", "Reference", "view", 1, {
+      kind: "toggle-view",
+      view: "reference",
+    }),
+    binding("view.assembled", "A", "KEY_A", "Assembled", "view", 2, {
+      kind: "toggle-view",
+      view: "assembled",
+    }),
+    binding("view.overlay", "O", "KEY_O", "Overlay", "view", 3, {
+      kind: "toggle-view",
+      view: "overlay",
+    }),
+    binding("debug.joints", "J", "KEY_J", "Joints", "debug-primary", 1, {
+      kind: "toggle-debug",
+      group: "joints",
+    }),
+    binding("debug.bounds", "B", "KEY_B", "Bounds", "debug-primary", 2, {
+      kind: "toggle-debug",
+      group: "bounds",
+    }),
+    binding("debug.pivots", "P", "KEY_P", "Pivots", "debug-primary", 3, {
+      kind: "toggle-debug",
+      group: "pivots",
+    }),
+    binding("debug.parent-links", "L", "KEY_L", "Links", "debug-primary", 4, {
+      kind: "toggle-debug",
+      group: "parent links",
+    }),
+    binding(
+      "debug.global-layers",
+      "G",
+      "KEY_G",
+      "Layers",
+      "debug-primary",
+      5,
+      { kind: "toggle-debug", group: "global layer labels" },
+    ),
+    binding(
+      "debug.attachment-slots",
+      "T",
+      "KEY_T",
+      "Slots",
+      "debug-secondary",
+      1,
+      { kind: "toggle-debug", group: "attachment slots" },
+    ),
+    binding(
+      "debug.garment-seams",
+      "M",
+      "KEY_M",
+      "Seams",
+      "debug-secondary",
+      2,
+      { kind: "toggle-debug", group: "garment seams" },
+    ),
+    binding(
+      "debug.accessory-sockets",
+      "S",
+      "KEY_S",
+      "Sockets",
+      "debug-secondary",
+      3,
+      { kind: "toggle-debug", group: "sockets" },
+    ),
+    binding(
+      "debug.skeleton",
+      "K",
+      "KEY_K",
+      "Skeleton",
+      "debug-secondary",
+      4,
+      { kind: "toggle-debug", group: "skeleton" },
+    ),
+    binding(
+      "debug.prop-grip-markers",
+      "Y",
+      "KEY_Y",
+      "Grip",
+      "debug-secondary",
+      5,
+      { kind: "toggle-debug", group: "grip markers" },
+    ),
+  ];
+
+export const COMPOSABLE_LOADOUT_CONTROL_BINDINGS =
+  validateComposableLoadoutControlBindings(
+    RAW_COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
+  );
+
+function binding(
+  semanticActionId: string,
+  displayedKey: string,
+  cocosKeyCode: ComposableLoadoutCocosKeyCode,
+  hudLabel: string,
+  hudGroup: ComposableLoadoutControlHudGroup,
+  hudOrder: number,
+  runtimeAction: ComposableLoadoutControlRuntimeAction,
+): ComposableLoadoutControlBinding {
+  return {
+    semanticActionId,
+    displayedKey,
+    cocosKeyCode,
+    hudLabel,
+    hudGroup,
+    hudOrder,
+    runtimeAction,
+  };
+}
+
+export function validateComposableLoadoutControlBindings(
+  bindings: readonly ComposableLoadoutControlBinding[],
+): readonly ComposableLoadoutControlBinding[] {
+  const duplicateDisplayedKeys = duplicateControlValues(
+    bindings.map((entry) => entry.displayedKey),
+  );
+  const duplicateCocosKeyCodes = duplicateControlValues(
+    bindings.map((entry) => entry.cocosKeyCode),
+  );
+  const duplicateSemanticActions = duplicateControlValues(
+    bindings.map((entry) => entry.semanticActionId),
+  );
+  const duplicateRuntimeActions = duplicateControlValues(
+    bindings.map((entry) => JSON.stringify(entry.runtimeAction)),
+  );
+  const missingRequiredActions = REQUIRED_COMPOSABLE_LOADOUT_ACTION_IDS.filter(
+    (actionId) =>
+      !bindings.some((entry) => entry.semanticActionId === actionId),
+  );
+  const invalidEntries = bindings
+    .filter(
+      (entry) =>
+        entry.semanticActionId.length === 0 ||
+        entry.displayedKey.length === 0 ||
+        entry.hudLabel.length === 0 ||
+        !Number.isInteger(entry.hudOrder) ||
+        entry.hudOrder < 1,
+    )
+    .map((entry) => entry.semanticActionId);
+  if (
+    bindings.length !== REQUIRED_COMPOSABLE_LOADOUT_ACTION_IDS.length ||
+    duplicateDisplayedKeys.length > 0 ||
+    duplicateCocosKeyCodes.length > 0 ||
+    duplicateSemanticActions.length > 0 ||
+    duplicateRuntimeActions.length > 0 ||
+    missingRequiredActions.length > 0 ||
+    invalidEntries.length > 0
+  ) {
+    throw new Error(
+      `${TASK_013_CONTROL_BINDINGS_INVALID}: ${JSON.stringify({
+        expectedCount: REQUIRED_COMPOSABLE_LOADOUT_ACTION_IDS.length,
+        actualCount: bindings.length,
+        duplicateDisplayedKeys,
+        duplicateCocosKeyCodes,
+        duplicateSemanticActions,
+        duplicateRuntimeActions,
+        missingRequiredActions,
+        invalidEntries,
+      })}`,
+    );
+  }
+  return Object.freeze(
+    [...bindings].sort((left, right) =>
+      left.semanticActionId.localeCompare(right.semanticActionId),
+    ),
+  );
+}
+
+function duplicateControlValues(values: readonly string[]): readonly string[] {
+  return [
+    ...new Set(
+      values.filter(
+        (value, index) =>
+          values.findIndex((candidate) => candidate === value) !== index,
+      ),
+    ),
+  ].sort();
+}
+
 export type ComposableLoadoutResourceCategory =
   | "base-part"
   | "attachment"
@@ -186,32 +585,57 @@ export const TASK_013_HUD_RUNTIME_BOUNDS_INVALID =
   "TASK_013_HUD_RUNTIME_BOUNDS_INVALID";
 export const TASK_013_HUD_TEXT_OVERFLOW = "TASK_013_HUD_TEXT_OVERFLOW";
 
-const COMPOSABLE_LOADOUT_STATIC_HELP_LINES = [
-  {
-    rowId: "preset-prop-controls",
-    text: "PRESETS F1–F8 · PROP Q None · W Left · E Right",
-  },
-  {
-    rowId: "clip-controls",
-    text: "CLIPS 1 Rest · 2 Walk · 3 Wave · 4 Swing · 5 Stress",
-  },
-  {
-    rowId: "playback-controls",
-    text: "PLAY Space Pause/Resume · Esc Exact Reset",
-  },
-  {
-    rowId: "view-controls",
-    text: "VIEWS R Reference · A Assembled · O Overlay",
-  },
-  {
-    rowId: "debug-controls-primary",
-    text: "DEBUG J Joints · B Bounds · P Pivots · L Links · G Layers",
-  },
-  {
-    rowId: "debug-controls-secondary",
-    text: "DEBUG T Slots · M Seams · S Sockets · K Skeleton · Y Grip",
-  },
-] as const;
+export function formatComposableLoadoutControlHelpLines(
+  bindings: readonly ComposableLoadoutControlBinding[] =
+    COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
+): readonly {
+  readonly rowId: (typeof COMPOSABLE_LOADOUT_HUD_HELP_ROWS)[number];
+  readonly text: string;
+}[] {
+  const validated = validateComposableLoadoutControlBindings(bindings);
+  const group = (hudGroup: ComposableLoadoutControlHudGroup) =>
+    validated
+      .filter((entry) => entry.hudGroup === hudGroup)
+      .sort(
+        (left, right) =>
+          left.hudOrder - right.hudOrder ||
+          left.semanticActionId.localeCompare(right.semanticActionId),
+      );
+  const formatEntries = (entries: readonly ComposableLoadoutControlBinding[]) =>
+    entries
+      .map((entry) => `${entry.displayedKey} ${entry.hudLabel}`)
+      .join(" · ");
+  const presetBindings = group("preset");
+  const presetRange =
+    `${presetBindings[0]!.displayedKey}–` +
+    presetBindings[presetBindings.length - 1]!.displayedKey;
+  return [
+    {
+      rowId: "preset-prop-controls",
+      text: `PRESETS ${presetRange} · PROP ${formatEntries(group("prop"))}`,
+    },
+    {
+      rowId: "clip-controls",
+      text: `CLIPS ${formatEntries(group("clip"))}`,
+    },
+    {
+      rowId: "playback-controls",
+      text: `PLAY ${formatEntries(group("playback"))}`,
+    },
+    {
+      rowId: "view-controls",
+      text: `VIEWS ${formatEntries(group("view"))}`,
+    },
+    {
+      rowId: "debug-controls-primary",
+      text: `DEBUG ${formatEntries(group("debug-primary"))}`,
+    },
+    {
+      rowId: "debug-controls-secondary",
+      text: `DEBUG ${formatEntries(group("debug-secondary"))}`,
+    },
+  ];
+}
 
 function assertBoundedHudValue(
   name: string,
@@ -362,7 +786,7 @@ export function formatComposableLoadoutHudLines(
         `RESOURCES ${state.resourceLoadedCount}/${state.resourceExpectedCount} ${resourceStatus} · ` +
         "GRIP PASS · SEAMS PASS · SOCKETS PASS · LAYERS PASS · EXACT PASS",
     },
-    ...COMPOSABLE_LOADOUT_STATIC_HELP_LINES.map((line) => ({
+    ...formatComposableLoadoutControlHelpLines().map((line) => ({
       ...line,
       region: "help" as const,
     })),
