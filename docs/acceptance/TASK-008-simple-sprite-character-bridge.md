@@ -2,12 +2,13 @@
 
 ## Result
 
-Accepted locally on 2026-07-24 in Cocos Creator 3.8.8 and its 1280×720 Web
-Game Preview. Automated verification, real SpriteFrame rendering, synchronized
-sprite/skeleton motion, debug controls, and dynamic visual acceptance pass.
+Accepted on 2026-07-24 in Cocos Creator 3.8.8 and its 1280×720 Web Game
+Preview. Automated verification, real SpriteFrame rendering, synchronized
+sprite/skeleton motion, debug controls, and manual dynamic visual acceptance
+all pass.
 
-The implementation is ready for manual visual review. No pull request has
-been created.
+TASK-008 is approved for a Draft Pull Request into `main`. It is not approved
+for automatic merge.
 
 ## Automated evidence
 
@@ -67,6 +68,26 @@ The reviewed SHA-256 is
 `61a1dd66d1a21e738dcb5b2641c14b88bc6cfde3cb2d6de7b517837ce798b896`.
 The MP4 is excluded by `.git/info/exclude` through the existing `artifacts/`
 rule and is not committed.
+
+## Manual visual acceptance
+
+Manual dynamic review passed on 2026-07-24. The reviewer verified:
+
+- transparent PNG parts remain aligned with the debug skeleton;
+- shoulder, elbow, hip, knee, and ankle pivots behave correctly;
+- no visible joint gaps occur within the authored animation ranges;
+- transforms do not accumulate drift across repeated loops;
+- draw order remains stable while limbs cross;
+- pause/resume works during animation;
+- reset restores the exact authored rest pose; and
+- joints, bounds, pivots, links, and skeleton debug views all work.
+
+The reviewer explicitly accepted:
+
+- in-place walk with foot sliding;
+- no root motion or foot locking;
+- deliberately simple validation artwork; and
+- a Cocos-only adapter at this stage.
 
 ## Exact preview instructions
 

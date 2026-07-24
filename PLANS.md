@@ -97,7 +97,15 @@ character work resumes.
   tracked-files-only archive checkout.
 - Reviewed the ignored 21.82-second dynamic MP4 covering Rest, Wave,
   Pause/Resume, Walk for more than three loops, Reset, and all debug toggles.
-- No PR was created; the branch stops for manual visual review.
+- Manual dynamic visual acceptance passed on 2026-07-24. Transparent PNGs
+  remained aligned with the debug skeleton; shoulder, elbow, hip, knee, and
+  ankle pivots behaved correctly; authored joint ranges showed no visible
+  gaps or accumulated drift; limb-crossing draw order stayed stable; and
+  pause/resume, exact reset, and every debug view passed.
+- In-place foot sliding, no root motion or foot locking, deliberately simple
+  validation artwork, and the Cocos-only adapter are accepted limitations.
+- TASK-008 is approved for a Draft PR into `main`; merge remains a separate
+  manual decision.
 
 ## Completed plan: TASK-007 Minimal Stickman Articulation Reference
 
