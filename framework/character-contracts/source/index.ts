@@ -19,6 +19,18 @@ export {
   resolveAttachmentLayout,
 } from "./attachment-resolver";
 export {
+  CharacterLoadoutError,
+  resolveCharacterLoadout,
+  validateSemanticClipIds,
+  type CharacterLoadoutContract,
+  type CharacterLoadoutErrorCode,
+  type CharacterLoadoutFamily,
+  type CharacterLoadoutState,
+  type ExclusiveAttachmentGroup,
+  type ResolvedCharacterLayer,
+  type ResolvedCharacterLoadout,
+} from "./loadout-resolver";
+export {
   SUPPORTED_SCHEMA_RANGE,
   isSupportedSchemaVersion,
   validateCharacterContractSemantics,

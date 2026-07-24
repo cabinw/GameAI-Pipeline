@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "TASK-013",
+  "source": "source/full-loadout-source.json",
+  "generator": "pipelines/character-asset-intake/scripts/generate-production-lite-full-loadout.mjs",
+  "sourceDigest": "a8a1acb3ee9c3bcbf0066951a83292b3f5447c0546fe5a54bb5269d99a00a1b8",
+  "exactRestStateIds": [
+    "base-only",
+    "accessories-only",
+    "garment-only",
+    "prop-only",
+    "garment-accessories",
+    "garment-prop",
+    "accessories-prop",
+    "full-loadout"
+  ],
+  "tolerances": {
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "boundsExpansionPixels": 0
+  }
+}

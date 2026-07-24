@@ -1,0 +1,210 @@
+{
+  "base-only": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 269,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 269,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "accessories-only": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 269,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 269,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "garment-only": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 285,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 285,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "prop-only": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 292,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 292,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "garment-accessories": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 285,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 285,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "garment-prop": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 299,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 299,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "accessories-prop": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 292,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 173,
+      "y": 48,
+      "width": 292,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  },
+  "full-loadout": {
+    "status": "passed",
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "seamMismatchPixels": 0,
+    "referenceBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 299,
+      "height": 608
+    },
+    "reconstructedBounds": {
+      "x": 166,
+      "y": 48,
+      "width": 299,
+      "height": 608
+    },
+    "boundsExpansionPixels": 0,
+    "tolerance": {
+      "rgbaMismatchPixels": 0,
+      "alphaMismatchPixels": 0,
+      "boundsExpansionPixels": 0,
+      "seamMismatchPixels": 0
+    },
+    "diagnostics": []
+  }
+}

@@ -2,6 +2,116 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013 Composable Full Character Loadout Reference
+
+- Status: Implementation complete; evidence publication pending
+- Started: 2026-07-24
+- Baseline: `main` at `317fd451c6a808cd41788e7ce8e0916701992642`
+- Branch: `feat/task-013-composable-character-loadout`
+- TASK-012 squash merge:
+  `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Compose the accepted TASK-010 head accessories, TASK-011 multi-part garment,
+and TASK-012 one-handed prop through one deterministic, engine-neutral
+character-loadout resolver. Prove all eight required loadout presets plus
+no-prop/left/right prop states on the production-lite character, exact Rest
+reconstruction, dense motion validation, and a single generic Cocos Creator
+3.8.x acceptance scene without adding a new attachment feature family.
+
+### Contract decisions
+
+- Resolve attachment families through generic IDs, exclusive slots, dependency
+  state, transforms, global layer roles, and draw order; never recognize
+  fixture asset names in framework behavior.
+- Keep Attachment Layout 1.0 backward compatible. Extend contracts only for a
+  demonstrated engine-neutral integration gap, with optional fields and stable
+  diagnostics.
+- Emit one engine-neutral resolved character consumed by a thin generic Cocos
+  adapter. The adapter performs no fitting, state selection, or demo-specific
+  composition.
+- Treat semantic animation IDs as the only control identity and validate
+  garment seams, accessory sockets, grip lock, state, transforms, presence,
+  and ordering at every 60 Hz sample.
+- Generate all fixture and Cocos mirror outputs from tracked editable source
+  descriptions. Keep acceptance MP4s ignored under `artifacts/TASK-013`.
+
+### Execution
+
+1. Record TASK-013 and inspect the accepted TASK-010 through TASK-012
+   contracts, generators, validators, evaluators, fixtures, adapters, tests,
+   and acceptance reports.
+2. Implement a deterministic generic loadout composition path and stable
+   validation for cross-family IDs, exclusive slots, dependencies, attachment
+   references, required counterparts, global roles/orders, transforms, seams,
+   sockets, grips, schema versions, and semantic animation IDs.
+3. Create the production-lite full-loadout source, transparent parts,
+   engine-neutral contracts, five semantic clips, eight exact Rest variants,
+   reconstruction/diff reports, and authoring provenance.
+4. Validate every required clip at 60 Hz and report total samples, maximum
+   seam/socket/grip errors, layer violations, and the first failing clip/time.
+5. Generate one generic Cocos resource mirror, adapter, acceptance scene,
+   semantic controls, comparison modes, complete debug views, runtime HUD, and
+   exact stopped Rest reset.
+6. Add automated coverage for all presets and prop states, reordered inputs,
+   invalid mutations, reconstruction, continuous validation, semantic
+   controls, reset, adapter neutrality, reproducibility, and tracked-only use;
+   retain TASK-010 through TASK-012 regression coverage.
+7. Document behavior and limitations and defer the engine-neutral
+   Socket-bound VFX Cue System as roadmap-only work after this milestone.
+8. Run working-copy and tracked-files-only frozen verification; commit and
+   push the feature branch with no tracked MP4.
+9. Record, inspect, fully decode, hash, and publish the two required H.264
+   evidence videos and manifest on temporary branch `evidence/task-013`, then
+   stop for external visual review without opening a PR.
+
+### Done when
+
+- All eight Rest variants reconstruct with zero RGBA, alpha, seam, and bounds
+  difference and all no-prop/left/right states resolve deterministically.
+- The five semantic clips pass all 60 Hz validations with exact authored Rest
+  reset and stable global ordering.
+- The Cocos acceptance scene uses only the generic resolved character result
+  and exposes every required control, view, marker, and runtime-derived HUD
+  identity.
+- Working-copy and tracked-files-only frozen verification pass with all prior
+  regression tests preserved and generated resources reproducible.
+- Feature and evidence branches are pushed, uploaded videos fully decode and
+  match the manifest, no TASK-013 PR exists, the feature branch tracks no MP4,
+  `main` remains at the Phase A integration SHA, the working tree is clean,
+  and the protected archive remains unchanged.
+
+### Deferred roadmap decision
+
+After TASK-013, design—but do not implement—an engine-neutral Socket-bound VFX
+Cue System covering generic effect IDs, socket-local transforms, layer roles,
+follow policies, one-shot/looping/persistent lifecycles, animation/gameplay
+cues, and Cocos/Unity/Godot adapter targets. TASK-013 adds no VFX schema,
+runtime, assets, events, particles, or tests.
+
+### Implementation result
+
+- One generic loadout resolver composes three unchanged Attachment Layout 1.0
+  families and emits immutable engine-neutral states and global layers.
+- Eight exact Rest presets reconstruct with zero RGBA, alpha, seam, and bounds
+  difference; no-prop, left-hand, and right-hand states are explicit.
+- Five semantic clips pass 60 Hz validation across 605 samples with zero seam,
+  accessory socket, grip, or layer-order error.
+- One Cocos Creator 3.8.x scene consumes the generic resolved-character plan
+  and exposes the required semantic controls, runtime-derived HUD, comparison
+  views, diagnostics, and exact stopped Rest reset.
+- The Socket-bound VFX Cue System is recorded only as deferred roadmap work;
+  TASK-013 includes no VFX implementation.
+
+### Verification
+
+- Working-copy `CI=true pnpm verify`: PASS, 222 tests.
+- Tracked-files-only archive after `pnpm install --frozen-lockfile`:
+  `CI=true pnpm verify` PASS, 222 tests.
+
 ## Completed correction: TASK-012 Semantic Prop Demo Controls
 
 - Status: Complete; external manual visual acceptance passed

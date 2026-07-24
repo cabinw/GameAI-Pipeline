@@ -112,6 +112,15 @@ declare module "cc" {
     readonly DIGIT_4: number;
     readonly DIGIT_5: number;
     readonly DIGIT_6: number;
+    readonly F1: number;
+    readonly F2: number;
+    readonly F3: number;
+    readonly F4: number;
+    readonly F5: number;
+    readonly F6: number;
+    readonly F7: number;
+    readonly F8: number;
+    readonly ESCAPE: number;
     readonly SPACE: number;
     readonly KEY_R: number;
     readonly KEY_J: number;
@@ -122,6 +131,7 @@ declare module "cc" {
     readonly KEY_E: number;
     readonly KEY_O: number;
     readonly KEY_Q: number;
+    readonly KEY_W: number;
     readonly KEY_V: number;
     readonly KEY_C: number;
     readonly KEY_G: number;
@@ -129,6 +139,9 @@ declare module "cc" {
     readonly KEY_K: number;
     readonly KEY_M: number;
     readonly KEY_H: number;
+    readonly KEY_P: number;
+    readonly KEY_T: number;
+    readonly KEY_Y: number;
     readonly KEY_Z: number;
     readonly KEY_X: number;
   };

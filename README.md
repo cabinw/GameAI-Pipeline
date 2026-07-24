@@ -124,6 +124,13 @@ exactly and samples grip lock across four clips at 60 Hz. See
 `examples/production-lite-one-handed-prop/README.md` and
 `docs/acceptance/TASK-012-one-handed-prop-reference.md`.
 
+TASK-013 composes TASK-010 through TASK-012 through one engine-neutral
+full-character loadout resolver. Eight Rest presets reconstruct exactly and
+five semantic clips pass seam, accessory, grip, state, transform, presence,
+and global-order validation across 605 samples at 60 Hz. See
+`examples/production-lite-full-loadout/README.md` and
+`docs/acceptance/TASK-013-composable-full-character-loadout-reference.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -147,4 +154,6 @@ that contract with grouped wearable sets and seam validation across a rigid
 multi-part garment without adding clothing-specific core behavior. TASK-012
 then proves generic socket-targeted one-handed props, authored grip lock,
 target-relative ordering, and dense interpolated-pose validation without
-adding item-specific core behavior.
+adding item-specific core behavior. TASK-013 integrates those accepted
+families into one deterministic resolved character and one generic Cocos
+adapter without creating another attachment schema family.

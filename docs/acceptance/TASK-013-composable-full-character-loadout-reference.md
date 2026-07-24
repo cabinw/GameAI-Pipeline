@@ -1,0 +1,63 @@
+# TASK-013 Acceptance: Composable Full Character Loadout Reference
+
+## Result
+
+TASK-013 integrates TASK-010 head accessories, TASK-011 multi-part garment,
+and TASK-012 one-handed prop attachments through one deterministic,
+engine-neutral resolved-character path. No attachment schema version change
+was required.
+
+## Contract and fixture
+
+The loadout contract references three ordinary Attachment Layout 1.0 family
+documents and declares named states, dependencies, required attachments,
+exclusive groups, and semantic clip IDs. The resolver validates cross-family
+IDs, state references, cycles, contradictions, exclusive occupants, required
+presence, global draw order, schema/rig compatibility, and clip identity
+before emitting immutable attachments and global layers.
+
+## Reconstruction
+
+All eight required Rest variants pass with 0 RGBA, 0 alpha, 0 seam, and 0 px
+bounds expansion: Base only, Accessories only, Garment only, Prop only,
+Garment + accessories, Garment + prop, Accessories + prop, and Full loadout.
+
+References, reconstructions, diffs, reports, resolved states, Cocos mirrors,
+and provenance regenerate from tracked source descriptions.
+
+## Motion and validation
+
+Semantic clips are Full Loadout Rest, Walk, Wave, Prop Swing, and Integration
+Stress. Continuous validation samples all clips at 60 Hz:
+
+- total samples: 605;
+- maximum garment seam error: 0;
+- maximum accessory socket error: 0;
+- maximum prop grip error: 0;
+- maximum global layer-order violations: 0;
+- first failure: none.
+
+## Cocos acceptance
+
+`composable-full-loadout-reference.scene` targets Cocos Creator 3.8.x and
+consumes the generic adapter plan. It exposes all eight presets, three prop
+states, five semantic clips, Pause/Resume, exact Reset, reference/assembled/
+overlay comparison, and joint, bounds, pivot, parent-link, global-layer,
+slot, seam, socket, grip, and skeleton diagnostics. HUD clip identity is read
+from active runtime playback state.
+
+## Verification and evidence
+
+Working-copy `CI=true pnpm verify` and tracked-files-only frozen installation
+plus `CI=true pnpm verify` both pass 222 tests. Video metadata/hashes, evidence
+commit, and review URLs are published in the temporary evidence manifest.
+`evidence/task-013` remains until external visual acceptance. No MP4 is
+tracked on the feature branch.
+
+## Accepted limitations
+
+Authored fitting only; rigid sprites; in-place walk; Cocos-only adapter; no
+automatic fitting/grip solving, IK, root motion, blending, physics, mesh
+deformation, two-handed interaction, combat, Unity/Godot adapter, Windows
+validation, VFX runtime, production editor UI, or original Red Cap
+reconstruction.

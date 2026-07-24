@@ -1,0 +1,914 @@
+{
+  "schemaVersion": "1.0.0",
+  "loadoutId": "production-lite-full-loadout",
+  "stateId": "accessories-only",
+  "resolvedStateIds": [
+    "accessories-only"
+  ],
+  "attachments": [
+    {
+      "attachmentId": "cap-back",
+      "slotId": "headwear",
+      "parentPartId": "head",
+      "file": "attachments/cap-back.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 60
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.609375
+      },
+      "drawOrder": 0.5,
+      "layerRole": "back",
+      "enabled": true
+    },
+    {
+      "attachmentId": "jacket-upper-sleeve-right",
+      "slotId": "upper-arm-right",
+      "parentPartId": "upper-arm-right",
+      "file": "attachments/jacket-upper-sleeve-right.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.8333333333333334,
+        "y": 0.1896551724137931
+      },
+      "drawOrder": 1.1,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "back",
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-lower-sleeve-right",
+      "slotId": "lower-arm-right",
+      "parentPartId": "lower-arm-right",
+      "file": "attachments/jacket-lower-sleeve-right.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5857142857142857,
+        "y": 0.16363636363636364
+      },
+      "drawOrder": 2.1,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "back",
+      "enabled": false
+    },
+    {
+      "attachmentId": "toolbox-right",
+      "slotId": "hand-right-prop",
+      "parentPartId": "hand-right",
+      "file": "attachments/toolbox-right.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "drawOrder": 2.5,
+      "propStateId": "right-hand-prop",
+      "attachmentKind": "prop",
+      "gripAnchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "handOverlayAttachmentId": "hand-overlay-right",
+      "layerRole": "behind-target",
+      "target": {
+        "kind": "socket",
+        "id": "hand-right-grip"
+      },
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-cuff-right",
+      "slotId": "wrist-right",
+      "parentPartId": "hand-right",
+      "file": "attachments/jacket-cuff-right.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.43103448275862066,
+        "y": 0.37142857142857144
+      },
+      "drawOrder": 3.2,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "cover",
+      "enabled": false
+    },
+    {
+      "attachmentId": "hand-overlay-right",
+      "slotId": "hand-right-prop",
+      "parentPartId": "hand-right",
+      "file": "attachments/hand-overlay-right.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "drawOrder": 3.5,
+      "propStateId": "right-hand-prop",
+      "attachmentKind": "hand-overlay",
+      "layerRole": "target-overlay",
+      "target": {
+        "kind": "socket",
+        "id": "hand-right-grip"
+      },
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-back",
+      "slotId": "torso-back",
+      "parentPartId": "torso",
+      "file": "attachments/jacket-back.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.898876404494382
+      },
+      "drawOrder": 9.5,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "back",
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-front",
+      "slotId": "torso-front",
+      "parentPartId": "torso",
+      "file": "attachments/jacket-front.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.898876404494382
+      },
+      "drawOrder": 10.2,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "front",
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-zipper-trim",
+      "slotId": "torso-front",
+      "parentPartId": "torso",
+      "file": "attachments/jacket-zipper-trim.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9666666666666667
+      },
+      "drawOrder": 10.3,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "cover",
+      "enabled": false
+    },
+    {
+      "attachmentId": "collar-back",
+      "slotId": "collar-back",
+      "parentPartId": "torso",
+      "file": "attachments/collar-back.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 72.5
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6666666666666666
+      },
+      "drawOrder": 11.5,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "back",
+      "enabled": false
+    },
+    {
+      "attachmentId": "sunglasses",
+      "slotId": "face-accessory",
+      "parentPartId": "head",
+      "file": "attachments/sunglasses.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 25
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5142857142857142
+      },
+      "drawOrder": 12.5,
+      "layerRole": "front",
+      "enabled": true
+    },
+    {
+      "attachmentId": "collar-front",
+      "slotId": "collar-front",
+      "parentPartId": "torso",
+      "file": "attachments/collar-front.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 72.5
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4888888888888889
+      },
+      "drawOrder": 13.2,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "front",
+      "enabled": false
+    },
+    {
+      "attachmentId": "cap-front",
+      "slotId": "headwear",
+      "parentPartId": "head",
+      "file": "attachments/cap-front.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 60
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6428571428571429
+      },
+      "drawOrder": 13.5,
+      "layerRole": "front",
+      "enabled": true
+    },
+    {
+      "attachmentId": "jacket-upper-sleeve-left",
+      "slotId": "upper-arm-left",
+      "parentPartId": "upper-arm-left",
+      "file": "attachments/jacket-upper-sleeve-left.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.15853658536585366,
+        "y": 0.17796610169491525
+      },
+      "drawOrder": 14.1,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "front",
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-lower-sleeve-left",
+      "slotId": "lower-arm-left",
+      "parentPartId": "lower-arm-left",
+      "file": "attachments/jacket-lower-sleeve-left.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.19444444444444445,
+        "y": 0.14285714285714285
+      },
+      "drawOrder": 15.1,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "front",
+      "enabled": false
+    },
+    {
+      "attachmentId": "toolbox-left",
+      "slotId": "hand-left-prop",
+      "parentPartId": "hand-left",
+      "file": "attachments/toolbox-left.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "drawOrder": 15.5,
+      "propStateId": "left-hand-prop",
+      "attachmentKind": "prop",
+      "gripAnchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "handOverlayAttachmentId": "hand-overlay-left",
+      "layerRole": "behind-target",
+      "target": {
+        "kind": "socket",
+        "id": "hand-left-grip"
+      },
+      "enabled": false
+    },
+    {
+      "attachmentId": "jacket-cuff-left",
+      "slotId": "wrist-left",
+      "parentPartId": "hand-left",
+      "file": "attachments/jacket-cuff-left.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.3225806451612903,
+        "y": 0.40540540540540543
+      },
+      "drawOrder": 16.2,
+      "wearableSetId": "casual-jacket",
+      "layerRole": "cover",
+      "enabled": false
+    },
+    {
+      "attachmentId": "hand-overlay-left",
+      "slotId": "hand-left-prop",
+      "parentPartId": "hand-left",
+      "file": "attachments/hand-overlay-left.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "drawOrder": 16.5,
+      "propStateId": "left-hand-prop",
+      "attachmentKind": "hand-overlay",
+      "layerRole": "target-overlay",
+      "target": {
+        "kind": "socket",
+        "id": "hand-left-grip"
+      },
+      "enabled": false
+    }
+  ],
+  "enabledAttachments": [
+    {
+      "attachmentId": "cap-back",
+      "slotId": "headwear",
+      "parentPartId": "head",
+      "file": "attachments/cap-back.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 60
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.609375
+      },
+      "drawOrder": 0.5,
+      "layerRole": "back",
+      "enabled": true
+    },
+    {
+      "attachmentId": "sunglasses",
+      "slotId": "face-accessory",
+      "parentPartId": "head",
+      "file": "attachments/sunglasses.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 25
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5142857142857142
+      },
+      "drawOrder": 12.5,
+      "layerRole": "front",
+      "enabled": true
+    },
+    {
+      "attachmentId": "cap-front",
+      "slotId": "headwear",
+      "parentPartId": "head",
+      "file": "attachments/cap-front.png",
+      "slotTransform": {
+        "position": {
+          "x": 0,
+          "y": 60
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "attachmentTransform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6428571428571429
+      },
+      "drawOrder": 13.5,
+      "layerRole": "front",
+      "enabled": true
+    }
+  ],
+  "globalLayers": [
+    {
+      "itemId": "hair-back",
+      "itemKind": "body",
+      "drawOrder": 0,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "cap-back",
+      "itemKind": "attachment",
+      "drawOrder": 0.5,
+      "layerRole": "back"
+    },
+    {
+      "itemId": "upper-arm-right",
+      "itemKind": "body",
+      "drawOrder": 1,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "lower-arm-right",
+      "itemKind": "body",
+      "drawOrder": 2,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "hand-right",
+      "itemKind": "body",
+      "drawOrder": 3,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "thigh-right",
+      "itemKind": "body",
+      "drawOrder": 4,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "shin-right",
+      "itemKind": "body",
+      "drawOrder": 5,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "shoe-right",
+      "itemKind": "body",
+      "drawOrder": 6,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "thigh-left",
+      "itemKind": "body",
+      "drawOrder": 7,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "shin-left",
+      "itemKind": "body",
+      "drawOrder": 8,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "shoe-left",
+      "itemKind": "body",
+      "drawOrder": 9,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "torso",
+      "itemKind": "body",
+      "drawOrder": 10,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "pelvis",
+      "itemKind": "body",
+      "drawOrder": 11,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "head",
+      "itemKind": "body",
+      "drawOrder": 12,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "sunglasses",
+      "itemKind": "attachment",
+      "drawOrder": 12.5,
+      "layerRole": "front"
+    },
+    {
+      "itemId": "hair-front",
+      "itemKind": "body",
+      "drawOrder": 13,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "cap-front",
+      "itemKind": "attachment",
+      "drawOrder": 13.5,
+      "layerRole": "front"
+    },
+    {
+      "itemId": "upper-arm-left",
+      "itemKind": "body",
+      "drawOrder": 14,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "lower-arm-left",
+      "itemKind": "body",
+      "drawOrder": 15,
+      "layerRole": "body"
+    },
+    {
+      "itemId": "hand-left",
+      "itemKind": "body",
+      "drawOrder": 16,
+      "layerRole": "body"
+    }
+  ]
+}

@@ -42,6 +42,10 @@ TASK-010 behavior, and the accepted TASK-010 fixture is a compatibility test.
 TASK-012 additively adds generic target metadata, prop-state grouping, authored
 grip anchors, linked overlays, and target-relative layer roles. TASK-010 and
 TASK-011 documents remain compatibility fixtures and do not require migration.
+TASK-013 does not revise Attachment Layout 1.0. Its loadout composition
+document references existing family layouts and is validated independently at
+the integration boundary, so TASK-010 through TASK-012 inputs retain their
+existing schema and normalization behavior.
 
 Source Canvas Annotation implements:
 

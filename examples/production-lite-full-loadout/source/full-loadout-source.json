@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0.0",
+  "loadoutId": "production-lite-full-loadout",
+  "rigSource": "../../production-lite-one-handed-prop/rig-layout.json",
+  "baseFixture": "../../production-lite-character",
+  "familySources": [
+    {
+      "familyId": "accessories",
+      "attachmentLayoutFile": "../../production-lite-garment-layering/attachment-layout.json",
+      "attachmentIds": ["cap-back", "cap-front", "sunglasses"]
+    },
+    {
+      "familyId": "garment",
+      "attachmentLayoutFile": "../../production-lite-garment-layering/attachment-layout.json",
+      "wearableSetIds": ["casual-jacket"]
+    },
+    {
+      "familyId": "prop",
+      "attachmentLayoutFile": "../../production-lite-one-handed-prop/attachment-layout.json",
+      "attachmentKinds": ["prop", "hand-overlay"]
+    }
+  ],
+  "states": [
+    {
+      "stateId": "base-only",
+      "enabledFamilyIds": []
+    },
+    {
+      "stateId": "accessories-only",
+      "enabledFamilyIds": ["accessories"],
+      "requiredAttachmentIds": ["cap-back", "cap-front", "sunglasses"]
+    },
+    {
+      "stateId": "garment-only",
+      "enabledFamilyIds": ["garment"],
+      "requiredAttachmentIds": ["jacket-back", "jacket-front", "collar-back", "collar-front", "jacket-zipper-trim", "jacket-upper-sleeve-left", "jacket-upper-sleeve-right", "jacket-lower-sleeve-left", "jacket-lower-sleeve-right", "jacket-cuff-left", "jacket-cuff-right"]
+    },
+    {
+      "stateId": "prop-only",
+      "enabledFamilyIds": ["prop"],
+      "propStateId": "left-hand-prop",
+      "requiredAttachmentIds": ["toolbox-left", "hand-overlay-left"]
+    },
+    {
+      "stateId": "garment-accessories",
+      "enabledFamilyIds": ["accessories", "garment"]
+    },
+    {
+      "stateId": "garment-prop",
+      "enabledFamilyIds": ["garment", "prop"],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "accessories-prop",
+      "enabledFamilyIds": ["accessories", "prop"],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "full-loadout",
+      "enabledFamilyIds": ["accessories", "garment", "prop"],
+      "propStateId": "left-hand-prop",
+      "requiredAttachmentIds": ["cap-back", "cap-front", "sunglasses", "jacket-back", "jacket-front", "collar-back", "collar-front", "jacket-zipper-trim", "jacket-upper-sleeve-left", "jacket-upper-sleeve-right", "jacket-lower-sleeve-left", "jacket-lower-sleeve-right", "jacket-cuff-left", "jacket-cuff-right", "toolbox-left", "hand-overlay-left"]
+    },
+    {
+      "stateId": "full-loadout-no-prop",
+      "enabledFamilyIds": ["accessories", "garment", "prop"]
+    },
+    {
+      "stateId": "full-loadout-left",
+      "enabledFamilyIds": ["accessories", "garment", "prop"],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "full-loadout-right",
+      "enabledFamilyIds": ["accessories", "garment", "prop"],
+      "propStateId": "right-hand-prop"
+    }
+  ],
+  "exactRestStateIds": ["base-only", "accessories-only", "garment-only", "prop-only", "garment-accessories", "garment-prop", "accessories-prop", "full-loadout"],
+  "exclusiveGroups": [
+    {
+      "groupId": "active-prop",
+      "attachmentIds": ["toolbox-left", "toolbox-right"],
+      "maximumEnabled": 1
+    },
+    {
+      "groupId": "active-hand-overlay",
+      "attachmentIds": ["hand-overlay-left", "hand-overlay-right"],
+      "maximumEnabled": 1
+    }
+  ],
+  "requiredSemanticClipIds": ["production-lite-full-loadout-rest", "production-lite-full-loadout-walk", "production-lite-full-loadout-wave", "production-lite-full-loadout-prop-swing", "production-lite-full-loadout-integration-stress"]
+}
