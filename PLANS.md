@@ -53,7 +53,7 @@ to complex segmented character art.
 5. Run `pnpm verify`, open the scene in Cocos Creator 3.8.8, inspect rest,
    wave, and walk playback plus pivots/mirroring, and capture evidence.
 6. Complete the acceptance report, review the scoped diff, and commit locally
-   without pushing pending visual review.
+   without pushing until visual review passes.
 
 ### Done when
 
@@ -67,7 +67,7 @@ to complex segmented character art.
   and playback state, and joint markers.
 - Real Creator evidence and a written visual inspection record are committed.
 - `pnpm verify` passes and the completed task is committed only on
-  `feat/task-007-stickman-reference`, with no push.
+  `feat/task-007-stickman-reference`; publication waits for visual acceptance.
 
 ### Result
 
@@ -79,9 +79,15 @@ to complex segmented character art.
 - Verified exact rest restoration, descendant inheritance, shoulder/elbow/
   hip/knee pivots, mirrored limbs, and all three clips in Creator 3.8.8 and
   its Web Game Preview; captured five visual evidence images.
-- `pnpm verify` passes all 136 tests. The replacement remains local and
-  unpushed pending visual review; `archive/old-task-007-cross-engine` remains
-  untouched.
+- Manual dynamic visual acceptance passed from the 24.9-second Web Preview
+  recording: parent/child propagation, shoulder/elbow/hip/knee/ankle pivots,
+  loop stability, pause/resume, exact rest reset, marker toggling, and mirrored
+  semantics were all accepted.
+- The pause evidence occurs at walk-cycle `TIME 0.00s` rather than an
+  interpolated mid-cycle pose. This is a documented non-blocking evidence
+  limitation.
+- `CI=true pnpm verify` passes all 136 tests.
+  `archive/old-task-007-cross-engine` remains untouched.
 
 ## Completed plan: TASK-006.2 Unmasked Rig Render Verification
 

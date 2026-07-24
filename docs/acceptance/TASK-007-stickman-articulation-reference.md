@@ -2,8 +2,8 @@
 
 ## Result
 
-Accepted locally on 2026-07-24 in Cocos Creator 3.8.8. The task remains
-unpushed pending visual review.
+Accepted on 2026-07-24 in Cocos Creator 3.8.8. Static Scene/Game Preview
+inspection and manual dynamic visual acceptance both passed.
 
 The scene contains 16 generated `Joint_*` nodes, 16 `Visual_*` primitive
 nodes, and 16 optional `Marker_*` nodes. It contains no Red Cap node, sprite,
@@ -48,6 +48,27 @@ Game Preview:
 - The Creator Scene view shows the dedicated Canvas and attached
   `GameAIStickmanArticulationDemo` with autoplay, auto-cycle, and joint-marker
   controls enabled.
+
+## Dynamic visual acceptance
+
+The real Cocos Web Preview was recorded at 1280×720 for 24.9 seconds and
+reviewed manually. The MP4 remains an ignored local acceptance artifact and is
+not committed to Git.
+
+The dynamic review accepted all of the following:
+
+- Arm-wave parent/child propagation is correct.
+- Shoulder and elbow rotations stay on the intended pivots.
+- Walk-cycle hip, knee, and ankle articulation is correct.
+- Repeated animation loops show no visible drift or disconnection.
+- Pause and resume update the visible playback state correctly.
+- Reset restores the exact authored rest pose.
+- Joint markers hide and restore correctly.
+- Mirrored limb semantics remain visually consistent.
+
+The pause was captured at walk-cycle `TIME 0.00s` rather than at an
+interpolated mid-cycle pose. This is a non-blocking evidence limitation and
+does not prevent TASK-007 acceptance.
 
 ## Visual evidence
 
