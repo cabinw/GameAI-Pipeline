@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "simple-sprite-character",
+  "displayName": "Simple Sprite Character",
+  "rigLayoutFile": "rig-layout.json",
+  "requiredParts": [
+    "foot-left",
+    "foot-right",
+    "hand-left",
+    "hand-right",
+    "head",
+    "lower-arm-left",
+    "lower-arm-right",
+    "pelvis",
+    "shin-left",
+    "shin-right",
+    "thigh-left",
+    "thigh-right",
+    "torso",
+    "upper-arm-left",
+    "upper-arm-right"
+  ],
+  "requiredAnimationTargets": [
+    "foot-left",
+    "foot-right",
+    "hand-left",
+    "hand-right",
+    "head",
+    "lower-arm-left",
+    "lower-arm-right",
+    "pelvis",
+    "shin-left",
+    "shin-right",
+    "thigh-left",
+    "thigh-right",
+    "torso",
+    "upper-arm-left",
+    "upper-arm-right"
+  ],
+  "animationTargets": [
+    {
+      "targetId": "foot-left",
+      "partId": "foot-left"
+    },
+    {
+      "targetId": "foot-right",
+      "partId": "foot-right"
+    },
+    {
+      "targetId": "hand-left",
+      "partId": "hand-left"
+    },
+    {
+      "targetId": "hand-right",
+      "partId": "hand-right"
+    },
+    {
+      "targetId": "head",
+      "partId": "head"
+    },
+    {
+      "targetId": "lower-arm-left",
+      "partId": "lower-arm-left"
+    },
+    {
+      "targetId": "lower-arm-right",
+      "partId": "lower-arm-right"
+    },
+    {
+      "targetId": "pelvis",
+      "partId": "pelvis"
+    },
+    {
+      "targetId": "shin-left",
+      "partId": "shin-left"
+    },
+    {
+      "targetId": "shin-right",
+      "partId": "shin-right"
+    },
+    {
+      "targetId": "thigh-left",
+      "partId": "thigh-left"
+    },
+    {
+      "targetId": "thigh-right",
+      "partId": "thigh-right"
+    },
+    {
+      "targetId": "torso",
+      "partId": "torso"
+    },
+    {
+      "targetId": "upper-arm-left",
+      "partId": "upper-arm-left"
+    },
+    {
+      "targetId": "upper-arm-right",
+      "partId": "upper-arm-right"
+    }
+  ]
+}

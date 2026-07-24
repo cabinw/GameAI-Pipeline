@@ -94,6 +94,11 @@ verification scene are documented in
 `examples/stickman-reference/README.md` and
 `docs/acceptance/TASK-007-stickman-articulation-reference.md`.
 
+The TASK-008 15-part transparent-PNG mannequin, deterministic artwork
+generator, contract-only sprite bridge, synchronized skeleton/debug view, and
+Cocos verification controls are documented in
+`examples/simple-sprite-character/README.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -105,4 +110,6 @@ TASK-006.2 replaces the rejected masked Red Cap articulation evidence with
 final-owner validation and real unmasked rendering. TASK-007 then establishes
 a separate minimal 16-part stickman reference with deterministic hierarchy
 evaluation and three Cocos-verified clips before complex-character animation
-work resumes.
+work resumes. TASK-008 extends that proof to real transparent PNG parts while
+retaining the same engine-independent hierarchy, pivots, transforms, and
+animation sampling.

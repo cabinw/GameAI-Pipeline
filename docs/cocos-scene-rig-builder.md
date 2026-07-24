@@ -139,6 +139,31 @@ The scene proves the existing Joint-only animation boundary without
 SpriteFrames, Red Cap art, image intake, or another engine adapter. Its visual
 acceptance record is `docs/acceptance/TASK-007-stickman-articulation-reference.md`.
 
+## Simple transparent-sprite bridge
+
+TASK-008 adds
+`assets/simple-sprite-character-bridge.scene` to the same Cocos 3.8.x fixture
+project. It advances the TASK-007 proof from primitive graphics to 15 real,
+repository-owned transparent PNG SpriteFrames without changing the published
+contracts or evaluator:
+
+- `examples/simple-sprite-character` owns the deterministic source, generated
+  PNGs, Rig Layout, Character Rig, and three adapted data clips.
+- A deterministic adapter validates the hierarchy and clips and derives every
+  Cocos visual size, offset, resource path, parent, and order from contract
+  data.
+- `GameAISimpleSpriteCharacterDemo` creates synchronized Sprite and skeleton
+  views and applies one sampled local pose to both Joint hierarchies.
+- The Sprite Visual remains a render-only child of its Joint. No per-part
+  correction position, rotation, scale, pivot, or switch table exists in the
+  scene runtime.
+- The HUD and keys `1`/`2`/`3`, `Space`, `R`, `J`, `B`, `A`, `L`, and `V`
+  expose clip selection, playback, exact reset, and all debug overlays.
+
+The fixture and exact preview instructions are documented in
+`examples/simple-sprite-character/README.md`. Its visual acceptance record is
+`docs/acceptance/TASK-008-simple-sprite-character-bridge.md`.
+
 ### Clean-checkout typechecking
 
 Creator remains the authoritative type environment during local Editor

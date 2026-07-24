@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0.0",
+  "layoutId": "simple-sprite-character-layout",
+  "sourceCanvas": { "width": 400, "height": 600 },
+  "referenceScale": 0.8,
+  "parts": [
+    {
+      "partId": "pelvis",
+      "parentId": null,
+      "rect": { "x": 160, "y": 300, "width": 80, "height": 70 },
+      "pivot": { "x": 200, "y": 320 },
+      "shape": { "kind": "rounded-rect", "x": 166, "y": 306, "width": 68, "height": 56, "radius": 24 },
+      "color": "#64748b",
+      "drawOrder": 6
+    },
+    {
+      "partId": "torso",
+      "parentId": "pelvis",
+      "rect": { "x": 145, "y": 165, "width": 110, "height": 170 },
+      "pivot": { "x": 200, "y": 320 },
+      "shape": { "kind": "rounded-rect", "x": 151, "y": 179, "width": 98, "height": 150, "radius": 30 },
+      "color": "#38bdf8",
+      "drawOrder": 7
+    },
+    {
+      "partId": "head",
+      "parentId": "torso",
+      "rect": { "x": 160, "y": 105, "width": 80, "height": 90 },
+      "pivot": { "x": 200, "y": 185 },
+      "distal": { "x": 200, "y": 145 },
+      "radius": 30,
+      "color": "#fbbf24",
+      "drawOrder": 8
+    },
+    {
+      "partId": "upper-arm-left",
+      "parentId": "torso",
+      "rect": { "x": 232, "y": 190, "width": 70, "height": 116 },
+      "pivot": { "x": 245, "y": 205 },
+      "distal": { "x": 285, "y": 290 },
+      "radius": 14,
+      "color": "#fb7185",
+      "drawOrder": 0
+    },
+    {
+      "partId": "lower-arm-left",
+      "parentId": "upper-arm-left",
+      "rect": { "x": 272, "y": 275, "width": 60, "height": 106 },
+      "pivot": { "x": 285, "y": 290 },
+      "distal": { "x": 315, "y": 365 },
+      "radius": 12,
+      "color": "#fda4af",
+      "drawOrder": 1
+    },
+    {
+      "partId": "hand-left",
+      "parentId": "lower-arm-left",
+      "rect": { "x": 300, "y": 350, "width": 42, "height": 56 },
+      "pivot": { "x": 315, "y": 365 },
+      "distal": { "x": 326, "y": 390 },
+      "radius": 12,
+      "color": "#fde68a",
+      "drawOrder": 2
+    },
+    {
+      "partId": "upper-arm-right",
+      "parentId": "torso",
+      "rect": { "x": 98, "y": 190, "width": 70, "height": 116 },
+      "pivot": { "x": 155, "y": 205 },
+      "distal": { "x": 115, "y": 290 },
+      "radius": 14,
+      "color": "#a78bfa",
+      "drawOrder": 9
+    },
+    {
+      "partId": "lower-arm-right",
+      "parentId": "upper-arm-right",
+      "rect": { "x": 68, "y": 275, "width": 60, "height": 106 },
+      "pivot": { "x": 115, "y": 290 },
+      "distal": { "x": 85, "y": 365 },
+      "radius": 12,
+      "color": "#c4b5fd",
+      "drawOrder": 10
+    },
+    {
+      "partId": "hand-right",
+      "parentId": "lower-arm-right",
+      "rect": { "x": 58, "y": 350, "width": 42, "height": 56 },
+      "pivot": { "x": 85, "y": 365 },
+      "distal": { "x": 74, "y": 390 },
+      "radius": 12,
+      "color": "#fde68a",
+      "drawOrder": 11
+    },
+    {
+      "partId": "thigh-left",
+      "parentId": "pelvis",
+      "rect": { "x": 199, "y": 335, "width": 58, "height": 146 },
+      "pivot": { "x": 218, "y": 350 },
+      "distal": { "x": 230, "y": 465 },
+      "radius": 16,
+      "color": "#fb7185",
+      "drawOrder": 3
+    },
+    {
+      "partId": "shin-left",
+      "parentId": "thigh-left",
+      "rect": { "x": 214, "y": 450, "width": 44, "height": 126 },
+      "pivot": { "x": 230, "y": 465 },
+      "distal": { "x": 235, "y": 560 },
+      "radius": 14,
+      "color": "#fda4af",
+      "drawOrder": 4
+    },
+    {
+      "partId": "foot-left",
+      "parentId": "shin-left",
+      "rect": { "x": 220, "y": 546, "width": 72, "height": 42 },
+      "pivot": { "x": 235, "y": 560 },
+      "distal": { "x": 275, "y": 570 },
+      "radius": 13,
+      "color": "#334155",
+      "drawOrder": 5
+    },
+    {
+      "partId": "thigh-right",
+      "parentId": "pelvis",
+      "rect": { "x": 143, "y": 335, "width": 58, "height": 146 },
+      "pivot": { "x": 182, "y": 350 },
+      "distal": { "x": 170, "y": 465 },
+      "radius": 16,
+      "color": "#a78bfa",
+      "drawOrder": 12
+    },
+    {
+      "partId": "shin-right",
+      "parentId": "thigh-right",
+      "rect": { "x": 142, "y": 450, "width": 44, "height": 126 },
+      "pivot": { "x": 170, "y": 465 },
+      "distal": { "x": 165, "y": 560 },
+      "radius": 14,
+      "color": "#c4b5fd",
+      "drawOrder": 13
+    },
+    {
+      "partId": "foot-right",
+      "parentId": "shin-right",
+      "rect": { "x": 108, "y": 546, "width": 72, "height": 42 },
+      "pivot": { "x": 165, "y": 560 },
+      "distal": { "x": 125, "y": 570 },
+      "radius": 13,
+      "color": "#334155",
+      "drawOrder": 14
+    }
+  ]
+}

@@ -2,6 +2,103 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-008 Simple Sprite Character Bridge
+
+- Status: Complete
+- Started: 2026-07-24
+- Completed: 2026-07-24
+- Baseline: `e2428149de39cb18288f4696796fafd835e82483`
+- Branch: `feat/task-008-simple-sprite-character`
+
+### Goal
+
+Prove that repository-owned transparent PNG body parts can use the TASK-007
+engine-independent hierarchy, proximal-pivot, local-to-world transform, and
+animation system without per-part Cocos corrections before complex Red Cap
+character work resumes.
+
+### Scope
+
+- Add a deterministic 15-part simple mannequin fixture: pelvis/root, torso,
+  head, paired upper arms, lower arms, hands, thighs, shins, and feet.
+- Generate flat-color transparent PNG sprites with rounded joint ends and
+  intentional overlap at every articulated connection from a checked-in,
+  deterministic generator.
+- Describe assembly only through Rig Layout contract fields: stable part and
+  parent IDs, file, source canvas, original rectangle, trim offset, anchor,
+  local rest pose, draw order, and reference scale.
+- Reuse TASK-007 hierarchy validation/evaluation, pivot semantics,
+  deterministic sampling, and the rest/idle, arm-wave, and walk-cycle clip
+  behavior.
+- Add a dedicated Cocos Creator 3.8.x verification scene using real
+  SpriteFrames, with sprite and skeleton/debug views, joint, bounds, pivot,
+  and parent-link overlays, complete playback controls, and visible clip
+  state/time.
+- Add contract, PNG, transform parity, mirror, overlap, reset, isolation, and
+  clean-checkout regression tests plus working-copy and tracked-only CI runs.
+- Record an ignored dynamic MP4 showing Rest → Wave → Pause/Resume → Walk ×3
+  → Reset → debug toggles, and document exact preview instructions.
+
+### Out of scope
+
+- Red Cap reconstruction or assumptions, arbitrary image auto-cutting, IK,
+  mesh deformation, Unity/Godot adapters, cross-engine compilation, combat,
+  Windows Editor support, production artwork, paid dependencies, cloud AI
+  APIs, or acceptance-video commits.
+
+### Execution
+
+1. Record this plan and the TASK-008 specification from clean `main`; preserve
+   `archive/old-task-007-cross-engine` at
+   `ed0923b466e457da7ce9932e0daf6644aa29df39`.
+2. Define the engine-neutral mannequin layout and three compatible data clips,
+   then implement deterministic PNG generation and byte-stable regeneration.
+3. Build a thin sprite bridge and Cocos fixture scene that consume validated
+   contract data unchanged and apply sampled transforms only to Joint nodes.
+4. Test image properties, hierarchy/IDs, anchors/pivots, ordering, sprite to
+   skeleton parity, mirrored semantics, animated overlap, exact reset, Red Cap
+   isolation, and tracked clean-CI configuration.
+5. Run `CI=true pnpm verify` in the working copy and from a tracked-files-only
+   archive checkout.
+6. Open the dedicated scene in Cocos Creator 3.8.x, exercise every control,
+   record and review the required ignored MP4, and write the acceptance report.
+7. Review the scoped diff, commit, push the feature branch, and stop for
+   manual visual review without creating a pull request.
+
+### Done when
+
+- All 15 transparent PNG parts exist, have the authored dimensions and alpha,
+  regenerate byte-identically, and visibly overlap at every declared joint
+  throughout the intended animation ranges.
+- The complete character is assembled from the published contract fields with
+  no per-part correction constants in Cocos scene code.
+- Sprite transforms equal evaluator skeleton transforms at deterministic
+  samples; anatomical mirror semantics, unique draw order, and exact rest
+  reset pass automated tests.
+- The Cocos scene exposes sprite/skeleton views, all requested debug overlays,
+  Rest/Arm Wave/Walk, pause/resume, reset, and clip/state/time display.
+- Both required `CI=true pnpm verify` runs pass from clean inputs.
+- The dynamic acceptance MP4 exists outside Git, the branch is committed and
+  pushed, exact scene/preview instructions are documented, and work stops
+  before PR creation for manual visual review.
+
+### Result
+
+- Added a deterministic 15-part transparent-PNG mannequin, its checked-in
+  generator, engine-neutral Rig Layout/Character Rig, and three compatible
+  animation clips.
+- Added a contract-derived Cocos SpriteFrame adapter and dedicated scene with
+  synchronized sprite/skeleton views, complete debug overlays, playback
+  controls, exact reset, and clip/state/time HUD.
+- Verified deterministic PNG generation, hierarchy, anchors/pivots, draw
+  order, transform parity, mirrored limbs, animated joint overlap, pause,
+  exact reset, complex-art isolation, and clean-checkout-safe Cocos types.
+- `CI=true pnpm verify` passes all 151 tests in both the working copy and a
+  tracked-files-only archive checkout.
+- Reviewed the ignored 21.82-second dynamic MP4 covering Rest, Wave,
+  Pause/Resume, Walk for more than three loops, Reset, and all debug toggles.
+- No PR was created; the branch stops for manual visual review.
+
 ## Completed plan: TASK-007 Minimal Stickman Articulation Reference
 
 - Status: Complete
