@@ -106,7 +106,24 @@ export interface RigAttachment {
   transform: AttachmentTransform;
   anchor: NormalizedAnchor;
   drawOrder: number;
-  layerRole?: "back" | "front";
+  wearableSetId?: string;
+  layerRole?: "back" | "middle" | "front" | "cover";
+}
+
+export interface WearableSet {
+  wearableSetId: string;
+  defaultEnabled: boolean;
+}
+
+export interface CoverageRegion extends Rectangle {}
+
+export interface AttachmentSeam {
+  seamId: string;
+  firstItemId: string;
+  secondItemId: string;
+  firstRegion: CoverageRegion;
+  secondRegion: CoverageRegion;
+  minimumOverlap: number;
 }
 
 export interface AttachmentLayout {
@@ -118,6 +135,8 @@ export interface AttachmentLayout {
   };
   slots: AttachmentSlot[];
   attachments: RigAttachment[];
+  wearableSets?: WearableSet[];
+  seams?: AttachmentSeam[];
 }
 
 export interface AffineTransform2D {
@@ -138,6 +157,7 @@ export interface ResolvedAttachment {
   attachmentTransform: AttachmentTransform;
   anchor: NormalizedAnchor;
   drawOrder: number;
-  layerRole?: "back" | "front";
+  wearableSetId?: string;
+  layerRole?: "back" | "middle" | "front" | "cover";
   enabled: boolean;
 }

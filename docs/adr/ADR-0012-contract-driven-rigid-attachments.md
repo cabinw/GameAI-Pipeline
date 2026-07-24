@@ -28,6 +28,11 @@ be duplicated for every equipment combination.
   renderer priorities while preserving the total order.
 - Engine adapters construct slot and attachment nodes from the resolved plan;
   they must not compensate individual artwork with scene constants.
+- Optional wearable sets group otherwise ordinary attachments under one
+  additional enabled-state override. Group state combines with slot state and
+  never changes the base rig.
+- Optional seam declarations pair generic rig/attachment items with local
+  authored coverage regions and a minimum overlap for sampled-pose validation.
 
 ## Consequences
 
@@ -40,3 +45,5 @@ be duplicated for every equipment combination.
 - The initial contract models rigid attachments only. Automatic fitting,
   meshes, deformers, IK, facial animation, and cross-engine compilation remain
   future work.
+- Multi-part garments remain authored rigid attachments. Wearable sets and
+  seams do not introduce clothing-specific evaluation or cloth behavior.

@@ -36,6 +36,9 @@ The TASK-010 Attachment Layout validator implements:
 
 An Attachment Layout binds to one Rig Layout identity and implemented
 major/minor version. Existing rigs do not require an attachment document.
+TASK-011 adds optional wearable-set grouping, seam regions, and additive layer
+roles inside the existing 1.0 contract. Documents that omit those fields retain
+TASK-010 behavior, and the accepted TASK-010 fixture is a compatibility test.
 
 Source Canvas Annotation implements:
 

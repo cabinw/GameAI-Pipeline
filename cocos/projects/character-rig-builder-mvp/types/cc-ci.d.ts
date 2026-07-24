@@ -111,6 +111,7 @@ declare module "cc" {
     readonly DIGIT_3: number;
     readonly DIGIT_4: number;
     readonly DIGIT_5: number;
+    readonly DIGIT_6: number;
     readonly SPACE: number;
     readonly KEY_R: number;
     readonly KEY_J: number;
@@ -125,6 +126,9 @@ declare module "cc" {
     readonly KEY_C: number;
     readonly KEY_G: number;
     readonly KEY_S: number;
+    readonly KEY_K: number;
+    readonly KEY_M: number;
+    readonly KEY_H: number;
   };
 
   export const input: {

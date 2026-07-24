@@ -52,8 +52,14 @@ export function composeAttachmentWorldTransform(
 export function resolveAttachmentLayout(
   layout: AttachmentLayout,
   slotOverrides: Readonly<Record<string, boolean>> = {},
+  wearableSetOverrides: Readonly<Record<string, boolean>> = {},
 ): readonly ResolvedAttachment[] {
   const slots = new Map(layout.slots.map((slot) => [slot.slotId, slot] as const));
+  const wearableSets = new Map(
+    (layout.wearableSets ?? []).map(
+      (wearableSet) => [wearableSet.wearableSetId, wearableSet] as const,
+    ),
+  );
   return Object.freeze(
     [...layout.attachments]
       .sort(
@@ -66,7 +72,20 @@ export function resolveAttachmentLayout(
         if (slot === undefined) {
           throw new Error(`UNKNOWN_ATTACHMENT_SLOT:${attachment.slotId}`);
         }
-        const enabled = slotOverrides[slot.slotId] ?? slot.defaultEnabled;
+        const slotEnabled = slotOverrides[slot.slotId] ?? slot.defaultEnabled;
+        const wearableSet =
+          attachment.wearableSetId === undefined
+            ? undefined
+            : wearableSets.get(attachment.wearableSetId);
+        if (attachment.wearableSetId !== undefined && wearableSet === undefined) {
+          throw new Error(`UNKNOWN_WEARABLE_SET:${attachment.wearableSetId}`);
+        }
+        const setEnabled =
+          wearableSet === undefined
+            ? true
+            : (wearableSetOverrides[wearableSet.wearableSetId] ??
+              wearableSet.defaultEnabled);
+        const enabled = slotEnabled && setEnabled;
         return Object.freeze({
           attachmentId: attachment.attachmentId,
           slotId: slot.slotId,
@@ -84,6 +103,9 @@ export function resolveAttachmentLayout(
           }),
           anchor: Object.freeze({ ...attachment.anchor }),
           drawOrder: attachment.drawOrder,
+          ...(attachment.wearableSetId === undefined
+            ? {}
+            : { wearableSetId: attachment.wearableSetId }),
           ...(attachment.layerRole === undefined
             ? {}
             : { layerRole: attachment.layerRole }),

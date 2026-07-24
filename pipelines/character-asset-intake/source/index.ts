@@ -28,6 +28,11 @@ export {
 } from "./production-lite-reconstruction";
 export { reconstructAttachmentVariant } from "./attachment-reconstruction";
 export {
+  validateAttachmentSeamCoverage,
+  type AttachmentSeamResult,
+  type AttachmentSeamSample,
+} from "./attachment-seam-validation";
+export {
   auditCanonicalArt,
   type CanonicalArtGateArtifacts,
   type CanonicalArtGateOptions,

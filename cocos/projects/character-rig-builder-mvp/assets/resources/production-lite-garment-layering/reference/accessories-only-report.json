@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "rgbaMismatchPixels": 0,
+  "alphaMismatchPixels": 0,
+  "seamMismatchPixels": 0,
+  "referenceBounds": {
+    "x": 173,
+    "y": 48,
+    "width": 269,
+    "height": 608
+  },
+  "reconstructedBounds": {
+    "x": 173,
+    "y": 48,
+    "width": 269,
+    "height": 608
+  },
+  "boundsExpansionPixels": 0,
+  "tolerance": {
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "boundsExpansionPixels": 0,
+    "seamMismatchPixels": 0
+  },
+  "diagnostics": []
+}

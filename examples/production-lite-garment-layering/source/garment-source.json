@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0.0",
+  "attachmentLayoutId": "production-lite-garment-layering",
+  "baseFixture": "../production-lite-character",
+  "accessoryFixture": "../production-lite-head-accessories",
+  "rig": {
+    "layoutId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "palette": {
+    "outline": "#25324A",
+    "jacket": "#C89A62",
+    "jacketShadow": "#9B6D3F",
+    "jacketLight": "#E1B77D",
+    "cuff": "#805431",
+    "zipper": "#E8D5B5",
+    "cap": "#D83B47",
+    "capShadow": "#A92334",
+    "capHighlight": "#F05A62",
+    "lens": "#23304B",
+    "lensHighlight": "#7DD3FC"
+  },
+  "wearableSets": [
+    {
+      "wearableSetId": "casual-jacket",
+      "defaultEnabled": true
+    }
+  ],
+  "slots": [
+    { "slotId": "headwear", "parentPartId": "head", "transform": { "position": { "x": 0, "y": 60 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "face-accessory", "parentPartId": "head", "transform": { "position": { "x": 0, "y": 25 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "torso-back", "parentPartId": "torso", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "torso-front", "parentPartId": "torso", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "upper-arm-right", "parentPartId": "upper-arm-right", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "lower-arm-right", "parentPartId": "lower-arm-right", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "wrist-right", "parentPartId": "hand-right", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "upper-arm-left", "parentPartId": "upper-arm-left", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "lower-arm-left", "parentPartId": "lower-arm-left", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "wrist-left", "parentPartId": "hand-left", "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "collar-back", "parentPartId": "torso", "transform": { "position": { "x": 0, "y": 72.5 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true },
+    { "slotId": "collar-front", "parentPartId": "torso", "transform": { "position": { "x": 0, "y": 72.5 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } }, "defaultEnabled": true }
+  ],
+  "attachments": [
+    {
+      "attachmentId": "cap-back", "slotId": "headwear", "file": "attachments/cap-back.png",
+      "sourceTopLeft": { "x": 244, "y": 56 }, "size": { "width": 112, "height": 64 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.609375 }, "drawOrder": 0.5, "layerRole": "back",
+      "svg": "<path d=\"M55 3C28 3 10 17 6 42L4 59H108L106 42C101 17 83 3 55 3Z\" fill=\"{capShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M18 44C40 35 75 35 96 44L97 58H16Z\" fill=\"{cap}\"/>"
+    },
+    {
+      "attachmentId": "jacket-upper-sleeve-right", "slotId": "upper-arm-right", "wearableSetId": "casual-jacket", "file": "attachments/jacket-upper-sleeve-right.png",
+      "sourceTopLeft": { "x": 187, "y": 213 }, "size": { "width": 78, "height": 116 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.8333333333333334, "y": 0.1896551724137931 }, "drawOrder": 1.1, "layerRole": "back",
+      "svg": "<path d=\"M66 5C39 4 17 16 9 41L4 83C5 101 18 111 36 111L68 76 74 27Z\" fill=\"{jacket}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M15 30C29 17 48 13 66 17\" fill=\"none\" stroke=\"{jacketLight}\" stroke-width=\"5\" stroke-linecap=\"round\"/>"
+    },
+    {
+      "attachmentId": "jacket-lower-sleeve-right", "slotId": "lower-arm-right", "wearableSetId": "casual-jacket", "file": "attachments/jacket-lower-sleeve-right.png",
+      "sourceTopLeft": { "x": 170, "y": 288 }, "size": { "width": 70, "height": 110 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5857142857142857, "y": 0.16363636363636364 }, "drawOrder": 2.1, "layerRole": "back",
+      "svg": "<path d=\"M43 5C26 5 13 15 9 31L4 81C4 98 16 105 31 105L60 88 65 29C64 14 57 6 43 5Z\" fill=\"{jacket}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M16 70C29 78 44 78 58 70\" fill=\"none\" stroke=\"{jacketShadow}\" stroke-width=\"4\"/>"
+    },
+    {
+      "attachmentId": "jacket-cuff-right", "slotId": "wrist-right", "wearableSetId": "casual-jacket", "file": "attachments/jacket-cuff-right.png",
+      "sourceTopLeft": { "x": 165, "y": 370 }, "size": { "width": 58, "height": 35 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.43103448275862066, "y": 0.37142857142857144 }, "drawOrder": 3.2, "layerRole": "cover",
+      "svg": "<path d=\"M5 5L52 3 54 24C42 31 22 32 4 25Z\" fill=\"{cuff}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M13 9L46 8\" stroke=\"{jacketLight}\" stroke-width=\"3\"/>"
+    },
+    {
+      "attachmentId": "jacket-back", "slotId": "torso-back", "wearableSetId": "casual-jacket", "file": "attachments/jacket-back.png",
+      "sourceTopLeft": { "x": 235, "y": 205 }, "size": { "width": 130, "height": 178 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.898876404494382 }, "drawOrder": 9.5, "layerRole": "back",
+      "svg": "<path d=\"M28 11C45 3 85 3 102 11L124 43 117 170H13L6 43Z\" fill=\"{jacketShadow}\" stroke=\"{outline}\" stroke-width=\"6\" stroke-linejoin=\"round\"/><path d=\"M24 24C44 14 84 14 106 24\" fill=\"none\" stroke=\"{jacketLight}\" stroke-width=\"5\"/>"
+    },
+    {
+      "attachmentId": "jacket-front", "slotId": "torso-front", "wearableSetId": "casual-jacket", "file": "attachments/jacket-front.png",
+      "sourceTopLeft": { "x": 240, "y": 205 }, "size": { "width": 120, "height": 178 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.898876404494382 }, "drawOrder": 10.2, "layerRole": "front",
+      "svg": "<path d=\"M22 10C38 4 48 3 60 8 72 3 82 4 98 10L114 40 108 170H12L6 40Z\" fill=\"{jacket}\" stroke=\"{outline}\" stroke-width=\"6\" stroke-linejoin=\"round\"/><path d=\"M18 42C28 31 39 24 52 19L59 39 68 19C82 24 93 31 103 42\" fill=\"none\" stroke=\"{jacketLight}\" stroke-width=\"6\" stroke-linejoin=\"round\"/><path d=\"M20 137H45V157H20Z M75 137H100V157H75Z\" fill=\"{jacketShadow}\"/>"
+    },
+    {
+      "attachmentId": "jacket-zipper-trim", "slotId": "torso-front", "wearableSetId": "casual-jacket", "file": "attachments/jacket-zipper-trim.png",
+      "sourceTopLeft": { "x": 292, "y": 220 }, "size": { "width": 16, "height": 150 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.9666666666666667 }, "drawOrder": 10.3, "layerRole": "cover",
+      "svg": "<path d=\"M8 2V146\" stroke=\"{outline}\" stroke-width=\"7\"/><path d=\"M8 3V145\" stroke=\"{zipper}\" stroke-width=\"3\" stroke-dasharray=\"5 4\"/>"
+    },
+    {
+      "attachmentId": "collar-back", "slotId": "collar-back", "wearableSetId": "casual-jacket", "file": "attachments/collar-back.png",
+      "sourceTopLeft": { "x": 260, "y": 190 }, "size": { "width": 80, "height": 45 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.6666666666666666 }, "drawOrder": 11.5, "layerRole": "back",
+      "svg": "<path d=\"M6 36L16 7 40 20 64 7 74 36 53 42 40 32 27 42Z\" fill=\"{jacketShadow}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/>"
+    },
+    {
+      "attachmentId": "sunglasses", "slotId": "face-accessory", "file": "attachments/sunglasses.png",
+      "sourceTopLeft": { "x": 254, "y": 147 }, "size": { "width": 92, "height": 35 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.5142857142857142 }, "drawOrder": 12.5, "layerRole": "front",
+      "svg": "<path d=\"M3 8L10 6 38 7 43 12H49L54 7 82 6 89 8 86 23C84 31 75 34 65 31 57 29 53 23 53 15H39C39 23 35 29 27 31 17 34 8 31 6 23Z\" fill=\"{lens}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M14 12L29 10\" stroke=\"{lensHighlight}\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.75\"/><path d=\"M62 12L77 10\" stroke=\"{lensHighlight}\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.75\"/>"
+    },
+    {
+      "attachmentId": "collar-front", "slotId": "collar-front", "wearableSetId": "casual-jacket", "file": "attachments/collar-front.png",
+      "sourceTopLeft": { "x": 265, "y": 198 }, "size": { "width": 70, "height": 45 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.4888888888888889 }, "drawOrder": 13.2, "layerRole": "front",
+      "svg": "<path d=\"M4 7L29 20 35 40 41 20 66 7 60 35 42 42 35 31 28 42 10 35Z\" fill=\"{jacketLight}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/>"
+    },
+    {
+      "attachmentId": "cap-front", "slotId": "headwear", "file": "attachments/cap-front.png",
+      "sourceTopLeft": { "x": 236, "y": 50 }, "size": { "width": 128, "height": 70 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.5, "y": 0.6428571428571429 }, "drawOrder": 13.5, "layerRole": "front",
+      "svg": "<path d=\"M63 3C34 2 16 14 11 38L10 47C34 40 83 40 108 47L106 37C101 14 84 3 63 3Z\" fill=\"{cap}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M18 28C37 17 70 15 94 25\" fill=\"none\" stroke=\"{capHighlight}\" stroke-width=\"5\" stroke-linecap=\"round\"/><path d=\"M9 45C30 40 74 40 109 47L124 56C111 65 85 68 59 62L20 55 5 54Z\" fill=\"{capShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M19 48C46 44 78 45 104 50\" fill=\"none\" stroke=\"{capHighlight}\" stroke-width=\"3\" stroke-linecap=\"round\"/>"
+    },
+    {
+      "attachmentId": "jacket-upper-sleeve-left", "slotId": "upper-arm-left", "wearableSetId": "casual-jacket", "file": "attachments/jacket-upper-sleeve-left.png",
+      "sourceTopLeft": { "x": 335, "y": 214 }, "size": { "width": 82, "height": 118 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.15853658536585366, "y": 0.17796610169491525 }, "drawOrder": 14.1, "layerRole": "front",
+      "svg": "<path d=\"M14 5C41 4 65 17 74 42L78 85C76 103 63 113 45 112L12 77 7 27Z\" fill=\"{jacket}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M16 17C36 13 56 18 69 31\" fill=\"none\" stroke=\"{jacketLight}\" stroke-width=\"5\" stroke-linecap=\"round\"/>"
+    },
+    {
+      "attachmentId": "jacket-lower-sleeve-left", "slotId": "lower-arm-left", "wearableSetId": "casual-jacket", "file": "attachments/jacket-lower-sleeve-left.png",
+      "sourceTopLeft": { "x": 376, "y": 290 }, "size": { "width": 72, "height": 112 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.19444444444444445, "y": 0.14285714285714285 }, "drawOrder": 15.1, "layerRole": "front",
+      "svg": "<path d=\"M15 5C33 4 47 14 52 30L68 83C68 99 56 107 41 107L12 90 5 29C6 14 10 7 15 5Z\" fill=\"{jacket}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M14 72C29 80 45 80 59 71\" fill=\"none\" stroke=\"{jacketShadow}\" stroke-width=\"4\"/>"
+    },
+    {
+      "attachmentId": "jacket-cuff-left", "slotId": "wrist-left", "wearableSetId": "casual-jacket", "file": "attachments/jacket-cuff-left.png",
+      "sourceTopLeft": { "x": 390, "y": 370 }, "size": { "width": 62, "height": 37 },
+      "transform": { "position": { "x": 0, "y": 0 }, "rotationDegrees": 0, "scale": { "x": 1, "y": 1 } },
+      "anchor": { "x": 0.3225806451612903, "y": 0.40540540540540543 }, "drawOrder": 16.2, "layerRole": "cover",
+      "svg": "<path d=\"M7 4L56 6 58 27C40 34 20 33 5 26Z\" fill=\"{cuff}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M15 10L49 11\" stroke=\"{jacketLight}\" stroke-width=\"3\"/>"
+    }
+  ],
+  "seams": [
+    { "seamId": "torso-upper-right", "firstItemId": "jacket-front", "secondItemId": "jacket-upper-sleeve-right", "firstRegion": { "x": 0, "y": 18, "width": 26, "height": 50 }, "secondRegion": { "x": 56, "y": 8, "width": 22, "height": 48 }, "minimumOverlap": 3 },
+    { "seamId": "torso-upper-left", "firstItemId": "jacket-front", "secondItemId": "jacket-upper-sleeve-left", "firstRegion": { "x": 94, "y": 18, "width": 26, "height": 50 }, "secondRegion": { "x": 0, "y": 8, "width": 24, "height": 48 }, "minimumOverlap": 3 },
+    { "seamId": "upper-lower-right", "firstItemId": "jacket-upper-sleeve-right", "secondItemId": "jacket-lower-sleeve-right", "firstRegion": { "x": 6, "y": 78, "width": 42, "height": 38 }, "secondRegion": { "x": 18, "y": 0, "width": 42, "height": 36 }, "minimumOverlap": 3 },
+    { "seamId": "upper-lower-left", "firstItemId": "jacket-upper-sleeve-left", "secondItemId": "jacket-lower-sleeve-left", "firstRegion": { "x": 36, "y": 78, "width": 42, "height": 40 }, "secondRegion": { "x": 4, "y": 0, "width": 42, "height": 36 }, "minimumOverlap": 3 },
+    { "seamId": "lower-cuff-right", "firstItemId": "jacket-lower-sleeve-right", "secondItemId": "jacket-cuff-right", "firstRegion": { "x": 0, "y": 76, "width": 48, "height": 34 }, "secondRegion": { "x": 0, "y": 0, "width": 58, "height": 30 }, "minimumOverlap": 2 },
+    { "seamId": "lower-cuff-left", "firstItemId": "jacket-lower-sleeve-left", "secondItemId": "jacket-cuff-left", "firstRegion": { "x": 24, "y": 78, "width": 48, "height": 34 }, "secondRegion": { "x": 0, "y": 0, "width": 62, "height": 30 }, "minimumOverlap": 2 },
+    { "seamId": "cuff-hand-right", "firstItemId": "jacket-cuff-right", "secondItemId": "hand-right", "firstRegion": { "x": 0, "y": 8, "width": 58, "height": 27 }, "secondRegion": { "x": 0, "y": 0, "width": 48, "height": 28 }, "minimumOverlap": 2 },
+    { "seamId": "cuff-hand-left", "firstItemId": "jacket-cuff-left", "secondItemId": "hand-left", "firstRegion": { "x": 0, "y": 8, "width": 62, "height": 29 }, "secondRegion": { "x": 0, "y": 0, "width": 50, "height": 28 }, "minimumOverlap": 2 },
+    { "seamId": "collar-torso", "firstItemId": "collar-front", "secondItemId": "jacket-front", "firstRegion": { "x": 0, "y": 18, "width": 70, "height": 27 }, "secondRegion": { "x": 20, "y": 0, "width": 80, "height": 45 }, "minimumOverlap": 3 },
+    { "seamId": "collar-neck", "firstItemId": "collar-back", "secondItemId": "head", "firstRegion": { "x": 12, "y": 0, "width": 56, "height": 45 }, "secondRegion": { "x": 24, "y": 100, "width": 50, "height": 32 }, "minimumOverlap": 2 }
+  ],
+  "variants": [
+    { "variantId": "base", "slotOverrides": { "headwear": false, "face-accessory": false }, "wearableSetOverrides": { "casual-jacket": false } },
+    { "variantId": "jacket-only", "slotOverrides": { "headwear": false, "face-accessory": false }, "wearableSetOverrides": { "casual-jacket": true } },
+    { "variantId": "accessories-only", "slotOverrides": { "headwear": true, "face-accessory": true }, "wearableSetOverrides": { "casual-jacket": false } },
+    { "variantId": "jacket-and-accessories", "slotOverrides": { "headwear": true, "face-accessory": true }, "wearableSetOverrides": { "casual-jacket": true } }
+  ]
+}

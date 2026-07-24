@@ -111,6 +111,12 @@ enabled-state references, and a socket/debug Cocos scene. See
 `examples/production-lite-head-accessories/README.md` and
 `docs/acceptance/TASK-010-head-accessory-layering-reference.md`.
 
+TASK-011 composes the same attachment system into a grouped eleven-part casual
+jacket with generic torso/arm/wrist/collar slots, authored seam regions, four
+exact Rest variants, Garment Stress, and a dedicated Cocos acceptance scene.
+See `examples/production-lite-garment-layering/README.md` and
+`docs/acceptance/TASK-011-garment-layering-reference.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -129,4 +135,6 @@ sprites, explicit hair and limb layering, exact reference reconstruction, and
 controlled articulation stress without adding a new runtime.
 TASK-010 then proves optional contract-driven headwear and face accessories
 with inherited transforms and stable front/back occlusion, while original Red
-Cap reconstruction and cross-engine work remain deferred.
+Cap reconstruction and cross-engine work remain deferred. TASK-011 extends
+that contract with grouped wearable sets and seam validation across a rigid
+multi-part garment without adding clothing-specific core behavior.

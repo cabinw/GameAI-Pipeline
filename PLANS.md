@@ -2,6 +2,96 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-011 Multi-Part Garment Layering Reference
+
+- Status: Complete; stopped for manual visual review
+- Started: 2026-07-24
+- Completed: 2026-07-24
+- Baseline: `main` at `3544da47d31126c100551d95929ba1455d13a328`
+- Branch: `feat/task-011-garment-layering-reference`
+- TASK-010 squash merge:
+  `3544da47d31126c100551d95929ba1455d13a328`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted production-lite body and generic attachment system with a
+deterministic, independently toggleable multi-part casual jacket. Prove
+contract-driven wearable sets, generic torso/arm/wrist/collar slots, stable
+layering, inherited articulation, authored seam coverage, exact Rest
+reconstruction, and a Cocos Creator 3.8.x acceptance scene without jacket-
+specific core behavior.
+
+### Contract decisions
+
+- Compose Attachment Layout 1.0 with optional generic wearable-set metadata
+  while preserving existing TASK-010 documents and parser behavior.
+- A wearable set groups multiple existing attachments under one enabled-state
+  override; slots remain generic parent bindings with local transforms.
+- Extend attachment metadata with optional seam constraints and a broader
+  generic layer role vocabulary only where required by garment validation.
+- Resolve enabled state, transforms, global order, and seam coverage entirely
+  from contracts and evaluator output; Cocos receives a generated scene plan.
+- Reject duplicate/unknown set membership, invalid or duplicate garment slots,
+  unknown parents, invalid anchors, missing parts, unstable order, insufficient
+  overlap, and bounds expansion through stable validation or verification.
+
+### Execution
+
+1. Record the task and plan, inspect TASK-009/010 contracts, generators,
+   evaluators, adapters, tests, and Cocos scene-generation patterns.
+2. Extend schema/types/parser/validation/resolution for backward-compatible
+   wearable sets, generic garment slots, grouped state, and seam constraints.
+3. Deterministically generate jacket sources, ten rigid PNG parts, four Rest
+   variants, exact reconstructions, reports, seam evidence, and a Garment
+   Stress clip while reusing accepted body/head assets unchanged.
+4. Add generic transform/order/seam verification across Rest, Wave, Walk,
+   Articulation Stress, Accessory Stress, and Garment Stress.
+5. Generate the Cocos adapter data, resource mirror, scene, runtime controls,
+   slot/seam/pivot/bounds/link/layer/skeleton diagnostics, and wearable state.
+6. Add contract, generator, reconstruction, ordering, inheritance, mutation,
+   compatibility, core-isolation, and clean-checkout tests and documentation.
+7. Run working-copy and tracked-files-only frozen verification.
+8. Record and inspect short independently decodable Web Preview evidence,
+   commit, push the feature branch without a PR, re-check the protected
+   archive, and stop for manual visual review.
+
+### Done when
+
+- TASK-007 through TASK-010 remain compatible and accepted source inputs are
+  unchanged.
+- All four requested Rest variants reconstruct with zero RGBA, alpha, seam,
+  and bounds-expansion difference.
+- Every authored seam satisfies its declared overlap over every supported clip
+  and mutations detect gaps, bindings, anchors, layers, bounds, and missing
+  parts.
+- The jacket toggles as one set without mutating base rig or head accessory
+  state, and all parts inherit torso/shoulder/elbow/wrist motion.
+- Cocos exposes all requested views, clips, controls, and diagnostics with no
+  garment-specific runtime correction constants or per-frame order patches.
+- Both required verification modes pass, ignored MP4 evidence is locally
+  available and decodable, the branch is committed/pushed without a PR, and
+  the protected archive remains `ed0923b`.
+
+### Result
+
+- Attachment Layout 1.0 now supports optional generic wearable sets, grouped
+  enabled state, expanded layer roles, and authored rectangular seam
+  constraints without invalidating TASK-010 documents.
+- Added a deterministic 11-part casual jacket, four exact Rest variants, six
+  supported clips, 10 seam constraints, generated Cocos resources, and a
+  dedicated Creator 3.8.x acceptance scene.
+- All four variants reconstruct with zero RGBA, alpha, seam, and bounds
+  difference. All 10 seams pass at 29 canonical times over all six clips
+  (174 pose samples).
+- Working-copy and tracked-files-only frozen verification both pass with 189
+  tests. Two ignored, independently decodable Web Preview videos cover the
+  required variants, motion, reset, pause/resume, and debug controls.
+- No original Red Cap art, briefcase, cloth simulation, IK, Cocos correction
+  constants, garment-specific core branching, or per-frame sorting patch was
+  added.
+
 ## Completed plan: TASK-010 Head Accessory Layering Reference
 
 - Status: Complete; manual dynamic visual acceptance passed

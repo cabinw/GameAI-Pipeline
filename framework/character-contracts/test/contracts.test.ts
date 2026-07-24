@@ -53,6 +53,9 @@ const productionLiteRigLayoutText = readRepositoryFile(
 const validAttachmentLayoutText = readRepositoryFile(
   "examples/production-lite-head-accessories/attachment-layout.json",
 );
+const validGarmentLayoutText = readRepositoryFile(
+  "examples/production-lite-garment-layering/attachment-layout.json",
+);
 
 describe("Attachment Layout contract", () => {
   it("parses generic slots and resolves deterministic default/override state", () => {
@@ -165,6 +168,62 @@ describe("Attachment Layout contract", () => {
       ),
       { a: 0, b: 1, c: -1, d: 0, tx: 5, ty: 22 },
     );
+  });
+
+  it("parses wearable sets, grouped state, and authored seam constraints", () => {
+    const rigLayout = parseRigLayout(productionLiteRigLayoutText);
+    assert.equal(rigLayout.ok, true);
+    if (!rigLayout.ok) return;
+    const parsed = parseAttachmentLayout(validGarmentLayoutText, rigLayout.value);
+    assert.equal(parsed.ok, true);
+    if (!parsed.ok) return;
+    assert.deepEqual(
+      parsed.value.wearableSets?.map((set) => set.wearableSetId),
+      ["casual-jacket"],
+    );
+    assert.equal(parsed.value.seams?.length, 10);
+    const enabled = resolveAttachmentLayout(parsed.value, {}, {
+      "casual-jacket": true,
+    });
+    const disabled = resolveAttachmentLayout(parsed.value, {}, {
+      "casual-jacket": false,
+    });
+    assert.equal(
+      enabled.filter((item) => item.wearableSetId === "casual-jacket").every(
+        (item) => item.enabled,
+      ),
+      true,
+    );
+    assert.equal(
+      disabled.filter((item) => item.wearableSetId === "casual-jacket").every(
+        (item) => !item.enabled,
+      ),
+      true,
+    );
+    assert.equal(
+      disabled.find((item) => item.attachmentId === "cap-front")?.enabled,
+      true,
+    );
+  });
+
+  it("rejects duplicate and unknown wearable sets and seam items", () => {
+    const rigLayout = JSON.parse(productionLiteRigLayoutText);
+    const fixture = JSON.parse(validGarmentLayoutText);
+    fixture.wearableSets.push(structuredClone(fixture.wearableSets[0]));
+    fixture.attachments[0].wearableSetId = "unknown-wearable";
+    fixture.seams.push(structuredClone(fixture.seams[0]));
+    fixture.seams[0].firstItemId = "missing-garment-part";
+    const codes = errorCodes(
+      parseAttachmentLayout(JSON.stringify(fixture), rigLayout),
+    );
+    for (const code of [
+      ValidationErrorCode.DUPLICATE_WEARABLE_SET_ID,
+      ValidationErrorCode.UNKNOWN_WEARABLE_SET,
+      ValidationErrorCode.DUPLICATE_ATTACHMENT_SEAM_ID,
+      ValidationErrorCode.UNKNOWN_ATTACHMENT_SEAM_ITEM,
+    ]) {
+      assert.equal(codes.includes(code), true, code);
+    }
   });
 });
 
@@ -367,11 +426,13 @@ describe("schema compatibility", () => {
       "DUPLICATE_ANIMATION_TARGET_ID",
       "DUPLICATE_ATTACHMENT_DRAW_ORDER",
       "DUPLICATE_ATTACHMENT_ID",
+      "DUPLICATE_ATTACHMENT_SEAM_ID",
       "DUPLICATE_ATTACHMENT_SLOT_ID",
       "DUPLICATE_DRAW_ORDER",
       "DUPLICATE_HIT_AREA_ID",
       "DUPLICATE_PART_ID",
       "DUPLICATE_SOCKET_ID",
+      "DUPLICATE_WEARABLE_SET_ID",
       "INCOMPATIBLE_ATTACHMENT_RIG",
       "INVALID_ATTACHMENT_TRANSFORM",
       "INVALID_FILE_PATH",
@@ -383,8 +444,10 @@ describe("schema compatibility", () => {
       "MISSING_REQUIRED_PART",
       "PARENT_CYCLE",
       "SCHEMA_VALIDATION_ERROR",
+      "UNKNOWN_ATTACHMENT_SEAM_ITEM",
       "UNKNOWN_ATTACHMENT_SLOT",
       "UNKNOWN_PARENT",
+      "UNKNOWN_WEARABLE_SET",
       "UNSUPPORTED_SCHEMA_VERSION",
     ]);
   });

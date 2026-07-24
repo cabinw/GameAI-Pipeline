@@ -31,8 +31,10 @@ export type {
   AffineTransform2D,
   AnimationTarget,
   AttachmentLayout,
+  AttachmentSeam,
   AttachmentSlot,
   AttachmentTransform,
+  CoverageRegion,
   CharacterContract,
   CharacterRig,
   CircleHitShape,
@@ -49,4 +51,5 @@ export type {
   ResolvedAttachment,
   Size,
   Vector2,
+  WearableSet,
 } from "./types";

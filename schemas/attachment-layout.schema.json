@@ -45,6 +45,19 @@
       "items": {
         "$ref": "#/definitions/attachment"
       }
+    },
+    "wearableSets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/wearableSet"
+      }
+    },
+    "seams": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/seam"
+      }
     }
   },
   "definitions": {
@@ -117,6 +130,46 @@
         "defaultEnabled": { "type": "boolean" }
       }
     },
+    "wearableSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wearableSetId", "defaultEnabled"],
+      "properties": {
+        "wearableSetId": { "$ref": "#/definitions/identifier" },
+        "defaultEnabled": { "type": "boolean" }
+      }
+    },
+    "coverageRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "seam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seamId",
+        "firstItemId",
+        "secondItemId",
+        "firstRegion",
+        "secondRegion",
+        "minimumOverlap"
+      ],
+      "properties": {
+        "seamId": { "$ref": "#/definitions/identifier" },
+        "firstItemId": { "$ref": "#/definitions/identifier" },
+        "secondItemId": { "$ref": "#/definitions/identifier" },
+        "firstRegion": { "$ref": "#/definitions/coverageRegion" },
+        "secondRegion": { "$ref": "#/definitions/coverageRegion" },
+        "minimumOverlap": { "type": "number", "minimum": 0 }
+      }
+    },
     "attachment": {
       "type": "object",
       "additionalProperties": false,
@@ -135,9 +188,10 @@
         "transform": { "$ref": "#/definitions/transform" },
         "anchor": { "$ref": "#/definitions/normalizedAnchor" },
         "drawOrder": { "type": "number" },
+        "wearableSetId": { "$ref": "#/definitions/identifier" },
         "layerRole": {
           "type": "string",
-          "enum": ["back", "front"]
+          "enum": ["back", "middle", "front", "cover"]
         }
       }
     }

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceDigest": "2e86c55a25222e3bb87c8471344b7410dcdd505adaf4f0ee8bb27fd10bd3adfd",
+  "baseLayoutDigest": "98b47c90d52d0bb22fa001d370ac6d05454d249a0951ac6ea93735ddfce1d4aa",
+  "attachmentLayoutDigest": "01652698864dee5222c98772d0847594c9aedb99c58d8822854b335c3f2787b3",
+  "variants": {
+    "base": "f277f7cd4b3f83ff00f157b82cb306a0658ac15c8090798277ee5b7ec4cad09a",
+    "jacket-only": "97097a0deec10384a28dac5035c0ba85afe2ae79ac10bbb051a9c38f82a1625a",
+    "accessories-only": "4b720933634fad761d42391043a6ab814b856c5a299f6c4d2d81ef767296f0bd",
+    "jacket-and-accessories": "40c3764ef331cc10f1f1f229b008a2dd9e7582a87cdb7df345bf7514afe2f8a9"
+  },
+  "renderer": "sharp-svg-authored-and-contract-reconstruction",
+  "tolerance": {
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "boundsExpansionPixels": 0,
+    "seamMismatchPixels": 0
+  },
+  "supportedGarmentRangesDegrees": {
+    "torso": [
+      -7,
+      7
+    ],
+    "head": [
+      -9,
+      9
+    ],
+    "upper-arm-right": [
+      -58,
+      34
+    ],
+    "lower-arm-right": [
+      0,
+      82
+    ],
+    "upper-arm-left": [
+      -42,
+      68
+    ],
+    "lower-arm-left": [
+      -92,
+      0
+    ]
+  }
+}
