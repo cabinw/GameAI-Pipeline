@@ -74,6 +74,38 @@ Both files are independently decodable H.264, 1280×720, 30 fps, yuv420p
 MP4s. The capture was cropped and pillarboxed to exclude the recorder utility
 overlay while retaining the actual Cocos Web Preview.
 
+## External manual visual acceptance
+
+Result: **PASS**.
+
+The reviewer downloaded both MP4 files from `origin/evidence/task-011`,
+confirmed that both SHA-256 values matched the manifest, and completed full
+FFmpeg decoding. Visual review covered:
+
+- all four wearable/accessory variants;
+- authored reference versus assembled output;
+- Wave and Walk;
+- repeated Garment Stress motion, including crossed-arm and raised-arm poses;
+- Pause/Resume and exact Reset; and
+- slots, seams, pivots, bounds, links, layer labels, and skeleton overlays.
+
+No visible garment detachment, broken articulation, unexpected layer
+switching, persistent seam opening, or animation flicker was found. The
+documented rigid-sprite limitations remain accepted.
+
+Temporary evidence metadata:
+
+- Branch: `evidence/task-011`
+- Evidence commit:
+  `c2a09e27cbad0e462d564b727bb429a13f1779b8`
+- `task-011-variants-and-motion.mp4` SHA-256:
+  `e49f2925cb8a92ebbbaaa9178fe4f50476bf96ec0bd9ac097db58b16c8d470cc`
+- `task-011-garment-stress-and-debug.mp4` SHA-256:
+  `c92fa0a6982c839099bc8d782e91034f38d2b84695f6f396a22aefcde7b2986a`
+
+The temporary evidence branch is deleted after this acceptance publication,
+so its raw GitHub URLs are not durable evidence.
+
 ## Known limitations
 
 The jacket is rigid and authored for this fixture. There is no arbitrary

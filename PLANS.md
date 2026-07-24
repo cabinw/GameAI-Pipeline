@@ -4,7 +4,7 @@ Use this file for active multi-file or architectural work. Keep one active plan 
 
 ## Completed plan: TASK-011 Multi-Part Garment Layering Reference
 
-- Status: Complete; stopped for manual visual review
+- Status: Complete; external manual visual acceptance passed
 - Started: 2026-07-24
 - Completed: 2026-07-24
 - Baseline: `main` at `3544da47d31126c100551d95929ba1455d13a328`
@@ -88,6 +88,11 @@ specific core behavior.
 - Working-copy and tracked-files-only frozen verification both pass with 189
   tests. Two ignored, independently decodable Web Preview videos cover the
   required variants, motion, reset, pause/resume, and debug controls.
+- External manual visual acceptance passed after the reviewer downloaded both
+  files from temporary branch `evidence/task-011` at evidence commit
+  `c2a09e27cbad0e462d564b727bb429a13f1779b8`, matched both manifest hashes,
+  and completed full FFmpeg decoding. The temporary evidence branch is deleted
+  after acceptance publication; its raw URLs are not durable evidence.
 - No original Red Cap art, briefcase, cloth simulation, IK, Cocos correction
   constants, garment-specific core branching, or per-frame sorting patch was
   added.
