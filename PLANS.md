@@ -46,6 +46,12 @@ top exceeded the Canvas, clipping every status row except shortcuts.
    1280x720 bounds inside documented 25 px side and 14 px top insets.
 7. Prove every required status row fits the HUD without overlap, generation is
    idempotent, and runtime layout remains generator-owned.
+8. Isolate the final `HUDLabel` transform from Label initialization by placing
+   it under a Label-free `HUDContainer`, applying CLAMP overflow and final
+   anchor/size/position only after Label creation.
+9. After the first rendered frame, measure the actual container and label
+   transforms, log their bounds once, and fail with
+   `TASK_013_HUD_RUNTIME_BOUNDS_INVALID` if either leaves the safe region.
 
 ### Done when
 

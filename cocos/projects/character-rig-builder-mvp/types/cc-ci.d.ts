@@ -38,6 +38,7 @@ declare module "cc" {
     setRotationFromEuler(x: number, y: number, z: number): void;
     setScale(x: number, y: number, z?: number): void;
     addComponent<T extends Component>(component: new () => T): T;
+    getComponent<T extends Component>(component: new () => T): T | null;
     destroy(): boolean;
   }
 
@@ -59,11 +60,16 @@ declare module "cc" {
   }
 
   export class Label extends Component {
+    static readonly Overflow: {
+      readonly CLAMP: number;
+    };
     string: string;
     fontSize: number;
     lineHeight: number;
     horizontalAlign: number;
     verticalAlign: number;
+    enableWrapText: boolean;
+    overflow: number;
     color: Color;
   }
 
@@ -98,6 +104,8 @@ declare module "cc" {
   };
 
   export class UITransform extends Component {
+    readonly anchorPoint: { readonly x: number; readonly y: number };
+    readonly contentSize: { readonly width: number; readonly height: number };
     setAnchorPoint(x: number, y: number): void;
     setContentSize(width: number, height: number): void;
   }
@@ -174,5 +182,17 @@ declare module "cc" {
     readonly Enum: {
       readonly UI_2D: number;
     };
+  };
+
+  export class Director {
+    static readonly EVENT_AFTER_DRAW: string;
+  }
+
+  export const director: {
+    once(
+      eventType: string,
+      callback: () => void,
+      target?: object,
+    ): () => void;
   };
 }

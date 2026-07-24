@@ -10,6 +10,8 @@ export type ComposableLoadoutControl =
   keyof typeof COMPOSABLE_LOADOUT_CONTROL_CLIP_IDS;
 
 export const COMPOSABLE_LOADOUT_HUD_LAYOUT = {
+  containerName: "HUDContainer",
+  labelName: "HUDLabel",
   designWidth: 1280,
   designHeight: 720,
   width: 1230,
@@ -27,6 +29,13 @@ export const COMPOSABLE_LOADOUT_HUD_LAYOUT = {
   ],
 } as const;
 
+export interface ComposableLoadoutHudRectangle {
+  readonly left: number;
+  readonly right: number;
+  readonly top: number;
+  readonly bottom: number;
+}
+
 export interface ComposableLoadoutHudBounds {
   readonly position: { readonly x: number; readonly y: number };
   readonly left: number;
@@ -38,6 +47,70 @@ export interface ComposableLoadoutHudBounds {
     readonly top: number;
     readonly bottom: number;
   }[];
+}
+
+export const TASK_013_HUD_RUNTIME_BOUNDS_INVALID =
+  "TASK_013_HUD_RUNTIME_BOUNDS_INVALID";
+
+export function calculateAnchoredRectangle(
+  position: { readonly x: number; readonly y: number },
+  size: { readonly width: number; readonly height: number },
+  anchor: { readonly x: number; readonly y: number },
+): ComposableLoadoutHudRectangle {
+  const left = position.x - size.width * anchor.x;
+  const bottom = position.y - size.height * anchor.y;
+  return {
+    left,
+    right: left + size.width,
+    top: bottom + size.height,
+    bottom,
+  };
+}
+
+export interface ComposableLoadoutHudRuntimeMeasurement {
+  readonly canvasSafeBounds: ComposableLoadoutHudRectangle;
+  readonly containerBounds: ComposableLoadoutHudRectangle;
+  readonly labelBounds: ComposableLoadoutHudRectangle;
+  readonly labelBoundsInContainer: ComposableLoadoutHudRectangle;
+  readonly containerContentBounds: ComposableLoadoutHudRectangle;
+  readonly labelContentHeight: number;
+}
+
+export function validateComposableLoadoutHudRuntimeBounds(
+  measurement: ComposableLoadoutHudRuntimeMeasurement,
+): void {
+  const {
+    canvasSafeBounds,
+    containerBounds,
+    labelBounds,
+    labelBoundsInContainer,
+    containerContentBounds,
+    labelContentHeight,
+  } = measurement;
+  const inside = (
+    inner: ComposableLoadoutHudRectangle,
+    outer: ComposableLoadoutHudRectangle,
+  ) =>
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.top <= outer.top &&
+    inner.bottom >= outer.bottom;
+  const requiredContentHeight =
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.rows.length *
+    COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight;
+  if (
+    !inside(containerBounds, canvasSafeBounds) ||
+    !inside(labelBounds, canvasSafeBounds) ||
+    !inside(labelBoundsInContainer, containerContentBounds) ||
+    labelContentHeight < requiredContentHeight
+  ) {
+    throw new Error(
+      `${TASK_013_HUD_RUNTIME_BOUNDS_INVALID}: ${JSON.stringify({
+        ...measurement,
+        requiredContentHeight,
+      })}`,
+    );
+  }
 }
 
 /**
@@ -53,24 +126,26 @@ export function calculateComposableLoadoutHudBounds(
     x: -canvasWidth / 2 + COMPOSABLE_LOADOUT_HUD_LAYOUT.leftInset,
     y: canvasHeight / 2 - COMPOSABLE_LOADOUT_HUD_LAYOUT.topInset,
   };
-  const left =
-    position.x -
-    COMPOSABLE_LOADOUT_HUD_LAYOUT.width *
-      COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorX;
-  const top =
-    position.y +
-    COMPOSABLE_LOADOUT_HUD_LAYOUT.height *
-      (1 - COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorY);
+  const rectangle = calculateAnchoredRectangle(
+    position,
+    {
+      width: COMPOSABLE_LOADOUT_HUD_LAYOUT.width,
+      height: COMPOSABLE_LOADOUT_HUD_LAYOUT.height,
+    },
+    {
+      x: COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorX,
+      y: COMPOSABLE_LOADOUT_HUD_LAYOUT.anchorY,
+    },
+  );
   return {
     position,
-    left,
-    right: left + COMPOSABLE_LOADOUT_HUD_LAYOUT.width,
-    top,
-    bottom: top - COMPOSABLE_LOADOUT_HUD_LAYOUT.height,
+    ...rectangle,
     rowBounds: COMPOSABLE_LOADOUT_HUD_LAYOUT.rows.map((rowId, index) => ({
       rowId,
-      top: top - index * COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight,
-      bottom: top - (index + 1) * COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight,
+      top: rectangle.top - index * COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight,
+      bottom:
+        rectangle.top -
+        (index + 1) * COMPOSABLE_LOADOUT_HUD_LAYOUT.lineHeight,
     })),
   };
 }

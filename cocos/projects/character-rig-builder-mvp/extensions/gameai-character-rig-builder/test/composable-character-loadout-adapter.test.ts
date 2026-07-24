@@ -20,6 +20,8 @@ import {
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
   ComposableLoadoutControlError,
   resolveComposableLoadoutControlClips,
+  TASK_013_HUD_RUNTIME_BOUNDS_INVALID,
+  validateComposableLoadoutHudRuntimeBounds,
 } from "../source/composable-character-loadout-controls";
 
 const repositoryRoot = path.resolve(__dirname, "../../../../../../../");
@@ -201,6 +203,57 @@ test("TASK-013 HUD declares non-overlapping in-bounds status rows", () => {
   );
 });
 
+test("TASK-013 runtime HUD guard accepts final bounds and rejects the observed centered bounds", () => {
+  const expected = {
+    left: -615,
+    right: 615,
+    top: 346,
+    bottom: 191,
+  };
+  const containerContentBounds = {
+    left: 0,
+    right: 1230,
+    top: 0,
+    bottom: -155,
+  };
+  assert.doesNotThrow(() =>
+    validateComposableLoadoutHudRuntimeBounds({
+      canvasSafeBounds: expected,
+      containerBounds: expected,
+      labelBounds: expected,
+      labelBoundsInContainer: containerContentBounds,
+      containerContentBounds,
+      labelContentHeight: 155,
+    }),
+  );
+  assert.throws(
+    () =>
+      validateComposableLoadoutHudRuntimeBounds({
+        canvasSafeBounds: expected,
+        containerBounds: expected,
+        labelBounds: {
+          left: -1230,
+          right: 0,
+          top: 423.5,
+          bottom: 268.5,
+        },
+        labelBoundsInContainer: {
+          left: -615,
+          right: 615,
+          top: 77.5,
+          bottom: -77.5,
+        },
+        containerContentBounds,
+        labelContentHeight: 155,
+      }),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_HUD_RUNTIME_BOUNDS_INVALID) &&
+      error.message.includes("-1230") &&
+      error.message.includes("423.5"),
+  );
+});
+
 test("generated TASK-013 runtime owns the repaired HUD configuration", () => {
   const sourceControls = readFileSync(
     path.join(
@@ -233,6 +286,80 @@ test("generated TASK-013 runtime owns the repaired HUD configuration", () => {
   );
   assert.equal(runtime.includes("this.hud(this.node)"), true);
   assert.equal(runtime.includes("this.hud(root)"), false);
+});
+
+test("generated TASK-013 runtime scene graph stabilizes Label-owned transform state", () => {
+  const runtime = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-demo.ts",
+    ),
+    "utf8",
+  );
+  const scene = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/composable-full-loadout-reference.scene",
+    ),
+    "utf8",
+  );
+  const generatedControls = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-controls.ts",
+    ),
+    "utf8",
+  );
+  const containerCreation = runtime.indexOf(
+    "new Node(COMPOSABLE_LOADOUT_HUD_LAYOUT.containerName)",
+  );
+  const labelCreation = runtime.indexOf(
+    "new Node(COMPOSABLE_LOADOUT_HUD_LAYOUT.labelName)",
+  );
+  const labelParenting = runtime.indexOf("labelNode.setParent(container)");
+  const labelCreationCall = runtime.indexOf("labelNode.addComponent(Label)");
+  const labelConfiguration = runtime.indexOf(
+    "this.status.overflow = Label.Overflow.CLAMP",
+  );
+  const finalTransform = runtime.indexOf(
+    "labelNode.getComponent(UITransform)",
+  );
+  const finalAnchor = runtime.indexOf(
+    "labelTransform.setAnchorPoint",
+  );
+  const finalSize = runtime.indexOf("labelTransform.setContentSize");
+  const finalPosition = runtime.indexOf("labelNode.setPosition(0, 0, 0)");
+  const finalString = runtime.indexOf("this.updateHud()", finalPosition);
+  assert.ok(containerCreation >= 0);
+  assert.ok(labelCreation > containerCreation);
+  assert.ok(labelParenting > labelCreation);
+  assert.ok(labelCreationCall > labelParenting);
+  assert.ok(labelConfiguration > labelCreationCall);
+  assert.ok(finalTransform > labelConfiguration);
+  assert.ok(finalAnchor > finalTransform);
+  assert.ok(finalSize > finalAnchor);
+  assert.ok(finalPosition > finalSize);
+  assert.ok(finalString > finalPosition);
+  assert.equal(runtime.includes("container.addComponent(Label)"), false);
+  assert.equal(generatedControls.includes('containerName: "HUDContainer"'), true);
+  assert.equal(generatedControls.includes('labelName: "HUDLabel"'), true);
+  assert.equal(runtime.includes("this.status.enableWrapText = false"), true);
+  assert.equal(runtime.includes("Label.Overflow.CLAMP"), true);
+  assert.equal(runtime.includes("Director.EVENT_AFTER_DRAW"), true);
+  assert.equal(
+    runtime.includes("validateComposableLoadoutHudRuntimeBounds(measurement)"),
+    true,
+  );
+  assert.equal(
+    runtime.includes("TASK_013_HUD_RUNTIME_BOUNDS"),
+    true,
+  );
+  assert.equal(scene.includes("TASK-013"), true);
+  assert.equal(
+    scene.includes("c83e6PqIb5JVZNMf1hkxheW"),
+    true,
+    "generated scene retains the runtime component that emits HUDContainer/HUDLabel",
+  );
 });
 
 test("generic adapter source contains no fixture attachment names", () => {
@@ -307,6 +434,7 @@ test("integrated Cocos scene exposes the complete loadout and debug surface", ()
     "ACCESSORY SOCKETS PASS",
     "GLOBAL LAYERS PASS",
     "F1–F8 presets",
+    "Label.Overflow.CLAMP",
   ]) {
     assert.equal(runtime.includes(token), true, token);
   }

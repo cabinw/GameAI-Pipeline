@@ -79,6 +79,20 @@ The layout constants and bounds calculation live in the tested
 Cocos controls mirror is byte-checked against that source, so the final runtime
 layout is reproducible and not a manual scene edit.
 
+Creator live Preview showed that adding a `Label` after configuring the same
+node's `UITransform` restored centered-anchor behavior. The lifecycle-safe
+structure therefore uses a Label-free `HUDContainer` for the Canvas-safe
+1230x155 region and creates a child `HUDLabel`. The Label is configured first
+with explicit `CLAMP` overflow and wrapping disabled; only then does the runtime
+retrieve its final `UITransform` and apply the top-left anchor, fixed size, and
+zero local position.
+
+The runtime listens once for `Director.EVENT_AFTER_DRAW`, measures the actual
+container and label transforms after the first rendered frame, and logs the
+measured bounds. Any Canvas or container escape, or an insufficient vertical
+line budget, fails with `TASK_013_HUD_RUNTIME_BOUNDS_INVALID` and includes the
+measured values.
+
 ## Verification and evidence
 
 Working-copy `CI=true pnpm verify` and tracked-files-only frozen installation
