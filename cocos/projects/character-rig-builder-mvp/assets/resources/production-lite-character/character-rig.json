@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "production-lite-character",
+  "displayName": "Production-Lite Layered Character",
+  "rigLayoutFile": "rig-layout.json",
+  "requiredParts": [
+    "hair-back",
+    "hair-front",
+    "hand-left",
+    "hand-right",
+    "head",
+    "lower-arm-left",
+    "lower-arm-right",
+    "pelvis",
+    "shin-left",
+    "shin-right",
+    "shoe-left",
+    "shoe-right",
+    "thigh-left",
+    "thigh-right",
+    "torso",
+    "upper-arm-left",
+    "upper-arm-right"
+  ],
+  "requiredAnimationTargets": [
+    "hair-back",
+    "hair-front",
+    "hand-left",
+    "hand-right",
+    "head",
+    "lower-arm-left",
+    "lower-arm-right",
+    "pelvis",
+    "shin-left",
+    "shin-right",
+    "shoe-left",
+    "shoe-right",
+    "thigh-left",
+    "thigh-right",
+    "torso",
+    "upper-arm-left",
+    "upper-arm-right"
+  ],
+  "animationTargets": [
+    {
+      "targetId": "hair-back",
+      "partId": "hair-back"
+    },
+    {
+      "targetId": "hair-front",
+      "partId": "hair-front"
+    },
+    {
+      "targetId": "hand-left",
+      "partId": "hand-left"
+    },
+    {
+      "targetId": "hand-right",
+      "partId": "hand-right"
+    },
+    {
+      "targetId": "head",
+      "partId": "head"
+    },
+    {
+      "targetId": "lower-arm-left",
+      "partId": "lower-arm-left"
+    },
+    {
+      "targetId": "lower-arm-right",
+      "partId": "lower-arm-right"
+    },
+    {
+      "targetId": "pelvis",
+      "partId": "pelvis"
+    },
+    {
+      "targetId": "shin-left",
+      "partId": "shin-left"
+    },
+    {
+      "targetId": "shin-right",
+      "partId": "shin-right"
+    },
+    {
+      "targetId": "shoe-left",
+      "partId": "shoe-left"
+    },
+    {
+      "targetId": "shoe-right",
+      "partId": "shoe-right"
+    },
+    {
+      "targetId": "thigh-left",
+      "partId": "thigh-left"
+    },
+    {
+      "targetId": "thigh-right",
+      "partId": "thigh-right"
+    },
+    {
+      "targetId": "torso",
+      "partId": "torso"
+    },
+    {
+      "targetId": "upper-arm-left",
+      "partId": "upper-arm-left"
+    },
+    {
+      "targetId": "upper-arm-right",
+      "partId": "upper-arm-right"
+    }
+  ]
+}

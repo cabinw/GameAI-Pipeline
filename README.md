@@ -99,6 +99,12 @@ generator, contract-only sprite bridge, synchronized skeleton/debug view, and
 Cocos verification controls are documented in
 `examples/simple-sprite-character/README.md`.
 
+The TASK-009 17-part production-lite layered humanoid, organic trimmed PNGs,
+authored Rest Pose composite, exact contract reconstruction, four evaluator
+clips, and reference/assembled/debug Cocos acceptance scene are documented in
+`examples/production-lite-character/README.md` and
+`docs/acceptance/TASK-009-production-lite-layered-character-reference.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -112,4 +118,6 @@ a separate minimal 16-part stickman reference with deterministic hierarchy
 evaluation and three Cocos-verified clips before complex-character animation
 work resumes. TASK-008 extends that proof to real transparent PNG parts while
 retaining the same engine-independent hierarchy, pivots, transforms, and
-animation sampling.
+animation sampling. TASK-009 advances the fixture to production-like organic
+sprites, explicit hair and limb layering, exact reference reconstruction, and
+controlled articulation stress without adding a new runtime.

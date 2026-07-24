@@ -1,0 +1,210 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "production-lite-character",
+  "layoutId": "production-lite-character-layout",
+  "sourceCanvas": { "width": 600, "height": 700 },
+  "referenceScale": 0.5,
+  "palette": {
+    "outline": "#25324A",
+    "hair": "#3A2848",
+    "skin": "#F2B58E",
+    "skinShadow": "#D98F70",
+    "shirt": "#38A6C7",
+    "shirtShadow": "#217E9C",
+    "pants": "#4A5A86",
+    "pantsShadow": "#344168",
+    "shoe": "#F1A83B",
+    "shoeSole": "#C47726",
+    "eye": "#26324A",
+    "mouth": "#B85C63"
+  },
+  "parts": [
+    {
+      "partId": "hair-back",
+      "parentId": "head",
+      "drawOrder": 0,
+      "originalRect": { "x": 238, "y": 45, "width": 124, "height": 176 },
+      "trimOffset": { "x": 4, "y": 3 },
+      "trimSize": { "width": 116, "height": 166 },
+      "pivot": { "x": 300, "y": 215 },
+      "jointRadius": 9,
+      "svg": "<path d=\"M58 2C24 2 8 27 9 61L2 101C1 128 17 154 38 164L45 130 58 158 70 129 86 163C105 147 114 124 111 96L107 55C104 22 87 2 58 2Z\" fill=\"{hair}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/>"
+    },
+    {
+      "partId": "upper-arm-right",
+      "parentId": "torso",
+      "drawOrder": 1,
+      "originalRect": { "x": 190, "y": 218, "width": 71, "height": 108 },
+      "trimOffset": { "x": 5, "y": 6 },
+      "trimSize": { "width": 61, "height": 96 },
+      "pivot": { "x": 252, "y": 235 },
+      "jointRadius": 10,
+      "svg": "<path d=\"M56 8C47 1 36 4 30 13L6 64C1 77 6 88 18 92 29 95 36 88 40 78L59 24C62 17 61 12 56 8Z\" fill=\"{shirtShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M10 67C21 67 30 72 39 80L34 91 15 88Z\" fill=\"{shirt}\"/>"
+    },
+    {
+      "partId": "lower-arm-right",
+      "parentId": "upper-arm-right",
+      "drawOrder": 2,
+      "originalRect": { "x": 174, "y": 292, "width": 61, "height": 100 },
+      "trimOffset": { "x": 4, "y": 5 },
+      "trimSize": { "width": 52, "height": 90 },
+      "pivot": { "x": 211, "y": 306 },
+      "jointRadius": 9,
+      "svg": "<path d=\"M36 5C27 2 20 7 17 16L3 66C0 77 7 85 17 87 28 89 35 83 37 72L49 21C51 12 45 7 36 5Z\" fill=\"{shirt}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M3 67C14 66 24 70 37 76L34 87 12 84Z\" fill=\"{shirtShadow}\"/>"
+    },
+    {
+      "partId": "hand-right",
+      "parentId": "lower-arm-right",
+      "drawOrder": 3,
+      "originalRect": { "x": 168, "y": 374, "width": 48, "height": 63 },
+      "trimOffset": { "x": 5, "y": 4 },
+      "trimSize": { "width": 38, "height": 54 },
+      "pivot": { "x": 190, "y": 383 },
+      "jointRadius": 8,
+      "svg": "<path d=\"M17 3C9 4 5 10 6 18L2 34C1 44 8 51 18 51 29 50 35 42 34 31L31 14C30 6 25 2 17 3Z\" fill=\"{skin}\" stroke=\"{outline}\" stroke-width=\"4\"/><path d=\"M8 36C17 39 25 38 33 33\" fill=\"none\" stroke=\"{skinShadow}\" stroke-width=\"3\" stroke-linecap=\"round\"/>"
+    },
+    {
+      "partId": "thigh-right",
+      "parentId": "pelvis",
+      "drawOrder": 4,
+      "originalRect": { "x": 237, "y": 366, "width": 67, "height": 142 },
+      "trimOffset": { "x": 5, "y": 5 },
+      "trimSize": { "width": 57, "height": 132 },
+      "pivot": { "x": 275, "y": 376 },
+      "jointRadius": 11,
+      "svg": "<path d=\"M35 4C20 2 10 10 8 24L2 108C1 121 10 129 23 129L32 129C43 128 50 119 49 107L53 25C54 12 47 5 35 4Z\" fill=\"{pantsShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M7 107C19 103 34 104 49 110L48 126 5 127Z\" fill=\"{pants}\"/>"
+    },
+    {
+      "partId": "shin-right",
+      "parentId": "thigh-right",
+      "drawOrder": 5,
+      "originalRect": { "x": 240, "y": 488, "width": 62, "height": 139 },
+      "trimOffset": { "x": 4, "y": 6 },
+      "trimSize": { "width": 53, "height": 128 },
+      "pivot": { "x": 270, "y": 498 },
+      "jointRadius": 10,
+      "svg": "<path d=\"M28 4C17 3 10 9 9 21L3 101C2 115 10 124 22 125L31 125C42 124 48 116 47 104L50 20C50 10 41 4 28 4Z\" fill=\"{pants}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M4 101C18 98 31 99 47 105L46 122 5 122Z\" fill=\"{pantsShadow}\"/>"
+    },
+    {
+      "partId": "shoe-right",
+      "parentId": "shin-right",
+      "drawOrder": 6,
+      "originalRect": { "x": 213, "y": 606, "width": 91, "height": 55 },
+      "trimOffset": { "x": 6, "y": 5 },
+      "trimSize": { "width": 80, "height": 45 },
+      "pivot": { "x": 269, "y": 616 },
+      "jointRadius": 9,
+      "svg": "<path d=\"M57 4C45 2 38 7 32 17L6 24C1 27 1 38 7 40L67 41C76 41 79 35 77 27L72 14C69 8 64 5 57 4Z\" fill=\"{shoe}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M5 33C24 36 49 36 76 32L75 41 7 41Z\" fill=\"{shoeSole}\"/>"
+    },
+    {
+      "partId": "thigh-left",
+      "parentId": "pelvis",
+      "drawOrder": 7,
+      "originalRect": { "x": 296, "y": 365, "width": 68, "height": 144 },
+      "trimOffset": { "x": 4, "y": 6 },
+      "trimSize": { "width": 59, "height": 132 },
+      "pivot": { "x": 325, "y": 376 },
+      "jointRadius": 11,
+      "svg": "<path d=\"M27 3C14 4 7 13 8 27L12 108C11 121 19 129 31 129L39 129C52 127 58 117 55 104L51 23C50 10 42 3 27 3Z\" fill=\"{pants}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M12 106C26 103 42 103 55 108L55 124 14 128Z\" fill=\"{pantsShadow}\"/>"
+    },
+    {
+      "partId": "shin-left",
+      "parentId": "thigh-left",
+      "drawOrder": 8,
+      "originalRect": { "x": 299, "y": 489, "width": 65, "height": 138 },
+      "trimOffset": { "x": 5, "y": 5 },
+      "trimSize": { "width": 55, "height": 128 },
+      "pivot": { "x": 330, "y": 499 },
+      "jointRadius": 10,
+      "svg": "<path d=\"M27 3C14 3 8 11 8 23L7 104C6 117 14 125 27 125L35 125C46 123 52 114 50 102L48 20C47 9 39 3 27 3Z\" fill=\"{pantsShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M7 103C20 99 37 100 50 105L49 122 9 124Z\" fill=\"{pants}\"/>"
+    },
+    {
+      "partId": "shoe-left",
+      "parentId": "shin-left",
+      "drawOrder": 9,
+      "originalRect": { "x": 298, "y": 607, "width": 94, "height": 56 },
+      "trimOffset": { "x": 5, "y": 4 },
+      "trimSize": { "width": 84, "height": 47 },
+      "pivot": { "x": 331, "y": 617 },
+      "jointRadius": 9,
+      "svg": "<path d=\"M28 4C16 4 10 10 8 20L4 31C2 39 8 43 17 43L75 43C82 42 84 34 79 29L52 17C47 8 40 4 28 4Z\" fill=\"{shoe}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M5 34C28 37 53 37 80 33L80 43 15 43Z\" fill=\"{shoeSole}\"/>"
+    },
+    {
+      "partId": "torso",
+      "parentId": "pelvis",
+      "drawOrder": 10,
+      "originalRect": { "x": 242, "y": 204, "width": 116, "height": 176 },
+      "trimOffset": { "x": 6, "y": 5 },
+      "trimSize": { "width": 103, "height": 165 },
+      "pivot": { "x": 300, "y": 365 },
+      "jointRadius": 12,
+      "svg": "<circle cx=\"4\" cy=\"26\" r=\"12\" fill=\"{shirt}\" stroke=\"{outline}\" stroke-width=\"4\"/><circle cx=\"100\" cy=\"26\" r=\"12\" fill=\"{shirt}\" stroke=\"{outline}\" stroke-width=\"4\"/><path d=\"M52 3C31 3 18 12 14 30L3 130C2 149 16 161 38 161L66 161C87 159 101 146 99 126L89 30C87 12 73 3 52 3Z\" fill=\"{shirt}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M6 126C29 119 71 119 97 126L96 149C74 157 30 158 6 148Z\" fill=\"{shirtShadow}\"/><path d=\"M33 7C37 21 67 22 72 7\" fill=\"none\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linecap=\"round\"/>"
+    },
+    {
+      "partId": "pelvis",
+      "parentId": null,
+      "drawOrder": 11,
+      "originalRect": { "x": 251, "y": 350, "width": 98, "height": 82 },
+      "trimOffset": { "x": 7, "y": 4 },
+      "trimSize": { "width": 84, "height": 70 },
+      "pivot": { "x": 300, "y": 365 },
+      "jointRadius": 12,
+      "svg": "<path d=\"M42 3C20 3 7 12 5 28L8 51C10 63 20 67 35 66L43 61 51 67C67 68 77 62 79 49L80 27C77 11 64 3 42 3Z\" fill=\"{pants}\" stroke=\"{outline}\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M8 27C30 33 56 33 78 26\" fill=\"none\" stroke=\"{pantsShadow}\" stroke-width=\"6\"/>"
+    },
+    {
+      "partId": "head",
+      "parentId": "torso",
+      "drawOrder": 12,
+      "originalRect": { "x": 251, "y": 93, "width": 98, "height": 132 },
+      "trimOffset": { "x": 7, "y": 5 },
+      "trimSize": { "width": 84, "height": 120 },
+      "pivot": { "x": 300, "y": 215 },
+      "jointRadius": 10,
+      "svg": "<path d=\"M42 3C20 3 7 18 6 43L8 78C10 101 23 115 42 116 63 115 76 99 77 76L78 41C76 17 63 3 42 3Z\" fill=\"{skin}\" stroke=\"{outline}\" stroke-width=\"5\"/><ellipse cx=\"28\" cy=\"58\" rx=\"4\" ry=\"6\" fill=\"{eye}\"/><ellipse cx=\"57\" cy=\"58\" rx=\"4\" ry=\"6\" fill=\"{eye}\"/><path d=\"M33 84C39 89 47 89 53 83\" fill=\"none\" stroke=\"{mouth}\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M40 64L37 74 44 75\" fill=\"none\" stroke=\"{skinShadow}\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+    },
+    {
+      "partId": "hair-front",
+      "parentId": "head",
+      "drawOrder": 13,
+      "originalRect": { "x": 237, "y": 48, "width": 126, "height": 176 },
+      "trimOffset": { "x": 5, "y": 4 },
+      "trimSize": { "width": 116, "height": 79 },
+      "pivot": { "x": 300, "y": 215 },
+      "jointRadius": 0,
+      "svg": "<path d=\"M58 2C30 1 9 14 5 39L3 59C18 57 27 50 34 40L33 68C47 62 57 53 64 39L68 65C83 57 90 47 93 34L102 59C111 49 114 35 108 23 99 8 80 2 58 2Z\" fill=\"{hair}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/>"
+    },
+    {
+      "partId": "upper-arm-left",
+      "parentId": "torso",
+      "drawOrder": 14,
+      "originalRect": { "x": 339, "y": 219, "width": 73, "height": 110 },
+      "trimOffset": { "x": 4, "y": 5 },
+      "trimSize": { "width": 64, "height": 99 },
+      "pivot": { "x": 348, "y": 235 },
+      "jointRadius": 10,
+      "svg": "<path d=\"M10 7C2 12 2 21 7 31L27 84C31 95 42 99 52 94 62 89 65 79 60 68L36 16C31 5 19 1 10 7Z\" fill=\"{shirt}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M28 82C39 76 50 73 60 73L61 87 41 96Z\" fill=\"{shirtShadow}\"/>"
+    },
+    {
+      "partId": "lower-arm-left",
+      "parentId": "upper-arm-left",
+      "drawOrder": 15,
+      "originalRect": { "x": 380, "y": 294, "width": 63, "height": 101 },
+      "trimOffset": { "x": 5, "y": 4 },
+      "trimSize": { "width": 53, "height": 92 },
+      "pivot": { "x": 390, "y": 306 },
+      "jointRadius": 9,
+      "svg": "<path d=\"M10 4C2 7 1 15 4 24L18 76C21 87 31 91 41 87 50 83 53 75 50 65L37 16C34 6 19 1 10 4Z\" fill=\"{shirt}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M18 75C29 70 40 68 49 70L50 84 27 89Z\" fill=\"{shirtShadow}\"/>"
+    },
+    {
+      "partId": "hand-left",
+      "parentId": "lower-arm-left",
+      "drawOrder": 16,
+      "originalRect": { "x": 397, "y": 376, "width": 50, "height": 64 },
+      "trimOffset": { "x": 4, "y": 5 },
+      "trimSize": { "width": 41, "height": 54 },
+      "pivot": { "x": 410, "y": 385 },
+      "jointRadius": 8,
+      "svg": "<path d=\"M12 3C4 5 2 11 5 20L8 38C10 49 18 53 28 49 38 45 41 36 37 26L31 11C28 4 20 1 12 3Z\" fill=\"{skin}\" stroke=\"{outline}\" stroke-width=\"4\"/><path d=\"M8 35C17 33 27 29 35 24\" fill=\"none\" stroke=\"{skinShadow}\" stroke-width=\"3\" stroke-linecap=\"round\"/>"
+    }
+  ]
+}

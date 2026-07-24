@@ -14,6 +14,9 @@
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js",
     "fixtures:generate": "node scripts/generate-fixtures.mjs",
     "generate:simple-sprite": "node scripts/generate-simple-sprite-character.mjs",
+    "generate:production-lite": "node scripts/generate-production-lite-character.mjs",
+    "verify:production-lite": "pnpm run build && node scripts/verify-production-lite-reconstruction.mjs",
+    "normalize:production-lite-cocos-metas": "node scripts/normalize-production-lite-cocos-metas.mjs",
     "reconstruct:red-cap": "node scripts/reconstruct-red-cap-remade.mjs",
     "audit:red-cap": "pnpm run build && node scripts/audit-red-cap-canonical-art.mjs",
     "audit:red-cap:report": "pnpm run build && node scripts/audit-red-cap-canonical-art.mjs --allow-blocked",
@@ -24,6 +27,7 @@
   },
   "dependencies": {
     "@gameai/character-contracts": "workspace:*",
+    "@gameai/rig-animation": "workspace:*",
     "sharp": "0.35.3"
   },
   "devDependencies": {

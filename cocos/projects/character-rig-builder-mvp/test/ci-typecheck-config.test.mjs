@@ -24,6 +24,7 @@ const expectedCcImports = [
   "Sorting2D",
   "Sprite",
   "SpriteFrame",
+  "UIOpacity",
   "UITransform",
   "_decorator",
   "input",
