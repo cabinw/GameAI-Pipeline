@@ -33,7 +33,7 @@ export interface CocosGarmentLayeringPlan {
     readonly visualSize: Readonly<{ width: number; height: number }>;
     readonly drawOrder: number;
     readonly sortingOrder: number;
-    readonly layerRole?: "back" | "middle" | "front" | "cover";
+    readonly layerRole?: string;
   }[];
   readonly referenceResourcePaths: Readonly<Record<string, string>>;
   readonly reconstructionStatus: Readonly<

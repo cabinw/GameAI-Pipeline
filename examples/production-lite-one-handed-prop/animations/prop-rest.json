@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "animationId": "production-lite-prop-rest",
+  "rig": {
+    "rigId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "duration": 2,
+  "loop": true,
+  "tracks": [
+    {
+      "jointId": "pelvis",
+      "property": "position",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1,
+          "value": {
+            "x": 0,
+            "y": 2
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 2,
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    }
+  ]
+}

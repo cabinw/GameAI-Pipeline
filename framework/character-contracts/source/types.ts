@@ -95,6 +95,10 @@ export interface AttachmentTransform {
 export interface AttachmentSlot {
   slotId: string;
   parentPartId: string;
+  target?: {
+    kind: string;
+    id: string;
+  };
   transform: AttachmentTransform;
   defaultEnabled: boolean;
 }
@@ -107,11 +111,20 @@ export interface RigAttachment {
   anchor: NormalizedAnchor;
   drawOrder: number;
   wearableSetId?: string;
-  layerRole?: "back" | "middle" | "front" | "cover";
+  propStateId?: string;
+  attachmentKind?: string;
+  gripAnchor?: NormalizedAnchor;
+  handOverlayAttachmentId?: string;
+  layerRole?: string;
 }
 
 export interface WearableSet {
   wearableSetId: string;
+  defaultEnabled: boolean;
+}
+
+export interface PropState {
+  propStateId: string;
   defaultEnabled: boolean;
 }
 
@@ -136,6 +149,7 @@ export interface AttachmentLayout {
   slots: AttachmentSlot[];
   attachments: RigAttachment[];
   wearableSets?: WearableSet[];
+  propStates?: PropState[];
   seams?: AttachmentSeam[];
 }
 
@@ -158,6 +172,14 @@ export interface ResolvedAttachment {
   anchor: NormalizedAnchor;
   drawOrder: number;
   wearableSetId?: string;
-  layerRole?: "back" | "middle" | "front" | "cover";
+  propStateId?: string;
+  attachmentKind?: string;
+  gripAnchor?: NormalizedAnchor;
+  handOverlayAttachmentId?: string;
+  layerRole?: string;
+  target?: Readonly<{
+    kind: string;
+    id: string;
+  }>;
   enabled: boolean;
 }

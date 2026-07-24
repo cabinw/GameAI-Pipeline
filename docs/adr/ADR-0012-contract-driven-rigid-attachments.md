@@ -33,6 +33,11 @@ be duplicated for every equipment combination.
   never changes the base rig.
 - Optional seam declarations pair generic rig/attachment items with local
   authored coverage regions and a minimum overlap for sampled-pose validation.
+- Optional generic part/socket targets, prop-state groups, authored grip
+  anchors, and linked hand-overlay attachments support one-handed rigid props
+  without item- or engine-specific fields.
+- Generic `behind-target`, `in-front-of-target`, and `target-overlay` roles
+  describe prop/hand composition in the same global ordering domain.
 
 ## Consequences
 
@@ -47,3 +52,5 @@ be duplicated for every equipment combination.
   future work.
 - Multi-part garments remain authored rigid attachments. Wearable sets and
   seams do not introduce clothing-specific evaluation or cloth behavior.
+- One-handed prop grip alignment is forward-authored and sampled; the core
+  does not perform IK, inverse grip solving, physics, or hand switching.

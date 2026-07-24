@@ -117,6 +117,13 @@ exact Rest variants, Garment Stress, and a dedicated Cocos acceptance scene.
 See `examples/production-lite-garment-layering/README.md` and
 `docs/acceptance/TASK-011-garment-layering-reference.md`.
 
+TASK-012 extends the generic attachment contract with hand-socket targets,
+authored prop grips, prop states, and optional hand overlays. Its deterministic
+production-lite toolbox fixture reconstructs no-prop/left/right Rest variants
+exactly and samples grip lock across four clips at 60 Hz. See
+`examples/production-lite-one-handed-prop/README.md` and
+`docs/acceptance/TASK-012-one-handed-prop-reference.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -137,4 +144,7 @@ TASK-010 then proves optional contract-driven headwear and face accessories
 with inherited transforms and stable front/back occlusion, while original Red
 Cap reconstruction and cross-engine work remain deferred. TASK-011 extends
 that contract with grouped wearable sets and seam validation across a rigid
-multi-part garment without adding clothing-specific core behavior.
+multi-part garment without adding clothing-specific core behavior. TASK-012
+then proves generic socket-targeted one-handed props, authored grip lock,
+target-relative ordering, and dense interpolated-pose validation without
+adding item-specific core behavior.

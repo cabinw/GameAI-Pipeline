@@ -39,6 +39,9 @@ major/minor version. Existing rigs do not require an attachment document.
 TASK-011 adds optional wearable-set grouping, seam regions, and additive layer
 roles inside the existing 1.0 contract. Documents that omit those fields retain
 TASK-010 behavior, and the accepted TASK-010 fixture is a compatibility test.
+TASK-012 additively adds generic target metadata, prop-state grouping, authored
+grip anchors, linked overlays, and target-relative layer roles. TASK-010 and
+TASK-011 documents remain compatibility fixtures and do not require migration.
 
 Source Canvas Annotation implements:
 

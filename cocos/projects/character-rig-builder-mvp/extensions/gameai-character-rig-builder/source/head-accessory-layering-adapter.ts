@@ -29,7 +29,7 @@ export interface CocosAttachmentPlan {
   readonly visualSize: Readonly<{ width: number; height: number }>;
   readonly drawOrder: number;
   readonly sortingOrder: number;
-  readonly layerRole?: "back" | "middle" | "front" | "cover";
+  readonly layerRole?: string;
 }
 
 export interface CocosHeadAccessoryLayeringPlan {

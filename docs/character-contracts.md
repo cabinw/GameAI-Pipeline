@@ -129,6 +129,14 @@ Error-code string values are public compatibility surface. Messages and `details
 | `DUPLICATE_ATTACHMENT_DRAW_ORDER` | Attachment draw-order values are not unique. |
 | `INCOMPATIBLE_ATTACHMENT_RIG` | Attachment and Rig Layout identities or versions differ. |
 | `INVALID_ATTACHMENT_TRANSFORM` | A slot or attachment transform is non-finite or has zero scale. |
+| `DUPLICATE_PROP_STATE_ID` | Prop-state IDs are not unique. |
+| `UNKNOWN_PROP_STATE` | An attachment references an absent prop state. |
+| `UNKNOWN_ATTACHMENT_SOCKET` | A socket-targeted slot names an absent rig socket. |
+| `MISSING_GRIP_ANCHOR` | A prop attachment omits its authored normalized grip anchor. |
+| `UNSUPPORTED_ATTACHMENT_TARGET` | A slot target or attachment kind is not implemented. |
+| `INVALID_ATTACHMENT_LAYER_ROLE` | An attachment declares an unsupported generic layer role. |
+| `MISSING_HAND_OVERLAY_PART` | A linked hand-overlay attachment ID is absent. |
+| `UNKNOWN_ATTACHMENT_TARGET_PART` | A part target is absent or a socket parent binding differs. |
 
 ## Attachment Layout
 
@@ -149,6 +157,19 @@ name that ID, and one set override controls every member in addition to its
 ordinary slot state. Optional seam constraints pair two rig or attachment
 items with authored local coverage regions and a minimum overlap. Generic
 validation rejects duplicate/unknown set and seam references.
+
+TASK-012 adds optional generic slot targets (`part` or `socket`), immutable
+`propStates`, attachment kinds, authored normalized grip anchors, and linked
+hand-overlay attachment IDs. Target-relative `behind-target`,
+`in-front-of-target`, and `target-overlay` roles remain descriptive values in
+the global draw-order domain. `resolveAttachmentLayout` combines slot,
+wearable-set, and prop-state overrides without mutating authored data.
+
+A socket-targeted slot retains its generic parent-part binding and declares the
+rig socket ID. Compatibility validation verifies that the socket exists and
+has the same parent. The attachment local transform places its authored grip
+on that socket; automated animation sampling verifies coincidence. No engine
+node, inverse solver, or item-specific behavior is implied.
 
 ## Deliberate limitations
 

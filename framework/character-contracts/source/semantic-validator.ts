@@ -84,6 +84,22 @@ export function validateAttachmentLayoutSemantics(
   layout: AttachmentLayout,
 ): ValidationIssue[] {
   const issues = validateSchemaVersion(layout.schemaVersion, "attachmentLayout");
+  const supportedTargetKinds = new Set(["part", "socket"]);
+  const supportedAttachmentKinds = new Set([
+    "generic",
+    "wearable",
+    "prop",
+    "hand-overlay",
+  ]);
+  const supportedLayerRoles = new Set([
+    "back",
+    "middle",
+    "front",
+    "cover",
+    "behind-target",
+    "in-front-of-target",
+    "target-overlay",
+  ]);
   const slotIds = new Set(layout.slots.map((slot) => slot.slotId));
   for (const slotId of findDuplicateValues(layout.slots.map((slot) => slot.slotId))) {
     issues.push(
@@ -112,6 +128,22 @@ export function validateAttachmentLayoutSemantics(
   const wearableSetIds = new Set(
     (layout.wearableSets ?? []).map((set) => set.wearableSetId),
   );
+  const propStateIds = new Set(
+    (layout.propStates ?? []).map((state) => state.propStateId),
+  );
+  for (const propStateId of findDuplicateValues(
+    (layout.propStates ?? []).map((state) => state.propStateId),
+  )) {
+    issues.push(
+      issue(
+        ValidationErrorCode.DUPLICATE_PROP_STATE_ID,
+        "attachmentLayout",
+        "/propStates",
+        `Prop state ${propStateId} is declared more than once.`,
+        { propStateId },
+      ),
+    );
+  }
   for (const wearableSetId of findDuplicateValues(
     (layout.wearableSets ?? []).map((set) => set.wearableSetId),
   )) {
@@ -163,7 +195,24 @@ export function validateAttachmentLayoutSemantics(
         ),
       );
     }
+    if (
+      slot.target !== undefined &&
+      !supportedTargetKinds.has(slot.target.kind)
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNSUPPORTED_ATTACHMENT_TARGET,
+          "attachmentLayout",
+          `/slots/${index}/target/kind`,
+          `Attachment slot ${slot.slotId} uses unsupported target kind ${slot.target.kind}.`,
+          { slotId: slot.slotId, targetKind: slot.target.kind },
+        ),
+      );
+    }
   });
+  const attachmentIds = new Set(
+    layout.attachments.map((attachment) => attachment.attachmentId),
+  );
   layout.attachments.forEach((attachment, index) => {
     if (!slotIds.has(attachment.slotId)) {
       issues.push(
@@ -215,6 +264,88 @@ export function validateAttachmentLayoutSemantics(
         ),
       );
     }
+    if (
+      attachment.propStateId !== undefined &&
+      !propStateIds.has(attachment.propStateId)
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNKNOWN_PROP_STATE,
+          "attachmentLayout",
+          `/attachments/${index}/propStateId`,
+          `Attachment ${attachment.attachmentId} references unknown prop state ${attachment.propStateId}.`,
+          {
+            attachmentId: attachment.attachmentId,
+            propStateId: attachment.propStateId,
+          },
+        ),
+      );
+    }
+    if (
+      attachment.attachmentKind !== undefined &&
+      !supportedAttachmentKinds.has(attachment.attachmentKind)
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNSUPPORTED_ATTACHMENT_TARGET,
+          "attachmentLayout",
+          `/attachments/${index}/attachmentKind`,
+          `Attachment ${attachment.attachmentId} uses unsupported attachment kind ${attachment.attachmentKind}.`,
+          {
+            attachmentId: attachment.attachmentId,
+            attachmentKind: attachment.attachmentKind,
+          },
+        ),
+      );
+    }
+    if (
+      attachment.attachmentKind === "prop" &&
+      attachment.gripAnchor === undefined
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.MISSING_GRIP_ANCHOR,
+          "attachmentLayout",
+          `/attachments/${index}/gripAnchor`,
+          `Prop attachment ${attachment.attachmentId} must declare an authored grip anchor.`,
+          { attachmentId: attachment.attachmentId },
+        ),
+      );
+    }
+    if (
+      attachment.layerRole !== undefined &&
+      !supportedLayerRoles.has(attachment.layerRole)
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.INVALID_ATTACHMENT_LAYER_ROLE,
+          "attachmentLayout",
+          `/attachments/${index}/layerRole`,
+          `Attachment ${attachment.attachmentId} uses invalid layer role ${attachment.layerRole}.`,
+          {
+            attachmentId: attachment.attachmentId,
+            layerRole: attachment.layerRole,
+          },
+        ),
+      );
+    }
+    if (
+      attachment.handOverlayAttachmentId !== undefined &&
+      !attachmentIds.has(attachment.handOverlayAttachmentId)
+    ) {
+      issues.push(
+        issue(
+          ValidationErrorCode.MISSING_HAND_OVERLAY_PART,
+          "attachmentLayout",
+          `/attachments/${index}/handOverlayAttachmentId`,
+          `Attachment ${attachment.attachmentId} references missing hand overlay ${attachment.handOverlayAttachmentId}.`,
+          {
+            attachmentId: attachment.attachmentId,
+            handOverlayAttachmentId: attachment.handOverlayAttachmentId,
+          },
+        ),
+      );
+    }
   });
   return sortIssues(issues);
 }
@@ -243,6 +374,9 @@ export function validateAttachmentLayoutCompatibility(
     );
   }
   const partIds = new Set(rigLayout.parts.map((part) => part.partId));
+  const sockets = new Map(
+    (rigLayout.sockets ?? []).map((socket) => [socket.socketId, socket] as const),
+  );
   const attachmentIds = new Set(
     attachmentLayout.attachments.map((attachment) => attachment.attachmentId),
   );
@@ -257,6 +391,45 @@ export function validateAttachmentLayoutCompatibility(
           { slotId: slot.slotId, parentPartId: slot.parentPartId },
         ),
       );
+    }
+    if (slot.target?.kind === "part" && !partIds.has(slot.target.id)) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNKNOWN_ATTACHMENT_TARGET_PART,
+          "contract",
+          `/attachmentLayout/slots/${index}/target/id`,
+          `Attachment slot ${slot.slotId} targets unknown part ${slot.target.id}.`,
+          { slotId: slot.slotId, targetPartId: slot.target.id },
+        ),
+      );
+    }
+    if (slot.target?.kind === "socket") {
+      const socket = sockets.get(slot.target.id);
+      if (socket === undefined) {
+        issues.push(
+          issue(
+            ValidationErrorCode.UNKNOWN_ATTACHMENT_SOCKET,
+            "contract",
+            `/attachmentLayout/slots/${index}/target/id`,
+            `Attachment slot ${slot.slotId} targets unknown socket ${slot.target.id}.`,
+            { slotId: slot.slotId, socketId: slot.target.id },
+          ),
+        );
+      } else if (socket.parentPartId !== slot.parentPartId) {
+        issues.push(
+          issue(
+            ValidationErrorCode.UNKNOWN_ATTACHMENT_TARGET_PART,
+            "contract",
+            `/attachmentLayout/slots/${index}/parentPartId`,
+            `Attachment slot ${slot.slotId} parent ${slot.parentPartId} does not match socket ${slot.target.id} parent ${socket.parentPartId}.`,
+            {
+              slotId: slot.slotId,
+              parentPartId: slot.parentPartId,
+              socketParentPartId: socket.parentPartId,
+            },
+          ),
+        );
+      }
     }
   });
   attachmentLayout.seams?.forEach((seam, index) => {

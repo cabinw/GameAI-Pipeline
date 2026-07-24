@@ -53,11 +53,17 @@ export function resolveAttachmentLayout(
   layout: AttachmentLayout,
   slotOverrides: Readonly<Record<string, boolean>> = {},
   wearableSetOverrides: Readonly<Record<string, boolean>> = {},
+  propStateOverrides: Readonly<Record<string, boolean>> = {},
 ): readonly ResolvedAttachment[] {
   const slots = new Map(layout.slots.map((slot) => [slot.slotId, slot] as const));
   const wearableSets = new Map(
     (layout.wearableSets ?? []).map(
       (wearableSet) => [wearableSet.wearableSetId, wearableSet] as const,
+    ),
+  );
+  const propStates = new Map(
+    (layout.propStates ?? []).map(
+      (propState) => [propState.propStateId, propState] as const,
     ),
   );
   return Object.freeze(
@@ -85,7 +91,19 @@ export function resolveAttachmentLayout(
             ? true
             : (wearableSetOverrides[wearableSet.wearableSetId] ??
               wearableSet.defaultEnabled);
-        const enabled = slotEnabled && setEnabled;
+        const propState =
+          attachment.propStateId === undefined
+            ? undefined
+            : propStates.get(attachment.propStateId);
+        if (attachment.propStateId !== undefined && propState === undefined) {
+          throw new Error(`UNKNOWN_PROP_STATE:${attachment.propStateId}`);
+        }
+        const propEnabled =
+          propState === undefined
+            ? true
+            : (propStateOverrides[propState.propStateId] ??
+              propState.defaultEnabled);
+        const enabled = slotEnabled && setEnabled && propEnabled;
         return Object.freeze({
           attachmentId: attachment.attachmentId,
           slotId: slot.slotId,
@@ -106,9 +124,24 @@ export function resolveAttachmentLayout(
           ...(attachment.wearableSetId === undefined
             ? {}
             : { wearableSetId: attachment.wearableSetId }),
+          ...(attachment.propStateId === undefined
+            ? {}
+            : { propStateId: attachment.propStateId }),
+          ...(attachment.attachmentKind === undefined
+            ? {}
+            : { attachmentKind: attachment.attachmentKind }),
+          ...(attachment.gripAnchor === undefined
+            ? {}
+            : { gripAnchor: Object.freeze({ ...attachment.gripAnchor }) }),
+          ...(attachment.handOverlayAttachmentId === undefined
+            ? {}
+            : { handOverlayAttachmentId: attachment.handOverlayAttachmentId }),
           ...(attachment.layerRole === undefined
             ? {}
             : { layerRole: attachment.layerRole }),
+          ...(slot.target === undefined
+            ? {}
+            : { target: Object.freeze({ ...slot.target }) }),
           enabled,
         });
       }),
