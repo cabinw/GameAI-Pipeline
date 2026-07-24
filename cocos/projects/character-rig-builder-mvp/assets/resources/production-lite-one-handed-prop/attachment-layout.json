@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "1.0.0",
+  "attachmentLayoutId": "production-lite-one-handed-prop-layout",
+  "rig": {
+    "layoutId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "propStates": [
+    {
+      "propStateId": "left-hand-prop",
+      "defaultEnabled": false
+    },
+    {
+      "propStateId": "right-hand-prop",
+      "defaultEnabled": false
+    }
+  ],
+  "slots": [
+    {
+      "slotId": "hand-left-prop",
+      "parentPartId": "hand-left",
+      "target": {
+        "kind": "socket",
+        "id": "hand-left-grip"
+      },
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "defaultEnabled": true
+    },
+    {
+      "slotId": "hand-right-prop",
+      "parentPartId": "hand-right",
+      "target": {
+        "kind": "socket",
+        "id": "hand-right-grip"
+      },
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "defaultEnabled": true
+    }
+  ],
+  "attachments": [
+    {
+      "attachmentId": "toolbox-left",
+      "slotId": "hand-left-prop",
+      "file": "attachments/toolbox-left.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "gripAnchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "drawOrder": 15.5,
+      "propStateId": "left-hand-prop",
+      "attachmentKind": "prop",
+      "handOverlayAttachmentId": "hand-overlay-left",
+      "layerRole": "behind-target"
+    },
+    {
+      "attachmentId": "hand-overlay-left",
+      "slotId": "hand-left-prop",
+      "file": "attachments/hand-overlay-left.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "drawOrder": 16.5,
+      "propStateId": "left-hand-prop",
+      "attachmentKind": "hand-overlay",
+      "layerRole": "target-overlay"
+    },
+    {
+      "attachmentId": "toolbox-right",
+      "slotId": "hand-right-prop",
+      "file": "attachments/toolbox-right.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "gripAnchor": {
+        "x": 0.5,
+        "y": 0.12
+      },
+      "drawOrder": 2.5,
+      "propStateId": "right-hand-prop",
+      "attachmentKind": "prop",
+      "handOverlayAttachmentId": "hand-overlay-right",
+      "layerRole": "behind-target"
+    },
+    {
+      "attachmentId": "hand-overlay-right",
+      "slotId": "hand-right-prop",
+      "file": "attachments/hand-overlay-right.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "drawOrder": 3.5,
+      "propStateId": "right-hand-prop",
+      "attachmentKind": "hand-overlay",
+      "layerRole": "target-overlay"
+    }
+  ]
+}

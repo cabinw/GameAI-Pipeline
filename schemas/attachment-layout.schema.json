@@ -53,6 +53,13 @@
         "$ref": "#/definitions/wearableSet"
       }
     },
+    "propStates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/propState"
+      }
+    },
     "seams": {
       "type": "array",
       "items": {
@@ -126,6 +133,15 @@
       "properties": {
         "slotId": { "$ref": "#/definitions/identifier" },
         "parentPartId": { "$ref": "#/definitions/identifier" },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "id"],
+          "properties": {
+            "kind": { "type": "string", "minLength": 1 },
+            "id": { "$ref": "#/definitions/identifier" }
+          }
+        },
         "transform": { "$ref": "#/definitions/transform" },
         "defaultEnabled": { "type": "boolean" }
       }
@@ -136,6 +152,15 @@
       "required": ["wearableSetId", "defaultEnabled"],
       "properties": {
         "wearableSetId": { "$ref": "#/definitions/identifier" },
+        "defaultEnabled": { "type": "boolean" }
+      }
+    },
+    "propState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["propStateId", "defaultEnabled"],
+      "properties": {
+        "propStateId": { "$ref": "#/definitions/identifier" },
         "defaultEnabled": { "type": "boolean" }
       }
     },
@@ -189,9 +214,13 @@
         "anchor": { "$ref": "#/definitions/normalizedAnchor" },
         "drawOrder": { "type": "number" },
         "wearableSetId": { "$ref": "#/definitions/identifier" },
+        "propStateId": { "$ref": "#/definitions/identifier" },
+        "attachmentKind": { "type": "string", "minLength": 1 },
+        "gripAnchor": { "$ref": "#/definitions/normalizedAnchor" },
+        "handOverlayAttachmentId": { "$ref": "#/definitions/identifier" },
         "layerRole": {
           "type": "string",
-          "enum": ["back", "middle", "front", "cover"]
+          "minLength": 1
         }
       }
     }

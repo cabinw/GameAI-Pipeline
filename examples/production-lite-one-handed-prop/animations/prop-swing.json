@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0.0",
+  "animationId": "production-lite-prop-swing",
+  "rig": {
+    "rigId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "duration": 2.4,
+  "loop": true,
+  "tracks": [
+    {
+      "jointId": "upper-arm-left",
+      "property": "rotation",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 0.6,
+          "value": -32,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1.2,
+          "value": 28,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1.8,
+          "value": -20,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 2.4,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    },
+    {
+      "jointId": "lower-arm-left",
+      "property": "rotation",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 0.6,
+          "value": 24,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1.2,
+          "value": -36,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1.8,
+          "value": 18,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 2.4,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    },
+    {
+      "jointId": "hand-left",
+      "property": "rotation",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 0.6,
+          "value": 18,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1.2,
+          "value": -22,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1.8,
+          "value": 14,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 2.4,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    }
+  ]
+}

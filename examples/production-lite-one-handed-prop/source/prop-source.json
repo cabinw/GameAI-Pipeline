@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "1.0.0",
+  "attachmentLayoutId": "production-lite-one-handed-prop-layout",
+  "rig": {
+    "layoutId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "palette": {
+    "case": "#d59032",
+    "caseDark": "#74421f",
+    "caseLight": "#f2b84f",
+    "metal": "#dfe7ed",
+    "skin": "#efb08a",
+    "skinDark": "#b96f55",
+    "line": "#392b35"
+  },
+  "sockets": [
+    {
+      "socketId": "hand-left-grip",
+      "parentPartId": "hand-left",
+      "position": { "x": 0, "y": 0 },
+      "rotationDegrees": 0
+    },
+    {
+      "socketId": "hand-right-grip",
+      "parentPartId": "hand-right",
+      "position": { "x": 0, "y": 0 },
+      "rotationDegrees": 0
+    }
+  ],
+  "propStates": [
+    { "propStateId": "left-hand-prop", "defaultEnabled": false },
+    { "propStateId": "right-hand-prop", "defaultEnabled": false }
+  ],
+  "slots": [
+    {
+      "slotId": "hand-left-prop",
+      "parentPartId": "hand-left",
+      "target": { "kind": "socket", "id": "hand-left-grip" },
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "defaultEnabled": true
+    },
+    {
+      "slotId": "hand-right-prop",
+      "parentPartId": "hand-right",
+      "target": { "kind": "socket", "id": "hand-right-grip" },
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "defaultEnabled": true
+    }
+  ],
+  "attachments": [
+    {
+      "attachmentId": "toolbox-left",
+      "slotId": "hand-left-prop",
+      "file": "attachments/toolbox-left.png",
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.12 },
+      "gripAnchor": { "x": 0.5, "y": 0.12 },
+      "drawOrder": 15.5,
+      "propStateId": "left-hand-prop",
+      "attachmentKind": "prop",
+      "handOverlayAttachmentId": "hand-overlay-left",
+      "layerRole": "behind-target",
+      "sourceTopLeft": { "x": 355, "y": 373 },
+      "size": { "width": 110, "height": 100 },
+      "svg": "<path d=\"M34 24V14C34 6 40 2 49 2h12c9 0 15 4 15 12v10h-10V15c0-3-2-4-6-4H50c-4 0-6 1-6 4v9z\" fill=\"{metal}\" stroke=\"{line}\" stroke-width=\"4\"/><path d=\"M8 24h94c4 0 7 3 7 7v61c0 4-3 7-7 7H8c-4 0-7-3-7-7V31c0-4 3-7 7-7z\" fill=\"{case}\" stroke=\"{line}\" stroke-width=\"3\"/><path d=\"M2 48h106v10H2z\" fill=\"{caseLight}\"/><path d=\"M2 53h106\" stroke=\"{line}\" stroke-width=\"3\"/><path d=\"M17 43h12v19H17zM81 43h12v19H81z\" fill=\"{metal}\" stroke=\"{line}\" stroke-width=\"3\"/><path d=\"M10 88h90\" stroke=\"{caseDark}\" stroke-width=\"5\"/><circle cx=\"55\" cy=\"75\" r=\"7\" fill=\"{caseDark}\"/>"
+    },
+    {
+      "attachmentId": "hand-overlay-left",
+      "slotId": "hand-left-prop",
+      "file": "attachments/hand-overlay-left.png",
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.5 },
+      "drawOrder": 16.5,
+      "propStateId": "left-hand-prop",
+      "attachmentKind": "hand-overlay",
+      "layerRole": "target-overlay",
+      "sourceTopLeft": { "x": 393, "y": 373 },
+      "size": { "width": 34, "height": 24 },
+      "svg": "<path d=\"M4 4c5-4 21-4 26 1l1 8c-7 6-20 8-28 2z\" fill=\"{skin}\" stroke=\"{line}\" stroke-width=\"2\"/><path d=\"M7 8c6 2 13 2 20 0M9 13c6 2 11 2 17 0\" fill=\"none\" stroke=\"{skinDark}\" stroke-width=\"2\" stroke-linecap=\"round\"/>"
+    },
+    {
+      "attachmentId": "toolbox-right",
+      "slotId": "hand-right-prop",
+      "file": "attachments/toolbox-right.png",
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.12 },
+      "gripAnchor": { "x": 0.5, "y": 0.12 },
+      "drawOrder": 2.5,
+      "propStateId": "right-hand-prop",
+      "attachmentKind": "prop",
+      "handOverlayAttachmentId": "hand-overlay-right",
+      "layerRole": "behind-target",
+      "sourceTopLeft": { "x": 135, "y": 371 },
+      "size": { "width": 110, "height": 100 },
+      "svg": "<path d=\"M34 24V14C34 6 40 2 49 2h12c9 0 15 4 15 12v10h-10V15c0-3-2-4-6-4H50c-4 0-6 1-6 4v9z\" fill=\"{metal}\" stroke=\"{line}\" stroke-width=\"4\"/><path d=\"M8 24h94c4 0 7 3 7 7v61c0 4-3 7-7 7H8c-4 0-7-3-7-7V31c0-4 3-7 7-7z\" fill=\"{case}\" stroke=\"{line}\" stroke-width=\"3\"/><path d=\"M2 48h106v10H2z\" fill=\"{caseLight}\"/><path d=\"M2 53h106\" stroke=\"{line}\" stroke-width=\"3\"/><path d=\"M17 43h12v19H17zM81 43h12v19H81z\" fill=\"{metal}\" stroke=\"{line}\" stroke-width=\"3\"/><path d=\"M10 88h90\" stroke=\"{caseDark}\" stroke-width=\"5\"/><circle cx=\"55\" cy=\"75\" r=\"7\" fill=\"{caseDark}\"/>"
+    },
+    {
+      "attachmentId": "hand-overlay-right",
+      "slotId": "hand-right-prop",
+      "file": "attachments/hand-overlay-right.png",
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.5 },
+      "drawOrder": 3.5,
+      "propStateId": "right-hand-prop",
+      "attachmentKind": "hand-overlay",
+      "layerRole": "target-overlay",
+      "sourceTopLeft": { "x": 173, "y": 371 },
+      "size": { "width": 34, "height": 24 },
+      "svg": "<path d=\"M4 4c5-4 21-4 26 1l1 8c-7 6-20 8-28 2z\" fill=\"{skin}\" stroke=\"{line}\" stroke-width=\"2\"/><path d=\"M7 8c6 2 13 2 20 0M9 13c6 2 11 2 17 0\" fill=\"none\" stroke=\"{skinDark}\" stroke-width=\"2\" stroke-linecap=\"round\"/>"
+    }
+  ],
+  "variants": [
+    {
+      "variantId": "no-prop",
+      "propStateOverrides": {
+        "left-hand-prop": false,
+        "right-hand-prop": false
+      }
+    },
+    {
+      "variantId": "left-hand",
+      "propStateOverrides": {
+        "left-hand-prop": true,
+        "right-hand-prop": false
+      }
+    },
+    {
+      "variantId": "right-hand",
+      "propStateOverrides": {
+        "left-hand-prop": false,
+        "right-hand-prop": true
+      }
+    }
+  ]
+}

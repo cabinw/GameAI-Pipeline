@@ -2,6 +2,110 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-012 One-Handed Prop Attachment Reference
+
+- Status: Complete; awaiting external visual review
+- Started: 2026-07-24
+- Completed: 2026-07-24
+- Baseline: `main` at `ebaa7ba90ee1bc42318867a365abebced05afa78`
+- Branch: `feat/task-012-one-handed-prop-reference`
+- TASK-011 squash merge:
+  `ebaa7ba90ee1bc42318867a365abebced05afa78`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted engine-neutral rigid attachment system with generic
+one-handed prop bindings. Prove authored grip-to-hand-socket coincidence,
+animated inheritance, deterministic prop/hand/overlay layering, exact Rest
+reconstruction, and a Cocos Creator 3.8.x acceptance scene while retaining
+item-neutral core semantics.
+
+### Contract decisions
+
+- Evolve Attachment Layout additively within the implemented 1.0 line with
+  optional generic target, socket, grip-anchor, and overlay metadata; keep
+  TASK-010/011 documents valid without normalization changes.
+- Represent left/right hand identities as authored rig socket IDs, never as
+  engine node references or hard-coded character part names.
+- Resolve attachment, wearable-set, and prop-state enablement through one
+  immutable generic state pass.
+- Define grip coincidence and layer roles in reference-space contract terms.
+  Cocos consumes only a generated scene plan and performs no fitting or
+  inverse solving.
+- Treat a hand overlay as an optional ordinary attachment part linked by ID,
+  with its own image, anchor, local transform, target part, role, and order.
+
+### Execution
+
+1. Record the task and plan; inspect TASK-009 through TASK-011 contracts,
+   fixtures, generators, evaluators, adapters, tests, and acceptance patterns.
+2. Extend schema/types/parser/validation/resolution with generic hand-socket
+   targets, grip anchors, local transforms, layer roles, overlay references,
+   state resolution, and stable diagnostics.
+3. Deterministically generate the production-lite prop source, transparent
+   prop/overlay PNGs, no-prop/left/right authored Rest references, exact
+   reconstructions/reports, and four prop clips.
+4. Add dense time sampling for socket/grip coincidence, transform
+   inheritance, ordering, state, exact reset, and focused invalid mutations.
+5. Generate the Cocos adapter data/resource mirror, acceptance scene/runtime,
+   all requested modes/debug views, and on-screen keyboard controls.
+6. Synchronize schemas, fixtures, tests, README/contract/versioning/ADR and
+   acceptance documentation without changing accepted body inputs.
+7. Run working-copy and tracked-files-only frozen verification and inspect
+   scope for temp state, absolute paths, generated/source separation, and
+   existing-test preservation.
+8. Record and inspect two decodable H.264 1280×720 videos, keep local copies
+   ignored, publish copies plus a metadata/hash manifest to
+   `evidence/task-012`, commit/push the feature branch, and stop without a PR.
+
+### Done when
+
+- TASK-007 through TASK-011 fixtures and published schema inputs remain
+  compatible and all existing tests pass.
+- The required invalid cases produce stable specific diagnostics.
+- No-prop, left-hand, and right-hand Rest variants reconstruct at exactly zero
+  RGBA, alpha, seam, and bounds tolerance with visible hand-over-handle
+  layering.
+- Every authored and interpolated sample in all four prop clips keeps the
+  authored grip point coincident with the selected hand socket and Reset
+  returns exactly to authored Rest.
+- The core contains no Cocos, briefcase/toolbox, Red Cap, Unity, or Godot
+  semantics; the Cocos layer contains no item-specific fitting constants.
+- Both verification modes pass from clean inputs, no generated Cocos temp
+  state or absolute machine path is required, and all required debug modes
+  and controls are present.
+- Two ignored local videos are independently decodable and their published
+  evidence copies match a committed manifest. Feature and evidence branches
+  are pushed, no TASK-012 PR exists, and the protected archive remains exact.
+
+### Result
+
+- Attachment Layout 1.0 now supports optional generic part/socket targets,
+  prop states, attachment kinds, authored grip anchors, linked hand overlays,
+  and target-relative layer roles while retaining TASK-010/011 compatibility.
+- The deterministic four-part prop fixture provides no-prop, left-hand, and
+  right-hand states. All three authored Rest references reconstruct with zero
+  RGBA, alpha, seam, and bounds difference.
+- Rest with prop, Walk with prop, Prop Swing, and Prop Stress are validated at
+  60 Hz across 532 authored and interpolated samples. Socket and grip world
+  positions remain coincident at every sample, and Prop Stress ends at exact
+  authored Rest offsets.
+- The generic Cocos plan, resources, 3.8.x acceptance scene, runtime controls,
+  and socket/grip/pivot/bounds/link/layer/skeleton diagnostics require no
+  generated editor temp state or absolute machine path.
+- Working-copy and tracked-files-only frozen verification both pass 200 tests.
+  Existing tests and accepted body/accessory/garment sources remain intact.
+- Two ignored, independently decodable H.264 High/yuv420p 1280×720 30 fps
+  videos were captured from the live Web Preview. Evidence branch
+  `evidence/task-012` is preserved at
+  `5984d3428d64769539ea2db5319a33d2a3cffee7`.
+- Accepted limitations are authored fitting, rigid sprites, in-place walk, a
+  Cocos-only adapter, and no IK, inverse solving, in-clip hand switching,
+  two-handed weapons, combat, physics, mesh deformation, other-engine
+  adapters, or original Red Cap reconstruction.
+
 ## Completed plan: TASK-011 Multi-Part Garment Layering Reference
 
 - Status: Complete; external manual visual acceptance passed
