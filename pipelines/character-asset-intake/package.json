@@ -13,6 +13,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js",
     "fixtures:generate": "node scripts/generate-fixtures.mjs",
+    "generate:simple-sprite": "node scripts/generate-simple-sprite-character.mjs",
     "reconstruct:red-cap": "node scripts/reconstruct-red-cap-remade.mjs",
     "audit:red-cap": "pnpm run build && node scripts/audit-red-cap-canonical-art.mjs",
     "audit:red-cap:report": "pnpm run build && node scripts/audit-red-cap-canonical-art.mjs --allow-blocked",

@@ -22,9 +22,12 @@ const expectedCcImports = [
   "Layers",
   "Node",
   "Sorting2D",
+  "Sprite",
+  "SpriteFrame",
   "UITransform",
   "_decorator",
   "input",
+  "resources",
 ];
 
 async function collectTypeScriptFiles(directory) {

@@ -53,6 +53,7 @@ declare module "cc" {
     moveTo(x: number, y: number): void;
     lineTo(x: number, y: number): void;
     circle(centerX: number, centerY: number, radius: number): void;
+    rect(x: number, y: number, width: number, height: number): void;
     fill(): void;
     stroke(): void;
   }
@@ -67,6 +68,24 @@ declare module "cc" {
   export class Sorting2D extends Component {
     sortingOrder: number;
   }
+
+  export class SpriteFrame {}
+
+  export class Sprite extends Component {
+    static readonly SizeMode: {
+      readonly CUSTOM: number;
+    };
+    sizeMode: number;
+    spriteFrame: SpriteFrame | null;
+  }
+
+  export const resources: {
+    load<T>(
+      path: string,
+      type: new () => T,
+      callback: (error: Error | null, asset: T | null) => void,
+    ): void;
+  };
 
   export class UITransform extends Component {
     setContentSize(width: number, height: number): void;
@@ -89,6 +108,10 @@ declare module "cc" {
     readonly SPACE: number;
     readonly KEY_R: number;
     readonly KEY_J: number;
+    readonly KEY_B: number;
+    readonly KEY_A: number;
+    readonly KEY_L: number;
+    readonly KEY_V: number;
   };
 
   export const input: {
