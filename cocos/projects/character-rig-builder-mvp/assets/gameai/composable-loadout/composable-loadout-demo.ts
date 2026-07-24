@@ -37,12 +37,18 @@ import {
   COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
   COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
+  deriveComposableLoadoutSortingPolicy,
   deriveComposableLoadoutResourceManifest,
   formatComposableLoadoutHudLines,
   resolveComposableLoadoutControlClips,
+  resolveComposableLoadoutDebugToggle,
+  TASK_013_DEBUG_GROUP_MISSING,
+  TASK_013_DEBUG_VISIBILITY_STATE_INVALID,
   TASK_013_RESOURCE_LOAD_FAILED,
   type ComposableLoadoutControl,
+  type ComposableLoadoutDebugGroup,
   type ComposableLoadoutControlRuntimeAction,
+  validateComposableLoadoutDebugRendererObservation,
   validateComposableLoadoutHudRuntimeBounds,
   validateComposableLoadoutHudTextLayout,
 } from "./composable-loadout-controls";
@@ -52,6 +58,8 @@ const { ccclass } = _decorator;
 type PartPlan = (typeof COMPOSABLE_LOADOUT_PLAN.base.parts)[number];
 const COMPOSABLE_LOADOUT_RESOURCE_MANIFEST =
   deriveComposableLoadoutResourceManifest(COMPOSABLE_LOADOUT_PLAN);
+const COMPOSABLE_LOADOUT_SORTING_POLICY =
+  deriveComposableLoadoutSortingPolicy(COMPOSABLE_LOADOUT_PLAN);
 const COMPOSABLE_LOADOUT_BINDINGS_BY_KEY_CODE = new Map(
   COMPOSABLE_LOADOUT_CONTROL_BINDINGS.map((binding) => [
     KeyCode[binding.cocosKeyCode],
@@ -83,7 +91,8 @@ export class GameAIComposableLoadoutDemo extends Component {
     | null = null;
   private presetId = "full-loadout";
   private propState = "left-hand";
-  private debugNodes = new Map<string, Node[]>();
+  private debugNodes = new Map<ComposableLoadoutDebugGroup, Node[]>();
+  private debugDiagnostic = "DEBUG OFF";
   private resourceFrames = new Map<string, SpriteFrame>();
   private requestedResourcePaths = new Set<string>();
   private failedResourcePaths = new Set<string>();
@@ -191,7 +200,11 @@ export class GameAIComposableLoadoutDemo extends Component {
     this.referenceView = this.display(root, "AuthoredReferenceView", -390);
     this.assembledView = this.display(root, "AssembledCharacterView", -65);
     this.skeletonView = this.display(root, "SkeletonDebugView", 355);
-    this.referenceSprite = this.reference(this.referenceView, "Reference", false);
+    this.referenceSprite = this.reference(
+      this.referenceView,
+      "Reference",
+      false,
+    );
     this.overlayView = new Node("ReferenceAssembledOverlay");
     this.overlayView.layer = Layers.Enum.UI_2D;
     this.overlayView.setParent(this.assembledView);
@@ -217,11 +230,13 @@ export class GameAIComposableLoadoutDemo extends Component {
       this.marker(sprite, "joints", new Color().fromHEX("#22d3ee"), 5);
       this.marker(sprite, "pivots", new Color().fromHEX("#fde047"), 3);
       this.labelMarker(sprite, "global layer labels", `${part.sortingOrder} ${part.jointId}`);
+      this.parentLinkMarker(sprite, part);
       this.labelMarker(sprite, "parent links", part.parentId ?? "root");
     }
     this.addAttachments(spriteJoints);
     this.applyState();
     this.updateDebug();
+    this.validateAllDebugGroups();
   }
 
   private display(parent: Node, name: string, x: number): Node {
@@ -244,7 +259,9 @@ export class GameAIComposableLoadoutDemo extends Component {
     );
     const sprite = node.addComponent(Sprite);
     sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    node.addComponent(Sorting2D).sortingOrder = translucent ? 250 : 200;
+    node.addComponent(Sorting2D).sortingOrder = translucent
+      ? COMPOSABLE_LOADOUT_SORTING_POLICY.overlayViewOrder
+      : COMPOSABLE_LOADOUT_SORTING_POLICY.referenceViewOrder;
     if (translucent) node.addComponent(UIOpacity).opacity = 105;
     return sprite;
   }
@@ -286,13 +303,17 @@ export class GameAIComposableLoadoutDemo extends Component {
   }
 
   private addSkeleton(parent: Node, part: PartPlan): void {
-    const graphics = parent.addComponent(Graphics);
+    const node = new Node("skeleton");
+    node.layer = Layers.Enum.UI_2D;
+    node.setParent(parent);
+    const graphics = node.addComponent(Graphics);
     graphics.strokeColor = new Color().fromHEX("#94a3b8");
     graphics.lineWidth = 2;
     graphics.moveTo(0, 0);
     graphics.lineTo(0, -Math.max(18, part.visualSize.height * 0.45));
+    graphics.circle(0, 0, 4);
     graphics.stroke();
-    this.marker(parent, "skeleton", new Color().fromHEX("#ffffff"), 4);
+    this.registerDebugRenderer(node, "skeleton");
   }
 
   private addAttachments(joints: ReadonlyMap<string, Node>): void {
@@ -335,7 +356,14 @@ export class GameAIComposableLoadoutDemo extends Component {
         "attachmentKind" in attachment &&
         attachment.attachmentKind === "prop"
       ) {
-        this.marker(pivot, "grip markers", new Color().fromHEX("#ef4444"), 7);
+        this.gripVisualization(
+          slots.get(attachment.slotId)!,
+          pivot,
+          Math.hypot(
+            attachment.transform.position.x,
+            attachment.transform.position.y,
+          ),
+        );
       }
       if (attachment.familyId === "garment") {
         this.marker(
@@ -348,7 +376,12 @@ export class GameAIComposableLoadoutDemo extends Component {
     }
   }
 
-  private marker(parent: Node, group: string, color: Color, radius: number): void {
+  private marker(
+    parent: Node,
+    group: ComposableLoadoutDebugGroup,
+    color: Color,
+    radius: number,
+  ): void {
     const node = new Node(group);
     node.layer = Layers.Enum.UI_2D;
     node.setParent(parent);
@@ -357,21 +390,113 @@ export class GameAIComposableLoadoutDemo extends Component {
     graphics.lineWidth = 2;
     graphics.circle(0, 0, radius);
     graphics.stroke();
-    const entries = this.debugNodes.get(group) ?? [];
-    entries.push(node);
-    this.debugNodes.set(group, entries);
+    this.registerDebugRenderer(node, group);
   }
 
-  private labelMarker(parent: Node, group: string, text: string): void {
+  private crosshairMarker(
+    parent: Node,
+    group: ComposableLoadoutDebugGroup,
+    color: Color,
+    radius: number,
+  ): void {
     const node = new Node(group);
     node.layer = Layers.Enum.UI_2D;
     node.setParent(parent);
-    node.setPosition(7, 7, 0);
+    const graphics = node.addComponent(Graphics);
+    graphics.strokeColor = color;
+    graphics.lineWidth = 3;
+    graphics.circle(0, 0, radius);
+    graphics.moveTo(-radius - 3, 0);
+    graphics.lineTo(radius + 3, 0);
+    graphics.moveTo(0, -radius - 3);
+    graphics.lineTo(0, radius + 3);
+    graphics.stroke();
+    this.registerDebugRenderer(node, group);
+  }
+
+  private parentLinkMarker(parent: Node, part: PartPlan): void {
+    const node = new Node("parent links");
+    node.layer = Layers.Enum.UI_2D;
+    node.setParent(parent);
+    const graphics = node.addComponent(Graphics);
+    graphics.strokeColor = new Color().fromHEX("#60a5fa");
+    graphics.lineWidth = 2;
+    if (part.parentId === null) {
+      graphics.circle(0, 0, 6);
+    } else {
+      graphics.moveTo(0, 0);
+      graphics.lineTo(
+        -part.restPose.position.x,
+        -part.restPose.position.y,
+      );
+    }
+    graphics.stroke();
+    this.registerDebugRenderer(node, "parent links");
+  }
+
+  private gripVisualization(
+    socket: Node,
+    pivot: Node,
+    error: number,
+  ): void {
+    const group = "grip markers";
+    this.crosshairMarker(
+      socket,
+      group,
+      new Color().fromHEX("#22d3ee"),
+      10,
+    );
+    const anchor = new Node(group);
+    anchor.layer = Layers.Enum.UI_2D;
+    anchor.setParent(pivot);
+    const graphics = anchor.addComponent(Graphics);
+    graphics.strokeColor = new Color().fromHEX("#f472b6");
+    graphics.lineWidth = 3;
+    graphics.circle(0, 0, 6);
+    graphics.moveTo(-8, -8);
+    graphics.lineTo(8, 8);
+    graphics.moveTo(-8, 8);
+    graphics.lineTo(8, -8);
+    graphics.moveTo(8, 8);
+    graphics.lineTo(18, 15);
+    graphics.stroke();
+    this.registerDebugRenderer(anchor, group);
+    const pass = error <= 0.0001;
+    this.labelMarker(
+      pivot,
+      group,
+      `GRIP ${pass ? "PASS" : "FAIL"} ${error.toFixed(2)}`,
+      { x: 20, y: 18 },
+      new Color().fromHEX(pass ? "#4ade80" : "#f87171"),
+    );
+  }
+
+  private labelMarker(
+    parent: Node,
+    group: ComposableLoadoutDebugGroup,
+    text: string,
+    position = { x: 7, y: 7 },
+    color = new Color().fromHEX("#ffffff"),
+  ): void {
+    const node = new Node(group);
+    node.layer = Layers.Enum.UI_2D;
+    node.setParent(parent);
+    node.setPosition(position.x, position.y, 0);
     const label = node.addComponent(Label);
     label.string = text;
     label.fontSize = 10;
     label.lineHeight = 12;
-    label.color = new Color().fromHEX("#ffffff");
+    label.color = color;
+    this.registerDebugRenderer(node, group);
+  }
+
+  private registerDebugRenderer(
+    node: Node,
+    group: ComposableLoadoutDebugGroup,
+  ): void {
+    const order =
+      COMPOSABLE_LOADOUT_SORTING_POLICY.debugOrderByGroup[group];
+    node.addComponent(Sorting2D).sortingOrder = order;
     const entries = this.debugNodes.get(group) ?? [];
     entries.push(node);
     this.debugNodes.set(group, entries);
@@ -441,6 +566,10 @@ export class GameAIComposableLoadoutDemo extends Component {
     label.enableWrapText = false;
     label.overflow = Label.Overflow.CLAMP;
     label.color = new Color().fromHEX("#ffffff");
+    node.addComponent(Sorting2D).sortingOrder =
+      name === COMPOSABLE_LOADOUT_HUD_LAYOUT.statusLabelName
+        ? COMPOSABLE_LOADOUT_SORTING_POLICY.hudStatusOrder
+        : COMPOSABLE_LOADOUT_SORTING_POLICY.hudHelpOrder;
     const transform = node.getComponent(UITransform);
     if (transform === null) {
       throw new Error("TASK_013_HUD_LABEL_TRANSFORM_MISSING");
@@ -581,12 +710,7 @@ export class GameAIComposableLoadoutDemo extends Component {
       return;
     }
     if (action.kind === "toggle-debug") {
-      const nodes = this.debugNodes.get(action.group) ?? [];
-      const active = !(nodes[0]?.active ?? false);
-      for (const node of nodes) node.active = active;
-      if (action.group === "skeleton" && this.skeletonView) {
-        this.skeletonView.active = active;
-      }
+      this.toggleDebugGroup(action.group);
       return;
     }
     const exhaustive: never = action;
@@ -680,11 +804,84 @@ export class GameAIComposableLoadoutDemo extends Component {
   }
 
   private updateDebug(): void {
-    for (const [group, nodes] of this.debugNodes) {
-      const skeleton = group === "skeleton";
-      for (const node of nodes) node.active = skeleton ? false : false;
+    for (const nodes of this.debugNodes.values()) {
+      for (const node of nodes) node.active = false;
     }
     if (this.skeletonView) this.skeletonView.active = false;
+    this.debugDiagnostic = "DEBUG OFF";
+  }
+
+  private toggleDebugGroup(group: ComposableLoadoutDebugGroup): void {
+    const nodes = this.debugNodes.get(group);
+    if (nodes === undefined || nodes.length === 0) {
+      throw new Error(
+        `${TASK_013_DEBUG_GROUP_MISSING}: ${JSON.stringify({ group })}`,
+      );
+    }
+    const active = resolveComposableLoadoutDebugToggle(
+      group,
+      nodes.map((node) => node.active),
+    );
+    for (const node of nodes) node.active = active;
+    if (group === "skeleton" && this.skeletonView) {
+      this.skeletonView.active = active;
+    }
+    const diagnostic = this.validateDebugGroup(group, active);
+    this.debugDiagnostic = diagnostic;
+    console.info(`TASK_013_DEBUG_TOGGLE ${diagnostic}`);
+    this.updateHud();
+  }
+
+  private validateAllDebugGroups(): void {
+    for (const binding of COMPOSABLE_LOADOUT_CONTROL_BINDINGS) {
+      if (binding.runtimeAction.kind === "toggle-debug") {
+        this.validateDebugGroup(binding.runtimeAction.group, false);
+      }
+    }
+    console.info(
+      `TASK_013_DEBUG_SORTING_POLICY ${JSON.stringify(
+        COMPOSABLE_LOADOUT_SORTING_POLICY,
+      )}`,
+    );
+  }
+
+  private validateDebugGroup(
+    group: ComposableLoadoutDebugGroup,
+    expectedActive: boolean,
+  ): string {
+    const nodes = this.debugNodes.get(group);
+    const activeStates = nodes?.map((node) => node.active) ?? [];
+    const renderers = nodes
+      ?.map((node) => ({
+        renderer: node.getComponent(Graphics) ?? node.getComponent(Label),
+        sorting: node.getComponent(Sorting2D),
+      }))
+      .filter((entry) => entry.renderer !== null) ?? [];
+    if (
+      group === "skeleton" &&
+      this.skeletonView?.active !== expectedActive
+    ) {
+      throw new Error(
+        `${TASK_013_DEBUG_VISIBILITY_STATE_INVALID}: ${JSON.stringify({
+          group,
+          expectedActive,
+          skeletonViewActive: this.skeletonView?.active ?? null,
+        })}`,
+      );
+    }
+    return validateComposableLoadoutDebugRendererObservation(
+      {
+        groupId: group,
+        nodeCount: nodes?.length ?? 0,
+        rendererCount: renderers.length,
+        sortingOrders: renderers.flatMap((entry) =>
+          entry.sorting === null ? [] : [entry.sorting.sortingOrder],
+        ),
+        activeStates,
+        expectedActive,
+      },
+      COMPOSABLE_LOADOUT_SORTING_POLICY,
+    );
   }
 
   private updateHud(): void {
@@ -716,6 +913,7 @@ export class GameAIComposableLoadoutDemo extends Component {
       resourceFailedCount: this.resourceFailedCount,
       resourceDuplicateRequestCount:
         this.resourceDuplicateRequestCount,
+      debugDiagnostic: this.debugDiagnostic,
     });
   }
 }

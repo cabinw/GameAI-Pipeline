@@ -18,14 +18,22 @@ import { buildCocosComposableCharacterLoadoutPlan } from "../source/composable-c
 import {
   calculateComposableLoadoutHudBounds,
   COMPOSABLE_LOADOUT_CHARACTER_ACCEPTANCE_BOUNDS,
+  COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MAXIMUM,
+  COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MINIMUM,
   COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
   COMPOSABLE_LOADOUT_HUD_LAYOUT,
+  deriveComposableLoadoutSortingPolicy,
   deriveComposableLoadoutResourceManifest,
   formatComposableLoadoutControlHelpLines,
   formatComposableLoadoutHudLines,
   ComposableLoadoutControlError,
   resolveComposableLoadoutControlClips,
+  resolveComposableLoadoutDebugDefinitions,
+  resolveComposableLoadoutDebugToggle,
   TASK_013_CONTROL_BINDINGS_INVALID,
+  TASK_013_DEBUG_RENDERER_MISSING,
+  TASK_013_DEBUG_SORT_ORDER_INVALID,
+  TASK_013_DEBUG_VISIBILITY_STATE_INVALID,
   TASK_013_RESOURCE_LOAD_FAILED,
   TASK_013_RESOURCE_MANIFEST_INVALID,
   TASK_013_HUD_RUNTIME_BOUNDS_INVALID,
@@ -34,6 +42,8 @@ import {
   validateComposableLoadoutHudRuntimeBounds,
   validateComposableLoadoutHudTextLayout,
   validateComposableLoadoutControlBindings,
+  validateComposableLoadoutDebugRendererObservation,
+  validateComposableLoadoutSortingPolicy,
   type ComposableLoadoutControlBinding,
 } from "../source/composable-character-loadout-controls";
 import {
@@ -490,7 +500,11 @@ test("TASK-013 HUD help derives from the same bindings independent of declaratio
   );
   const relabeled = COMPOSABLE_LOADOUT_CONTROL_BINDINGS.map((entry) =>
     entry.semanticActionId === "debug.skeleton"
-      ? { ...entry, hudLabel: "Bones" }
+      ? {
+          ...entry,
+          hudLabel: "Bones",
+          debug: { ...entry.debug!, displayLabel: "Bones" },
+        }
       : entry,
   );
   assert.equal(
@@ -543,6 +557,291 @@ test("TASK-013 shared bindings reject duplicate keys/actions and missing control
     "duplicateRuntimeActions",
   );
   rejects(COMPOSABLE_LOADOUT_CONTROL_BINDINGS.slice(1), "missingRequiredActions");
+});
+
+test("TASK-013 shared debug definitions own marker expectations and sorting roles", () => {
+  const definitions = resolveComposableLoadoutDebugDefinitions();
+  assert.deepEqual(
+    definitions.map((definition) => ({
+      groupId: definition.groupId,
+      displayLabel: definition.displayLabel,
+      sortingRole: definition.sortingRole,
+      sortingOffset: definition.sortingOffset,
+      expectedMinimumRendererCount:
+        definition.expectedMinimumRendererCount,
+      expectedMarkerType: definition.expectedMarkerType,
+    })),
+    [
+      {
+        groupId: "joints",
+        displayLabel: "Joints",
+        sortingRole: "debug-overlay",
+        sortingOffset: 0,
+        expectedMinimumRendererCount: 17,
+        expectedMarkerType: "ring",
+      },
+      {
+        groupId: "bounds",
+        displayLabel: "Bounds",
+        sortingRole: "debug-overlay",
+        sortingOffset: 1,
+        expectedMinimumRendererCount: 17,
+        expectedMarkerType: "ring",
+      },
+      {
+        groupId: "pivots",
+        displayLabel: "Pivots",
+        sortingRole: "debug-overlay",
+        sortingOffset: 2,
+        expectedMinimumRendererCount: 17,
+        expectedMarkerType: "crosshair",
+      },
+      {
+        groupId: "parent links",
+        displayLabel: "Links",
+        sortingRole: "debug-overlay",
+        sortingOffset: 3,
+        expectedMinimumRendererCount: 34,
+        expectedMarkerType: "link-and-label",
+      },
+      {
+        groupId: "global layer labels",
+        displayLabel: "Layers",
+        sortingRole: "debug-overlay",
+        sortingOffset: 4,
+        expectedMinimumRendererCount: 35,
+        expectedMarkerType: "label",
+      },
+      {
+        groupId: "attachment slots",
+        displayLabel: "Slots",
+        sortingRole: "debug-overlay",
+        sortingOffset: 5,
+        expectedMinimumRendererCount: 14,
+        expectedMarkerType: "label",
+      },
+      {
+        groupId: "garment seams",
+        displayLabel: "Seams",
+        sortingRole: "debug-overlay",
+        sortingOffset: 6,
+        expectedMinimumRendererCount: 11,
+        expectedMarkerType: "ring",
+      },
+      {
+        groupId: "sockets",
+        displayLabel: "Sockets",
+        sortingRole: "debug-overlay",
+        sortingOffset: 7,
+        expectedMinimumRendererCount: 2,
+        expectedMarkerType: "ring",
+      },
+      {
+        groupId: "skeleton",
+        displayLabel: "Skeleton",
+        sortingRole: "debug-overlay",
+        sortingOffset: 8,
+        expectedMinimumRendererCount: 17,
+        expectedMarkerType: "skeleton",
+      },
+      {
+        groupId: "grip markers",
+        displayLabel: "Grip",
+        sortingRole: "debug-overlay",
+        sortingOffset: 9,
+        expectedMinimumRendererCount: 6,
+        expectedMarkerType: "grip-lock",
+      },
+    ],
+  );
+  assert.equal(
+    definitions.every(
+      (definition) => definition.sortingRole === "debug-overlay",
+    ),
+    true,
+  );
+});
+
+test("TASK-013 production, debug, and HUD sorting ranges are explicit and reorder-stable", () => {
+  const policy = deriveComposableLoadoutSortingPolicy(composablePlan);
+  assert.deepEqual(
+    {
+      cocos: [policy.cocosMinimum, policy.cocosMaximum],
+      planProduction: [
+        policy.planProductionMinimum,
+        policy.planProductionMaximum,
+      ],
+      production: [
+        policy.planProductionMinimum,
+        policy.productionMaximum,
+      ],
+      debug: [policy.debugMinimum, policy.debugMaximum],
+      hud: [policy.hudMinimum, policy.hudMaximum],
+      referenceViewOrder: policy.referenceViewOrder,
+      overlayViewOrder: policy.overlayViewOrder,
+      debugOrderByGroup: policy.debugOrderByGroup,
+    },
+    {
+      cocos: [
+        COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MINIMUM,
+        COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MAXIMUM,
+      ],
+      planProduction: [0, 34],
+      production: [0, 36],
+      debug: [37, 46],
+      hud: [47, 48],
+      referenceViewOrder: 35,
+      overlayViewOrder: 36,
+      debugOrderByGroup: {
+        joints: 37,
+        bounds: 38,
+        pivots: 39,
+        "parent links": 40,
+        "global layer labels": 41,
+        "attachment slots": 42,
+        "garment seams": 43,
+        sockets: 44,
+        skeleton: 45,
+        "grip markers": 46,
+      },
+    },
+  );
+  assert.ok(policy.productionMaximum < policy.debugMinimum);
+  assert.ok(policy.debugMinimum <= policy.debugMaximum);
+  assert.ok(policy.debugMaximum < policy.hudMinimum);
+  assert.equal(
+    policy.debugOrderByGroup["grip markers"] >
+      Math.max(
+        ...composablePlan.attachments.map(
+          (attachment) => attachment.sortingOrder,
+        ),
+      ),
+    true,
+  );
+  assert.ok(
+    policy.debugOrderByGroup["grip markers"] < policy.hudMinimum,
+  );
+  assert.deepEqual(
+    deriveComposableLoadoutSortingPolicy({
+      base: { parts: [...composablePlan.base.parts].reverse() },
+      attachments: [...composablePlan.attachments].reverse(),
+    }),
+    policy,
+  );
+});
+
+test("TASK-013 every debug action toggles and validates its intended renderer group", () => {
+  const policy = deriveComposableLoadoutSortingPolicy(composablePlan);
+  const planBefore = JSON.stringify(composablePlan);
+  const validationBefore = readFileSync(
+    path.join(fixtureRoot, "continuous-validation-report.json"),
+    "utf8",
+  );
+  for (const definition of resolveComposableLoadoutDebugDefinitions()) {
+    const group = definition.groupId;
+    const count = definition.expectedMinimumRendererCount;
+    const order = policy.debugOrderByGroup[group];
+    const on = resolveComposableLoadoutDebugToggle(
+      group,
+      Array.from({ length: count }, () => false),
+    );
+    assert.equal(on, true, group);
+    assert.equal(
+      validateComposableLoadoutDebugRendererObservation(
+        {
+          groupId: group,
+          nodeCount: count,
+          rendererCount: count,
+          sortingOrders: Array.from({ length: count }, () => order),
+          activeStates: Array.from({ length: count }, () => on),
+          expectedActive: on,
+        },
+        policy,
+      ).startsWith(`DEBUG ${group} ON`),
+      true,
+    );
+    const off = resolveComposableLoadoutDebugToggle(
+      group,
+      Array.from({ length: count }, () => on),
+    );
+    assert.equal(off, false, group);
+    validateComposableLoadoutDebugRendererObservation(
+      {
+        groupId: group,
+        nodeCount: count,
+        rendererCount: count,
+        sortingOrders: Array.from({ length: count }, () => order),
+        activeStates: Array.from({ length: count }, () => off),
+        expectedActive: off,
+      },
+      policy,
+    );
+  }
+  assert.equal(JSON.stringify(composablePlan), planBefore);
+  assert.equal(
+    readFileSync(
+      path.join(fixtureRoot, "continuous-validation-report.json"),
+      "utf8",
+    ),
+    validationBefore,
+  );
+});
+
+test("TASK-013 rejects unsorted, overlapping, and inconsistent debug observations", () => {
+  const policy = deriveComposableLoadoutSortingPolicy(composablePlan);
+  const gripBase = {
+    groupId: "grip markers" as const,
+    nodeCount: 6,
+    rendererCount: 6,
+    activeStates: [true, true, true, true, true, true],
+    expectedActive: true,
+  };
+  assert.throws(
+    () =>
+      validateComposableLoadoutDebugRendererObservation(
+        { ...gripBase, sortingOrders: [] },
+        policy,
+      ),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_DEBUG_RENDERER_MISSING),
+  );
+  assert.throws(
+    () =>
+      validateComposableLoadoutDebugRendererObservation(
+        { ...gripBase, sortingOrders: [0, 0, 0, 0, 0, 0] },
+        policy,
+      ),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_DEBUG_SORT_ORDER_INVALID),
+  );
+  assert.throws(
+    () =>
+      validateComposableLoadoutDebugRendererObservation(
+        {
+          ...gripBase,
+          sortingOrders: [46, 46, 46, 46, 46, 46],
+          activeStates: [true, true, true, true, true, false],
+        },
+        policy,
+      ),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(
+        TASK_013_DEBUG_VISIBILITY_STATE_INVALID,
+      ),
+  );
+  assert.throws(
+    () =>
+      validateComposableLoadoutSortingPolicy({
+        ...policy,
+        hudMinimum: policy.debugMaximum,
+      }),
+    (error) =>
+      error instanceof Error &&
+      error.message.startsWith(TASK_013_DEBUG_SORT_ORDER_INVALID),
+  );
 });
 
 test("exact Reset is stopped at 0.00 with the authored Rest sample", () => {
@@ -963,6 +1262,55 @@ test("TASK-013 runtime dispatch and HUD consume the shared semantic bindings", (
     controls.includes("formatComposableLoadoutControlHelpLines()"),
     true,
   );
+});
+
+test("TASK-013 runtime assigns explicit debug and HUD sorting with visible grip diagnostics", () => {
+  const runtime = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/composable-loadout/composable-loadout-demo.ts",
+    ),
+    "utf8",
+  );
+  assert.equal(
+    runtime.includes(
+      "deriveComposableLoadoutSortingPolicy(COMPOSABLE_LOADOUT_PLAN)",
+    ),
+    true,
+  );
+  assert.equal(runtime.includes("private registerDebugRenderer("), true);
+  assert.equal(
+    runtime.includes(
+      "node.addComponent(Sorting2D).sortingOrder = order",
+    ),
+    true,
+  );
+  assert.equal(
+    runtime.includes(
+      "COMPOSABLE_LOADOUT_SORTING_POLICY.hudStatusOrder",
+    ),
+    true,
+  );
+  assert.equal(
+    runtime.includes(
+      "COMPOSABLE_LOADOUT_SORTING_POLICY.hudHelpOrder",
+    ),
+    true,
+  );
+  assert.equal(runtime.includes("private gripVisualization("), true);
+  assert.equal(runtime.includes("this.crosshairMarker("), true);
+  assert.equal(runtime.includes('`GRIP ${pass ? "PASS" : "FAIL"}'), true);
+  assert.equal(
+    runtime.includes('this.marker(pivot, "grip markers"'),
+    false,
+  );
+  assert.equal(
+    runtime.includes("validateComposableLoadoutDebugRendererObservation("),
+    true,
+  );
+  assert.equal(runtime.includes("TASK_013_DEBUG_TOGGLE"), true);
+  assert.equal(runtime.includes("TASK_013_DEBUG_SORTING_POLICY"), true);
+  assert.equal(runtime.includes("debugDiagnostic: this.debugDiagnostic"), true);
 });
 
 test("TASK-013 separates runtime resource loading from Creator edit mode", () => {

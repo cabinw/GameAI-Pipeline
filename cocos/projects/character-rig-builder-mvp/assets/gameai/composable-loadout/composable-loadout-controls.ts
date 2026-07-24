@@ -55,6 +55,23 @@ export type ComposableLoadoutDebugGroup =
   | "skeleton"
   | "grip markers";
 
+export type ComposableLoadoutDebugMarkerType =
+  | "ring"
+  | "crosshair"
+  | "label"
+  | "link-and-label"
+  | "skeleton"
+  | "grip-lock";
+
+export interface ComposableLoadoutDebugDefinition {
+  readonly groupId: ComposableLoadoutDebugGroup;
+  readonly displayLabel: string;
+  readonly sortingRole: "debug-overlay";
+  readonly sortingOffset: number;
+  readonly expectedMinimumRendererCount: number;
+  readonly expectedMarkerType: ComposableLoadoutDebugMarkerType;
+}
+
 export type ComposableLoadoutControlRuntimeAction =
   | { readonly kind: "set-preset"; readonly presetId: string }
   | {
@@ -93,10 +110,18 @@ export interface ComposableLoadoutControlBinding {
   readonly hudGroup: ComposableLoadoutControlHudGroup;
   readonly hudOrder: number;
   readonly runtimeAction: ComposableLoadoutControlRuntimeAction;
+  readonly debug?: ComposableLoadoutDebugDefinition;
 }
 
 export const TASK_013_CONTROL_BINDINGS_INVALID =
   "TASK_013_CONTROL_BINDINGS_INVALID";
+export const TASK_013_DEBUG_GROUP_MISSING = "TASK_013_DEBUG_GROUP_MISSING";
+export const TASK_013_DEBUG_RENDERER_MISSING =
+  "TASK_013_DEBUG_RENDERER_MISSING";
+export const TASK_013_DEBUG_SORT_ORDER_INVALID =
+  "TASK_013_DEBUG_SORT_ORDER_INVALID";
+export const TASK_013_DEBUG_VISIBILITY_STATE_INVALID =
+  "TASK_013_DEBUG_VISIBILITY_STATE_INVALID";
 
 const REQUIRED_COMPOSABLE_LOADOUT_ACTION_IDS = [
   "preset.base-only",
@@ -243,75 +268,125 @@ const RAW_COMPOSABLE_LOADOUT_CONTROL_BINDINGS: readonly ComposableLoadoutControl
       kind: "toggle-view",
       view: "overlay",
     }),
-    binding("debug.joints", "J", "KEY_J", "Joints", "debug-primary", 1, {
-      kind: "toggle-debug",
-      group: "joints",
-    }),
-    binding("debug.bounds", "B", "KEY_B", "Bounds", "debug-primary", 2, {
-      kind: "toggle-debug",
-      group: "bounds",
-    }),
-    binding("debug.pivots", "P", "KEY_P", "Pivots", "debug-primary", 3, {
-      kind: "toggle-debug",
-      group: "pivots",
-    }),
-    binding("debug.parent-links", "L", "KEY_L", "Links", "debug-primary", 4, {
-      kind: "toggle-debug",
-      group: "parent links",
-    }),
-    binding(
+    debugBinding(
+      "debug.joints",
+      "J",
+      "KEY_J",
+      "Joints",
+      "debug-primary",
+      1,
+      "joints",
+      0,
+      17,
+      "ring",
+    ),
+    debugBinding(
+      "debug.bounds",
+      "B",
+      "KEY_B",
+      "Bounds",
+      "debug-primary",
+      2,
+      "bounds",
+      1,
+      17,
+      "ring",
+    ),
+    debugBinding(
+      "debug.pivots",
+      "P",
+      "KEY_P",
+      "Pivots",
+      "debug-primary",
+      3,
+      "pivots",
+      2,
+      17,
+      "crosshair",
+    ),
+    debugBinding(
+      "debug.parent-links",
+      "L",
+      "KEY_L",
+      "Links",
+      "debug-primary",
+      4,
+      "parent links",
+      3,
+      34,
+      "link-and-label",
+    ),
+    debugBinding(
       "debug.global-layers",
       "G",
       "KEY_G",
       "Layers",
       "debug-primary",
       5,
-      { kind: "toggle-debug", group: "global layer labels" },
+      "global layer labels",
+      4,
+      35,
+      "label",
     ),
-    binding(
+    debugBinding(
       "debug.attachment-slots",
       "T",
       "KEY_T",
       "Slots",
       "debug-secondary",
       1,
-      { kind: "toggle-debug", group: "attachment slots" },
+      "attachment slots",
+      5,
+      14,
+      "label",
     ),
-    binding(
+    debugBinding(
       "debug.garment-seams",
       "M",
       "KEY_M",
       "Seams",
       "debug-secondary",
       2,
-      { kind: "toggle-debug", group: "garment seams" },
+      "garment seams",
+      6,
+      11,
+      "ring",
     ),
-    binding(
+    debugBinding(
       "debug.accessory-sockets",
       "S",
       "KEY_S",
       "Sockets",
       "debug-secondary",
       3,
-      { kind: "toggle-debug", group: "sockets" },
+      "sockets",
+      7,
+      2,
+      "ring",
     ),
-    binding(
+    debugBinding(
       "debug.skeleton",
       "K",
       "KEY_K",
       "Skeleton",
       "debug-secondary",
       4,
-      { kind: "toggle-debug", group: "skeleton" },
+      "skeleton",
+      8,
+      17,
+      "skeleton",
     ),
-    binding(
+    debugBinding(
       "debug.prop-grip-markers",
       "Y",
       "KEY_Y",
       "Grip",
       "debug-secondary",
       5,
-      { kind: "toggle-debug", group: "grip markers" },
+      "grip markers",
+      9,
+      6,
+      "grip-lock",
     ),
   ];
 
@@ -328,6 +403,7 @@ function binding(
   hudGroup: ComposableLoadoutControlHudGroup,
   hudOrder: number,
   runtimeAction: ComposableLoadoutControlRuntimeAction,
+  debug?: ComposableLoadoutDebugDefinition,
 ): ComposableLoadoutControlBinding {
   return {
     semanticActionId,
@@ -337,7 +413,39 @@ function binding(
     hudGroup,
     hudOrder,
     runtimeAction,
+    ...(debug === undefined ? {} : { debug }),
   };
+}
+
+function debugBinding(
+  semanticActionId: string,
+  displayedKey: string,
+  cocosKeyCode: ComposableLoadoutCocosKeyCode,
+  hudLabel: string,
+  hudGroup: "debug-primary" | "debug-secondary",
+  hudOrder: number,
+  groupId: ComposableLoadoutDebugGroup,
+  sortingOffset: number,
+  expectedMinimumRendererCount: number,
+  expectedMarkerType: ComposableLoadoutDebugMarkerType,
+): ComposableLoadoutControlBinding {
+  return binding(
+    semanticActionId,
+    displayedKey,
+    cocosKeyCode,
+    hudLabel,
+    hudGroup,
+    hudOrder,
+    { kind: "toggle-debug", group: groupId },
+    {
+      groupId,
+      displayLabel: hudLabel,
+      sortingRole: "debug-overlay",
+      sortingOffset,
+      expectedMinimumRendererCount,
+      expectedMarkerType,
+    },
+  );
 }
 
 export function validateComposableLoadoutControlBindings(
@@ -369,6 +477,45 @@ export function validateComposableLoadoutControlBindings(
         entry.hudOrder < 1,
     )
     .map((entry) => entry.semanticActionId);
+  const debugEntries = bindings.filter(
+    (
+      entry,
+    ): entry is ComposableLoadoutControlBinding & {
+      readonly runtimeAction: {
+        readonly kind: "toggle-debug";
+        readonly group: ComposableLoadoutDebugGroup;
+      };
+    } => entry.runtimeAction.kind === "toggle-debug",
+  );
+  const invalidDebugEntries = bindings
+    .filter((entry) => {
+      if (entry.runtimeAction.kind !== "toggle-debug") {
+        return entry.debug !== undefined;
+      }
+      return (
+        entry.debug === undefined ||
+        entry.debug.groupId !== entry.runtimeAction.group ||
+        entry.debug.displayLabel !== entry.hudLabel ||
+        entry.debug.sortingRole !== "debug-overlay" ||
+        !Number.isInteger(entry.debug.sortingOffset) ||
+        entry.debug.sortingOffset < 0 ||
+        !Number.isInteger(entry.debug.expectedMinimumRendererCount) ||
+        entry.debug.expectedMinimumRendererCount < 1
+      );
+    })
+    .map((entry) => entry.semanticActionId);
+  const duplicateDebugGroups = duplicateControlValues(
+    debugEntries.map((entry) => entry.debug?.groupId ?? ""),
+  );
+  const duplicateDebugSortingOffsets = duplicateControlValues(
+    debugEntries.map((entry) => String(entry.debug?.sortingOffset ?? "")),
+  );
+  const debugSortingOffsets = debugEntries
+    .map((entry) => entry.debug?.sortingOffset ?? -1)
+    .sort((left, right) => left - right);
+  const debugOffsetsAreContiguous = debugSortingOffsets.every(
+    (offset, index) => offset === index,
+  );
   if (
     bindings.length !== REQUIRED_COMPOSABLE_LOADOUT_ACTION_IDS.length ||
     duplicateDisplayedKeys.length > 0 ||
@@ -376,7 +523,11 @@ export function validateComposableLoadoutControlBindings(
     duplicateSemanticActions.length > 0 ||
     duplicateRuntimeActions.length > 0 ||
     missingRequiredActions.length > 0 ||
-    invalidEntries.length > 0
+    invalidEntries.length > 0 ||
+    invalidDebugEntries.length > 0 ||
+    duplicateDebugGroups.length > 0 ||
+    duplicateDebugSortingOffsets.length > 0 ||
+    !debugOffsetsAreContiguous
   ) {
     throw new Error(
       `${TASK_013_CONTROL_BINDINGS_INVALID}: ${JSON.stringify({
@@ -388,6 +539,10 @@ export function validateComposableLoadoutControlBindings(
         duplicateRuntimeActions,
         missingRequiredActions,
         invalidEntries,
+        invalidDebugEntries,
+        duplicateDebugGroups,
+        duplicateDebugSortingOffsets,
+        debugSortingOffsets,
       })}`,
     );
   }
@@ -407,6 +562,266 @@ function duplicateControlValues(values: readonly string[]): readonly string[] {
       ),
     ),
   ].sort();
+}
+
+export const COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MINIMUM = -32768;
+export const COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MAXIMUM = 32767;
+
+export interface ComposableLoadoutSortingPolicy {
+  readonly cocosMinimum: number;
+  readonly cocosMaximum: number;
+  readonly planProductionMinimum: number;
+  readonly planProductionMaximum: number;
+  readonly referenceViewOrder: number;
+  readonly overlayViewOrder: number;
+  readonly productionMaximum: number;
+  readonly debugMinimum: number;
+  readonly debugMaximum: number;
+  readonly debugOrderByGroup: Readonly<
+    Record<ComposableLoadoutDebugGroup, number>
+  >;
+  readonly hudMinimum: number;
+  readonly hudStatusOrder: number;
+  readonly hudHelpOrder: number;
+  readonly hudMaximum: number;
+}
+
+export function resolveComposableLoadoutDebugDefinitions(
+  bindings: readonly ComposableLoadoutControlBinding[] =
+    COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
+): readonly ComposableLoadoutDebugDefinition[] {
+  return Object.freeze(
+    validateComposableLoadoutControlBindings(bindings)
+      .filter(
+        (
+          entry,
+        ): entry is ComposableLoadoutControlBinding & {
+          readonly debug: ComposableLoadoutDebugDefinition;
+        } => entry.runtimeAction.kind === "toggle-debug",
+      )
+      .map((entry) => entry.debug)
+      .sort(
+        (left, right) =>
+          left.sortingOffset - right.sortingOffset ||
+          left.groupId.localeCompare(right.groupId),
+      ),
+  );
+}
+
+export function resolveComposableLoadoutDebugDefinition(
+  groupId: ComposableLoadoutDebugGroup,
+  bindings: readonly ComposableLoadoutControlBinding[] =
+    COMPOSABLE_LOADOUT_CONTROL_BINDINGS,
+): ComposableLoadoutDebugDefinition {
+  const definition = resolveComposableLoadoutDebugDefinitions(bindings).find(
+    (entry) => entry.groupId === groupId,
+  );
+  if (definition === undefined) {
+    throw new Error(
+      `${TASK_013_DEBUG_GROUP_MISSING}: ${JSON.stringify({ groupId })}`,
+    );
+  }
+  return definition;
+}
+
+export function deriveComposableLoadoutSortingPolicy(plan: {
+  readonly base: {
+    readonly parts: readonly { readonly sortingOrder: number }[];
+  };
+  readonly attachments: readonly { readonly sortingOrder: number }[];
+}): ComposableLoadoutSortingPolicy {
+  const productionOrders = [
+    ...plan.base.parts.map((part) => part.sortingOrder),
+    ...plan.attachments.map((attachment) => attachment.sortingOrder),
+  ];
+  const invalidProductionOrders = productionOrders.filter(
+    (order) =>
+      !Number.isInteger(order) ||
+      order < COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MINIMUM ||
+      order > COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MAXIMUM,
+  );
+  if (productionOrders.length === 0 || invalidProductionOrders.length > 0) {
+    throw new Error(
+      `${TASK_013_DEBUG_SORT_ORDER_INVALID}: ${JSON.stringify({
+        productionOrderCount: productionOrders.length,
+        invalidProductionOrders,
+      })}`,
+    );
+  }
+  const definitions = resolveComposableLoadoutDebugDefinitions();
+  const planProductionMinimum = Math.min(...productionOrders);
+  const planProductionMaximum = Math.max(...productionOrders);
+  const referenceViewOrder = planProductionMaximum + 1;
+  const overlayViewOrder = referenceViewOrder + 1;
+  const productionMaximum = overlayViewOrder;
+  const debugMinimum = productionMaximum + 1;
+  const debugOrderByGroup = Object.freeze(
+    Object.fromEntries(
+      definitions.map((definition) => [
+        definition.groupId,
+        debugMinimum + definition.sortingOffset,
+      ]),
+    ) as Record<ComposableLoadoutDebugGroup, number>,
+  );
+  const debugMaximum = Math.max(...Object.values(debugOrderByGroup));
+  const hudMinimum = debugMaximum + 1;
+  const hudStatusOrder = hudMinimum;
+  const hudHelpOrder = hudMinimum + 1;
+  const hudMaximum = hudHelpOrder;
+  const policy = Object.freeze({
+    cocosMinimum: COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MINIMUM,
+    cocosMaximum: COMPOSABLE_LOADOUT_COCOS_SORTING_ORDER_MAXIMUM,
+    planProductionMinimum,
+    planProductionMaximum,
+    referenceViewOrder,
+    overlayViewOrder,
+    productionMaximum,
+    debugMinimum,
+    debugMaximum,
+    debugOrderByGroup,
+    hudMinimum,
+    hudStatusOrder,
+    hudHelpOrder,
+    hudMaximum,
+  });
+  validateComposableLoadoutSortingPolicy(policy);
+  return policy;
+}
+
+export function validateComposableLoadoutSortingPolicy(
+  policy: ComposableLoadoutSortingPolicy,
+): void {
+  const debugOrders = Object.values(policy.debugOrderByGroup);
+  const allOrders = [
+    policy.planProductionMinimum,
+    policy.planProductionMaximum,
+    policy.referenceViewOrder,
+    policy.overlayViewOrder,
+    policy.productionMaximum,
+    policy.debugMinimum,
+    policy.debugMaximum,
+    ...debugOrders,
+    policy.hudMinimum,
+    policy.hudStatusOrder,
+    policy.hudHelpOrder,
+    policy.hudMaximum,
+  ];
+  if (
+    allOrders.some(
+      (order) =>
+        !Number.isInteger(order) ||
+        order < policy.cocosMinimum ||
+        order > policy.cocosMaximum,
+    ) ||
+    policy.planProductionMaximum >= policy.referenceViewOrder ||
+    policy.referenceViewOrder >= policy.overlayViewOrder ||
+    policy.overlayViewOrder !== policy.productionMaximum ||
+    policy.productionMaximum >= policy.debugMinimum ||
+    policy.debugMinimum > policy.debugMaximum ||
+    policy.debugMaximum >= policy.hudMinimum ||
+    policy.hudMinimum > policy.hudMaximum ||
+    new Set(debugOrders).size !== debugOrders.length ||
+    debugOrders.some(
+      (order) =>
+        order < policy.debugMinimum || order > policy.debugMaximum,
+    )
+  ) {
+    throw new Error(
+      `${TASK_013_DEBUG_SORT_ORDER_INVALID}: ${JSON.stringify(policy)}`,
+    );
+  }
+}
+
+export interface ComposableLoadoutDebugRendererObservation {
+  readonly groupId: ComposableLoadoutDebugGroup;
+  readonly nodeCount: number;
+  readonly rendererCount: number;
+  readonly sortingOrders: readonly number[];
+  readonly activeStates: readonly boolean[];
+  readonly expectedActive: boolean;
+}
+
+export function validateComposableLoadoutDebugRendererObservation(
+  observation: ComposableLoadoutDebugRendererObservation,
+  policy: ComposableLoadoutSortingPolicy,
+): string {
+  const definition = resolveComposableLoadoutDebugDefinition(
+    observation.groupId,
+  );
+  if (observation.nodeCount < 1) {
+    throw new Error(
+      `${TASK_013_DEBUG_GROUP_MISSING}: ${JSON.stringify(observation)}`,
+    );
+  }
+  if (
+    observation.rendererCount <
+      definition.expectedMinimumRendererCount ||
+    observation.rendererCount !== observation.nodeCount ||
+    observation.sortingOrders.length !== observation.rendererCount
+  ) {
+    throw new Error(
+      `${TASK_013_DEBUG_RENDERER_MISSING}: ${JSON.stringify({
+        ...observation,
+        expectedMinimumRendererCount:
+          definition.expectedMinimumRendererCount,
+      })}`,
+    );
+  }
+  const expectedOrder = policy.debugOrderByGroup[observation.groupId];
+  if (
+    observation.sortingOrders.some(
+      (order) =>
+        order !== expectedOrder ||
+        order <= policy.productionMaximum ||
+        order >= policy.hudMinimum,
+    )
+  ) {
+    throw new Error(
+      `${TASK_013_DEBUG_SORT_ORDER_INVALID}: ${JSON.stringify({
+        ...observation,
+        expectedOrder,
+        productionMaximum: policy.productionMaximum,
+        hudMinimum: policy.hudMinimum,
+      })}`,
+    );
+  }
+  if (
+    observation.activeStates.length !== observation.nodeCount ||
+    observation.activeStates.some(
+      (active) => active !== observation.expectedActive,
+    )
+  ) {
+    throw new Error(
+      `${TASK_013_DEBUG_VISIBILITY_STATE_INVALID}: ${JSON.stringify(
+        observation,
+      )}`,
+    );
+  }
+  return (
+    `DEBUG ${observation.groupId} ` +
+    `${observation.expectedActive ? "ON" : "OFF"} · ` +
+    `nodes ${observation.nodeCount} · ` +
+    `renderers ${observation.rendererCount} · order ${expectedOrder}`
+  );
+}
+
+export function resolveComposableLoadoutDebugToggle(
+  groupId: ComposableLoadoutDebugGroup,
+  currentStates: readonly boolean[],
+): boolean {
+  resolveComposableLoadoutDebugDefinition(groupId);
+  if (
+    currentStates.length === 0 ||
+    currentStates.some((state) => state !== currentStates[0])
+  ) {
+    throw new Error(
+      `${TASK_013_DEBUG_VISIBILITY_STATE_INVALID}: ${JSON.stringify({
+        groupId,
+        currentStates,
+      })}`,
+    );
+  }
+  return !currentStates[0]!;
 }
 
 export type ComposableLoadoutResourceCategory =
@@ -559,6 +974,7 @@ export interface ComposableLoadoutHudState {
   readonly resourceLoadedCount: number;
   readonly resourceFailedCount: number;
   readonly resourceDuplicateRequestCount: number;
+  readonly debugDiagnostic?: string;
 }
 
 export interface ComposableLoadoutHudRectangle {
@@ -722,6 +1138,8 @@ export function formatComposableLoadoutHudLines(
     state.playbackState,
     COMPOSABLE_LOADOUT_HUD_LAYOUT.maximumPlaybackStateCharacters,
   );
+  const debugDiagnostic = state.debugDiagnostic ?? "DEBUG OFF";
+  assertBoundedHudValue("debugDiagnostic", debugDiagnostic, 80);
   if (
     !Number.isFinite(state.timeSeconds) ||
     state.timeSeconds < 0 ||
@@ -770,7 +1188,9 @@ export function formatComposableLoadoutHudLines(
     {
       rowId: "task-title",
       region: "status",
-      text: "TASK-013 · COMPOSABLE FULL CHARACTER LOADOUT",
+      text:
+        "TASK-013 · COMPOSABLE FULL CHARACTER LOADOUT · " +
+        debugDiagnostic,
     },
     {
       rowId: "runtime-status",

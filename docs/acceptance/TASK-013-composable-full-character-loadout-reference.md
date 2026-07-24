@@ -145,10 +145,37 @@ Cocos key codes, semantic action IDs, or runtime actions. Tests cover all
 the canonical non-crossed mapping: `K` toggles Skeleton and `Y` toggles Grip
 markers.
 
+### Creator 3.8.8 debug-overlay sorting repair
+
+Live Preview then showed that the Grip semantic state changed correctly but
+its `Graphics` remained at the default sort order beneath the prop and
+hand-overlay sprites. The repaired shared debug definitions now declare one
+group ID, display label, sorting offset, minimum renderer count, and marker
+type for every debug action. HUD help, keyboard dispatch, active state,
+renderer registration, and validation all consume those same group IDs.
+
+The runtime derives rather than guesses its reserved ranges from the resolved
+plan: authored plan orders are `0..34`, reference/overlay production views
+extend the production range to `0..36`, debug groups occupy `37..46`, and HUD
+status/help labels occupy `47..48`. All values are inside Cocos Creator
+3.8.8's signed 16-bit `Sorting2D` range. Every debug `Graphics` and `Label`,
+including renderers parented beneath animated joints, receives an explicit
+group order; transform inheritance remains unchanged.
+
+Each toggle validates group presence, renderer count, active state, exact
+sorting order, and separation from production and HUD ranges, then emits one
+bounded `TASK_013_DEBUG_TOGGLE` diagnostic. Missing groups/renderers, invalid
+orders, and inconsistent visibility fail with stable
+`TASK_013_DEBUG_GROUP_MISSING`, `TASK_013_DEBUG_RENDERER_MISSING`,
+`TASK_013_DEBUG_SORT_ORDER_INVALID`, and
+`TASK_013_DEBUG_VISIBILITY_STATE_INVALID` codes. Grip renders separate cyan
+socket and pink anchor crosshairs plus a compact green/red error label, without
+changing either authored transform.
+
 ## Verification and evidence
 
 Working-copy `CI=true pnpm verify` and tracked-files-only frozen installation
-plus `CI=true pnpm verify` both pass 245 tests. Video metadata/hashes, evidence
+plus `CI=true pnpm verify` both pass 250 tests. Video metadata/hashes, evidence
 commit, and review URLs are published in the temporary evidence manifest.
 `evidence/task-013` remains until external visual acceptance. No MP4 is
 tracked on the feature branch.
