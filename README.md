@@ -88,6 +88,12 @@ Hidden joint extensions, bidirectional stress validation, neutral pixel-diff
 evidence, and fixed Cocos acceptance scenes are documented in
 `docs/articulation-safety.md`.
 
+The 16-part primitive stickman reference, pure local-to-world hierarchy
+evaluation, rest/idle, arm-wave, walk articulation clips, and dedicated Cocos
+verification scene are documented in
+`examples/stickman-reference/README.md` and
+`docs/acceptance/TASK-007-stickman-articulation-reference.md`.
+
 ## Status
 
 The project is in **v0.2 Character Pipeline**. TASK-001 established the
@@ -95,7 +101,8 @@ engine-neutral contracts, TASK-002 added safe asset intake, TASK-003 added
 deterministic annotated Rig Layout generation, and TASK-004 added the first
 production Cocos Creator 3.8.8 scene-rig builder. TASK-005 adds the first
 versioned, data-driven Joint animation runtime and subtle Red Cap idle.
-TASK-006.2 replaces the rejected masked articulation evidence with final-owner
-composite validation, meaningful ±8/±12/±6-degree stress ranges, untrimmed
-19-part Cocos rendering, and real Scene/Game Preview evidence before Walk,
-Hit, blending, or state-machine work.
+TASK-006.2 replaces the rejected masked Red Cap articulation evidence with
+final-owner validation and real unmasked rendering. TASK-007 then establishes
+a separate minimal 16-part stickman reference with deterministic hierarchy
+evaluation and three Cocos-verified clips before complex-character animation
+work resumes.

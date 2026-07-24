@@ -89,3 +89,44 @@ export interface JointFinalPose {
   readonly rotationDegrees: number;
   readonly scale: Readonly<AnimationVector2>;
 }
+
+export interface RigHierarchyJoint {
+  readonly jointId: string;
+  readonly parentId: string | null;
+  readonly restPose: JointRestPose;
+}
+
+export type RigHierarchyErrorCode =
+  | "DUPLICATE_HIERARCHY_JOINT"
+  | "INVALID_HIERARCHY_ROOT_COUNT"
+  | "UNKNOWN_HIERARCHY_PARENT"
+  | "HIERARCHY_PARENT_CYCLE"
+  | "NON_FINITE_HIERARCHY_TRANSFORM";
+
+export interface RigHierarchyDiagnostic {
+  readonly code: RigHierarchyErrorCode;
+  readonly jointId?: string;
+  readonly message: string;
+}
+
+export interface AffineTransform2D {
+  readonly a: number;
+  readonly b: number;
+  readonly c: number;
+  readonly d: number;
+  readonly tx: number;
+  readonly ty: number;
+}
+
+export interface EvaluatedJointPose {
+  readonly jointId: string;
+  readonly parentId: string | null;
+  readonly localPose: JointFinalPose;
+  readonly worldTransform: AffineTransform2D;
+  readonly worldPivot: Readonly<AnimationVector2>;
+}
+
+export interface EvaluatedRigPose {
+  readonly joints: Readonly<Record<string, EvaluatedJointPose>>;
+  readonly evaluationOrder: readonly string[];
+}

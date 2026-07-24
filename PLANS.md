@@ -2,6 +2,87 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-007 Minimal Stickman Articulation Reference
+
+- Status: Complete
+- Started: 2026-07-24
+- Completed: 2026-07-24
+
+### Goal
+
+Prove the reusable rigid-rig hierarchy, proximal pivots, exact rest pose,
+local-to-world transform evaluation, mirrored-limb semantics, and deterministic
+animation playback with deliberately simple stickman geometry before returning
+to complex segmented character art.
+
+### Scope
+
+- Add a 16-part engine-neutral stickman fixture with stable IDs, one explicit
+  root, parent relationships, proximal pivots, local rest transforms, and
+  unique draw order.
+- Reuse the published Rig Layout and Rig Animation 1.0 contracts rather than
+  adding a character-specific schema.
+- Add pure hierarchy validation and 2D local-to-world evaluation to
+  `@gameai/rig-animation`, including rotation, non-uniform scale, and mirrored
+  scale semantics.
+- Add data-only rest/idle, arm-wave, and walk-cycle articulation clips and
+  deterministic sampled evidence.
+- Add a thin Cocos Creator 3.8.x demonstration adapter that creates only
+  generated primitive graphics, applies sampled local poses to the Joint
+  hierarchy, displays clip/playback state, and optionally displays joint
+  markers.
+- Add a dedicated Cocos verification scene and capture real Scene/Game
+  evidence for all three clips.
+
+### Out of scope
+
+- Red Cap reconstruction or assumptions, automatic cutting, production art,
+  Unity or Godot adapters, a cross-engine compiler, IK, mesh deformation,
+  combat logic, blending, or an animation state machine.
+
+### Execution
+
+1. Record the replacement TASK-007 specification and this plan from clean
+   `main` at `daa90d4858ab99e80429d77d4f615493f0fcb8cd`.
+2. Create `feat/task-007-stickman-reference` without modifying, merging,
+   deleting, or pushing `archive/old-task-007-cross-engine`.
+3. Add the engine-neutral fixture, three clips, hierarchy validator, affine
+   transform evaluator, deterministic evidence generator, and focused tests.
+4. Add the Cocos primitive-shape adapter, runtime clip controls/status/debug
+   overlay, and verification scene without adding another engine adapter.
+5. Run `pnpm verify`, open the scene in Cocos Creator 3.8.8, inspect rest,
+   wave, and walk playback plus pivots/mirroring, and capture evidence.
+6. Complete the acceptance report, review the scoped diff, and commit locally
+   without pushing pending visual review.
+
+### Done when
+
+- The exact rest sample reproduces every authored local and world transform.
+- Parent rotation visibly and numerically moves descendants around the
+  intended shoulder, elbow, hip, and knee pivots.
+- Left/right arms and legs obey explicit, tested mirrored semantics.
+- Rest/idle, arm-wave, and walk-cycle clips validate and sample
+  deterministically without any Red Cap data.
+- The dedicated Cocos scene visibly shows the primitive stickman, current clip
+  and playback state, and joint markers.
+- Real Creator evidence and a written visual inspection record are committed.
+- `pnpm verify` passes and the completed task is committed only on
+  `feat/task-007-stickman-reference`, with no push.
+
+### Result
+
+- Added the engine-neutral 16-part primitive fixture, three versioned clips,
+  deterministic evidence, hierarchy validation, and affine local-to-world
+  evaluation without adding a schema or Red Cap-specific assumption.
+- Added a Cocos Creator-only primitive adapter, generated runtime data,
+  dedicated verification scene, clip controls/HUD, and optional joint markers.
+- Verified exact rest restoration, descendant inheritance, shoulder/elbow/
+  hip/knee pivots, mirrored limbs, and all three clips in Creator 3.8.8 and
+  its Web Game Preview; captured five visual evidence images.
+- `pnpm verify` passes all 136 tests. The replacement remains local and
+  unpushed pending visual review; `archive/old-task-007-cross-engine` remains
+  untouched.
+
 ## Completed plan: TASK-006.2 Unmasked Rig Render Verification
 
 - Status: Complete

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "rigId": "stickman-reference-layout",
+  "lineWidth": 12,
+  "jointMarkerRadius": 4,
+  "parts": [
+    { "partId": "root", "kind": "circle", "center": { "x": 0, "y": 0 }, "radius": 4, "color": "#94a3b8" },
+    { "partId": "pelvis", "kind": "segment", "from": { "x": -20, "y": 0 }, "to": { "x": 20, "y": 0 }, "color": "#38bdf8" },
+    { "partId": "torso", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": 72 }, "color": "#38bdf8" },
+    { "partId": "head", "kind": "circle", "center": { "x": 0, "y": 23 }, "radius": 22, "color": "#f8fafc" },
+    { "partId": "upper-arm-left", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -52 }, "color": "#fbbf24" },
+    { "partId": "lower-arm-left", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -48 }, "color": "#fde68a" },
+    { "partId": "hand-left", "kind": "circle", "center": { "x": 0, "y": -8 }, "radius": 9, "color": "#f8fafc" },
+    { "partId": "upper-arm-right", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -52 }, "color": "#fb7185" },
+    { "partId": "lower-arm-right", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -48 }, "color": "#fda4af" },
+    { "partId": "hand-right", "kind": "circle", "center": { "x": 0, "y": -8 }, "radius": 9, "color": "#f8fafc" },
+    { "partId": "thigh-left", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -62 }, "color": "#fbbf24" },
+    { "partId": "shin-left", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -58 }, "color": "#fde68a" },
+    { "partId": "foot-left", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": -28, "y": 0 }, "color": "#f8fafc" },
+    { "partId": "thigh-right", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -62 }, "color": "#fb7185" },
+    { "partId": "shin-right", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 0, "y": -58 }, "color": "#fda4af" },
+    { "partId": "foot-right", "kind": "segment", "from": { "x": 0, "y": 0 }, "to": { "x": 28, "y": 0 }, "color": "#f8fafc" }
+  ],
+  "mirrorPairs": [
+    ["upper-arm-left", "upper-arm-right"],
+    ["lower-arm-left", "lower-arm-right"],
+    ["hand-left", "hand-right"],
+    ["thigh-left", "thigh-right"],
+    ["shin-left", "shin-right"],
+    ["foot-left", "foot-right"]
+  ]
+}

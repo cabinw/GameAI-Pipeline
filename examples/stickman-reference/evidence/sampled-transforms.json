@@ -1,0 +1,1463 @@
+{
+  "schemaVersion": "1.0.0",
+  "rigId": "stickman-reference-layout",
+  "partCount": 16,
+  "evaluationOrder": [
+    "root",
+    "pelvis",
+    "thigh-left",
+    "shin-left",
+    "foot-left",
+    "thigh-right",
+    "shin-right",
+    "foot-right",
+    "torso",
+    "head",
+    "upper-arm-left",
+    "lower-arm-left",
+    "hand-left",
+    "upper-arm-right",
+    "lower-arm-right",
+    "hand-right"
+  ],
+  "restWorldPivots": {
+    "foot-left": {
+      "x": -14,
+      "y": -256
+    },
+    "foot-right": {
+      "x": 14,
+      "y": -256
+    },
+    "hand-left": {
+      "x": -31,
+      "y": -156
+    },
+    "hand-right": {
+      "x": 31,
+      "y": -156
+    },
+    "head": {
+      "x": 0,
+      "y": -40
+    },
+    "lower-arm-left": {
+      "x": -31,
+      "y": -108
+    },
+    "lower-arm-right": {
+      "x": 31,
+      "y": -108
+    },
+    "pelvis": {
+      "x": 0,
+      "y": -130
+    },
+    "root": {
+      "x": 0,
+      "y": -130
+    },
+    "shin-left": {
+      "x": -14,
+      "y": -198
+    },
+    "shin-right": {
+      "x": 14,
+      "y": -198
+    },
+    "thigh-left": {
+      "x": -14,
+      "y": -136
+    },
+    "thigh-right": {
+      "x": 14,
+      "y": -136
+    },
+    "torso": {
+      "x": 0,
+      "y": -112
+    },
+    "upper-arm-left": {
+      "x": -31,
+      "y": -56
+    },
+    "upper-arm-right": {
+      "x": 31,
+      "y": -56
+    }
+  },
+  "clips": [
+    {
+      "animationId": "stickman-rest-idle",
+      "duration": 2,
+      "loop": true,
+      "samples": [
+        {
+          "inputTime": 0,
+          "sampleTime": 0,
+          "localOffsets": {
+            "head": {
+              "rotationDegrees": 0
+            },
+            "torso": {
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 31,
+              "y": -156
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -108
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 1,
+          "sampleTime": 1,
+          "localOffsets": {
+            "head": {
+              "rotationDegrees": 2
+            },
+            "torso": {
+              "position": {
+                "x": 0,
+                "y": 2
+              }
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -154
+            },
+            "hand-right": {
+              "x": 31,
+              "y": -154
+            },
+            "head": {
+              "x": 0,
+              "y": -38
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -106
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -106
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -110
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -54
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -54
+            }
+          }
+        },
+        {
+          "inputTime": 2,
+          "sampleTime": 0,
+          "localOffsets": {
+            "head": {
+              "rotationDegrees": 0
+            },
+            "torso": {
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 31,
+              "y": -156
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -108
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        }
+      ]
+    },
+    {
+      "animationId": "stickman-arm-wave",
+      "duration": 2,
+      "loop": true,
+      "samples": [
+        {
+          "inputTime": 0,
+          "sampleTime": 0,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": 0
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 0
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 0
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 31,
+              "y": -156
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -108
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 0.4,
+          "sampleTime": 0.4,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": 15
+            },
+            "lower-arm-right": {
+              "rotationDegrees": -65
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 100
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 109.741664,
+              "y": -86.289648
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 82.210016,
+              "y": -46.970304
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 0.7,
+          "sampleTime": 0.7,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": -15
+            },
+            "lower-arm-right": {
+              "rotationDegrees": -25
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 100
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 128.574464,
+              "y": -59.393616
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 82.210016,
+              "y": -46.970304
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 1,
+          "sampleTime": 1,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": 15
+            },
+            "lower-arm-right": {
+              "rotationDegrees": -70
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 100
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 106.210016,
+              "y": -88.539552
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 82.210016,
+              "y": -46.970304
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 1.3,
+          "sampleTime": 1.3,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": -15
+            },
+            "lower-arm-right": {
+              "rotationDegrees": -25
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 100
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 128.574464,
+              "y": -59.393616
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 82.210016,
+              "y": -46.970304
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 1.6,
+          "sampleTime": 1.6,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": 15
+            },
+            "lower-arm-right": {
+              "rotationDegrees": -65
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 100
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 109.741664,
+              "y": -86.289648
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 82.210016,
+              "y": -46.970304
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 2,
+          "sampleTime": 0,
+          "localOffsets": {
+            "hand-right": {
+              "rotationDegrees": 0
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 0
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 0
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -14,
+              "y": -256
+            },
+            "foot-right": {
+              "x": 14,
+              "y": -256
+            },
+            "hand-left": {
+              "x": -31,
+              "y": -156
+            },
+            "hand-right": {
+              "x": 31,
+              "y": -156
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -108
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -108
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -198
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -198
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        }
+      ]
+    },
+    {
+      "animationId": "stickman-walk-cycle",
+      "duration": 1.2,
+      "loop": true,
+      "samples": [
+        {
+          "inputTime": 0,
+          "sampleTime": 0,
+          "localOffsets": {
+            "foot-left": {
+              "rotationDegrees": -8
+            },
+            "foot-right": {
+              "rotationDegrees": -12
+            },
+            "lower-arm-left": {
+              "rotationDegrees": -12
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 32
+            },
+            "root": {
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            "shin-left": {
+              "rotationDegrees": 8
+            },
+            "shin-right": {
+              "rotationDegrees": -10
+            },
+            "thigh-left": {
+              "rotationDegrees": 30
+            },
+            "thigh-right": {
+              "rotationDegrees": -30
+            },
+            "upper-arm-left": {
+              "rotationDegrees": -25
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 25
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": 52.708338,
+              "y": -235.39813
+            },
+            "foot-right": {
+              "x": -54.281704,
+              "y": -234.124102
+            },
+            "hand-left": {
+              "x": -81.863256,
+              "y": -141.462544
+            },
+            "hand-right": {
+              "x": 93.232296,
+              "y": -129.270688
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -52.976136,
+              "y": -103.128016
+            },
+            "lower-arm-right": {
+              "x": 52.976136,
+              "y": -103.128016
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": 17,
+              "y": -189.69355
+            },
+            "shin-right": {
+              "x": -17,
+              "y": -189.69355
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 0.3,
+          "sampleTime": 0.3,
+          "localOffsets": {
+            "foot-left": {
+              "rotationDegrees": 2
+            },
+            "foot-right": {
+              "rotationDegrees": -2
+            },
+            "lower-arm-left": {
+              "rotationDegrees": -22
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 22
+            },
+            "root": {
+              "position": {
+                "x": 0,
+                "y": 4
+              }
+            },
+            "shin-left": {
+              "rotationDegrees": 38
+            },
+            "shin-right": {
+              "rotationDegrees": -9
+            },
+            "thigh-left": {
+              "rotationDegrees": 0
+            },
+            "thigh-right": {
+              "rotationDegrees": 0
+            },
+            "upper-arm-left": {
+              "rotationDegrees": 0
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 0
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": 21.708338,
+              "y": -239.704638
+            },
+            "foot-right": {
+              "x": 4.926828,
+              "y": -251.285904
+            },
+            "hand-left": {
+              "x": -48.981136,
+              "y": -148.504832
+            },
+            "hand-right": {
+              "x": 48.981136,
+              "y": -148.504832
+            },
+            "head": {
+              "x": 0,
+              "y": -36
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -104
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -104
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -126
+            },
+            "root": {
+              "x": 0,
+              "y": -126
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -194
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -194
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -132
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -132
+            },
+            "torso": {
+              "x": 0,
+              "y": -108
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -52
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -52
+            }
+          }
+        },
+        {
+          "inputTime": 0.6,
+          "sampleTime": 0.6,
+          "localOffsets": {
+            "foot-left": {
+              "rotationDegrees": 12
+            },
+            "foot-right": {
+              "rotationDegrees": 8
+            },
+            "lower-arm-left": {
+              "rotationDegrees": -32
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 12
+            },
+            "root": {
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            "shin-left": {
+              "rotationDegrees": 10
+            },
+            "shin-right": {
+              "rotationDegrees": -8
+            },
+            "thigh-left": {
+              "rotationDegrees": -30
+            },
+            "thigh-right": {
+              "rotationDegrees": 30
+            },
+            "upper-arm-left": {
+              "rotationDegrees": 25
+            },
+            "upper-arm-right": {
+              "rotationDegrees": -25
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -64.83716,
+              "y": -244.195686
+            },
+            "foot-right": {
+              "x": 66.727206,
+              "y": -243.470164
+            },
+            "hand-left": {
+              "x": -14.873576,
+              "y": -150.770224
+            },
+            "hand-right": {
+              "x": -1.773784,
+              "y": -149.897824
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -9.023864,
+              "y": -103.128016
+            },
+            "lower-arm-right": {
+              "x": 9.023864,
+              "y": -103.128016
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": -45,
+              "y": -189.69355
+            },
+            "shin-right": {
+              "x": 45,
+              "y": -189.69355
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        },
+        {
+          "inputTime": 0.9,
+          "sampleTime": 0.9,
+          "localOffsets": {
+            "foot-left": {
+              "rotationDegrees": 2
+            },
+            "foot-right": {
+              "rotationDegrees": -2
+            },
+            "lower-arm-left": {
+              "rotationDegrees": -22
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 22
+            },
+            "root": {
+              "position": {
+                "x": 0,
+                "y": 4
+              }
+            },
+            "shin-left": {
+              "rotationDegrees": 9
+            },
+            "shin-right": {
+              "rotationDegrees": -38
+            },
+            "thigh-left": {
+              "rotationDegrees": 0
+            },
+            "thigh-right": {
+              "rotationDegrees": 0
+            },
+            "upper-arm-left": {
+              "rotationDegrees": 0
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 0
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": -4.926828,
+              "y": -251.285904
+            },
+            "foot-right": {
+              "x": -21.708338,
+              "y": -239.704638
+            },
+            "hand-left": {
+              "x": -48.981136,
+              "y": -148.504832
+            },
+            "hand-right": {
+              "x": 48.981136,
+              "y": -148.504832
+            },
+            "head": {
+              "x": 0,
+              "y": -36
+            },
+            "lower-arm-left": {
+              "x": -31,
+              "y": -104
+            },
+            "lower-arm-right": {
+              "x": 31,
+              "y": -104
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -126
+            },
+            "root": {
+              "x": 0,
+              "y": -126
+            },
+            "shin-left": {
+              "x": -14,
+              "y": -194
+            },
+            "shin-right": {
+              "x": 14,
+              "y": -194
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -132
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -132
+            },
+            "torso": {
+              "x": 0,
+              "y": -108
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -52
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -52
+            }
+          }
+        },
+        {
+          "inputTime": 1.2,
+          "sampleTime": 0,
+          "localOffsets": {
+            "foot-left": {
+              "rotationDegrees": -8
+            },
+            "foot-right": {
+              "rotationDegrees": -12
+            },
+            "lower-arm-left": {
+              "rotationDegrees": -12
+            },
+            "lower-arm-right": {
+              "rotationDegrees": 32
+            },
+            "root": {
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            "shin-left": {
+              "rotationDegrees": 8
+            },
+            "shin-right": {
+              "rotationDegrees": -10
+            },
+            "thigh-left": {
+              "rotationDegrees": 30
+            },
+            "thigh-right": {
+              "rotationDegrees": -30
+            },
+            "upper-arm-left": {
+              "rotationDegrees": -25
+            },
+            "upper-arm-right": {
+              "rotationDegrees": 25
+            }
+          },
+          "worldPivots": {
+            "foot-left": {
+              "x": 52.708338,
+              "y": -235.39813
+            },
+            "foot-right": {
+              "x": -54.281704,
+              "y": -234.124102
+            },
+            "hand-left": {
+              "x": -81.863256,
+              "y": -141.462544
+            },
+            "hand-right": {
+              "x": 93.232296,
+              "y": -129.270688
+            },
+            "head": {
+              "x": 0,
+              "y": -40
+            },
+            "lower-arm-left": {
+              "x": -52.976136,
+              "y": -103.128016
+            },
+            "lower-arm-right": {
+              "x": 52.976136,
+              "y": -103.128016
+            },
+            "pelvis": {
+              "x": 0,
+              "y": -130
+            },
+            "root": {
+              "x": 0,
+              "y": -130
+            },
+            "shin-left": {
+              "x": 17,
+              "y": -189.69355
+            },
+            "shin-right": {
+              "x": -17,
+              "y": -189.69355
+            },
+            "thigh-left": {
+              "x": -14,
+              "y": -136
+            },
+            "thigh-right": {
+              "x": 14,
+              "y": -136
+            },
+            "torso": {
+              "x": 0,
+              "y": -112
+            },
+            "upper-arm-left": {
+              "x": -31,
+              "y": -56
+            },
+            "upper-arm-right": {
+              "x": 31,
+              "y": -56
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "deterministicSha256": "40349833b5ed52090ae36b7a87eccdeb3044023e25c3d30649fa1fc95499cf6a"
+}

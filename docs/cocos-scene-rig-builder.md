@@ -119,6 +119,26 @@ registered component reports `ANIMATION_RUNTIME_COMPONENT_MISSING`. Stop and
 reset restore the exact captured rest transforms. See
 `docs/rig-animation.md` for coordinate and loop semantics.
 
+## Minimal stickman articulation scene
+
+TASK-007 adds
+`assets/stickman-articulation-reference.scene` to the Cocos fixture project.
+It is intentionally separate from the production sprite builder:
+
+- `examples/stickman-reference` remains the engine-neutral source.
+- A deterministic adapter validates the hierarchy and clips, then emits the
+  Cocos demo plan consumed by the fixture.
+- `GameAIStickmanArticulationDemo` creates only `Graphics` circles/segments,
+  `Joint_*` transforms, `Visual_*` render nodes, and optional `Marker_*`
+  overlays.
+- The HUD displays active clip, playback state, absolute sample time, and
+  marker state. Keys `1`/`2`/`3`, `Space`, `R`, and `J` select clips, control
+  playback, restore exact rest, and toggle markers.
+
+The scene proves the existing Joint-only animation boundary without
+SpriteFrames, Red Cap art, image intake, or another engine adapter. Its visual
+acceptance record is `docs/acceptance/TASK-007-stickman-articulation-reference.md`.
+
 ## World-space 2D rendering
 
 Generated Character Rigs are world-space 2D content. `CHR_<characterId>` owns

@@ -10,6 +10,7 @@
   },
   "include": [
     "source/runtime.ts",
+    "source/hierarchy.ts",
     "source/playback.ts",
     "source/sampler.ts",
     "source/types.ts"

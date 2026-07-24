@@ -54,6 +54,29 @@ The sampler never reads a previous frame. Loop time is canonicalized to
 must start at `0`, end at `duration`, and repeat the same endpoint value.
 This prevents drift and visible boundary jumps.
 
+## Hierarchy and world-transform evaluation
+
+TASK-007 adds pure 2D hierarchy evaluation without changing the Rig Animation
+contract. A `RigHierarchyJoint` contains only a stable `jointId`, `parentId`,
+and local rest pose. `validateRigHierarchy` rejects duplicate joints, unknown
+parents, invalid root counts, parent cycles, and non-finite/zero-scale rest
+transforms before evaluation.
+
+`evaluateRigPose` composes each sampled rest-relative local pose into a
+deterministic affine matrix:
+
+```text
+local = translate(position) × rotate(rotationDegrees) × scale(scale)
+world = parentWorld × local
+```
+
+The joint origin is its proximal pivot. Its `worldPivot` is therefore the
+translation column of the evaluated world matrix; rotating the joint keeps
+that pivot fixed while moving descendants. Negative scale is preserved in the
+matrix so reflected limbs use the same evaluation path. Public matrices,
+pivots, and composed poses are rounded to six decimal places, matching clip
+sampling determinism.
+
 ## Interpolation
 
 Version 1.0 supports `linear` and `step` interpolation plus `linear`,
@@ -123,3 +146,6 @@ The real Creator acceptance procedure and evidence are recorded in
   unchanged; Walk, Hit, blending, and state-machine behavior are still absent.
 - Runtime validation assumes Main supplied normalized, already validated data;
   Scene Script does not duplicate JSON-contract parsing.
+- The TASK-007 walk cycle is a minimal in-place articulation reference, not a
+  production locomotion system; it adds no root motion, foot locking, IK,
+  blending, or state machine.

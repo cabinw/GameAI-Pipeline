@@ -2,8 +2,14 @@
   "name": "gameai-character-rig-builder-cocos-project",
   "version": "3.8.8",
   "private": true,
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.assets.json --noEmit"
+  },
   "dependencies": {
     "@gameai/rig-animation": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
   },
   "creator": {
     "version": "3.8.8"
