@@ -3,7 +3,8 @@
   "version": "3.8.8",
   "private": true,
   "scripts": {
-    "typecheck": "tsc -p tsconfig.assets.json --noEmit"
+    "typecheck": "node scripts/run-typecheck.mjs",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@gameai/rig-animation": "workspace:*"

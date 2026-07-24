@@ -139,6 +139,17 @@ The scene proves the existing Joint-only animation boundary without
 SpriteFrames, Red Cap art, image intake, or another engine adapter. Its visual
 acceptance record is `docs/acceptance/TASK-007-stickman-articulation-reference.md`.
 
+### Clean-checkout typechecking
+
+Creator remains the authoritative type environment during local Editor
+development: the project `tsconfig.json` and `tsconfig.assets.json` extend the
+generated `temp/tsconfig.cocos.json`. Clean CI runners do not have that ignored
+Editor state, so `CI=true` selects the tracked `tsconfig.ci.json` and the
+strict, deliberately minimal `types/cc-ci.d.ts` surface instead. Regression
+tests reject generated-directory and developer-machine paths in that CI
+configuration and keep its exported Cocos APIs synchronized with checked-in
+asset imports.
+
 ## World-space 2D rendering
 
 Generated Character Rigs are world-space 2D content. `CHR_<characterId>` owns
