@@ -4,7 +4,13 @@ import {
   type ContractDocument,
   type ValidationIssue,
 } from "./errors";
-import type { CharacterRig, RigLayout, RigPart } from "./types";
+import type {
+  AttachmentLayout,
+  AttachmentTransform,
+  CharacterRig,
+  RigLayout,
+  RigPart,
+} from "./types";
 
 export const SUPPORTED_SCHEMA_RANGE = ">=1.0.0 <1.1.0";
 
@@ -50,7 +56,7 @@ function validateSchemaVersion(
   ];
 }
 
-function isSafeRelativePath(path: string, extensionPattern: RegExp): boolean {
+export function isSafeRelativePath(path: string, extensionPattern: RegExp): boolean {
   return (
     path.length > 0 &&
     !path.startsWith("/") &&
@@ -60,6 +66,151 @@ function isSafeRelativePath(path: string, extensionPattern: RegExp): boolean {
     !path.includes("\u0000") &&
     extensionPattern.test(path)
   );
+}
+
+function validAttachmentTransform(transform: AttachmentTransform): boolean {
+  return (
+    Number.isFinite(transform.position.x) &&
+    Number.isFinite(transform.position.y) &&
+    Number.isFinite(transform.rotationDegrees) &&
+    Number.isFinite(transform.scale.x) &&
+    Number.isFinite(transform.scale.y) &&
+    transform.scale.x !== 0 &&
+    transform.scale.y !== 0
+  );
+}
+
+export function validateAttachmentLayoutSemantics(
+  layout: AttachmentLayout,
+): ValidationIssue[] {
+  const issues = validateSchemaVersion(layout.schemaVersion, "attachmentLayout");
+  const slotIds = new Set(layout.slots.map((slot) => slot.slotId));
+  for (const slotId of findDuplicateValues(layout.slots.map((slot) => slot.slotId))) {
+    issues.push(
+      issue(
+        ValidationErrorCode.DUPLICATE_ATTACHMENT_SLOT_ID,
+        "attachmentLayout",
+        "/slots",
+        `Attachment slot ${slotId} is declared more than once.`,
+        { slotId },
+      ),
+    );
+  }
+  for (const attachmentId of findDuplicateValues(
+    layout.attachments.map((attachment) => attachment.attachmentId),
+  )) {
+    issues.push(
+      issue(
+        ValidationErrorCode.DUPLICATE_ATTACHMENT_ID,
+        "attachmentLayout",
+        "/attachments",
+        `Attachment ${attachmentId} is declared more than once.`,
+        { attachmentId },
+      ),
+    );
+  }
+  for (const drawOrder of findDuplicateValues(
+    layout.attachments.map((attachment) => String(attachment.drawOrder)),
+  )) {
+    issues.push(
+      issue(
+        ValidationErrorCode.DUPLICATE_ATTACHMENT_DRAW_ORDER,
+        "attachmentLayout",
+        "/attachments",
+        `Attachment draw order ${drawOrder} is declared more than once.`,
+        { drawOrder: Number(drawOrder) },
+      ),
+    );
+  }
+  layout.slots.forEach((slot, index) => {
+    if (!validAttachmentTransform(slot.transform)) {
+      issues.push(
+        issue(
+          ValidationErrorCode.INVALID_ATTACHMENT_TRANSFORM,
+          "attachmentLayout",
+          `/slots/${index}/transform`,
+          `Attachment slot ${slot.slotId} has a non-finite or zero-scale transform.`,
+          { slotId: slot.slotId },
+        ),
+      );
+    }
+  });
+  layout.attachments.forEach((attachment, index) => {
+    if (!slotIds.has(attachment.slotId)) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNKNOWN_ATTACHMENT_SLOT,
+          "attachmentLayout",
+          `/attachments/${index}/slotId`,
+          `Attachment ${attachment.attachmentId} references unknown slot ${attachment.slotId}.`,
+          { attachmentId: attachment.attachmentId, slotId: attachment.slotId },
+        ),
+      );
+    }
+    if (!isSafeRelativePath(attachment.file, /\.(?:png|jpg|jpeg|webp)$/)) {
+      issues.push(
+        issue(
+          ValidationErrorCode.INVALID_FILE_PATH,
+          "attachmentLayout",
+          `/attachments/${index}/file`,
+          `Attachment ${attachment.attachmentId} must use a safe relative POSIX image path.`,
+          { attachmentId: attachment.attachmentId, file: attachment.file },
+        ),
+      );
+    }
+    if (!validAttachmentTransform(attachment.transform)) {
+      issues.push(
+        issue(
+          ValidationErrorCode.INVALID_ATTACHMENT_TRANSFORM,
+          "attachmentLayout",
+          `/attachments/${index}/transform`,
+          `Attachment ${attachment.attachmentId} has a non-finite or zero-scale transform.`,
+          { attachmentId: attachment.attachmentId },
+        ),
+      );
+    }
+  });
+  return sortIssues(issues);
+}
+
+export function validateAttachmentLayoutCompatibility(
+  attachmentLayout: AttachmentLayout,
+  rigLayout: RigLayout,
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  if (
+    attachmentLayout.rig.layoutId !== rigLayout.layoutId ||
+    attachmentLayout.rig.schemaVersion !== rigLayout.schemaVersion
+  ) {
+    issues.push(
+      issue(
+        ValidationErrorCode.INCOMPATIBLE_ATTACHMENT_RIG,
+        "contract",
+        "/attachmentLayout/rig",
+        `Attachment Layout ${attachmentLayout.attachmentLayoutId} does not target ${rigLayout.layoutId}@${rigLayout.schemaVersion}.`,
+        {
+          expectedLayoutId: rigLayout.layoutId,
+          expectedSchemaVersion: rigLayout.schemaVersion,
+          actual: attachmentLayout.rig,
+        },
+      ),
+    );
+  }
+  const partIds = new Set(rigLayout.parts.map((part) => part.partId));
+  attachmentLayout.slots.forEach((slot, index) => {
+    if (!partIds.has(slot.parentPartId)) {
+      issues.push(
+        issue(
+          ValidationErrorCode.UNKNOWN_PARENT,
+          "contract",
+          `/attachmentLayout/slots/${index}/parentPartId`,
+          `Attachment slot ${slot.slotId} references unknown parent ${slot.parentPartId}.`,
+          { slotId: slot.slotId, parentPartId: slot.parentPartId },
+        ),
+      );
+    }
+  });
+  return sortIssues(issues);
 }
 
 function findDuplicateValues(values: readonly string[]): string[] {

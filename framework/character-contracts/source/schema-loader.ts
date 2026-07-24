@@ -24,3 +24,4 @@ export function loadSchema(file: string): JsonSchema {
 
 export const characterRigSchema = loadSchema("character-rig.schema.json");
 export const rigLayoutSchema = loadSchema("rig-layout.schema.json");
+export const attachmentLayoutSchema = loadSchema("attachment-layout.schema.json");

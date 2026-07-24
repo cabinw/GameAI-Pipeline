@@ -26,6 +26,7 @@ export {
   type ReconstructionResult,
   type ReconstructionTolerance,
 } from "./production-lite-reconstruction";
+export { reconstructAttachmentVariant } from "./attachment-reconstruction";
 export {
   auditCanonicalArt,
   type CanonicalArtGateArtifacts,

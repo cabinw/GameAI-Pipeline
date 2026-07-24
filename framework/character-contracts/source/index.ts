@@ -6,16 +6,33 @@ export {
   type ValidationResult,
 } from "./errors";
 export { parseCharacterContract, parseCharacterRig, parseRigLayout } from "./parser";
-export { characterRigSchema, rigLayoutSchema, type JsonSchema } from "./schema-loader";
+export { parseAttachmentLayout } from "./parser";
+export {
+  attachmentLayoutSchema,
+  characterRigSchema,
+  rigLayoutSchema,
+  type JsonSchema,
+} from "./schema-loader";
+export {
+  composeAttachmentWorldTransform,
+  multiplyAttachmentTransforms,
+  resolveAttachmentLayout,
+} from "./attachment-resolver";
 export {
   SUPPORTED_SCHEMA_RANGE,
   isSupportedSchemaVersion,
   validateCharacterContractSemantics,
   validateCharacterRigSemantics,
+  validateAttachmentLayoutCompatibility,
+  validateAttachmentLayoutSemantics,
   validateRigLayoutSemantics,
 } from "./semantic-validator";
 export type {
+  AffineTransform2D,
   AnimationTarget,
+  AttachmentLayout,
+  AttachmentSlot,
+  AttachmentTransform,
   CharacterContract,
   CharacterRig,
   CircleHitShape,
@@ -28,6 +45,8 @@ export type {
   RigLayout,
   RigPart,
   RigSocket,
+  RigAttachment,
+  ResolvedAttachment,
   Size,
   Vector2,
 } from "./types";

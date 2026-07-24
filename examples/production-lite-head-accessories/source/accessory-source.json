@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "1.0.0",
+  "attachmentLayoutId": "production-lite-head-accessories",
+  "baseFixture": "../production-lite-character",
+  "rig": {
+    "layoutId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "palette": {
+    "outline": "#25324A",
+    "cap": "#D83B47",
+    "capShadow": "#A92334",
+    "capHighlight": "#F05A62",
+    "lens": "#23304B",
+    "lensHighlight": "#7DD3FC"
+  },
+  "slots": [
+    {
+      "slotId": "headwear",
+      "parentPartId": "head",
+      "transform": {
+        "position": { "x": 0, "y": 60 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "defaultEnabled": true
+    },
+    {
+      "slotId": "face-accessory",
+      "parentPartId": "head",
+      "transform": {
+        "position": { "x": 0, "y": 25 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "defaultEnabled": true
+    }
+  ],
+  "attachments": [
+    {
+      "attachmentId": "cap-back",
+      "slotId": "headwear",
+      "file": "attachments/cap-back.png",
+      "sourceTopLeft": { "x": 244, "y": 56 },
+      "size": { "width": 112, "height": 64 },
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.609375 },
+      "drawOrder": 0.5,
+      "layerRole": "back",
+      "svg": "<path d=\"M55 3C28 3 10 17 6 42L4 59H108L106 42C101 17 83 3 55 3Z\" fill=\"{capShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M18 44C40 35 75 35 96 44L97 58H16Z\" fill=\"{cap}\"/>"
+    },
+    {
+      "attachmentId": "sunglasses",
+      "slotId": "face-accessory",
+      "file": "attachments/sunglasses.png",
+      "sourceTopLeft": { "x": 254, "y": 147 },
+      "size": { "width": 92, "height": 35 },
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.5142857142857142 },
+      "drawOrder": 12.5,
+      "layerRole": "front",
+      "svg": "<path d=\"M3 8L10 6 38 7 43 12H49L54 7 82 6 89 8 86 23C84 31 75 34 65 31 57 29 53 23 53 15H39C39 23 35 29 27 31 17 34 8 31 6 23Z\" fill=\"{lens}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M14 12L29 10\" stroke=\"{lensHighlight}\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.75\"/><path d=\"M62 12L77 10\" stroke=\"{lensHighlight}\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.75\"/>"
+    },
+    {
+      "attachmentId": "cap-front",
+      "slotId": "headwear",
+      "file": "attachments/cap-front.png",
+      "sourceTopLeft": { "x": 236, "y": 50 },
+      "size": { "width": 128, "height": 70 },
+      "transform": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 }
+      },
+      "anchor": { "x": 0.5, "y": 0.6428571428571429 },
+      "drawOrder": 13.5,
+      "layerRole": "front",
+      "svg": "<path d=\"M63 3C34 2 16 14 11 38L10 47C34 40 83 40 108 47L106 37C101 14 84 3 63 3Z\" fill=\"{cap}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M18 28C37 17 70 15 94 25\" fill=\"none\" stroke=\"{capHighlight}\" stroke-width=\"5\" stroke-linecap=\"round\"/><path d=\"M9 45C30 40 74 40 109 47L124 56C111 65 85 68 59 62L20 55 5 54Z\" fill=\"{capShadow}\" stroke=\"{outline}\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M19 48C46 44 78 45 104 50\" fill=\"none\" stroke=\"{capHighlight}\" stroke-width=\"3\" stroke-linecap=\"round\"/>"
+    }
+  ],
+  "variants": [
+    {
+      "variantId": "base",
+      "slotOverrides": { "headwear": false, "face-accessory": false }
+    },
+    {
+      "variantId": "cap-only",
+      "slotOverrides": { "headwear": true, "face-accessory": false }
+    },
+    {
+      "variantId": "sunglasses-only",
+      "slotOverrides": { "headwear": false, "face-accessory": true }
+    },
+    {
+      "variantId": "cap-and-sunglasses",
+      "slotOverrides": { "headwear": true, "face-accessory": true }
+    }
+  ]
+}

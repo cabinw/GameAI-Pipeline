@@ -85,3 +85,59 @@ export interface CharacterContract {
   characterRig: CharacterRig;
   rigLayout: RigLayout;
 }
+
+export interface AttachmentTransform {
+  position: Vector2;
+  rotationDegrees: number;
+  scale: Vector2;
+}
+
+export interface AttachmentSlot {
+  slotId: string;
+  parentPartId: string;
+  transform: AttachmentTransform;
+  defaultEnabled: boolean;
+}
+
+export interface RigAttachment {
+  attachmentId: string;
+  slotId: string;
+  file: string;
+  transform: AttachmentTransform;
+  anchor: NormalizedAnchor;
+  drawOrder: number;
+  layerRole?: "back" | "front";
+}
+
+export interface AttachmentLayout {
+  schemaVersion: string;
+  attachmentLayoutId: string;
+  rig: {
+    layoutId: string;
+    schemaVersion: string;
+  };
+  slots: AttachmentSlot[];
+  attachments: RigAttachment[];
+}
+
+export interface AffineTransform2D {
+  a: number;
+  b: number;
+  c: number;
+  d: number;
+  tx: number;
+  ty: number;
+}
+
+export interface ResolvedAttachment {
+  attachmentId: string;
+  slotId: string;
+  parentPartId: string;
+  file: string;
+  slotTransform: AttachmentTransform;
+  attachmentTransform: AttachmentTransform;
+  anchor: NormalizedAnchor;
+  drawOrder: number;
+  layerRole?: "back" | "front";
+  enabled: boolean;
+}

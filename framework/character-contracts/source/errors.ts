@@ -15,12 +15,22 @@ export const ValidationErrorCode = {
   DUPLICATE_HIT_AREA_ID: "DUPLICATE_HIT_AREA_ID",
   DUPLICATE_ANIMATION_TARGET_ID: "DUPLICATE_ANIMATION_TARGET_ID",
   MISSING_ANIMATION_TARGET: "MISSING_ANIMATION_TARGET",
+  DUPLICATE_ATTACHMENT_SLOT_ID: "DUPLICATE_ATTACHMENT_SLOT_ID",
+  DUPLICATE_ATTACHMENT_ID: "DUPLICATE_ATTACHMENT_ID",
+  UNKNOWN_ATTACHMENT_SLOT: "UNKNOWN_ATTACHMENT_SLOT",
+  DUPLICATE_ATTACHMENT_DRAW_ORDER: "DUPLICATE_ATTACHMENT_DRAW_ORDER",
+  INCOMPATIBLE_ATTACHMENT_RIG: "INCOMPATIBLE_ATTACHMENT_RIG",
+  INVALID_ATTACHMENT_TRANSFORM: "INVALID_ATTACHMENT_TRANSFORM",
 } as const;
 
 export type ValidationErrorCode =
   (typeof ValidationErrorCode)[keyof typeof ValidationErrorCode];
 
-export type ContractDocument = "characterRig" | "rigLayout" | "contract";
+export type ContractDocument =
+  | "characterRig"
+  | "rigLayout"
+  | "attachmentLayout"
+  | "contract";
 
 export interface ValidationIssue {
   code: ValidationErrorCode;
