@@ -2,10 +2,11 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-010 Head Accessory Layering Reference
+## Completed plan: TASK-010 Head Accessory Layering Reference
 
-- Status: Implementation complete; awaiting manual dynamic visual review
+- Status: Complete; manual dynamic visual acceptance passed
 - Started: 2026-07-24
+- Completed: 2026-07-24
 - Baseline: `main` at `e240020a18aca15c0f1ec1369c411b624b5bfa6e`
 - Branch: `feat/task-010-head-accessory-layering`
 - TASK-009 squash merge:
@@ -42,8 +43,8 @@ character-specific core behavior, or resuming original Red Cap reconstruction.
   overlay, skeleton, attachment sockets, bounds/pivots/layers, accessory state,
   all five clips, exact reset, and complete requested toggles.
 - Run working-copy and tracked-files-only verification, record and inspect the
-  ignored real Web Preview MP4, commit and push the feature branch, and stop
-  before PR creation for manual visual review.
+  ignored real Web Preview MP4, commit and push the feature branch, stop for
+  manual visual review, then record acceptance and open a Draft PR.
 
 ### Out of scope
 
@@ -91,6 +92,9 @@ cloud AI, or paid dependencies.
 7. Record and inspect the required real Web Preview sequence, keep the MP4
    ignored, complete acceptance documentation, review scope, commit, push,
    re-check the protected archive, and stop for manual visual review.
+8. After explicit reviewer acceptance, record the split original/tail review
+   evidence, repeat both verification modes, and open a Draft PR without
+   merging.
 
 ### Done when
 
@@ -109,8 +113,9 @@ cloud AI, or paid dependencies.
   socket/debug toggle, and status field with no per-accessory placement
   constants.
 - Both required CI verification runs pass from clean inputs.
-- The ignored acceptance MP4 exists, the branch is committed and pushed, no PR
-  is created, and the protected archive remains `ed0923b`.
+- The ignored acceptance MP4s exist, the branch is committed and pushed,
+  manual dynamic visual acceptance passes, a Draft PR is opened without
+  merging, and the protected archive remains `ed0923b`.
 
 ### Implementation result
 
@@ -128,8 +133,20 @@ cloud AI, or paid dependencies.
 - The real 1280×720 Web Preview sequence was recorded to the ignored TASK-010
   artifact path and sampled directly for every required state and control.
 - A frozen install and `CI=true pnpm verify` pass the same 175 tests from a
-  tracked-files-only archive tree. The implementation branch is committed and
-  pushed and is stopped for reviewer acceptance; no pull request was created.
+  tracked-files-only archive tree.
+- Manual review passed using the first 48 seconds of the original local
+  recording plus an independently re-encoded, fully decodable 24.466667-second
+  tail beginning at 00:00:45. Uploaded long copies were truncated, so the
+  ignored original and tail files remain the authoritative local evidence.
+- The review verified all four accessory variants, stable cap and hair
+  ordering, glasses-to-eye alignment, shared head-transform inheritance,
+  drift-free Accessory Stress, pose-preserving Pause/Resume, exact Reset,
+  aligned socket/debug views, and base-rig immutability under accessory
+  toggles.
+- The accepted limitations are authored rather than automatic fitting,
+  in-place walk/foot sliding, rigid sprites, a Cocos-only adapter, and no
+  original Red Cap reconstruction. A Draft PR into `main` is authorized;
+  automatic merge remains prohibited.
 
 ## Completed plan: TASK-009 Production-Lite Layered Character Reference
 
