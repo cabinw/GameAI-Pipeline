@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "TASK-013",
+  "featureCommitSha": "6e8dab87039ccbe1a842eaf76517825d4568d755",
+  "reviewStatus": "awaiting-external-visual-review",
+  "videos": [
+    {
+      "filename": "task-013-loadout-variants-and-overlay.mp4",
+      "size": 923748,
+      "duration": 32.2,
+      "codec": "h264",
+      "codecProfile": "High",
+      "width": 1280,
+      "height": 720,
+      "frameRate": "30/1",
+      "pixelFormat": "yuv420p",
+      "sha256": "b34749a542dadb7223aceff4f70d15d69398b667d9b6741bbfec71ce78d3e458",
+      "coverage": [
+        "Base only",
+        "Accessories only",
+        "Garment only",
+        "Prop only",
+        "Garment + accessories",
+        "Garment + prop",
+        "Accessories + prop",
+        "Full loadout",
+        "no-prop state",
+        "left-hand prop state",
+        "right-hand prop state",
+        "authored reference",
+        "assembled output",
+        "overlay comparison",
+        "exact reconstruction status"
+      ]
+    },
+    {
+      "filename": "task-013-full-loadout-motion-and-stress.mp4",
+      "size": 3345483,
+      "duration": 35.5,
+      "codec": "h264",
+      "codecProfile": "High",
+      "width": 1280,
+      "height": 720,
+      "frameRate": "30/1",
+      "pixelFormat": "yuv420p",
+      "sha256": "bf0c20aa53cdc6972e1cd4ed884d828f47a01db3cb7176ff2b90bd37db66fafc",
+      "coverage": [
+        "Full Loadout Rest",
+        "Full Loadout Walk",
+        "Full Loadout Wave",
+        "Full Loadout Prop Swing",
+        "two complete Full Loadout Integration Stress loops",
+        "Pause during Integration Stress",
+        "Resume",
+        "garment seam markers",
+        "accessory socket markers",
+        "prop grip markers",
+        "pivots",
+        "bounds",
+        "parent links",
+        "global layer labels",
+        "joints",
+        "skeleton",
+        "debug views disabled again",
+        "exact Reset",
+        "final STOPPED 0.00 authored Rest pose",
+        "actual semantic clip ID display"
+      ]
+    }
+  ]
+}
