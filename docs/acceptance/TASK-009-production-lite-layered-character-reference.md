@@ -7,8 +7,8 @@ its 1280×720 Web Game Preview. Deterministic generation, contract-only
 reconstruction, layered SpriteFrame rendering, shared evaluator animation,
 debug controls, and the requested dynamic evidence pass.
 
-The feature branch is ready to be committed and pushed. TASK-009 does not
-create a pull request and does not authorize merge.
+The feature branch is committed and pushed. TASK-009 did not create a pull
+request and does not authorize merge.
 
 ## Automated evidence
 

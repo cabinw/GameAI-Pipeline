@@ -104,6 +104,8 @@ dependencies, or combat logic.
 - Recorded and reviewed the ignored 40.0-second 1280×720 Web Preview MP4 at
   `artifacts/TASK-009/task-009-dynamic-acceptance.mp4`; SHA-256 is
   `ef11962dfa4ce582eebf97b5b4f25c9c2b9571cc717ec8adee8e7855828a8fc2`.
+- Committed and pushed `feat/task-009-layered-character-reference` without
+  creating a pull request; the protected TASK-007 archive was not changed.
 - The accepted limitations are rigid sprites, in-place walk/foot sliding, no
   IK/root motion/foot locking/blending/deformation, and a Cocos-only adapter.
 

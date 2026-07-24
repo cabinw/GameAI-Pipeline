@@ -2,9 +2,9 @@
 
 ## Status
 
-Complete on 2026-07-24. The implementation and acceptance evidence are ready
-for the required feature-branch commit and push, after which work stops for
-manual visual review. This task does not create a pull request.
+Complete on 2026-07-24. The implementation and acceptance evidence are
+committed and pushed on the required feature branch. Work stops here for
+manual visual review; this task did not create a pull request.
 
 ## Baseline and branch
 
