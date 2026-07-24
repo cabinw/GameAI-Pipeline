@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "authoringDigest": "e94e729ba15bf0d3fd24163cefba83fa31883153fdf06fe73c58f0816234b9a9",
+  "layoutDigest": "98b47c90d52d0bb22fa001d370ac6d05454d249a0951ac6ea93735ddfce1d4aa",
+  "referenceDigest": "f277f7cd4b3f83ff00f157b82cb306a0658ac15c8090798277ee5b7ec4cad09a",
+  "renderer": "sharp-svg-independent-authored-and-contract-reconstruction-paths",
+  "tolerance": {
+    "rgbaMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "boundsExpansionPixels": 0,
+    "seamMismatchPixels": 0
+  }
+}

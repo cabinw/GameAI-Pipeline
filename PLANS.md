@@ -2,6 +2,111 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Completed plan: TASK-009 Production-Lite Layered Character Reference
+
+- Status: Complete
+- Started: 2026-07-24
+- Completed: 2026-07-24
+- Baseline: `c196602a38e5a1752995e9bc6d398e8d53e5348b`
+- Branch: `feat/task-009-layered-character-reference`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Bridge the TASK-008 mannequin and the Red Cap fixture with deterministic,
+moderately detailed casual-game artwork that proves irregular trimmed sprites,
+explicit front/back layers, contract-only rest reconstruction, and the proven
+rig evaluator under four animation clips.
+
+### Scope
+
+- Add a repository-owned layered humanoid with a simple face, separate back
+  and front hair, shaped shirt and pants, clothed tapered arms, hands, thighs,
+  shins, and shoes.
+- Preserve editable JSON artwork descriptions and generate byte-stable
+  transparent PNG parts plus an independently authored Rest Pose composite.
+- Describe all assembly through Rig Layout fields and validate reconstruction
+  from parts, layout, and draw order without Cocos-specific placement values.
+- Reuse the TASK-007/008 hierarchy evaluator and Rest/Idle, Arm Wave, and Walk
+  semantics; add one data-only articulation stress clip.
+- Add a dedicated Cocos Creator 3.8.x scene with reference, assembled,
+  skeleton/debug, overlay comparison, complete playback controls, and all
+  requested diagnostic toggles and status.
+- Add deterministic generation, image/contract/hierarchy/layering,
+  reconstruction-mutation, overlap-range, transform-parity, reset,
+  core-isolation, and clean-checkout tests.
+- Run working-copy and tracked-files-only verification, record the ignored
+  real Web Preview MP4, commit and push the feature branch, and stop before PR
+  creation for manual visual review.
+
+### Out of scope
+
+Red Cap reconstruction or corrections, arbitrary master-image cutting, hats,
+glasses, jacket flaps, props, facial animation, loose cloth, IK, mesh
+deformation, root motion, foot locking, blending, other engine adapters,
+cross-engine compilation, Windows Editor support, cloud AI, paid
+dependencies, or combat logic.
+
+### Execution
+
+1. Confirm the clean requested baseline and protected archive commit, read the
+   governing contracts/ADRs and TASK-007/008 implementation and acceptance
+   evidence, then record this plan and the complete TASK-009 specification.
+2. Author the deterministic part descriptions, common-canvas layout,
+   reference composite description, four clips, and checked-in generator.
+3. Generate and verify transparent parts, the reference composite,
+   reconstructed composite, comparison evidence, and the Cocos resource
+   mirror.
+4. Implement a reusable reconstruction verifier and contract-derived Cocos
+   plan with no per-part adapter compensation or new animation runtime.
+5. Build the dedicated Creator scene/runtime UI and test every requested
+   control, hierarchy/layer invariant, transform, overlap, and exact reset.
+6. Run `CI=true pnpm verify` in the working tree and after a frozen install in
+   a tracked-files-only archive checkout.
+7. Record and inspect the required real Web Preview flow, leave the MP4
+   ignored, complete acceptance documentation, review the scoped diff, commit,
+   push, re-check the protected archive, and stop for manual visual review.
+
+### Done when
+
+- Generated part PNGs are transparent, irregular, differently trimmed, and
+  byte-stable; source descriptions and authored reference are tracked.
+- The validated contract alone reconstructs the authored Rest Pose within the
+  documented fixed tolerance and mutation tests detect every required failure
+  class.
+- Hair and limb front/back ordering is explicit and stable in all four clips;
+  all required articulated connections retain authored overlap.
+- Sprite and skeleton transforms match the shared evaluator; pause/resume and
+  exact Rest reset pass automated and visual checks.
+- The Creator scene exposes every requested view, overlay, label, control, and
+  status field with the complete character visible.
+- Both required CI verification runs pass from clean inputs.
+- The ignored acceptance video exists, the branch is committed and pushed,
+  no PR is created, and the protected archive still resolves to `ed0923b`.
+
+### Result
+
+- Added a deterministic 17-part production-lite humanoid with organic trimmed
+  PNGs, editable JSON source, separate hair layers, shaped clothing, tapered
+  limbs, and explicit rear/middle/front draw order.
+- Added a generic exact reconstruction verifier and independently authored
+  Rest Pose composite. The accepted result has zero RGBA, alpha, seam, or
+  bounds mismatches, and mutation tests reject every required failure class.
+- Reused `@gameai/rig-animation` for Rest/Idle, Arm Wave, Walk Cycle, and a
+  data-only Articulation Stress clip; no animation runtime or per-part Cocos
+  corrections were added.
+- Added a dedicated Cocos Creator 3.8.x scene with reference, assembled,
+  overlay, skeleton, complete playback controls, all requested diagnostic
+  toggles, and visible reconstruction status.
+- `CI=true pnpm verify` passes all 160 tests in the working tree and after a
+  frozen install in a tracked-files-only archive checkout.
+- Recorded and reviewed the ignored 40.0-second 1280×720 Web Preview MP4 at
+  `artifacts/TASK-009/task-009-dynamic-acceptance.mp4`; SHA-256 is
+  `ef11962dfa4ce582eebf97b5b4f25c9c2b9571cc717ec8adee8e7855828a8fc2`.
+- The accepted limitations are rigid sprites, in-place walk/foot sliding, no
+  IK/root motion/foot locking/blending/deformation, and a Cocos-only adapter.
+
 ## Completed plan: TASK-008 Simple Sprite Character Bridge
 
 - Status: Complete

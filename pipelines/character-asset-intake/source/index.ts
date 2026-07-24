@@ -19,6 +19,14 @@ export {
   type ReferencePoint,
 } from "./reconstruction";
 export {
+  reconstructProductionLiteRest,
+  type ProductionLiteLayout,
+  type ProductionLiteLayoutPart,
+  type ReconstructionMetrics,
+  type ReconstructionResult,
+  type ReconstructionTolerance,
+} from "./production-lite-reconstruction";
+export {
   auditCanonicalArt,
   type CanonicalArtGateArtifacts,
   type CanonicalArtGateOptions,

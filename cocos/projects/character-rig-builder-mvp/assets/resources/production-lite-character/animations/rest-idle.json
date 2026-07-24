@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "animationId": "production-lite-rest-idle",
+  "rig": {
+    "rigId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "duration": 2,
+  "loop": true,
+  "tracks": [
+    {
+      "jointId": "pelvis",
+      "property": "position",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1,
+          "value": {
+            "x": 0,
+            "y": 2
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 2,
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    },
+    {
+      "jointId": "head",
+      "property": "rotation",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1,
+          "value": 1.5,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 2,
+          "value": 0,
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    }
+  ]
+}

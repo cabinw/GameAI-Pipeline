@@ -91,6 +91,10 @@ declare module "cc" {
     setContentSize(width: number, height: number): void;
   }
 
+  export class UIOpacity extends Component {
+    opacity: number;
+  }
+
   export interface EventKeyboard {
     readonly keyCode: number;
   }
@@ -105,12 +109,17 @@ declare module "cc" {
     readonly DIGIT_1: number;
     readonly DIGIT_2: number;
     readonly DIGIT_3: number;
+    readonly DIGIT_4: number;
     readonly SPACE: number;
     readonly KEY_R: number;
     readonly KEY_J: number;
     readonly KEY_B: number;
     readonly KEY_A: number;
     readonly KEY_L: number;
+    readonly KEY_D: number;
+    readonly KEY_E: number;
+    readonly KEY_O: number;
+    readonly KEY_Q: number;
     readonly KEY_V: number;
   };
 

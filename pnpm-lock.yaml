@@ -55,6 +55,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.0.0
+      sharp:
+        specifier: 0.35.3
+        version: 0.35.3(@types/node@24.0.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.2
@@ -88,6 +91,9 @@ importers:
       '@gameai/character-contracts':
         specifier: workspace:*
         version: link:../../framework/character-contracts
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../rig-animation
       sharp:
         specifier: 0.35.3
         version: 0.35.3(@types/node@24.0.0)
