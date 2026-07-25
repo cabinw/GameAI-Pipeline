@@ -2,11 +2,16 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R6 Generic One-Handed Prop Integration
+## Accepted plan: TASK-013R6 Generic One-Handed Prop Integration
 
-- Status: Implementation accepted; awaiting external visual review
+- Status: Accepted after external visual review
 - Started: 2026-07-25
+- Accepted: 2026-07-26
 - Branch: `recovery/task-013r6-one-handed-prop-integration`
+- Implementation commit:
+  `fe981463962231969b4eff446ff03bf44b7b8a69`
+- Reviewed evidence commit:
+  `7a70d873d5e8516deaeab6eccdc62f6e57f72db7`
 - Baseline / frozen accepted R5:
   `1f87032bf45e806c9db6360c9a7837c97baa93b2`
 - Frozen accepted R4:
@@ -113,8 +118,15 @@ Creator-owned Scene boundaries.
   outside the character region: 0.
 - 60 Hz prop validation: 580 samples across both hands and both required
   stress clips, maximum grip error `0.000 px`.
-- Evidence capture and uploaded-copy verification remain pending external
-  visual review publication.
+- External visual review: PASS.
+- Uploaded-copy SHA-256 identity and complete 4,567-frame decode: PASS.
+- Visual review accepted all 12 states, no/left/right prop behavior,
+  hand-over-handle layering, four clips, Pause/Resume, Transform Stress,
+  spatial overlays, post-rebuild switching, Exact Reset, and zero duplicate,
+  sorting, role, resource, or spatial errors.
+- Evidence capture began at setup 2, teardown 1, rebuild 1 and visibly
+  performed another rebuild, ending at setup 3, teardown 2, rebuild 2. This
+  is accepted repeated-rebuild coverage rather than a counter discrepancy.
 
 ## Accepted plan: TASK-013R5 Multi-Part Garment Layering Bridge
 

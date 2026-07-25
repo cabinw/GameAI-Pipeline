@@ -3,7 +3,7 @@
 ## Result
 
 Implementation acceptance gate: **PASS**.
-External visual review: **PENDING**.
+External visual review: **PASS**.
 
 The recovered R1-R5 Cocos Adapter boundaries now resolve, load, mount,
 animate, switch, sort, measure, rebuild, and reset one contract-defined
@@ -127,9 +127,38 @@ mirroring, inverse grip solving, or fixed Skeleton geometry.
 
 ## External visual acceptance
 
-Pending evidence capture and external review. The complete live gate passed
-without a runtime defect, so evidence may be recorded from the accepted
-Creator Web Preview.
+External review independently accepted the Creator Web Preview evidence at
+`7a70d873d5e8516deaeab6eccdc62f6e57f72db7`.
+
+- Uploaded SHA-256 identity: PASS
+- Encoding: H.264 High, 1280x720, 30 fps, yuv420p
+- Frames: 4,567/4,567 decoded successfully
+- All 12 garment/accessory/prop cross-product states: PASS
+- No-prop, left-hand, and right-hand state behavior: PASS
+- Active-hand states show exactly one primary prop and one matching hand
+  overlay: PASS
+- Hand-over-handle layering: PASS
+- Rest, Wave, Prop Swing, and Integration Stress: PASS
+- Pause/Resume and Transform Stress: PASS
+- Garment seam, accessory socket/anchor, and prop socket/grip alignment:
+  PASS
+- Post-rebuild prop, garment, and accessory switching: PASS
+- Exact Reset: authored Rest, `STOPPED`, `0.00`, no prop, transform stress
+  OFF, Debug OFF
+- Duplicate nodes, input handlers, resource requests, sorting violations,
+  role violations, non-finite coordinates, and spatial errors: 0
+
+The recording began after the implementation gate's first rebuild, at
+`SETUP 2 / TEARDOWN 1 / REBUILDS 1`. It visibly performed another lifecycle
+rebuild during capture and ended at
+`SETUP 3 / TEARDOWN 2 / REBUILDS 2`. These counters are accepted
+repeated-rebuild evidence, not a discrepancy or failure.
+
+The reviewed video SHA-256 is
+`4e52af2f8224ba3f3753ffb18161ab0a2ef26d21eb50079d8561b53166df6cd3`.
+The temporary `evidence/task-013r6` branch may be removed after this
+acceptance documentation is safely pushed. The ignored local recording
+remains preserved and no MP4 is tracked on the R6 feature branch.
 
 ## Limits
 
