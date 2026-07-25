@@ -142,6 +142,7 @@ declare module "cc" {
     readonly DIGIT_4: number;
     readonly DIGIT_5: number;
     readonly DIGIT_6: number;
+    readonly DIGIT_7: number;
     readonly F1: number;
     readonly F2: number;
     readonly F3: number;

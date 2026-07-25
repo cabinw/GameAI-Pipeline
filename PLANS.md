@@ -2,6 +2,118 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R4 Head Accessory Layering Bridge
+
+- Status: Implementation and all local acceptance gates passed; evidence
+  publication pending
+- Started: 2026-07-25
+- Branch: `recovery/task-013r4-head-accessory-layering`
+- Baseline / frozen accepted R3:
+  `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
+- Frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted generic single-attachment bridge to a deterministic
+collection of simultaneously active head attachments. Use the existing
+production-lite cap and sunglasses fixtures to prove generic slot resolution,
+enabled-state groups, front/back layer roles, resource loading, runtime
+mounting, socket/anchor measurement, and lifecycle behavior without
+reconnecting the old Full Loadout demo.
+
+### Boundaries
+
+- Create a new Creator-owned R4 scene; do not clone or modify the old Full
+  Loadout scene.
+- Consume the existing Attachment Layout contract and resolver output. Do not
+  add a Cocos-specific attachment, slot, pivot, state, or layer source.
+- Reuse the accepted R1-R3 lifecycle, resource, semantic input, sorting,
+  projection, spatial assertion, Base Rig, and generic attachment modules.
+- Extend generic runtime identity from one resolved attachment to a collection
+  keyed by declared attachment and slot IDs, never display or file names.
+- Resolve front/back placement from declared role/order semantics through the
+  global sorting registry; no attachment-specific sorting constants or magic
+  offsets.
+- Do not add garments, seams, props, grip, comparison views, Full Loadout
+  presets, Red Cap, VFX, Unity, Godot, R5, or TASK-014 behavior.
+
+### Execution
+
+1. Record TASK-013R4 scope and acceptance criteria before implementation.
+2. Add a deterministic generic multi-attachment bridge plan for Base only,
+   Cap only, Sunglasses only, and Cap plus sunglasses.
+3. Extend the resource manifest, semantic state/input registry, global sorting
+   validation, runtime attachment collection, and per-attachment spatial
+   measurements without fixture-specific branches.
+4. Create and save an isolated Creator-owned R4 scene through Creator 3.8.8.
+5. Add pure TypeScript, tracked-files-only, metadata, manifest, lifecycle,
+   state, ordering, duplicate, and spatial regression tests.
+6. Pass working-copy and tracked-files-only frozen verification.
+7. Pass the complete Creator clean-open, scene-switch/reopen, Console,
+   resource, four-state, animation, transform, debug, rebuild, and Reset gate
+   in one uninterrupted run.
+8. Commit and push one reviewed R4 feature commit.
+9. Prepare a recording checklist, capture every required item in one Creator
+   Web Preview video, decode/hash/publish it on `evidence/task-013r4`, and
+   independently verify the uploaded copy.
+10. Stop for external visual review without a PR or further attachment work.
+
+### Done when
+
+- All four states resolve deterministically and display exactly their declared
+  active attachment parts with no duplicate IDs, requests, nodes, or
+  prohibited slot collisions.
+- Cap back/front and sunglasses retain stable declared front/back ordering in
+  Rest, Wave, Integration Stress, and root transform stress.
+- Every active socket-to-anchor error, maximum joint-marker error, and maximum
+  Skeleton endpoint error is `<= 0.5 px`.
+- Unknown slots/roles/attachments/parents/resources, non-finite positions,
+  sorting/front-back violations, and out-of-region debug geometry are zero.
+- Lifecycle rebuild leaves one character and the expected attachment set;
+  exact Reset restores authored Rest, stopped time zero, the documented
+  default accessory state, no duplicates, and Debug OFF.
+- Both verification modes, the uninterrupted Creator gate, media checks, and
+  uploaded-copy verification pass while all frozen/protected refs and the old
+  demo remain unchanged.
+
+### Implementation result
+
+- A new Creator-owned
+  `task-013r4-head-accessory-layering.scene` contains only Canvas, Camera, and
+  one R4 bridge component at rest; runtime construction remains manifest
+  gated.
+- One generic collection plan resolves two declared slots and three declared
+  attachment parts from the existing engine-neutral Attachment Layout.
+- The required states resolve to exact active counts:
+  Base only 0, Cap only 2, Sunglasses only 1, and Cap plus sunglasses 3.
+- Front/back ordering is role driven and remains
+  `hair-back < cap-back < head < sunglasses < hair-front < cap-front`.
+- Working-copy and tracked-files-only frozen verification both pass with 300
+  tests and 0 failures.
+- The uninterrupted Creator 3.8.8 gate passed clean import, accepted-scene
+  switch/reopen, Console checks, 20/20 resources, all states, repeated
+  switching, Rest/Wave/Integration Stress, Pause/Resume, transform stress,
+  lifecycle rebuild, post-rebuild switching, exact Reset, and Debug OFF.
+- Runtime maxima are `0.000 px` for joint markers, Skeleton endpoints, and
+  every active socket-to-anchor measurement. Unknown slots, duplicates,
+  sorting/front-back violations, non-finite positions, and outside debug
+  geometry are all 0.
+- Lifecycle rebuild ended at setup 2, teardown 1, rebuild 1 with one character,
+  three default-state attachment parts, no duplicate handlers, and no
+  duplicate resource requests.
+- No engine-neutral schema/resolver, accepted R1-R3 boundary, old Full Loadout
+  scene, garment, prop, or protected reference changed.
+
 ## Accepted plan: TASK-013R3 Single Attachment Bridge
 
 - Status: Accepted after external visual review
