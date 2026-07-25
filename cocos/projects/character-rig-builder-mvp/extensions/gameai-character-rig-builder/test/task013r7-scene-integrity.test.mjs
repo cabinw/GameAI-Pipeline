@@ -29,6 +29,10 @@ const scriptFile = path.join(
   "composable-character-loadout-reference-v2.ts",
 );
 const scriptMetaFile = `${scriptFile}.meta`;
+const acceptedR6ScriptFile = path.join(
+  assetsRoot,
+  "gameai/task013r6/task013r6-one-handed-prop-integration.ts",
+);
 
 async function json(file) {
   return JSON.parse(await readFile(file, "utf8"));
@@ -101,6 +105,31 @@ test("TASK-013R7 canonical facade wraps accepted R6 and never imports the supers
   assert.doesNotMatch(
     source,
     /composable-loadout-demo|GameAIComposableLoadoutDemo/iu,
+  );
+});
+
+test("TASK-013R7 canonical runtime injects production identity while accepted R6 retains its identity", async () => {
+  const [canonicalSource, acceptedR6Source] = await Promise.all([
+    readFile(scriptFile, "utf8"),
+    readFile(acceptedR6ScriptFile, "utf8"),
+  ]);
+  assert.match(
+    canonicalSource,
+    /CANONICAL_LOADOUT_DISPLAY_IDENTITY/u,
+  );
+  assert.match(
+    canonicalSource,
+    /runtimeDisplayIdentity\(\)/u,
+  );
+  assert.doesNotMatch(canonicalSource, /TASK-013R6/iu);
+  assert.doesNotMatch(canonicalSource, /recovery\/task-013r/iu);
+  assert.match(
+    acceptedR6Source,
+    /TASK-013R6 · GENERIC ONE-HANDED PROP INTEGRATION/u,
+  );
+  assert.match(
+    acceptedR6Source,
+    /runtime\.hudLabel\.string = \[\s*identity\.hudTitle/um,
   );
 });
 

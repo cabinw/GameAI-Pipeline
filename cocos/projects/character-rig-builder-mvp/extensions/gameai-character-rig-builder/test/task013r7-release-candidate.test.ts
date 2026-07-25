@@ -15,6 +15,7 @@ import sharp from "sharp";
 import {
   CANONICAL_LOADOUT_ADAPTER_ID,
   CANONICAL_LOADOUT_ADAPTER_VERSION,
+  CANONICAL_LOADOUT_DISPLAY_IDENTITY,
   CANONICAL_LOADOUT_SCENE_PATH,
   createCanonicalLoadoutAdapter,
 } from "../source/composable-loadout/canonical-loadout-adapter";
@@ -213,6 +214,10 @@ test("TASK-013R7 canonical facade preserves accepted R6 semantics exactly", asyn
     CANONICAL_LOADOUT_ADAPTER_VERSION,
   );
   assert.equal(canonical.scenePath, CANONICAL_LOADOUT_SCENE_PATH);
+  assert.deepEqual(
+    canonical.displayIdentity,
+    CANONICAL_LOADOUT_DISPLAY_IDENTITY,
+  );
   assert.equal(canonical.plan, plan);
   assert.deepEqual(canonical.validation, validatePropBridgePlan(plan));
   assert.deepEqual(canonical.resources, createPropResourceManifest(plan));
@@ -230,6 +235,17 @@ test("TASK-013R7 canonical facade preserves accepted R6 semantics exactly", asyn
       plan.defaultPropStateId,
     ).exactReset(),
   );
+});
+
+test("TASK-013R7 canonical adapter owns a neutral production display identity", () => {
+  assert.deepEqual(CANONICAL_LOADOUT_DISPLAY_IDENTITY, {
+    adapterId: CANONICAL_LOADOUT_ADAPTER_ID,
+    hudTitle: "GAMEAI · COMPOSABLE CHARACTER LOADOUT V2",
+    diagnosticsId: "GAMEAI_COMPOSABLE_CHARACTER_LOADOUT_V2",
+  });
+  const serialized = JSON.stringify(CANONICAL_LOADOUT_DISPLAY_IDENTITY);
+  assert.doesNotMatch(serialized, /TASK-013R6/iu);
+  assert.doesNotMatch(serialized, /recovery\/task-013r/iu);
 });
 
 test("TASK-013R7 canonical and R6 state membership and resolved order are identical", async () => {

@@ -21,6 +21,8 @@ reference.
   `GameAIComposableCharacterLoadoutReferenceV2`
 - Canonical adapter ID:
   `gameai-composable-character-loadout-reference-v2`
+- Canonical display title:
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2`
 - Accepted implementation source: TASK-013R6 generic one-handed prop
   integration
 - Base Sprite parts: 17
@@ -60,10 +62,10 @@ sorting, reset defaults, or tolerance values.
 ## Automated verification
 
 - Working copy: `CI=true pnpm verify` — PASS.
-- Total tests: 335 passed, 0 failed.
-- Extension tests: 183 passed, 0 failed.
+- Total tests: 337 passed, 0 failed.
+- Extension tests: 185 passed, 0 failed.
 - Tracked-files-only `pnpm install --frozen-lockfile` and
-  `CI=true pnpm verify` — PASS, 335 passed, 0 failed.
+  `CI=true pnpm verify` — PASS, 337 passed, 0 failed.
 - Generated canonical runtime mirror: byte-deterministic.
 - Creator Scene/script/resource metadata audit: PASS.
 - Global metadata audit: PASS.
@@ -97,9 +99,28 @@ sorting, reset defaults, or tolerance values.
   Integration Stress, and Exact Reset.
 - No canonical/R6 live difference or defect occurred.
 
-The canonical HUD intentionally reports the accepted R6 runtime identity
-because TASK-013R7 is a canonical facade over that implementation rather than
-a new behavioral runtime. This is verified parity, not a fallback.
+External review of the first evidence capture found a release-blocking
+identity leak: the canonical HUD reported the accepted R6 task title. The
+focused repair injects the typed canonical display identity through the
+adapter boundary while preserving the accepted R6 title in the R6 Scene.
+External visual acceptance remains **PENDING** until replacement evidence
+proves both identities and repeats the release-candidate gate.
+
+### Focused identity repair verification
+
+- Canonical V2 HUD:
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2` — PASS.
+- Canonical V2 preview contains no visible `TASK-013R6` identity — PASS.
+- Accepted R6 HUD retains
+  `TASK-013R6 · GENERIC ONE-HANDED PROP INTEGRATION` — PASS.
+- Return to canonical V2, no/left/right prop, garment/accessories combined,
+  Integration Stress, one Lifecycle Rebuild, and Exact Reset — PASS.
+- Manifest remained 35/35 PASS.
+- Spatial, duplicate, sorting, role, non-finite, and debug-region counters
+  remained 0.
+- Creator Console and Preview Console remained clean.
+- No other runtime or visual defect appeared during the authorized focused
+  gate.
 
 ## Spatial, layer, lifecycle, and duplicate results
 

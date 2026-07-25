@@ -34,10 +34,24 @@ export const CANONICAL_LOADOUT_ADAPTER_VERSION = "1.0.0";
 export const CANONICAL_LOADOUT_SCENE_PATH =
   "assets/composable-character-loadout-reference-v2.scene";
 
+export interface CanonicalLoadoutDisplayIdentity {
+  readonly adapterId: typeof CANONICAL_LOADOUT_ADAPTER_ID;
+  readonly hudTitle: string;
+  readonly diagnosticsId: string;
+}
+
+export const CANONICAL_LOADOUT_DISPLAY_IDENTITY:
+  CanonicalLoadoutDisplayIdentity = Object.freeze({
+    adapterId: CANONICAL_LOADOUT_ADAPTER_ID,
+    hudTitle: "GAMEAI · COMPOSABLE CHARACTER LOADOUT V2",
+    diagnosticsId: "GAMEAI_COMPOSABLE_CHARACTER_LOADOUT_V2",
+  });
+
 export interface CanonicalLoadoutAdapterDescriptor {
   readonly adapterId: typeof CANONICAL_LOADOUT_ADAPTER_ID;
   readonly adapterVersion: typeof CANONICAL_LOADOUT_ADAPTER_VERSION;
   readonly scenePath: typeof CANONICAL_LOADOUT_SCENE_PATH;
+  readonly displayIdentity: CanonicalLoadoutDisplayIdentity;
   readonly plan: PropBridgePlan;
   readonly validation: PropBridgeValidationSnapshot;
   readonly resources: readonly HarnessResolvedResource[];
@@ -65,6 +79,7 @@ export function createCanonicalLoadoutAdapter(
     adapterId: CANONICAL_LOADOUT_ADAPTER_ID,
     adapterVersion: CANONICAL_LOADOUT_ADAPTER_VERSION,
     scenePath: CANONICAL_LOADOUT_SCENE_PATH,
+    displayIdentity: CANONICAL_LOADOUT_DISPLAY_IDENTITY,
     plan,
     validation,
     resources,

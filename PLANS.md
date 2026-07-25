@@ -4,7 +4,8 @@ Use this file for active multi-file or architectural work. Keep one active plan 
 
 ## Active plan: TASK-013R7 Recovered Full-Loadout Release Candidate
 
-- Status: Implementation accepted; awaiting external visual review
+- Status: External review blocked on canonical HUD identity; one focused
+  display-identity injection fix authorized
 - Started: 2026-07-26
 - Branch: `recovery/task-013r7-full-loadout-release-candidate`
 - Baseline / frozen accepted R6:
@@ -70,6 +71,23 @@ superseded monolithic TASK-013 runtime.
    `evidence/task-013r7`, verify byte/hash/frame/metadata/decode identity, and
    stop for external review.
 
+### Focused release-blocking identity repair
+
+- External review found that the canonical V2 Web Preview inherited the
+  visible `TASK-013R6` HUD title from the shared runtime.
+- Add one typed display identity at the adapter boundary. The accepted R6
+  component keeps its existing identity; the canonical component injects a
+  neutral production identity from the canonical facade.
+- HUD title and ready diagnostics must consume the injected identity. Scene
+  filename, script filename, branch name, task ID, and asset-name conditionals
+  are not identity sources.
+- Preserve plans, resources, inputs, sorting, animation IDs, reset defaults,
+  loadout states, lifecycle, projection, and runtime validation behavior
+  exactly.
+- Re-run both automated verification modes and the focused Creator parity
+  gate. If no other defect appears, append one feature commit and replacement
+  evidence while preserving the superseded original evidence entry.
+
 ### Done when
 
 - The canonical facade and accepted R6 expose equivalent plans, 12-state
@@ -88,9 +106,9 @@ superseded monolithic TASK-013 runtime.
 
 ### Implementation acceptance
 
-- Working-copy `CI=true pnpm verify`: PASS, 335 passed, 0 failed.
+- Working-copy `CI=true pnpm verify`: PASS, 337 passed, 0 failed.
 - Tracked-files-only frozen install and `CI=true pnpm verify`: PASS,
-  335 passed, 0 failed.
+  337 passed, 0 failed.
 - Creator-owned canonical Scene identity and metadata: PASS.
 - Canonical/R6 automated descriptor, state, resource, input, sorting, clip,
   reset, and tolerance parity: PASS.
@@ -107,7 +125,15 @@ superseded monolithic TASK-013 runtime.
   Integration Stress, and Exact Reset.
 - Creator and Preview Consoles: 0 relevant warnings, 0 errors.
 - No live difference or defect occurred after the hard-stop gate began.
-- Evidence publication remains pending after the R7 feature commit is safely
+- Focused canonical identity gate: PASS. Canonical V2 visibly reports
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2`; accepted R6 visibly retains
+  `TASK-013R6 · GENERIC ONE-HANDED PROP INTEGRATION`.
+- Focused canonical smoke after returning from R6: PASS for no/left/right
+  prop, garment/accessories combined, Integration Stress, one rebuild, and
+  Exact Reset with 35/35 resources and all spatial/duplicate counters at 0.
+- Creator and Preview consoles remained clean during the focused identity
+  gate. No second runtime or visual defect appeared.
+- Replacement evidence remains pending after the focused fix commit is safely
   pushed.
 
 ## Accepted plan: TASK-013R6 Generic One-Handed Prop Integration

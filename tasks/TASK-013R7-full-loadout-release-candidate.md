@@ -27,6 +27,11 @@ attachment family or runtime capability.
   resource paths, state IDs, animation IDs, input mappings, ordering, reset
   defaults, or tolerance values.
 - The accepted R6 plan and canonical plan must remain structurally equal.
+- A typed display identity is injected at the canonical adapter boundary.
+  The canonical HUD and ready diagnostics use the neutral production
+  identity, while the accepted R6 Scene retains its existing R6 identity.
+- Display identity must not be inferred from Scene/script filenames, branch
+  names, task IDs, or conditional asset names.
 - Unknown resources, states, slots, parents, roles, or clips continue to fail
   closed without fallback.
 

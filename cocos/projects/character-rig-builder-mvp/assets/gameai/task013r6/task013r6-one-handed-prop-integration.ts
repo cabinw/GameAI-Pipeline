@@ -111,6 +111,19 @@ const BINDING_BY_KEY = new Map(
   ]),
 );
 
+export interface PropIntegrationDisplayIdentity {
+  readonly adapterId: string;
+  readonly hudTitle: string;
+  readonly diagnosticsId: string;
+}
+
+export const TASK013R6_DISPLAY_IDENTITY: PropIntegrationDisplayIdentity =
+  Object.freeze({
+    adapterId: "task-013r6-one-handed-prop-integration",
+    hudTitle: "TASK-013R6 · GENERIC ONE-HANDED PROP INTEGRATION",
+    diagnosticsId: "TASK_013R6",
+  });
+
 interface PropIntegrationRuntime {
   readonly generatedRoot: Node;
   readonly base: BuiltBaseRigRuntime;
@@ -197,6 +210,10 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
   });
   private lastSpatial: SpatialRuntimeSnapshot | null = null;
 
+  protected runtimeDisplayIdentity(): PropIntegrationDisplayIdentity {
+    return TASK013R6_DISPLAY_IDENTITY;
+  }
+
   onEnable(): void {
     this.beginRuntimeSetup();
   }
@@ -247,8 +264,10 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
           this.buildRuntime();
           this.lifecycle.ready(generation);
           this.exactReset();
+          const identity = this.runtimeDisplayIdentity();
           console.info(
-            `TASK_013R6_RUNTIME_READY ${JSON.stringify({
+            `${identity.diagnosticsId}_RUNTIME_READY ${JSON.stringify({
+              displayIdentity: identity,
               lifecycle: this.lifecycle.snapshot(),
               resources: snapshot,
               plan: PLAN_VALIDATION,
@@ -1145,8 +1164,9 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     ).length;
     const accessoryPartCount =
       PLAN.garment.attachments.length - garmentPartCount;
+    const identity = this.runtimeDisplayIdentity();
     runtime.hudLabel.string = [
-      "TASK-013R6 · GENERIC ONE-HANDED PROP INTEGRATION",
+      identity.hudTitle,
       `LIFECYCLE ${lifecycle.phase.toUpperCase()} · SETUP ${lifecycle.setupCount} · TEARDOWN ${lifecycle.teardownCount} · REBUILDS ${this.lifecycleRebuildCount} · INPUT EVENTS ${this.inputEventCount}`,
       `RESOURCES ${resource?.loaded ?? 0}/${resource?.expected ?? RESOURCE_MANIFEST.length} ${(resource?.terminal ?? "pending").toUpperCase()} · BASE ${PLAN_VALIDATION.partCount} · JOINTS ${PLAN_VALIDATION.jointCount} · ATTACHMENTS ${this.activeCounts.active + this.activePropCounts.active}/${PLAN_VALIDATION.garmentAttachmentCount + PLAN_VALIDATION.propAttachmentCount}`,
       `STATE ${semantic.loadoutStateId} · ${this.stateLabel()} · GARMENT ${this.activeCounts.garment}/${garmentPartCount} · ACCESSORIES ${this.activeCounts.accessories}/${accessoryPartCount}`,

@@ -2,7 +2,11 @@ import { _decorator } from "cc";
 
 import {
   GameAITask013R6OneHandedPropIntegration,
+  type PropIntegrationDisplayIdentity,
 } from "../task013r6/task013r6-one-handed-prop-integration";
+import {
+  CANONICAL_LOADOUT_DISPLAY_IDENTITY,
+} from "./canonical-loadout-adapter";
 export * from "./canonical-loadout-adapter";
 
 const { ccclass } = _decorator;
@@ -14,4 +18,8 @@ const { ccclass } = _decorator;
  */
 @ccclass("GameAIComposableCharacterLoadoutReferenceV2")
 export class GameAIComposableCharacterLoadoutReferenceV2
-  extends GameAITask013R6OneHandedPropIntegration {}
+  extends GameAITask013R6OneHandedPropIntegration {
+  protected runtimeDisplayIdentity(): PropIntegrationDisplayIdentity {
+    return CANONICAL_LOADOUT_DISPLAY_IDENTITY;
+  }
+}

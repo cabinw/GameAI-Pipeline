@@ -34,6 +34,13 @@ serialized class ID remain Creator-owned. Generators may mirror deterministic
 TypeScript/data into the project and validators may inspect metadata, but
 neither may synthesize or replace identity.
 
+The adapter facade also owns one typed display identity containing the
+canonical adapter ID, production-facing HUD title, and ready-diagnostic ID.
+The canonical component injects that identity into the reused runtime through
+an explicit runtime boundary. The accepted R6 component supplies its existing
+R6 identity through the same boundary. Scene/script filenames, branch names,
+task IDs, and conditional asset names are not display-identity sources.
+
 ### Engine-neutral source of truth
 
 Rig hierarchy, pivots, rest transforms, semantic clips, attachment slots,
@@ -80,6 +87,8 @@ the accepted R6 Scene. Any difference stops publication.
 ## Consequences
 
 - Release identity is stable without rewriting accepted runtime behavior.
+- Canonical HUD and ready diagnostics expose the production adapter identity
+  without changing accepted R6 behavior or duplicating its component.
 - Task-numbered recovery modules remain implementation details behind the
   canonical facade.
 - The old monolithic demo remains auditable but cannot be mistaken for the
