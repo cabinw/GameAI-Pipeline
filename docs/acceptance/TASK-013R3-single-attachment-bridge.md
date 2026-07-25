@@ -7,7 +7,7 @@ Feature acceptance gate: **PASS**.
 The accepted R1/R2 adapter boundaries now resolve, load, mount, animate,
 toggle, measure, rebuild, and reset one engine-neutral rigid attachment on the
 production-lite Base Rig. The production-lite sunglasses are acceptance data;
-the adapter core remains generic. External visual review is pending.
+the adapter core remains generic. External visual review: **PASS**.
 
 ## Runtime surface
 
@@ -104,12 +104,51 @@ Measurements use current runtime world positions. No Canvas compensation,
 head-specific offset, sunglasses-specific placement correction, or fixed
 skeleton line is present.
 
-## Evidence status
+## Evidence acceptance
 
-The implementation is ready for a real Cocos Creator 3.8.8 Web Preview
-recording on temporary branch `evidence/task-013r3`. The evidence must be
-H.264 High, 1280 x 720, 30 fps, `yuv420p`, fully decodable, hashed, uploaded,
-re-downloaded, and verified byte-identical before external review.
+External visual review: **PASS**.
+
+The original `task-013r3-single-attachment-bridge.mp4` recording passed core
+visual coverage for:
+
+- Base-only and attachment-enabled states;
+- attachment disable/re-enable;
+- Rest, Wave, and Integration Stress;
+- Pause/Resume;
+- joint/Skeleton and socket/anchor alignment; and
+- translation, scale, and rotation stress.
+
+Its SHA-256 is
+`2446cf4c8d548af25645e6854eb8a12486bb10cc4be1e2b0db58b84dc1e53ab6`.
+
+The supplemental `task-013r3-acceptance-tail.mp4` recording passed the
+remaining visual coverage:
+
+- lifecycle rebuild visibly reports setup 2, teardown 1, and rebuild 1;
+- resources report 18/18 passed;
+- attachment, input-handler, and resource-request duplicate counts remain 0;
+- Base-only removes the sunglasses and re-enable restores exactly one;
+- Wave retains head attachment alignment after rebuild;
+- socket-to-anchor error remains `0.000 px`;
+- exact Reset restores authored Rest, `STOPPED`, `0.00`, and the default
+  attachment-enabled state; and
+- Debug OFF removes every joint, Skeleton, socket, anchor, and residual debug
+  geometry while the final clean state remains visible.
+
+The supplemental media is 835,128 bytes, 70.000 seconds, 2,100 frames,
+H.264 High, 1280 x 720, 30 fps, and `yuv420p`. Its SHA-256 is
+`959d8fce394c5a628e57bf36a76462bcec4f81b38bb1d3da7da856179c96e22d`.
+The uploaded copy was downloaded and passed SHA-256 identity, metadata,
+frame-count, and complete FFmpeg decode verification.
+
+The final evidence manifest's `uploadedCopyVerification` field explicitly
+names the original media only. The supplemental remote copy was independently
+downloaded and verified for SHA-256, metadata, frame count, and full decode
+outside that manifest field.
+
+After this acceptance documentation is safely pushed, the temporary
+`evidence/task-013r3` branch may be removed. Ignored local recordings remain
+available, and no MP4 is tracked on the feature branch.
 
 ## Limits
 

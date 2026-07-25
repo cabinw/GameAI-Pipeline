@@ -2,11 +2,14 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R3 Single Attachment Bridge
+## Accepted plan: TASK-013R3 Single Attachment Bridge
 
-- Status: Implementation complete; pending external visual review
+- Status: Accepted after external visual review
 - Started: 2026-07-25
+- Accepted: 2026-07-25
 - Branch: `recovery/task-013r3-single-attachment-bridge`
+- Implementation commit:
+  `645957e0e2a6442509881e1920f2905192d2a24c`
 - Baseline / frozen accepted R2:
   `726859ebec11d6a09ecab5984fe1352fd62fd93a`
 - Frozen accepted R1:
@@ -79,7 +82,7 @@ semantic controls generic.
 - Feature and evidence branches are pushed while all frozen/protected refs and
   the old demo remain unchanged.
 
-### Implementation result
+### Acceptance result
 
 - A new Creator-owned
   `assets/task-013r3-single-attachment-bridge.scene` contains only Canvas,
@@ -102,7 +105,28 @@ semantic controls generic.
   debug geometry were 0.
 - Working-copy and tracked-files-only frozen verification each passed all 287
   tests.
-- Evidence remains to be captured and published for external visual review.
+- External visual review: PASS.
+- The original 64-second Creator Web Preview recording passed the core visual
+  coverage for Base-only/attachment-enabled states, attachment
+  disable/re-enable, Rest, Wave, Integration Stress, Pause/Resume, joint and
+  Skeleton alignment, socket/anchor alignment, and transform stress.
+- A focused 70-second, 2,100-frame supplemental recording passed the remaining
+  visual coverage for lifecycle rebuild, post-rebuild attachment
+  disable/re-enable and Wave follow, exact Reset, and final Debug-OFF cleanup.
+- The supplemental recording visibly reports setup 2, teardown 1, rebuild 1,
+  18/18 resources passed, 0 attachment/input/resource duplicates, spatial
+  PASS, and `0.000 px` socket-to-anchor error.
+- Original recording SHA-256:
+  `2446cf4c8d548af25645e6854eb8a12486bb10cc4be1e2b0db58b84dc1e53ab6`.
+- Supplemental recording SHA-256:
+  `959d8fce394c5a628e57bf36a76462bcec4f81b38bb1d3da7da856179c96e22d`.
+- Both uploaded copies were downloaded and verified for SHA identity,
+  metadata, frame count, and complete decode. The final evidence manifest's
+  `uploadedCopyVerification` field explicitly names the original media only;
+  the supplemental copy was independently verified outside that field.
+- The temporary `evidence/task-013r3` branch may be removed after this
+  acceptance documentation is safely pushed. Ignored local recordings remain
+  available and no MP4 is tracked on the feature branch.
 
 ## Accepted plan: TASK-013R2 Base Rig Bridge
 
