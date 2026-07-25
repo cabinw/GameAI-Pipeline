@@ -15,7 +15,6 @@ import {
   resources,
   Sorting2D,
   UITransform,
-  Vec3,
   VerticalTextAlignment,
 } from "cc";
 
@@ -39,13 +38,16 @@ import {
   harnessDistance,
   HARNESS_SPATIAL_TOLERANCE_PX,
   validateHarnessSpatialMeasurement,
-  type HarnessPoint,
   type HarnessSpatialMeasurement,
 } from "./harness-spatial";
 import {
   HarnessPlaybackState,
   type HarnessPose,
 } from "./harness-state";
+import {
+  projectNodeToOverlayLocal,
+  runtimeWorldPoint,
+} from "./debug-space-projector";
 
 const { ccclass } = _decorator;
 const GENERATED_ROOT_NAME = "TASK013R1Generated";
@@ -339,14 +341,30 @@ export class GameAITask013R1Harness extends Component {
     runtime.overlayGraphics.clear();
     if (!debugEnabled) return;
 
-    const rootWorld = this.worldPoint(runtime.rootJoint);
-    const childWorld = this.worldPoint(runtime.childJoint);
-    const socketWorld = this.worldPoint(runtime.socket);
-    const gripWorld = this.worldPoint(runtime.gripAnchor);
-    const rootLocal = this.overlayPoint(runtime.overlayRoot, rootWorld);
-    const childLocal = this.overlayPoint(runtime.overlayRoot, childWorld);
-    const socketLocal = this.overlayPoint(runtime.overlayRoot, socketWorld);
-    const gripLocal = this.overlayPoint(runtime.overlayRoot, gripWorld);
+    const rootProjection = projectNodeToOverlayLocal(
+      runtime.rootJoint,
+      runtime.overlayRoot,
+    );
+    const childProjection = projectNodeToOverlayLocal(
+      runtime.childJoint,
+      runtime.overlayRoot,
+    );
+    const socketProjection = projectNodeToOverlayLocal(
+      runtime.socket,
+      runtime.overlayRoot,
+    );
+    const gripProjection = projectNodeToOverlayLocal(
+      runtime.gripAnchor,
+      runtime.overlayRoot,
+    );
+    const rootWorld = rootProjection.world;
+    const childWorld = childProjection.world;
+    const socketWorld = socketProjection.world;
+    const gripWorld = runtimeWorldPoint(runtime.gripAnchor);
+    const rootLocal = rootProjection.overlayLocal;
+    const childLocal = childProjection.overlayLocal;
+    const socketLocal = socketProjection.overlayLocal;
+    const gripLocal = gripProjection.overlayLocal;
     const graphics = runtime.overlayGraphics;
 
     graphics.lineWidth = 3;
@@ -367,15 +385,9 @@ export class GameAITask013R1Harness extends Component {
     graphics.lineTo(gripLocal.x, gripLocal.y + 14);
     graphics.stroke();
 
-    const rootRoundTrip = this.overlayLocalToWorld(runtime.overlayRoot, rootLocal);
-    const childRoundTrip = this.overlayLocalToWorld(
-      runtime.overlayRoot,
-      childLocal,
-    );
-    const socketRoundTrip = this.overlayLocalToWorld(
-      runtime.overlayRoot,
-      socketLocal,
-    );
+    const rootRoundTrip = rootProjection.roundTripWorld;
+    const childRoundTrip = childProjection.roundTripWorld;
+    const socketRoundTrip = socketProjection.roundTripWorld;
     const measurement: HarnessSpatialMeasurement = {
       markerError: harnessDistance(socketWorld, socketRoundTrip),
       skeletonRootError: harnessDistance(rootWorld, rootRoundTrip),
@@ -402,39 +414,6 @@ export class GameAITask013R1Harness extends Component {
       this.maximumGripError,
       measurement.gripError,
     );
-  }
-
-  private worldPoint(node: Node): HarnessPoint {
-    const world = node.getWorldPosition(new Vec3());
-    if (!Number.isFinite(world.x) || !Number.isFinite(world.y)) {
-      throw new Error("TASK_013R1_RUNTIME_WORLD_POSITION_NON_FINITE");
-    }
-    return { x: world.x, y: world.y };
-  }
-
-  private overlayPoint(overlayRoot: Node, world: HarnessPoint): HarnessPoint {
-    const transform = overlayRoot.getComponent(UITransform);
-    if (transform === null) {
-      throw new Error("TASK_013R1_OVERLAY_TRANSFORM_MISSING");
-    }
-    const local = transform.convertToNodeSpaceAR(
-      new Vec3(world.x, world.y, 0),
-    );
-    return { x: local.x, y: local.y };
-  }
-
-  private overlayLocalToWorld(
-    overlayRoot: Node,
-    local: HarnessPoint,
-  ): HarnessPoint {
-    const transform = overlayRoot.getComponent(UITransform);
-    if (transform === null) {
-      throw new Error("TASK_013R1_OVERLAY_TRANSFORM_MISSING");
-    }
-    const world = transform.convertToWorldSpaceAR(
-      new Vec3(local.x, local.y, 0),
-    );
-    return { x: world.x, y: world.y };
   }
 
   private registerInput(): void {

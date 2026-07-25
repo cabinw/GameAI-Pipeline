@@ -19,6 +19,17 @@ export interface HarnessSpatialMeasurement {
   readonly debugBounds: HarnessBounds;
 }
 
+export interface HierarchySpatialMeasurement {
+  readonly markerErrors: readonly number[];
+  readonly skeletonEndpointErrors: readonly number[];
+  readonly characterBounds: HarnessBounds;
+  readonly debugBounds: HarnessBounds;
+  readonly unknownParentCount: number;
+  readonly parentCycleCount: number;
+  readonly nonFinitePositionCount: number;
+  readonly sortingViolationCount: number;
+}
+
 export const HARNESS_SPATIAL_TOLERANCE_PX = 0.5;
 
 export function harnessDistance(
@@ -58,6 +69,64 @@ export function harnessBoundsIntersect(
     left.top < right.bottom ||
     left.bottom > right.top
   );
+}
+
+export function harnessBoundsContain(
+  outer: HarnessBounds,
+  inner: HarnessBounds,
+): boolean {
+  return (
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.bottom >= outer.bottom &&
+    inner.top <= outer.top
+  );
+}
+
+export function validateHierarchySpatialMeasurement(
+  measurement: HierarchySpatialMeasurement,
+  tolerance = HARNESS_SPATIAL_TOLERANCE_PX,
+): void {
+  const errors = [
+    ...measurement.markerErrors,
+    ...measurement.skeletonEndpointErrors,
+  ];
+  if (
+    errors.length === 0 ||
+    !Number.isFinite(tolerance) ||
+    tolerance < 0 ||
+    errors.some((error) => !Number.isFinite(error)) ||
+    measurement.nonFinitePositionCount !== 0
+  ) {
+    throw new Error("TASK_013R2_SPATIAL_NON_FINITE");
+  }
+  const maximum = Math.max(...errors);
+  if (maximum > tolerance) {
+    throw new Error(
+      `TASK_013R2_SPATIAL_TOLERANCE_EXCEEDED: ${maximum.toFixed(6)}`,
+    );
+  }
+  if (
+    measurement.unknownParentCount !== 0 ||
+    measurement.parentCycleCount !== 0
+  ) {
+    throw new Error("TASK_013R2_SPATIAL_HIERARCHY_INVALID");
+  }
+  if (measurement.sortingViolationCount !== 0) {
+    throw new Error("TASK_013R2_SPATIAL_SORTING_INVALID");
+  }
+  if (
+    !harnessBoundsIntersect(
+      measurement.characterBounds,
+      measurement.debugBounds,
+    ) ||
+    !harnessBoundsContain(
+      measurement.characterBounds,
+      measurement.debugBounds,
+    )
+  ) {
+    throw new Error("TASK_013R2_SPATIAL_DEBUG_OUTSIDE_CHARACTER");
+  }
 }
 
 export function validateHarnessSpatialMeasurement(

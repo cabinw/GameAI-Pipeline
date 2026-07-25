@@ -2,6 +2,93 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R2 Base Rig Bridge
+
+- Status: Implementation complete; pending external visual review
+- Started: 2026-07-25
+- Branch: `recovery/task-013r2-base-rig-bridge`
+- Baseline / frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Connect only the production-lite base character to the accepted R1 runtime
+adapter boundaries and prove that the lifecycle, manifest, semantic controls,
+sorting, projection, and runtime spatial assertions scale from two joints to
+the complete engine-neutral base rig hierarchy.
+
+### Boundaries
+
+- Use a new Creator-owned scene.
+- Consume the existing engine-neutral rig and Rest/Wave/Integration Stress
+  clips without defining Cocos-specific pivots, hierarchy, or clip IDs.
+- Reuse and generically extend R1 modules; do not copy them into a monolithic
+  component.
+- Do not modify the old Full Loadout scene or add accessories, garments,
+  props, grip, loadout presets, Red Cap, VFX, Unity, or Godot behavior.
+- No Canvas compensation or character-specific debug offset.
+
+### Execution
+
+1. Record TASK-013R2 scope and acceptance criteria.
+2. Add deterministic base-rig resource planning and semantic clip state.
+3. Extend the reusable runtime projection/measurement surface for arbitrary
+   joint hierarchies.
+4. Create and save a new scene through Creator 3.8.8.
+5. Add pure TypeScript, tracked-files-only, metadata, manifest, lifecycle, and
+   spatial regression tests.
+6. Pass both verification modes.
+7. Pass the complete Creator open/switch/reopen, Console, Preview, animation,
+   transform, debug, rebuild, and Reset gate in one uninterrupted run.
+8. Commit and push one reviewed R2 feature commit.
+9. Record, decode, hash, publish, re-download, and re-decode the temporary
+   `evidence/task-013r2` review video.
+10. Stop for external visual review without a PR or further attachment work.
+
+### Done when
+
+- Every declared base part and joint is present exactly once.
+- Rest reconstructs the authored base rig and Wave/Integration Stress visibly
+  articulate the expected hierarchy.
+- Marker and skeleton endpoint errors are each `<= 0.5 px`.
+- Unknown parents, cycles, non-finite transforms, out-of-region debug lines,
+  duplicate requests/listeners, and sorting violations are all zero.
+- Exact Reset is stopped at time zero in authored Rest.
+- Both verification modes and the uninterrupted Creator gate pass.
+- Feature and evidence branches are pushed while all frozen/protected refs and
+  the old demo remain unchanged.
+
+### Implementation result
+
+- The Creator-owned scene is
+  `assets/task-013r2-base-rig-bridge.scene`; it contains only the Canvas and
+  its Camera and owns exactly one `GameAITask013R2BaseRigBridge` component.
+- The runtime resolves the existing production-lite plan into 17 Sprite parts,
+  17 real joints, and 16 live parent-child skeleton segments.
+- Rest, Wave, and Integration Stress are selected by explicit semantic clip
+  IDs; the HUD and dispatcher are generated from one eight-action input
+  registry.
+- The R1 lifecycle, terminal resource coordinator, global sorting policy, and
+  world-to-overlay-local projector are reused. R1 resource, sorting, and
+  hierarchy-spatial boundaries were extended generically rather than copied.
+- Working-copy verification and tracked-files-only frozen verification pass.
+- The uninterrupted Creator 3.8.8 gate passes with clean Creator and Preview
+  Consoles, 17/17 resources, one input response after rebuild, one visible
+  character after reopen/rebuild, zero non-finite/unknown-parent/cycle/
+  out-of-region/sorting violations, and maximum marker and skeleton errors of
+  `0.000 px`.
+- Exact Reset returns to `production-lite-rest-idle`, `STOPPED`, time `0.00`,
+  transform stress enabled, and debug disabled.
+- Temporary review evidence is published only after the reviewed feature
+  commit and remains pending external visual review.
+
 ## Accepted plan: TASK-013R1 Minimal Cocos Runtime Adapter Harness
 
 - Status: Accepted after external visual review

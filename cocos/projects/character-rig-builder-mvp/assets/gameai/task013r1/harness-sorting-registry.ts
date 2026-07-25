@@ -15,8 +15,8 @@ export interface HarnessSortingPolicy {
 }
 
 export const HARNESS_SORTING_POLICY: HarnessSortingPolicy = Object.freeze({
-  production: Object.freeze({ minimum: 10, maximum: 19 }),
-  debug: Object.freeze({ minimum: 100, maximum: 109 }),
+  production: Object.freeze({ minimum: 10, maximum: 99 }),
+  debug: Object.freeze({ minimum: 100, maximum: 199 }),
   hud: Object.freeze({ minimum: 200, maximum: 209 }),
   orderByRole: Object.freeze({
     "production-root": 10,
@@ -67,6 +67,25 @@ export function harnessSortingOrder(
   const order = policy.orderByRole[role];
   if (order === undefined) {
     throw new Error(`TASK_013R1_SORTING_ROLE_UNKNOWN: ${String(role)}`);
+  }
+  return order;
+}
+
+export function harnessProductionSortingOrder(
+  drawOrder: number,
+  policy: HarnessSortingPolicy = HARNESS_SORTING_POLICY,
+): number {
+  validateHarnessSortingPolicy(policy);
+  if (!Number.isInteger(drawOrder) || drawOrder < 0) {
+    throw new Error(
+      `TASK_013R1_PRODUCTION_DRAW_ORDER_INVALID: ${drawOrder}`,
+    );
+  }
+  const order = policy.production.minimum + drawOrder;
+  if (order > policy.production.maximum) {
+    throw new Error(
+      `TASK_013R1_PRODUCTION_DRAW_ORDER_OUT_OF_RANGE: ${drawOrder}`,
+    );
   }
   return order;
 }

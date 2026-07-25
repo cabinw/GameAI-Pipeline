@@ -276,13 +276,20 @@ test("TASK-013R1 runtime source does not contain Full Loadout or fixed skeleton 
     ),
     "utf8",
   );
+  const projector = readFileSync(
+    path.join(
+      projectRoot,
+      "assets/gameai/task013r1/debug-space-projector.ts",
+    ),
+    "utf8",
+  );
   assert.doesNotMatch(
     runtime,
     /composable-loadout|full-loadout|toolbox|jacket|sunglasses/iu,
   );
-  assert.match(runtime, /convertToNodeSpaceAR/u);
-  assert.match(runtime, /convertToWorldSpaceAR/u);
-  assert.match(runtime, /getWorldPosition/u);
+  assert.match(projector, /convertToNodeSpaceAR/u);
+  assert.match(projector, /convertToWorldSpaceAR/u);
+  assert.match(projector, /getWorldPosition/u);
   assert.match(runtime, /harnessDistance\(socketWorld, gripWorld\)/u);
   assert.doesNotMatch(runtime, /lineTo\(0,\s*-\s*Math\.max/gu);
 });

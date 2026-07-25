@@ -1,7 +1,7 @@
 export interface HarnessLogicalResource {
   readonly logicalId: string;
   readonly relativePath: string;
-  readonly kind: "json";
+  readonly kind: "json" | "sprite-frame";
 }
 
 export interface HarnessResolvedResource extends HarnessLogicalResource {
@@ -20,29 +20,47 @@ export function resolveHarnessResourceManifest(
   manifest: readonly HarnessLogicalResource[] =
     HARNESS_LOGICAL_RESOURCE_MANIFEST,
 ): readonly HarnessResolvedResource[] {
+  return resolveLogicalResourceManifest(manifest, "task013r1", "TASK_013R1");
+}
+
+export function resolveLogicalResourceManifest(
+  manifest: readonly HarnessLogicalResource[],
+  rootPath: string,
+  diagnosticPrefix: string,
+): readonly HarnessResolvedResource[] {
+  if (
+    !/^[A-Z0-9_]+$/u.test(diagnosticPrefix) ||
+    (rootPath.length > 0 &&
+      !/^[a-z0-9]+(?:[/-][a-z0-9]+)*$/u.test(rootPath))
+  ) {
+    throw new Error(`${diagnosticPrefix}_RESOURCE_MANIFEST_INVALID: root`);
+  }
   const logicalIds = new Set<string>();
   const paths = new Set<string>();
   const resolved = manifest
     .map((entry) => {
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(entry.logicalId)) {
         throw new Error(
-          `TASK_013R1_RESOURCE_MANIFEST_INVALID: logicalId ${entry.logicalId}`,
+          `${diagnosticPrefix}_RESOURCE_MANIFEST_INVALID: logicalId ${entry.logicalId}`,
         );
       }
-      if (!/^[a-z0-9]+(?:[/-][a-z0-9]+)*$/u.test(entry.relativePath)) {
+      if (!/^[A-Za-z0-9]+(?:[/-][A-Za-z0-9]+)*$/u.test(entry.relativePath)) {
         throw new Error(
-          `TASK_013R1_RESOURCE_MANIFEST_INVALID: relativePath ${entry.relativePath}`,
+          `${diagnosticPrefix}_RESOURCE_MANIFEST_INVALID: relativePath ${entry.relativePath}`,
         );
       }
       if (logicalIds.has(entry.logicalId)) {
         throw new Error(
-          `TASK_013R1_RESOURCE_MANIFEST_DUPLICATE_ID: ${entry.logicalId}`,
+          `${diagnosticPrefix}_RESOURCE_MANIFEST_DUPLICATE_ID: ${entry.logicalId}`,
         );
       }
-      const cocosPath = `task013r1/${entry.relativePath}`;
+      const cocosPath =
+        rootPath.length === 0
+          ? entry.relativePath
+          : `${rootPath}/${entry.relativePath}`;
       if (paths.has(cocosPath)) {
         throw new Error(
-          `TASK_013R1_RESOURCE_MANIFEST_DUPLICATE_PATH: ${cocosPath}`,
+          `${diagnosticPrefix}_RESOURCE_MANIFEST_DUPLICATE_PATH: ${cocosPath}`,
         );
       }
       logicalIds.add(entry.logicalId);
