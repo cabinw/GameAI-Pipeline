@@ -2,11 +2,14 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R2 Base Rig Bridge
+## Accepted plan: TASK-013R2 Base Rig Bridge
 
-- Status: Implementation complete; pending external visual review
+- Status: Accepted after external visual review
 - Started: 2026-07-25
+- Accepted: 2026-07-25
 - Branch: `recovery/task-013r2-base-rig-bridge`
+- Implementation commit:
+  `fda803194a517960d9edec6ea362a929a0966827`
 - Baseline / frozen accepted R1:
   `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
 - Frozen TASK-013 feature:
@@ -65,7 +68,7 @@ the complete engine-neutral base rig hierarchy.
 - Feature and evidence branches are pushed while all frozen/protected refs and
   the old demo remain unchanged.
 
-### Implementation result
+### Acceptance result
 
 - The Creator-owned scene is
   `assets/task-013r2-base-rig-bridge.scene`; it contains only the Canvas and
@@ -86,8 +89,23 @@ the complete engine-neutral base rig hierarchy.
   `0.000 px`.
 - Exact Reset returns to `production-lite-rest-idle`, `STOPPED`, time `0.00`,
   transform stress enabled, and debug disabled.
-- Temporary review evidence is published only after the reviewed feature
-  commit and remains pending external visual review.
+- External visual review: PASS.
+- The reviewed 54-second, 1,620-frame Creator Web Preview video shows one
+  coherent 17-part character, correct Rest assembly, Wave and Integration
+  Stress hierarchy articulation, aligned 17-joint/16-segment diagnostics,
+  Pause/Resume, transform stress, one-character lifecycle rebuild, exact
+  Reset, and debug-OFF cleanup without clipping, duplication, flicker, jumps,
+  drift, or layer anomalies.
+- Reviewed video SHA-256:
+  `8a9f142bd496b001e6e2842ad9d0f8fee28bb583820b887910444526de517219`.
+- The Canvas-only recording validates visible Web Preview behavior. Creator
+  Console cleanliness and scene-switch/reopen lifecycle results remain
+  supported by the recorded live acceptance procedure and automated/runtime
+  diagnostics because those editor surfaces are not pixels inside the
+  captured Canvas.
+- The temporary `evidence/task-013r2` branch may be removed after this
+  acceptance documentation is safely pushed. The accepted R2 branch is then
+  frozen at its final acceptance commit.
 
 ## Accepted plan: TASK-013R1 Minimal Cocos Runtime Adapter Harness
 

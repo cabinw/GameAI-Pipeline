@@ -7,8 +7,8 @@ Feature acceptance gate: **PASS**.
 The accepted TASK-013R1 adapter boundaries scale from the isolated two-joint
 harness to the complete production-lite base character without reconnecting
 the old TASK-013 Full Loadout demo. The result remains intentionally limited
-to the base rig and is pending external visual review of its temporary
-Creator Web Preview evidence.
+to the base rig. External visual review of its Creator Web Preview evidence:
+**PASS**.
 
 ## Runtime surface
 
@@ -104,11 +104,48 @@ character-specific debug offset, or fixed skeleton line is present.
 
 ## Evidence status
 
-The temporary evidence file is
+External visual review passed for
 `task-013r2-base-rig-bridge.mp4`, captured from Creator 3.8.8 Web Preview.
-Its evidence manifest records the reviewed feature SHA, measured maxima,
-media metadata, SHA-256, full-decode result, re-download identity, and
-`pending-external-visual-review`.
+
+- Reviewed feature:
+  `fda803194a517960d9edec6ea362a929a0966827`
+- Final evidence head:
+  `0a11c7d1460c461a2312b4787cf6a69c995df451`
+- Uploaded-copy verification source:
+  `851c0024e81c214140eb6e116226172a162d8655`
+- Size: 1,539,627 bytes
+- Duration: 54.000 seconds
+- Frames: 1,620
+- Codec/profile: H.264 High
+- Resolution/frame rate: 1280 x 720 at 30 fps
+- Pixel format: `yuv420p`
+- SHA-256:
+  `8a9f142bd496b001e6e2842ad9d0f8fee28bb583820b887910444526de517219`
+- Full decode: PASS
+- Re-downloaded evidence SHA-256 identity: PASS
+
+The visual review confirms:
+
+- transition into real Cocos Web Preview;
+- correct Base Rest assembly as one coherent 17-part character;
+- expected Wave hierarchy articulation;
+- arm, leg, and torso articulation during Integration Stress;
+- 17 joint markers and 16 skeleton segments remaining aligned;
+- Pause freezing the current pose and Resume continuing playback;
+- root translation, scale, and rotation without debug drift;
+- one visible character after lifecycle rebuild;
+- exact Reset to Rest, `STOPPED`, `0.00`;
+- no visible debug geometry after Debug OFF; and
+- no clipping, duplicate character, flicker, jump, or layer anomaly.
+
+This is Canvas-only video evidence. Creator Console cleanliness and
+scene-switch/reopen results are supported by the recorded live acceptance
+procedure and automated/runtime diagnostics rather than by video pixels
+alone.
+
+After this acceptance record is safely pushed, the temporary
+`evidence/task-013r2` branch may be deleted. The ignored local recording is
+retained and no MP4 becomes tracked.
 
 ## Limits
 
