@@ -2,12 +2,18 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R7 Recovered Full-Loadout Release Candidate
+## Accepted plan: TASK-013R7 Recovered Full-Loadout Release Candidate
 
-- Status: External review blocked on canonical HUD identity; one focused
-  display-identity injection fix authorized
+- Status: Accepted after external visual review
 - Started: 2026-07-26
+- Accepted: 2026-07-26
 - Branch: `recovery/task-013r7-full-loadout-release-candidate`
+- Original implementation commit:
+  `37b7134fbb88ebf7f2b2ea2823c9ce2d597531d9`
+- Final reviewed implementation commit:
+  `ce5bb6d1f0b7f1676243ded6e2781d915f7005b4`
+- Reviewed evidence commit:
+  `ebd447ad6e7158d1dfa26f7ea5e60bc74daa851f`
 - Baseline / frozen accepted R6:
   `5d708cb676c626244218e82a9e2fd9343aa5f736`
 - Frozen accepted R5:
@@ -133,8 +139,24 @@ superseded monolithic TASK-013 runtime.
   Exact Reset with 35/35 resources and all spatial/duplicate counters at 0.
 - Creator and Preview consoles remained clean during the focused identity
   gate. No second runtime or visual defect appeared.
-- Replacement evidence remains pending after the focused fix commit is safely
-  pushed.
+- External visual review of the replacement evidence: PASS.
+- The canonical Creator-owned V2 Scene and
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2` HUD identity were visible; no
+  `TASK-013R6` identity appeared in the canonical preview.
+- The reviewed replacement demonstrated all 12 loadout states, no/left/right
+  prop states, Wave, Prop Swing, Integration Stress, Pause/Resume, spatial
+  Debug overlays, Transform Stress, two lifecycle rebuilds, post-rebuild
+  switching, Exact Reset, and the final authored Rest state at `STOPPED`
+  `0.00s` with no prop, Stress OFF, and Debug OFF.
+- Lifecycle counters advanced from `1 / 0 / 0` to `3 / 2 / 2`; spatial,
+  duplicate, sorting, and role violation counts remained 0.
+- Replacement video
+  `task-013r7-recovered-full-loadout-release-candidate-v2.mp4`: 2,790 frames,
+  SHA-256
+  `84424ea760bbeb721e0610afa380450623f702f5ebd6cadf8acff8f4563420a8`,
+  complete decode PASS.
+- The original video is retained in the reviewed manifest with status
+  `superseded-canonical-hud-identity-mismatch`.
 
 ## Accepted plan: TASK-013R6 Generic One-Handed Prop Integration
 

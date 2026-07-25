@@ -3,7 +3,7 @@
 ## Result
 
 Implementation acceptance gate: **PASS**.
-External visual review: **PENDING**.
+External visual review: **PASS**.
 
 TASK-013R7 publishes the externally accepted R1-R6 recovery chain through one
 canonical engine-neutral Cocos adapter facade and one Creator-owned canonical
@@ -103,8 +103,8 @@ External review of the first evidence capture found a release-blocking
 identity leak: the canonical HUD reported the accepted R6 task title. The
 focused repair injects the typed canonical display identity through the
 adapter boundary while preserving the accepted R6 title in the R6 Scene.
-External visual acceptance remains **PENDING** until replacement evidence
-proves both identities and repeats the release-candidate gate.
+The replacement evidence proved both identities and repeated the
+release-candidate gate; external visual acceptance is **PASS**.
 
 ### Focused identity repair verification
 
@@ -148,17 +148,47 @@ grip solving, or fixed Skeleton geometry.
 
 ## Evidence status
 
-The canonical Creator Web Preview recording and temporary
-`evidence/task-013r7` publication are authorized only after this
-implementation is committed and pushed. The evidence manifest must record
-the exact reviewed feature SHA, canonical Scene path, accepted R6 parity
-result, lifecycle start/final counters, spatial maxima, media metadata,
-SHA-256, complete decode, and
-`pending-external-visual-review`.
+External visual review of the replacement Creator 3.8.8 Web Preview evidence:
+**PASS**.
+
+- Reviewed feature:
+  `ce5bb6d1f0b7f1676243ded6e2781d915f7005b4`
+- Reviewed evidence:
+  `ebd447ad6e7158d1dfa26f7ea5e60bc74daa851f`
+- Replacement recording:
+  `task-013r7-recovered-full-loadout-release-candidate-v2.mp4`
+- Canonical Creator-owned V2 Scene identity: visible
+- Canonical HUD identity:
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2`
+- Visible `TASK-013R6` identity in canonical preview: none
+- Loadout coverage: all 12 states, including no/left/right prop states
+- Animation coverage: Wave, Prop Swing, and Integration Stress
+- Runtime coverage: Pause/Resume, spatial Debug overlays, Transform Stress,
+  two Lifecycle Rebuilds, post-rebuild switching, and Exact Reset
+- Lifecycle counters: `SETUP 1 / TEARDOWN 0 / REBUILDS 0` to
+  `SETUP 3 / TEARDOWN 2 / REBUILDS 2`
+- Final state: authored Rest, `STOPPED`, `0.00s`, no prop, Stress OFF,
+  Debug OFF
+- Spatial, duplicate, sorting, and role violations: 0
+- Size: 1,895,523 bytes
+- Duration: 93.000 seconds
+- Frames: 2,790
+- Codec/profile: H.264 High
+- Resolution/frame rate/pixel format: 1280x720, 30 fps, `yuv420p`
+- SHA-256:
+  `84424ea760bbeb721e0610afa380450623f702f5ebd6cadf8acff8f4563420a8`
+- Complete 2,790-frame decode: PASS
+- Uploaded-copy byte size, SHA-256, frame count, metadata, and full decode:
+  PASS
+
+The original
+`task-013r7-recovered-full-loadout-release-candidate.mp4` remains recorded in
+the reviewed evidence manifest with status
+`superseded-canonical-hud-identity-mismatch`.
 
 ## Limits
 
 TASK-013R7 does not add a new attachment family, schema or resolver change,
 old monolithic demo repair, Red Cap reconstruction, IK, physics, blending,
-root motion, VFX, Unity/Godot adapters, Windows validation, TASK-014, a PR,
-or a merge.
+root motion, VFX, Unity/Godot adapters, Windows validation, TASK-014, or a
+merge.
