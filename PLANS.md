@@ -2,6 +2,117 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R5 Multi-Part Garment Layering Bridge
+
+- Status: Implementation and one-pass Creator gate passed; external visual
+  review pending
+- Started: 2026-07-25
+- Branch: `recovery/task-013r5-garment-layering`
+- Baseline / frozen accepted R4:
+  `90a8bf3acf8712f3c4923d25e7b9e50359f47a2b`
+- Frozen accepted R3:
+  `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
+- Frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the recovered adapter from the accepted Base Rig and generic head
+accessories to one contract-resolved multi-part wearable set. Reuse the
+production-lite TASK-011 garment fixture to prove deterministic state
+composition, global front/back sorting, live seam measurements, resource
+loading, lifecycle behavior, and exact Reset without reconnecting the old
+Full Loadout demo.
+
+### Boundaries
+
+- Create a separate Creator-owned R5 Scene; do not clone or modify the old
+  Full Loadout Scene.
+- Consume existing engine-neutral rig, attachment, wearable-set, seam, and
+  animation data. Do not create a second Cocos source for pivots, hierarchy,
+  placement, membership, seam constraints, roles, or clip IDs.
+- Reuse and generically extend the accepted R1-R4 lifecycle, manifest, input,
+  sorting, projection, spatial, Base Rig, and attachment collection modules.
+- Keep shared runtime free of jacket, collar, sleeve, cuff, cap, and
+  sunglasses branches. Fixture labels remain outside generic logic.
+- Do not add props, grip, automatic fitting, cloth/mesh behavior, Full
+  Loadout migration, Red Cap, cross-engine work, R6, or TASK-014.
+
+### Execution
+
+1. Record TASK-013R5 scope and acceptance criteria before implementation.
+2. Build a deterministic generic wearable bridge plan for Base only, Garment
+   only, Accessories only, and Garment plus accessories.
+3. Extend manifest, state/input registry, sorting, runtime collection, seam
+   measurement, spatial assertions, lifecycle, and exact Reset through small
+   testable modules.
+4. Create and save an isolated Creator-owned R5 Scene through Creator 3.8.8.
+5. Add pure TypeScript, tracked-files-only, metadata, state, resource,
+   ordering, seam, lifecycle, duplicate, and spatial regression tests.
+6. Pass working-copy and tracked-files-only frozen verification.
+7. Run the complete clean-open, scene-switch/reopen, Console, resource,
+   state/control, animation, transform, debug, rebuild, and Reset Creator gate
+   once without interruption.
+8. If any live defect appears, stop without patching or recording evidence.
+9. If the entire gate passes, commit/push one reviewed R5 implementation,
+   record and validate the required video, publish `evidence/task-013r5`,
+   verify the uploaded copy, and stop for external review.
+
+### Done when
+
+- All four states resolve deterministically with exact garment/accessory
+  membership and counts and no duplicate IDs, nodes, requests, or listeners.
+- Manifest completion precedes construction and every resource loads exactly
+  once.
+- Global/front-back ordering remains stable and every garment seam,
+  accessory socket/anchor, joint marker, and Skeleton endpoint error is
+  `<= 0.5 px` under Rest, Wave, Integration Stress, and root transform stress.
+- Unknown slots, non-finite positions, sorting/front-back violations, and
+  out-of-region debug geometry are zero.
+- Lifecycle rebuild leaves one character and the expected state; exact Reset
+  restores authored Rest, stopped time zero, default garment/accessory state,
+  transform stress OFF, Debug OFF, and no residual geometry.
+- Both verification modes, the uninterrupted Creator gate, media checks, and
+  uploaded-copy verification pass while all frozen/protected refs and the old
+  demo remain unchanged.
+
+### Implementation result
+
+- A new Creator-owned `task-013r5-garment-layering.scene` contains only
+  Canvas, Camera, and one R5 bridge component at rest. Runtime construction
+  remains gated on terminal manifest success.
+- One deterministic generic garment bridge plan consumes the existing
+  TASK-011 engine-neutral Attachment Layout, including 12 slots, 14
+  attachment parts, one 11-member wearable set, 10 seam constraints, three
+  head-accessory parts, and four loadout states.
+- The runtime reuses the accepted lifecycle, resource coordinator, semantic
+  control, sorting, Base Rig, projector, and spatial assertion boundaries.
+  It adds small fixture-neutral garment plan, manifest, state, input, runtime
+  collection, and spatial modules instead of reconnecting the old Full
+  Loadout component.
+- The uninterrupted Creator 3.8.8 gate passed clean open, R4 scene
+  switch/R5 reopen, Preview and Creator Consoles, all four states and every
+  semantic control, Wave and Integration Stress seam inspection,
+  Pause/Resume, transform stress, lifecycle rebuild, post-rebuild garment and
+  accessory toggles, exact Reset, and final Debug OFF cleanup.
+- Live HUD results remained 31/31 resources, 17 base parts, 17 joints,
+  11 garment parts, three accessory parts, 10/10 active seams in garment
+  states, setup 2/teardown 1/rebuild 1 after lifecycle rebuild, and zero
+  marker, Skeleton, socket, seam, duplicate, sorting, role, non-finite,
+  unknown-slot, and out-of-viewport errors.
+- Working-copy and tracked-files-only frozen verification each passed
+  313 tests with zero failures. Evidence publication remains pending and no
+  PR or merge has been created.
+
 ## Accepted plan: TASK-013R4 Head Accessory Layering Bridge
 
 - Status: Accepted after external visual review
