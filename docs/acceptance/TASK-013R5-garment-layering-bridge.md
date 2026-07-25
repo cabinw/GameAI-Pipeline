@@ -3,7 +3,7 @@
 ## Result
 
 Implementation acceptance gate: **PASS**.
-External visual review: **PENDING**.
+External visual review: **PASS**.
 
 The recovered R1-R4 Cocos Adapter boundaries now resolve, load, mount,
 animate, switch, sort, measure, rebuild, and reset one contract-defined
@@ -131,12 +131,34 @@ Measurements use current Creator runtime world positions. There is no Canvas
 compensation, character-specific offset, fixture-specific sorting constant,
 automatic fitting, or fixed Skeleton geometry.
 
-## Evidence status
+## External visual acceptance
 
-The implementation and uninterrupted live gate have passed. A real Creator
-3.8.8 Web Preview recording will be published temporarily on
-`evidence/task-013r5` for external visual review. The feature branch will not
-track the MP4.
+External review independently verified the uploaded evidence at
+`f0ded791e75811f3b9a48c7030a167b06576d68d`.
+
+- Uploaded SHA-256 identity: PASS
+- Encoding: H.264 High, 1280x720, 30 fps, yuv420p
+- Frames: 4,095/4,095 decoded successfully
+- Base only: garment 0, accessories 0
+- Garment only: garment 11, accessories 0
+- Accessories only: garment 0, accessories 3
+- Garment plus accessories: garment 11, accessories 3
+- Garment layering around torso, arms, and cuffs: PASS
+- Garment seams in Rest, Wave, and Integration Stress: PASS
+- Accessory socket alignment: PASS
+- Joint and Skeleton debug alignment: PASS
+- Pause/Resume and transform stress: PASS
+- Lifecycle rebuild: setup 2, teardown 1, rebuild 1
+- Post-rebuild garment/accessory switching: PASS
+- Exact Reset: authored Rest, STOPPED, 0.00 seconds
+- Final state: transform stress OFF, Debug OFF
+- Spatial, sorting, front/back, duplicate, and resource errors: 0
+
+The reviewed video SHA-256 is
+`b6c956b15806eb84380945111c6bcec8d2e8b68659c2fb4ca969eb59e7e63908`.
+The temporary `evidence/task-013r5` branch may be removed after this
+acceptance documentation is safely pushed. The ignored local recording
+remains preserved and no MP4 is tracked on the R5 feature branch.
 
 ## Limits
 

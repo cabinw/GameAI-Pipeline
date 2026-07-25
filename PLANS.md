@@ -2,12 +2,16 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R5 Multi-Part Garment Layering Bridge
+## Accepted plan: TASK-013R5 Multi-Part Garment Layering Bridge
 
-- Status: Implementation and one-pass Creator gate passed; external visual
-  review pending
+- Status: Accepted after external visual review
 - Started: 2026-07-25
+- Accepted: 2026-07-25
 - Branch: `recovery/task-013r5-garment-layering`
+- Implementation commit:
+  `f5083ca767ea0b5b7bb11109e09c8440e0b8e5e4`
+- Reviewed evidence commit:
+  `f0ded791e75811f3b9a48c7030a167b06576d68d`
 - Baseline / frozen accepted R4:
   `90a8bf3acf8712f3c4923d25e7b9e50359f47a2b`
 - Frozen accepted R3:
@@ -110,8 +114,21 @@ Full Loadout demo.
   marker, Skeleton, socket, seam, duplicate, sorting, role, non-finite,
   unknown-slot, and out-of-viewport errors.
 - Working-copy and tracked-files-only frozen verification each passed
-  313 tests with zero failures. Evidence publication remains pending and no
-  PR or merge has been created.
+  313 tests with zero failures.
+- External visual review independently verified the uploaded video SHA-256,
+  H.264 High 1280x720 30 fps yuv420p encoding, and complete decode of all
+  4,095 frames.
+- The reviewed recording visibly verifies all four state counts, garment
+  layering around the torso, arms, and cuffs, garment seams in Rest, Wave,
+  and Integration Stress, accessory socket alignment, joint/Skeleton debug
+  alignment, Pause/Resume, transform stress, lifecycle rebuild at setup 2 /
+  teardown 1 / rebuild 1, post-rebuild garment/accessory switching, exact
+  Reset to STOPPED 0.00 seconds, and the final Stress-OFF/Debug-OFF state.
+- The reviewed runtime reported zero spatial, sorting, front/back, duplicate,
+  and resource errors. The temporary `evidence/task-013r5` branch may be
+  removed after this acceptance documentation is safely pushed; the ignored
+  local recording remains preserved and the accepted R5 branch is then
+  frozen.
 
 ## Accepted plan: TASK-013R4 Head Accessory Layering Bridge
 
