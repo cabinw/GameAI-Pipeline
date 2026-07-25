@@ -2,11 +2,14 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R1 Minimal Cocos Runtime Adapter Harness
+## Accepted plan: TASK-013R1 Minimal Cocos Runtime Adapter Harness
 
-- Status: In progress
+- Status: Accepted after external visual review
 - Started: 2026-07-25
+- Accepted: 2026-07-25
 - Branch: `recovery/task-013r1-minimal-cocos-harness`
+- Implementation commit:
+  `8543fc61742b8a95b7c9ded6ad7347e49cd3ca63`
 - Baseline: `5170185fdca666300c4d61488f17e15aa18656be`
 - Frozen feature: `feat/task-013-composable-character-loadout` at
   `5170185fdca666300c4d61488f17e15aa18656be`
@@ -58,6 +61,22 @@ reconnection.
 - Scene reopen and disable/enable produce no duplicate nodes or input response.
 - The recovery and evidence branches are pushed while all protected refs and
   the old demo remain unchanged.
+
+### Acceptance result
+
+- External visual review: PASS.
+- Reviewed video:
+  `task-013r1-cocos-runtime-harness.mp4`.
+- Reviewed video SHA-256:
+  `7f0122f81151950ac21e3276b8fe1c07fc12ec7449edfe431296e446157c4c3a`.
+- The Canvas-only recording confirms the visible HUD, animation, debug
+  alignment, transform stress, lifecycle rebuild, exact Reset, and debug-OFF
+  behavior. Creator Console and scene-switch/reopen results remain supported
+  by the recorded live acceptance procedure and automated/runtime diagnostics,
+  because those editor surfaces are not pixels inside the captured Canvas.
+- The temporary `evidence/task-013r1` branch may be removed after this
+  acceptance documentation is safely pushed. The accepted recovery branch is
+  frozen at its final acceptance commit.
 
 ## Frozen prior plan: TASK-013 Creator Scene-Load Repair
 

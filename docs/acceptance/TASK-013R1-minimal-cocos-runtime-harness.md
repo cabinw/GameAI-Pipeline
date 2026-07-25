@@ -4,6 +4,9 @@
 - Creator: 3.8.8
 - Preview: Web, 1280 × 720
 - Branch: `recovery/task-013r1-minimal-cocos-harness`
+- Implementation commit:
+  `8543fc61742b8a95b7c9ded6ad7347e49cd3ca63`
+- External visual review: PASS
 
 ## Automated verification
 
@@ -50,8 +53,42 @@ All positions were sampled from live Cocos Nodes in world space and projected
 through the `DebugOverlayRoot` `UITransform`; no fixed Canvas compensation or
 character-specific debug offset was used.
 
-## Evidence status
+## External visual acceptance
 
-The feature implementation passed the gate. External visual evidence is
-published separately on `evidence/task-013r1` and remains pending external
-visual review.
+External review passed for:
+
+- filename: `task-013r1-cocos-runtime-harness.mp4`;
+- size: 944,217 bytes;
+- duration: 60.000 seconds;
+- codec/profile: H.264 High;
+- dimensions: 1280 × 720;
+- frame rate: 30 fps;
+- pixel format: `yuv420p`;
+- SHA-256:
+  `7f0122f81151950ac21e3276b8fe1c07fc12ec7449edfe431296e446157c4c3a`;
+  and
+- complete FFmpeg decode: PASS.
+
+The review confirmed:
+
+- a fully visible, unclipped HUD;
+- overlays aligned with animated runtime targets;
+- skeleton endpoints following actual joints under transform stress;
+- coincident socket and grip markers;
+- correct Pause, Resume, and exact Reset;
+- one visible character after lifecycle rebuild;
+- no residual debug geometry after Debug OFF; and
+- no visible drift, flicker, duplication, clipping, or coordinate jump.
+
+The video is Canvas-only evidence. It directly proves visible runtime behavior,
+but does not contain Creator editor chrome or Console pixels. Creator Console
+cleanliness and scene-switch/reopen behavior remain supported by the
+contemporaneous one-pass Creator acceptance record above and by the
+automated/runtime lifecycle diagnostics.
+
+The reviewed evidence was published at
+`evidence/task-013r1` commit
+`6ac3399bb7e3dc67c827504a96a33114bf1b8177`. After this acceptance
+documentation is safely committed and pushed, the temporary evidence branch
+is eligible for local and remote deletion while the ignored local recording
+is preserved.
