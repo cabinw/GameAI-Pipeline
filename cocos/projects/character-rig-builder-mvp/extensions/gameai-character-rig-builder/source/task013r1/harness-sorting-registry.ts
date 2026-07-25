@@ -88,3 +88,51 @@ export function harnessProductionSortingOrder(
   }
   return order;
 }
+
+export interface HarnessProductionSortEntry {
+  readonly semanticId: string;
+  readonly drawOrder: number;
+}
+
+export function resolveHarnessProductionSortingOrders(
+  entries: readonly HarnessProductionSortEntry[],
+  policy: HarnessSortingPolicy = HARNESS_SORTING_POLICY,
+): ReadonlyMap<string, number> {
+  validateHarnessSortingPolicy(policy);
+  if (entries.length === 0) {
+    throw new Error("TASK_013R1_PRODUCTION_SORT_ENTRIES_EMPTY");
+  }
+  const ids = new Set<string>();
+  const drawOrders = new Set<number>();
+  const ordered = [...entries].sort(
+    (left, right) =>
+      left.drawOrder - right.drawOrder ||
+      left.semanticId.localeCompare(right.semanticId),
+  );
+  for (const entry of ordered) {
+    if (
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(entry.semanticId) ||
+      !Number.isFinite(entry.drawOrder) ||
+      ids.has(entry.semanticId) ||
+      drawOrders.has(entry.drawOrder)
+    ) {
+      throw new Error(
+        `TASK_013R1_PRODUCTION_SORT_ENTRY_INVALID: ${entry.semanticId}`,
+      );
+    }
+    ids.add(entry.semanticId);
+    drawOrders.add(entry.drawOrder);
+  }
+  if (
+    policy.production.minimum + ordered.length - 1 >
+    policy.production.maximum
+  ) {
+    throw new Error("TASK_013R1_PRODUCTION_SORT_RANGE_EXHAUSTED");
+  }
+  return new Map(
+    ordered.map(
+      (entry, index) =>
+        [entry.semanticId, policy.production.minimum + index] as const,
+    ),
+  );
+}

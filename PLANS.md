@@ -2,6 +2,108 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R3 Single Attachment Bridge
+
+- Status: Implementation complete; pending external visual review
+- Started: 2026-07-25
+- Branch: `recovery/task-013r3-single-attachment-bridge`
+- Baseline / frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Bridge exactly one resolved engine-neutral rigid attachment into the accepted
+17-part Base Rig runtime. Use the production-lite sunglasses fixture only as
+acceptance data while keeping slot resolution, node construction, resource
+loading, enable state, sorting, socket/anchor measurement, lifecycle, and
+semantic controls generic.
+
+### Boundaries
+
+- Create a new Creator-owned R3 scene; do not clone or modify the old
+  Full Loadout scene.
+- Consume the existing Attachment Layout contract and
+  `resolveAttachmentLayout`; do not define a Cocos-specific attachment state,
+  pivot, slot, or semantic clip source.
+- Reuse the accepted R1 lifecycle, resource, sorting, projection, and spatial
+  boundaries and the R2 Base Rig Bridge modules.
+- The runtime adapter understands only generic IDs, slots, parent parts,
+  transforms, anchors, enabled state, resource paths, and global draw order.
+- Do not add cap layering, multiple attachments, garments, props, grip,
+  comparison views, loadout presets, Red Cap, VFX, Unity, or Godot behavior.
+- Unknown slot, attachment, parent, resource, semantic action, or clip fails
+  clearly without fallback.
+
+### Execution
+
+1. Record TASK-013R3 scope and acceptance criteria before implementation.
+2. Add a deterministic single-attachment bridge plan resolved from the
+   engine-neutral rig and attachment contract.
+3. Extend the manifest, semantic state/input registry, sorting validation, and
+   spatial measurement for one generic attachment.
+4. Build a separate Creator-owned scene and small runtime component by
+   composing accepted modules instead of copying them into a monolith.
+5. Add pure TypeScript, tracked-files-only, metadata, manifest, lifecycle,
+   state, sorting, and socket/anchor regression tests.
+6. Pass working-copy and tracked-files-only frozen verification.
+7. Pass the complete Creator open/switch/reopen, Console, resource, state,
+   animation, transform, attachment, debug, rebuild, and Reset gate in one
+   uninterrupted run.
+8. Commit and push one reviewed R3 feature commit.
+9. Record, decode, hash, publish, re-download, and re-decode the temporary
+   `evidence/task-013r3` review video.
+10. Stop for external visual review without a PR or further attachment work.
+
+### Done when
+
+- Base-only and Base-plus-attachment states are selected through the one
+  semantic input registry and correctly reported by the HUD.
+- The enabled runtime has exactly one attachment parented through its declared
+  slot; disabling removes it completely and re-enabling never duplicates it.
+- Rest, Wave, Integration Stress, root transform stress, lifecycle rebuild,
+  Pause/Resume, and exact Reset preserve the declared attachment relationship.
+- Maximum joint-marker, skeleton-endpoint, and socket-to-anchor errors are each
+  `<= 0.5 px`.
+- Unknown slots, duplicate attachment nodes/requests/listeners, non-finite
+  positions, out-of-region debug geometry, and sorting violations are zero.
+- Both verification modes and the uninterrupted Creator gate pass.
+- Feature and evidence branches are pushed while all frozen/protected refs and
+  the old demo remain unchanged.
+
+### Implementation result
+
+- A new Creator-owned
+  `assets/task-013r3-single-attachment-bridge.scene` contains only Canvas,
+  Camera, and one R3 bridge component.
+- The generator resolves the existing engine-neutral attachment contract into
+  one deterministic generic bridge plan; the runtime core contains no
+  sunglasses-specific behavior.
+- The terminal manifest loads 17 base parts and one attachment resource with
+  18 unique requests, 0 failures, and 0 duplicate requests.
+- Base-only and attachment-enabled states derive from the same semantic input
+  registry used by the HUD and dispatcher.
+- Rest, Wave, Integration Stress, Pause/Resume, transform stress, lifecycle
+  rebuild, exact Reset, and Debug OFF passed in one Creator 3.8.8 run.
+- Scene switch/reopen and a second preview initialization passed; Creator and
+  Preview Consoles had 0 relevant warnings or errors.
+- Maximum projected joint-marker, skeleton-endpoint, and socket-to-anchor
+  errors were each `0.000 px` against the `0.5 px` tolerance.
+- Duplicate attachment nodes, input handlers, and resource requests were 0;
+  non-finite positions, unknown slots, sorting violations, and out-of-region
+  debug geometry were 0.
+- Working-copy and tracked-files-only frozen verification each passed all 287
+  tests.
+- Evidence remains to be captured and published for external visual review.
+
 ## Accepted plan: TASK-013R2 Base Rig Bridge
 
 - Status: Accepted after external visual review
