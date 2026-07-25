@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "harnessId": "task-013r1-minimal-cocos-runtime-harness",
+  "designResolution": {
+    "width": 1280,
+    "height": 720
+  },
+  "runtimeTolerancePx": 0.5
+}

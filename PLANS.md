@@ -2,7 +2,64 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013 Creator Scene-Load Repair
+## Active plan: TASK-013R1 Minimal Cocos Runtime Adapter Harness
+
+- Status: In progress
+- Started: 2026-07-25
+- Branch: `recovery/task-013r1-minimal-cocos-harness`
+- Baseline: `5170185fdca666300c4d61488f17e15aa18656be`
+- Frozen feature: `feat/task-013-composable-character-loadout` at
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Build a separate Creator-owned two-joint runtime harness that proves scene
+identity, Editor/runtime lifecycle separation, complete manifest loading,
+semantic input, global sorting, world-to-overlay-local projection, runtime
+spatial assertions, transform stress, and exact Reset before any Full Loadout
+reconnection.
+
+### Boundaries
+
+- Do not modify or delete the existing Full Loadout demo, contracts, resolver,
+  production assets, or evidence.
+- Do not clone TASK-010 through TASK-013 scenes.
+- Creator owns scene and script `.meta` identities.
+- No hard-coded Canvas or character compensation offset.
+- Static tests are secondary to actual runtime measurements.
+
+### Execution
+
+1. Record the postmortem, TASK-013R1 specification, and ADR-0013.
+2. Create a separate Creator-authored scene and minimal primitive fixture.
+3. Implement small lifecycle, manifest, input, sorting, projection, and
+   measurement modules.
+4. Add pure TypeScript, tracked-files-only, and runtime assertions.
+5. Pass working-copy and frozen tracked-files-only verification.
+6. Pass the complete Creator first-open, switch, reopen, Preview, transform,
+   animation, debug, teardown, and Reset gate in one run.
+7. Commit and push one reviewed recovery commit.
+8. Record, decode, hash, publish, re-download, and re-decode one real Creator
+   Web Preview video on `evidence/task-013r1`.
+9. Stop for external review without a PR or Full Loadout reconnection.
+
+### Done when
+
+- Both verification modes pass.
+- Creator and Preview consoles contain zero relevant warnings/errors.
+- Maximum marker, skeleton endpoint, and locked grip error are each
+  `<= 0.5 px`.
+- Debug OFF leaves no active debug renderers.
+- Scene reopen and disable/enable produce no duplicate nodes or input response.
+- The recovery and evidence branches are pushed while all protected refs and
+  the old demo remain unchanged.
+
+## Frozen prior plan: TASK-013 Creator Scene-Load Repair
 
 - Status: In progress
 - Started: 2026-07-24

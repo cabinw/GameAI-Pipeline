@@ -12,10 +12,12 @@ declare module "cc" {
     property: PropertyDecorator;
   };
 
-  export interface Vec3 {
-    readonly x: number;
-    readonly y: number;
-    readonly z: number;
+  export class Vec3 {
+    x: number;
+    y: number;
+    z: number;
+
+    constructor(x?: number, y?: number, z?: number);
   }
 
   export class Component {
@@ -37,8 +39,10 @@ declare module "cc" {
     setPosition(x: number, y: number, z?: number): void;
     setRotationFromEuler(x: number, y: number, z: number): void;
     setScale(x: number, y: number, z?: number): void;
+    getWorldPosition(out?: Vec3): Vec3;
     addComponent<T extends Component>(component: new () => T): T;
     getComponent<T extends Component>(component: new () => T): T | null;
+    removeFromParent(): void;
     destroy(): boolean;
   }
 
@@ -55,6 +59,7 @@ declare module "cc" {
     lineTo(x: number, y: number): void;
     circle(centerX: number, centerY: number, radius: number): void;
     rect(x: number, y: number, width: number, height: number): void;
+    clear(): void;
     fill(): void;
     stroke(): void;
   }
@@ -87,6 +92,10 @@ declare module "cc" {
 
   export class SpriteFrame {}
 
+  export class JsonAsset {
+    readonly json: unknown;
+  }
+
   export class Sprite extends Component {
     static readonly SizeMode: {
       readonly CUSTOM: number;
@@ -108,6 +117,8 @@ declare module "cc" {
     readonly contentSize: { readonly width: number; readonly height: number };
     setAnchorPoint(x: number, y: number): void;
     setContentSize(width: number, height: number): void;
+    convertToNodeSpaceAR(worldPoint: Vec3, out?: Vec3): Vec3;
+    convertToWorldSpaceAR(nodePoint: Vec3, out?: Vec3): Vec3;
   }
 
   export class UIOpacity extends Component {
