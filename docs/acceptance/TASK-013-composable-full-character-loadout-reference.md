@@ -1,5 +1,12 @@
 # TASK-013 Acceptance: Composable Full Character Loadout Reference
 
+> **Superseded Cocos runtime:** the engine-neutral contracts, generated
+> assets, reconstruction reports, and headless validation in this report
+> remain authoritative evidence. The original
+> `composable-full-loadout-reference.scene` and monolithic Cocos component are
+> non-production and superseded by the recovered TASK-013R1-R7 adapter path.
+> They remain tracked for provenance and are not deleted.
+
 ## Result
 
 TASK-013 integrates TASK-010 head accessories, TASK-011 multi-part garment,

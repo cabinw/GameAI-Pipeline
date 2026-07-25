@@ -1,0 +1,143 @@
+# TASK-013R7 Recovered Full-Loadout Release Candidate Acceptance
+
+## Result
+
+Implementation acceptance gate: **PASS**.
+External visual review: **PENDING**.
+
+TASK-013R7 publishes the externally accepted R1-R6 recovery chain through one
+canonical engine-neutral Cocos adapter facade and one Creator-owned canonical
+Scene. It adds no attachment family or runtime capability. The accepted R6
+plan remains the runtime source of truth, and the original monolithic
+TASK-013 Cocos demo remains tracked only as a superseded, non-production
+reference.
+
+## Canonical runtime surface
+
+- Creator: 3.8.8
+- Canonical Scene:
+  `assets/composable-character-loadout-reference-v2.scene`
+- Canonical component:
+  `GameAIComposableCharacterLoadoutReferenceV2`
+- Canonical adapter ID:
+  `gameai-composable-character-loadout-reference-v2`
+- Accepted implementation source: TASK-013R6 generic one-handed prop
+  integration
+- Base Sprite parts: 17
+- Runtime joints: 17
+- Live parent-child Skeleton segments: 16
+- Garment parts: 11
+- Head-accessory parts: 3
+- Prop attachments: 4
+- Total resources: 35
+- Cross-product states: 12
+- Runtime tolerance: `0.5 px`
+
+The Creator-owned Scene contains one canonical adapter component. It contains
+neither the accepted R6 component identity nor the superseded monolithic
+TASK-013 component identity. The facade inherits the accepted R6 behavior
+without copying pivots, hierarchy, resources, states, clips, controls,
+sorting, reset defaults, or tolerance values.
+
+## Canonical boundary and parity
+
+- One canonical descriptor identifies the adapter, schema version, Scene,
+  implementation source, state IDs, semantic clip IDs, sorting ranges,
+  resource IDs, reset defaults, and spatial tolerance.
+- The descriptor is deterministically generated into the Creator runtime
+  mirror.
+- Canonical and accepted R6 plans are structurally equal.
+- All 12 state IDs and resolved attachment membership are equal.
+- Manifest logical IDs and resource paths are equal.
+- Semantic action IDs, displayed keys, Cocos `KeyCode` values, HUD labels,
+  and typed handler intents are equal.
+- Production, debug, and HUD sorting ranges and resolved orders are equal.
+- Rest, Wave, Prop Swing, and Integration Stress clip IDs are equal.
+- Exact Reset defaults and the `0.5 px` tolerance are equal.
+- Unknown resources, states, slots, parents, roles, and clips continue to
+  fail closed without fallback.
+
+## Automated verification
+
+- Working copy: `CI=true pnpm verify` — PASS.
+- Total tests: 335 passed, 0 failed.
+- Extension tests: 183 passed, 0 failed.
+- Tracked-files-only `pnpm install --frozen-lockfile` and
+  `CI=true pnpm verify` — PASS, 335 passed, 0 failed.
+- Generated canonical runtime mirror: byte-deterministic.
+- Creator Scene/script/resource metadata audit: PASS.
+- Global metadata audit: PASS.
+- Exactly one canonical Scene component: PASS.
+- Accepted R6 Scene and runtime implementation remained unchanged.
+- Tracked MP4 count: 0.
+
+## Creator 3.8.8 one-pass gate
+
+- Clean canonical Scene import/open: PASS.
+- Switch to the accepted R6 Scene and reopen the canonical Scene: PASS.
+- Creator Console: 0 relevant warnings, 0 errors.
+- Preview Console: 0 warnings, 0 errors.
+- Web Preview design resolution: 1280x720.
+- Manifest completed 35/35 PASS before construction.
+- All 12 garment/accessory/prop states: PASS.
+- No-prop, left-hand prop, and right-hand prop selection: PASS.
+- Rest, Wave, Prop Swing, and Integration Stress: PASS.
+- Pause froze the active Integration Stress pose and time.
+- Resume continued from the frozen time.
+- Debug markers, live Skeleton, accessory sockets, garment seams, prop
+  socket/grip markers, bounds, and pivots: PASS.
+- Translation, scale, rotation, and nested transform stress: PASS.
+- First rebuild: `SETUP 2 / TEARDOWN 1 / REBUILDS 1`.
+- Post-first-rebuild garment, accessory, and prop inputs: PASS.
+- Second rebuild: `SETUP 3 / TEARDOWN 2 / REBUILDS 2`.
+- Post-second-rebuild state, clip, debug, and transform inputs: PASS.
+- Exact Reset: authored Rest, `STOPPED`, `0.00`, combined garment/accessory
+  state, no prop, transform stress OFF, and Debug OFF.
+- Accepted R6 parity smoke: PASS for default, left prop, right prop,
+  Integration Stress, and Exact Reset.
+- No canonical/R6 live difference or defect occurred.
+
+The canonical HUD intentionally reports the accepted R6 runtime identity
+because TASK-013R7 is a canonical facade over that implementation rather than
+a new behavioral runtime. This is verified parity, not a fallback.
+
+## Spatial, layer, lifecycle, and duplicate results
+
+- Maximum projected joint-marker error: `0.000 px`
+- Maximum Skeleton endpoint-to-joint error: `0.000 px`
+- Maximum accessory socket-to-anchor error: `0.000 px`
+- Maximum garment seam error: `0.000 px`
+- Maximum prop socket-to-grip error: `0.000 px`
+- Runtime tolerance: `0.5 px`
+- Unknown hand sockets: 0
+- Duplicate garment nodes: 0
+- Duplicate accessory nodes: 0
+- Duplicate prop nodes: 0
+- Duplicate input handlers: 0
+- Duplicate resource requests: 0
+- Production/debug/HUD sorting violations: 0
+- Front/back role violations: 0
+- Non-finite positions: 0
+- Debug geometry outside the character region: 0
+
+Measurements use current Creator runtime world positions and the accepted
+world-to-`DebugOverlayRoot` projection. There is no Canvas compensation,
+character-specific offset, item-name dispatch, implicit mirroring, inverse
+grip solving, or fixed Skeleton geometry.
+
+## Evidence status
+
+The canonical Creator Web Preview recording and temporary
+`evidence/task-013r7` publication are authorized only after this
+implementation is committed and pushed. The evidence manifest must record
+the exact reviewed feature SHA, canonical Scene path, accepted R6 parity
+result, lifecycle start/final counters, spatial maxima, media metadata,
+SHA-256, complete decode, and
+`pending-external-visual-review`.
+
+## Limits
+
+TASK-013R7 does not add a new attachment family, schema or resolver change,
+old monolithic demo repair, Red Cap reconstruction, IK, physics, blending,
+root motion, VFX, Unity/Godot adapters, Windows validation, TASK-014, a PR,
+or a merge.

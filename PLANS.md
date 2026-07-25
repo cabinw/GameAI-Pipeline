@@ -2,6 +2,114 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R7 Recovered Full-Loadout Release Candidate
+
+- Status: Implementation accepted; awaiting external visual review
+- Started: 2026-07-26
+- Branch: `recovery/task-013r7-full-loadout-release-candidate`
+- Baseline / frozen accepted R6:
+  `5d708cb676c626244218e82a9e2fd9343aa5f736`
+- Frozen accepted R5:
+  `1f87032bf45e806c9db6360c9a7837c97baa93b2`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Publish the accepted R1-R6 recovery chain through one canonical,
+engine-neutral Cocos adapter entry point and one Creator-owned canonical
+release-candidate Scene. Prove exact parity with accepted R6 without adding a
+new attachment capability, changing engine-neutral contracts, or reviving the
+superseded monolithic TASK-013 runtime.
+
+### Boundaries
+
+- Wrap or re-export the accepted R6 plan, state, manifest, semantic input,
+  sorting, animation, reset, lifecycle, projection, and spatial boundaries.
+- Keep the R6 Scene unchanged and available for the required live parity
+  smoke test.
+- Create and save the canonical Scene and script identities through Cocos
+  Creator 3.8.8. Generators may mirror deterministic source modules but may
+  not synthesize Scene UUIDs or component class IDs.
+- Preserve the exact 12-state matrix, no/left/right prop behavior, four
+  semantic clips, default reset state, resource set, global ordering, and
+  `0.5 px` tolerance.
+- Mark the original `composable-full-loadout-reference.scene` runtime as
+  superseded and non-production in documentation only; do not delete or
+  modify it.
+- Do not add capabilities, broadly rewrite R1-R6, change a schema/resolver,
+  create a PR, merge, start TASK-014, or implement Unity/Godot adapters.
+
+### Execution
+
+1. Record TASK-013R7 scope, acceptance criteria, canonical boundary, and
+   supersession decision before implementation.
+2. Add a small canonical adapter facade and deterministic descriptor that
+   consume the accepted R6 modules.
+3. Add canonical/R6 parity tests for state IDs and membership, resource
+   manifest, semantic inputs, sorting, clip IDs, reset defaults, and spatial
+   tolerance.
+4. Create and save the canonical Creator-owned Scene through Creator 3.8.8
+   and validate Scene/component metadata from tracked files.
+5. Pass working-copy and tracked-files-only frozen verification.
+6. Run the uninterrupted canonical Creator gate, including two lifecycle
+   rebuilds and post-rebuild switching.
+7. Open the accepted R6 Scene and smoke-test default, left prop, right prop,
+   Integration Stress, and Exact Reset for live parity.
+8. Stop immediately without patching or publishing evidence if any live
+   difference or defect appears.
+9. If all gates pass, commit/push one R7 release-candidate implementation,
+   record one canonical Creator Web Preview video, publish and re-download
+   `evidence/task-013r7`, verify byte/hash/frame/metadata/decode identity, and
+   stop for external review.
+
+### Done when
+
+- The canonical facade and accepted R6 expose equivalent plans, 12-state
+  membership, manifests, input mappings, sorting, clip IDs, reset defaults,
+  and spatial tolerance.
+- The canonical Scene owns valid Creator metadata and contains exactly one
+  canonical adapter component.
+- Clean open, scene switch/reopen, second initialization, 35-resource
+  terminal PASS, every state/clip/control, transform stress, Debug ON/OFF,
+  two rebuilds, post-rebuild switching, and Exact Reset pass without console
+  errors, duplicates, drift, fallback, or ordering violations.
+- Canonical and accepted R6 live behavior match for the required parity smoke.
+- Both verification modes, local media validation, and uploaded-copy
+  verification pass while all frozen/protected refs and the old demo remain
+  unchanged.
+
+### Implementation acceptance
+
+- Working-copy `CI=true pnpm verify`: PASS, 335 passed, 0 failed.
+- Tracked-files-only frozen install and `CI=true pnpm verify`: PASS,
+  335 passed, 0 failed.
+- Creator-owned canonical Scene identity and metadata: PASS.
+- Canonical/R6 automated descriptor, state, resource, input, sorting, clip,
+  reset, and tolerance parity: PASS.
+- Creator 3.8.8 canonical live gate: PASS for all 12 loadout states, four
+  semantic clips, Pause/Resume, transform stress, Debug ON/OFF, two lifecycle
+  rebuilds, post-rebuild input, and Exact Reset.
+- Lifecycle counters advanced from `SETUP 1 / TEARDOWN 0 / REBUILDS 0` to
+  `SETUP 3 / TEARDOWN 2 / REBUILDS 2`.
+- Resource terminal state remained 35/35 PASS with zero duplicate requests.
+- Maximum projected joint, Skeleton, accessory socket, garment seam, and prop
+  grip errors were all `0.000 px`; sorting, role, duplicate, non-finite, and
+  debug-region violations were all 0.
+- Accepted R6 live parity smoke: PASS for default, left prop, right prop,
+  Integration Stress, and Exact Reset.
+- Creator and Preview Consoles: 0 relevant warnings, 0 errors.
+- No live difference or defect occurred after the hard-stop gate began.
+- Evidence publication remains pending after the R7 feature commit is safely
+  pushed.
+
 ## Accepted plan: TASK-013R6 Generic One-Handed Prop Integration
 
 - Status: Accepted after external visual review

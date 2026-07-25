@@ -1,5 +1,12 @@
 # Cocos Scene Rig Builder
 
+> **Canonical full-loadout runtime:** TASK-013R7 publishes
+> `composable-character-loadout-reference-v2.scene` as the recovered
+> release-candidate entry point. The older
+> `composable-full-loadout-reference.scene` and its monolithic component are
+> retained only for historical provenance and are superseded, non-production
+> runtime surfaces. See ADR-0014.
+
 ## Purpose
 
 The Character Rig Builder is the first production editor adapter for the
