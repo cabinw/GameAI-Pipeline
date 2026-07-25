@@ -2,12 +2,14 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R4 Head Accessory Layering Bridge
+## Accepted plan: TASK-013R4 Head Accessory Layering Bridge
 
-- Status: Implementation and all local acceptance gates passed; evidence
-  publication pending
+- Status: Accepted after external visual review
 - Started: 2026-07-25
+- Accepted: 2026-07-25
 - Branch: `recovery/task-013r4-head-accessory-layering`
+- Implementation commit:
+  `52222633fc0ed9fc88004166420de22a1a3146ea`
 - Baseline / frozen accepted R3:
   `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
 - Frozen accepted R2:
@@ -111,6 +113,24 @@ reconnecting the old Full Loadout demo.
 - Lifecycle rebuild ended at setup 2, teardown 1, rebuild 1 with one character,
   three default-state attachment parts, no duplicate handlers, and no
   duplicate resource requests.
+- External visual review: PASS.
+- The 90-second, 2,700-frame Creator Web Preview recording visibly verified
+  all four attachment states and their exact 0/2/1/3 part counts, repeated
+  switching, Wave, Integration Stress, Pause/Resume, transform stress,
+  socket/anchor and Skeleton alignment, lifecycle rebuild, post-rebuild Base
+  and Cap switching, exact Reset, and final Debug-OFF cleanup.
+- The visible lifecycle counters were setup 2, teardown 1, rebuild 1.
+  Resources remained 20/20 PASS and all duplicate, sorting, front/back,
+  spatial, unknown-slot, non-finite, and outside-debug diagnostics remained 0.
+- Evidence commit:
+  `6796a7a0744bc0add48f8eba79a453cf2f5ac32f`.
+- Evidence media SHA-256:
+  `39052cdc157493dc3b5dc09ca6f4b1f9b8c1cc34072d2f6c78c7e3b71c5b0325`.
+  The uploaded copy matched its local SHA-256 and metadata and completed a
+  full FFmpeg decode.
+- The temporary `evidence/task-013r4` branch may be removed after this
+  acceptance documentation is safely pushed. The ignored local recording
+  remains available and no MP4 is tracked on the feature branch.
 - No engine-neutral schema/resolver, accepted R1-R3 boundary, old Full Loadout
   scene, garment, prop, or protected reference changed.
 

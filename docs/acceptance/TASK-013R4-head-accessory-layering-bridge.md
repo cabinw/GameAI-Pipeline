@@ -3,12 +3,13 @@
 ## Result
 
 Implementation acceptance gate: **PASS**.
+External visual review: **PASS**.
 
 The accepted R1-R3 Cocos Adapter boundaries now resolve, load, mount, animate,
 switch, sort, measure, rebuild, and reset a deterministic collection of
 engine-neutral rigid attachments on the production-lite Base Rig. The
 production-lite cap and sunglasses are fixture data; collection behavior
-remains generic. External visual review is pending.
+remains generic.
 
 ## Runtime surface
 
@@ -129,18 +130,33 @@ or fixed Skeleton geometry.
 
 ## Evidence status
 
-The implementation branch may be committed and pushed because both automated
-verification modes and the uninterrupted Creator gate passed. A complete real
-Creator Web Preview recording,
-`task-013r4-head-accessory-layering.mp4`, must still be captured and
-independently verified before external visual review.
+External review accepted the complete real Creator Web Preview recording:
 
-The recording must visibly cover all four states, repeated switching and
-counts, duplicate and layer diagnostics, per-attachment markers, Wave,
-Integration Stress, Pause/Resume, transform stress, lifecycle rebuild,
-post-rebuild switching, exact Reset, and at least two seconds of final Debug
-OFF. Media and uploaded-copy results will live only on the temporary
-`evidence/task-013r4` branch and in the final report.
+- File: `task-013r4-head-accessory-layering.mp4`
+- Evidence commit:
+  `6796a7a0744bc0add48f8eba79a453cf2f5ac32f`
+- Size: 2,122,565 bytes
+- Duration: 90.000 seconds
+- Frames: 2,700
+- Codec/profile: H.264 High
+- Resolution/frame rate/pixel format: 1280 x 720, 30 fps, `yuv420p`
+- SHA-256:
+  `39052cdc157493dc3b5dc09ca6f4b1f9b8c1cc34072d2f6c78c7e3b71c5b0325`
+- Local full decode: PASS
+- Uploaded-copy SHA identity, metadata match, and full decode: PASS
+
+The external review visibly verified all four attachment states and exact
+active part counts 0/2/1/3, repeated switching, Wave, Integration Stress,
+Pause/Resume, exact Reset, transform stress, joint/Skeleton and
+socket/anchor alignment, and Debug-OFF cleanup. Lifecycle rebuild visibly
+reported setup 2, teardown 1, rebuild 1; post-rebuild Base and Cap switching
+remained exact. Resources remained 20/20 PASS, while duplicate attachment,
+input, and resource counts, sorting and front/back violations, and spatial
+errors remained zero.
+
+The temporary `evidence/task-013r4` branch may be deleted after this
+acceptance documentation is safely pushed. The ignored local recording is
+preserved and no MP4 is tracked on the R4 feature branch.
 
 ## Limits
 
