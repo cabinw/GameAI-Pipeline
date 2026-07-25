@@ -2,6 +2,120 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R6 Generic One-Handed Prop Integration
+
+- Status: Implementation accepted; awaiting external visual review
+- Started: 2026-07-25
+- Branch: `recovery/task-013r6-one-handed-prop-integration`
+- Baseline / frozen accepted R5:
+  `1f87032bf45e806c9db6360c9a7837c97baa93b2`
+- Frozen accepted R4:
+  `90a8bf3acf8712f3c4923d25e7b9e50359f47a2b`
+- Frozen accepted R3:
+  `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
+- Frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted recovered adapter with one generic contract-resolved
+one-handed prop capability. Compose no-prop, left-hand, and right-hand prop
+states with the accepted garment/accessory matrix while preserving lifecycle,
+manifest, semantic input, sorting, projection, spatial assertion, and
+Creator-owned Scene boundaries.
+
+### Boundaries
+
+- Consume the existing TASK-012 engine-neutral prop contracts, authored hand
+  sockets, grip anchors, transforms, layer roles, source assets, and semantic
+  animation data.
+- Create a separate Creator-owned R6 Scene; do not clone or modify the old
+  Full Loadout Scene or frozen monolithic TASK-013 implementation.
+- Keep shared runtime free of toolbox, briefcase, hand-side inference,
+  filename semantics, Canvas correction constants, and implicit mirroring.
+- Reuse and generically extend the accepted R1-R5 lifecycle, generation token,
+  terminal manifest, input registry, global Sorting2D registry, Base Rig,
+  attachment collection, garment seams, world-to-overlay projector, and
+  runtime spatial assertions.
+- Do not add two-handed props, inverse grip solving, IK, physics, collision,
+  combat, cloth/mesh behavior, automatic fitting, root motion, blending,
+  Red Cap reconstruction, cross-engine work, Full Loadout migration, R7, or
+  TASK-014.
+
+### Execution
+
+1. Record TASK-013R6 scope and acceptance criteria before implementation.
+2. Build a deterministic generic prop bridge plan covering the 12-state
+   garment/accessory/prop cross-product.
+3. Extend manifest, state/input registry, sorting, runtime attachment
+   collection, grip measurement, lifecycle, and exact Reset through small
+   separately tested modules.
+4. Add Rest, Wave, Prop Swing, and Integration Stress through explicit
+   semantic clip IDs.
+5. Create and save an isolated Creator-owned R6 Scene through Creator 3.8.8.
+6. Add deterministic TypeScript, 60 Hz, tracked-files-only, metadata,
+   manifest, sorting, grip, state, lifecycle, duplicate, and Reset tests.
+7. Pass working-copy and tracked-files-only frozen verification.
+8. Run the complete Creator clean-open, switch/reopen, Console, 12-state,
+   control, animation, transform, debug, rebuild, and Reset gate once.
+9. If any live defect appears, stop without patching or recording evidence.
+10. If the entire gate passes, commit/push one reviewed R6 implementation,
+    capture and validate the Creator Web Preview video, publish
+    `evidence/task-013r6`, verify the uploaded copy, and stop for external
+    review.
+
+### Done when
+
+- All 12 states resolve deterministically with exact garment, accessory, and
+  prop membership and exactly zero or one active prop as declared.
+- Manifest completion precedes construction and every resource loads exactly
+  once.
+- Rest, Wave, Prop Swing, and Integration Stress keep joint, Skeleton,
+  accessory socket, garment seam, and active hand-socket/grip errors at
+  `<= 0.5 px`, including translation, non-unit scale, rotation, and nested
+  transform stress.
+- Unknown prop states, hand sockets, attachment slots, resources, parents,
+  roles, and semantic clips fail closed without fallback.
+- Duplicate prop/garment/accessory nodes, listeners, requests, non-finite
+  coordinates, sorting/front-back violations, and out-of-viewport debug
+  geometry are zero.
+- Lifecycle rebuild leaves one character and the expected active sets; exact
+  Reset restores authored Rest, stopped time zero, documented defaults,
+  transform stress OFF, Debug OFF, and no residual geometry.
+- Both verification modes, the uninterrupted Creator gate, local media
+  checks, and uploaded-copy verification pass while every frozen/protected
+  reference and the old demo remain unchanged.
+
+### Implementation acceptance result
+
+- Working-copy `CI=true pnpm verify`: PASS, 327/327 tests.
+- Tracked-files-only frozen install and `CI=true pnpm verify`: PASS,
+  327/327 tests.
+- Creator 3.8.8 clean open, R5 switch/reopen, Creator Console, Preview
+  Console, 12-state matrix, four clips, Pause/Resume, debug overlays,
+  transform stress, lifecycle rebuild, post-rebuild switches, and Exact
+  Reset: PASS in one uninterrupted run.
+- Manifest: 35/35 PASS with 0 duplicate requests.
+- Lifecycle after rebuild: setup 2, teardown 1, rebuild 1.
+- Maximum joint, Skeleton, accessory socket, garment seam, and prop grip
+  errors: `0.000 px`.
+- Duplicate active attachment nodes, input handlers, resource requests,
+  non-finite coordinates, sorting/front-back violations, and debug geometry
+  outside the character region: 0.
+- 60 Hz prop validation: 580 samples across both hands and both required
+  stress clips, maximum grip error `0.000 px`.
+- Evidence capture and uploaded-copy verification remain pending external
+  visual review publication.
+
 ## Accepted plan: TASK-013R5 Multi-Part Garment Layering Bridge
 
 - Status: Accepted after external visual review
