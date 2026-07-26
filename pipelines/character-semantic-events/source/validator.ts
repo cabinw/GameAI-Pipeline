@@ -8,6 +8,7 @@ import {
 import type {
   CharacterSemanticEvent,
   CharacterSemanticEventContract,
+  CharacterSemanticEventTrack,
   SemanticEventValidationContext,
   SemanticFollowPolicy,
   SemanticLocalTransform,
@@ -100,6 +101,24 @@ export function schemaErrorCode(
   }
   if (path.endsWith("/eventKind")) {
     return SemanticEventErrorCode.UNSUPPORTED_EVENT_KIND;
+  }
+  if (
+    path.endsWith("/payload/windowId") &&
+    error.keyword === "required"
+  ) {
+    return SemanticEventErrorCode.MISSING_GAMEPLAY_WINDOW_ID;
+  }
+  if (
+    path.endsWith("/payload/windowId") &&
+    error.keyword === "additionalProperties"
+  ) {
+    return SemanticEventErrorCode.UNEXPECTED_GAMEPLAY_WINDOW_ID;
+  }
+  if (
+    path.endsWith("/payload/kind") &&
+    (error.keyword === "const" || error.keyword === "required")
+  ) {
+    return SemanticEventErrorCode.PAYLOAD_KIND_MISMATCH;
   }
   return SemanticEventErrorCode.SCHEMA_VALIDATION_ERROR;
 }
@@ -256,6 +275,57 @@ function validateEvent(
   return errors;
 }
 
+function validateGameplayWindows(
+  track: CharacterSemanticEventTrack,
+  trackIndex: number,
+): SemanticEventDiagnostic[] {
+  const errors: SemanticEventDiagnostic[] = [];
+  const openWindows = new Map<string, string>();
+  const ordered = track.events
+    .map((event, eventIndex) => ({ event, eventIndex }))
+    .sort(
+      (left, right) =>
+        left.event.timeSeconds - right.event.timeSeconds ||
+        left.event.order - right.event.order ||
+        left.event.eventId.localeCompare(right.event.eventId),
+    );
+
+  for (const { event, eventIndex } of ordered) {
+    if (event.payload.kind !== "gameplay") continue;
+    const path = `${eventPath(trackIndex, eventIndex)}/payload/windowId`;
+    if (event.payload.action === "signal") continue;
+    const windowId = event.payload.windowId;
+    if (event.payload.action === "window-open") {
+      if (openWindows.has(windowId)) {
+        errors.push({
+          code: SemanticEventErrorCode.DUPLICATE_GAMEPLAY_WINDOW_OPEN,
+          path,
+          message: `Gameplay window ${windowId} is already open in this track.`,
+        });
+      } else {
+        openWindows.set(windowId, path);
+      }
+      continue;
+    }
+    if (!openWindows.delete(windowId)) {
+      errors.push({
+        code: SemanticEventErrorCode.UNMATCHED_GAMEPLAY_WINDOW_CLOSE,
+        path,
+        message: `Gameplay window ${windowId} closes without a preceding open in this track.`,
+      });
+    }
+  }
+
+  for (const [windowId, path] of openWindows) {
+    errors.push({
+      code: SemanticEventErrorCode.UNCLOSED_GAMEPLAY_WINDOW,
+      path,
+      message: `Gameplay window ${windowId} remains open at the end of this track.`,
+    });
+  }
+  return errors;
+}
+
 export function validateCharacterSemanticEvents(
   contract: CharacterSemanticEventContract,
   context: SemanticEventValidationContext,
@@ -343,6 +413,7 @@ export function validateCharacterSemanticEvents(
         ...validateEvent(event, path, clipDuration, socketIds, cueIds),
       );
     });
+    errors.push(...validateGameplayWindows(track, trackIndex));
   });
   return sortSemanticEventDiagnostics(errors);
 }

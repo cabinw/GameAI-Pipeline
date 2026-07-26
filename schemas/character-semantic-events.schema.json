@@ -96,17 +96,30 @@
       }
     },
     "gameplayPayload": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "action"],
-      "properties": {
-        "kind": { "const": "gameplay" },
-        "action": {
-          "type": "string",
-          "enum": ["window-open", "window-close", "signal"]
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "action", "windowId"],
+          "properties": {
+            "kind": { "const": "gameplay" },
+            "action": {
+              "type": "string",
+              "enum": ["window-open", "window-close"]
+            },
+            "windowId": { "$ref": "#/definitions/identifier" }
+          }
         },
-        "windowId": { "$ref": "#/definitions/identifier" }
-      }
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "action"],
+          "properties": {
+            "kind": { "const": "gameplay" },
+            "action": { "const": "signal" }
+          }
+        }
+      ]
     },
     "semanticEvent": {
       "type": "object",

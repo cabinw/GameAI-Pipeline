@@ -7,10 +7,12 @@ import {
   SemanticEventErrorCode,
   SemanticEventEvaluationError,
   SemanticEventEvaluationErrorCode,
+  MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE,
+  MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE,
   characterSemanticEventsSchema,
   createCharacterSemanticEventEvaluator,
   parseCharacterSemanticEvents,
-  validateCharacterSemanticEvents,
+  validateCharacterSemanticEventInput,
   type CharacterSemanticEventContract,
   type SemanticEventValidationContext,
 } from "../source";
@@ -21,6 +23,8 @@ const fixtureRoot = path.join(
   repositoryRoot,
   "examples/character-semantic-events",
 );
+const walkTrackId = "walk-semantic-events";
+const waveTrackId = "wave-semantic-events";
 
 async function fixture(name = "events.json"): Promise<string> {
   return readFile(path.join(fixtureRoot, name), "utf8");
@@ -124,6 +128,26 @@ test("negative textual fixtures return their stable targeted codes", async () =>
     [
       "invalid/unsupported-schema-version.json",
       SemanticEventErrorCode.UNSUPPORTED_SCHEMA_VERSION,
+    ],
+    [
+      "invalid/missing-window-id.json",
+      SemanticEventErrorCode.MISSING_GAMEPLAY_WINDOW_ID,
+    ],
+    [
+      "invalid/signal-window-id.json",
+      SemanticEventErrorCode.UNEXPECTED_GAMEPLAY_WINDOW_ID,
+    ],
+    [
+      "invalid/unmatched-window-close.json",
+      SemanticEventErrorCode.UNMATCHED_GAMEPLAY_WINDOW_CLOSE,
+    ],
+    [
+      "invalid/duplicate-window-open.json",
+      SemanticEventErrorCode.DUPLICATE_GAMEPLAY_WINDOW_OPEN,
+    ],
+    [
+      "invalid/unclosed-window.json",
+      SemanticEventErrorCode.UNCLOSED_GAMEPLAY_WINDOW,
     ],
   ];
   for (const [file, code] of cases) {
@@ -283,7 +307,9 @@ test("covers every published stable validation diagnostic", async () => {
     const value = clone(base);
     const contextValue = structuredClone(validationContext);
     fixtureCase.mutate(value, contextValue);
-    const errors = validateCharacterSemanticEvents(value, contextValue);
+    const validation = validateCharacterSemanticEventInput(value, contextValue);
+    assert.equal(validation.ok, false, fixtureCase.code);
+    const errors = validation.ok ? [] : validation.errors;
     assert.ok(
       errors.some((error) => error.code === fixtureCase.code),
       `${fixtureCase.code}: ${JSON.stringify(errors)}`,
@@ -306,6 +332,49 @@ test("covers every published stable validation diagnostic", async () => {
     structuralResult.errors.forEach((error) => observed.add(error.code));
   }
 
+  for (const [file, code] of [
+    [
+      "invalid/missing-window-id.json",
+      SemanticEventErrorCode.MISSING_GAMEPLAY_WINDOW_ID,
+    ],
+    [
+      "invalid/signal-window-id.json",
+      SemanticEventErrorCode.UNEXPECTED_GAMEPLAY_WINDOW_ID,
+    ],
+    [
+      "invalid/unmatched-window-close.json",
+      SemanticEventErrorCode.UNMATCHED_GAMEPLAY_WINDOW_CLOSE,
+    ],
+    [
+      "invalid/duplicate-window-open.json",
+      SemanticEventErrorCode.DUPLICATE_GAMEPLAY_WINDOW_OPEN,
+    ],
+    [
+      "invalid/unclosed-window.json",
+      SemanticEventErrorCode.UNCLOSED_GAMEPLAY_WINDOW,
+    ],
+  ] as const) {
+    const result = parseCharacterSemanticEvents(
+      await fixture(file),
+      validationContext,
+    );
+    assert.equal(result.ok, false, file);
+    if (!result.ok) {
+      assert.ok(result.errors.some((error) => error.code === code));
+      result.errors.forEach((error) => observed.add(error.code));
+    }
+  }
+
+  const unknownInitial = createCharacterSemanticEventEvaluator(
+    base,
+    validationContext,
+    "missing-track",
+  );
+  assert.equal(unknownInitial.ok, false);
+  if (!unknownInitial.ok) {
+    unknownInitial.errors.forEach((error) => observed.add(error.code));
+  }
+
   assert.deepEqual(
     [...observed].sort(),
     Object.values(SemanticEventErrorCode).sort(),
@@ -316,6 +385,7 @@ test("orders same-time events by time, order, and eventId across a skipped frame
   const result = createCharacterSemanticEventEvaluator(
     await validContract(),
     await context(),
+    walkTrackId,
   );
   assert.equal(result.ok, true);
   if (!result.ok) return;
@@ -330,7 +400,11 @@ test("orders same-time events by time, order, and eventId across a skipped frame
 test("emits duration before time-zero at one loop and enumerates multiple loops", async () => {
   const contract = await validContract();
   const validationContext = await context();
-  const one = createCharacterSemanticEventEvaluator(contract, validationContext);
+  const one = createCharacterSemanticEventEvaluator(
+    contract,
+    validationContext,
+    walkTrackId,
+  );
   assert.equal(one.ok, true);
   if (!one.ok) return;
   one.value.play();
@@ -348,6 +422,7 @@ test("emits duration before time-zero at one loop and enumerates multiple loops"
   const many = createCharacterSemanticEventEvaluator(
     contract,
     validationContext,
+    walkTrackId,
   );
   assert.equal(many.ok, true);
   if (!many.ok) return;
@@ -365,6 +440,7 @@ test("pause/resume advances no boundary and never duplicates an emitted event", 
   const result = createCharacterSemanticEventEvaluator(
     await validContract(),
     await context(),
+    walkTrackId,
   );
   assert.equal(result.ok, true);
   if (!result.ok) return;
@@ -382,6 +458,7 @@ test("Exact Reset emits nothing and replay can emit crossed events again", async
   const result = createCharacterSemanticEventEvaluator(
     await validContract(),
     await context(),
+    walkTrackId,
   );
   assert.equal(result.ok, true);
   if (!result.ok) return;
@@ -402,6 +479,7 @@ test("clip switching emits no old-clip event and preserves playback status", asy
   const result = createCharacterSemanticEventEvaluator(
     await validContract(),
     await context(),
+    walkTrackId,
   );
   assert.equal(result.ok, true);
   if (!result.ok) return;
@@ -420,6 +498,7 @@ test("documents zero/duration policy and avoids floating-point boundary duplicat
   const result = createCharacterSemanticEventEvaluator(
     await validContract(),
     await context(),
+    walkTrackId,
   );
   assert.equal(result.ok, true);
   if (!result.ok) return;
@@ -450,6 +529,7 @@ test("validation gates evaluator creation and unsupported motion fails clearly",
   const rejected = createCharacterSemanticEventEvaluator(
     invalid,
     await context(),
+    walkTrackId,
   );
   assert.equal(rejected.ok, false);
   if (!rejected.ok) {
@@ -463,6 +543,7 @@ test("validation gates evaluator creation and unsupported motion fails clearly",
   const result = createCharacterSemanticEventEvaluator(
     await validContract(),
     await context(),
+    walkTrackId,
   );
   assert.equal(result.ok, true);
   if (!result.ok) return;
@@ -486,4 +567,302 @@ test("validation gates evaluator creation and unsupported motion fails clearly",
       error instanceof SemanticEventEvaluationError &&
       error.code === SemanticEventEvaluationErrorCode.UNSUPPORTED_SEEK,
   );
+});
+
+test("direct evaluator inputs fail closed through the shared structural boundary", async () => {
+  const base = await validContract();
+  const validationContext = await context();
+  const malformed: Array<[string, unknown]> = [
+    ["primitive", 42],
+    ["array container", []],
+    ["empty tracks", { ...clone(base), tracks: [] }],
+    [
+      "missing tracks",
+      (() => {
+        const value = clone(base) as Partial<CharacterSemanticEventContract>;
+        delete value.tracks;
+        return value;
+      })(),
+    ],
+    [
+      "missing events",
+      (() => {
+        const value = clone(base) as unknown as {
+          tracks: Array<Record<string, unknown>>;
+        };
+        delete value.tracks[0]!.events;
+        return value;
+      })(),
+    ],
+    [
+      "missing vfx cues",
+      (() => {
+        const value = clone(base) as Partial<CharacterSemanticEventContract>;
+        delete value.vfxCues;
+        return value;
+      })(),
+    ],
+    [
+      "malformed payload discriminator",
+      (() => {
+        const value = clone(base) as unknown as {
+          tracks: Array<{ events: Array<Record<string, unknown>> }>;
+        };
+        value.tracks[0]!.events[0]!.payload = {
+          kind: "audio",
+          cueDefinitionId: "footstep-dust",
+        };
+        return value;
+      })(),
+    ],
+    [
+      "invalid tracks container",
+      { ...clone(base), tracks: {} },
+    ],
+    [
+      "missing rig compatibility",
+      (() => {
+        const value = clone(base) as Partial<CharacterSemanticEventContract>;
+        delete value.rig;
+        return value;
+      })(),
+    ],
+    [
+      "invalid cue fields",
+      (() => {
+        const value = clone(base) as unknown as {
+          vfxCues: Array<Record<string, unknown>>;
+        };
+        value.vfxCues[0]!.visualIntent = "";
+        value.vfxCues[0]!.intensity = "high";
+        return value;
+      })(),
+    ],
+  ];
+
+  for (const [label, value] of malformed) {
+    let result:
+      | ReturnType<typeof createCharacterSemanticEventEvaluator>
+      | undefined;
+    assert.doesNotThrow(() => {
+      result = createCharacterSemanticEventEvaluator(
+        value,
+        validationContext,
+        walkTrackId,
+      );
+    }, label);
+    assert.equal(result?.ok, false, label);
+    if (result !== undefined && !result.ok) {
+      assert.ok(result.errors.length > 0, label);
+    }
+  }
+
+  const missingContext = createCharacterSemanticEventEvaluator(
+    base,
+    {},
+    walkTrackId,
+  );
+  assert.equal(missingContext.ok, false);
+  if (!missingContext.ok) {
+    assert.ok(
+      missingContext.errors.every(
+        (error) => error.code === SemanticEventErrorCode.SCHEMA_VALIDATION_ERROR,
+      ),
+    );
+  }
+});
+
+test("explicit initial track is independent of authored track array order", async () => {
+  const validationContext = await context();
+  const original = await validContract();
+  const reordered = clone(original);
+  reordered.tracks.reverse();
+
+  for (const contract of [original, reordered]) {
+    const result = createCharacterSemanticEventEvaluator(
+      contract,
+      validationContext,
+      walkTrackId,
+    );
+    assert.equal(result.ok, true);
+    if (!result.ok) continue;
+    assert.equal(result.value.snapshot.trackId, walkTrackId);
+    result.value.play();
+    assert.deepEqual(
+      result.value.advance(0.61).map((command) => command.eventId),
+      ["walk-audio-left", "walk-footstep-mid"],
+    );
+  }
+});
+
+test("looping lifecycle emits stable starts and duration stops across skipped loops", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await validContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+  const commands = evaluator.advance(4.31);
+  assert.deepEqual(
+    commands.map((command) => [
+      command.command,
+      "instanceId" in command ? command.instanceId : undefined,
+      command.command === "stop" ? command.reason : undefined,
+    ]),
+    [
+      ["start", `${waveTrackId}:wave-hand-trail:0`, undefined],
+      ["stop", `${waveTrackId}:wave-hand-trail:0`, "duration"],
+      ["start", `${waveTrackId}:wave-hand-trail:1`, undefined],
+      ["stop", `${waveTrackId}:wave-hand-trail:1`, "duration"],
+      ["start", `${waveTrackId}:wave-hand-trail:2`, undefined],
+    ],
+  );
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, [
+    `${waveTrackId}:wave-hand-trail:2`,
+  ]);
+
+  evaluator.pause();
+  assert.deepEqual(evaluator.advance(10), []);
+  evaluator.resume();
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, [
+    `${waveTrackId}:wave-hand-trail:2`,
+  ]);
+  assert.deepEqual(
+    evaluator.exactReset().map((command) => [
+      command.command,
+      command.command === "stop" ? command.reason : undefined,
+    ]),
+    [["stop", "exact-reset"]],
+  );
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, []);
+});
+
+test("persistent cleanup and same-time lifecycle ordering are deterministic", async () => {
+  const validationContext = await context();
+  const persistentContract = await validContract();
+  const persistentEvent = persistentContract.tracks[1]!.events[0]!;
+  persistentEvent.lifecycle = "persistent";
+  delete persistentEvent.durationSeconds;
+  const persistent = createCharacterSemanticEventEvaluator(
+    persistentContract,
+    validationContext,
+    waveTrackId,
+  );
+  assert.equal(persistent.ok, true);
+  if (!persistent.ok) return;
+  persistent.value.play();
+  assert.equal(persistent.value.advance(0.31)[0]?.command, "start");
+  assert.deepEqual(
+    persistent.value.switchTrack(walkTrackId).map((command) => [
+      command.command,
+      command.command === "stop" ? command.reason : undefined,
+    ]),
+    [["stop", "track-switch"]],
+  );
+  persistent.value.switchTrack(waveTrackId);
+  persistent.value.play();
+  persistent.value.advance(0.31);
+  assert.deepEqual(
+    persistent.value.dispose().map((command) => [
+      command.command,
+      command.command === "stop" ? command.reason : undefined,
+    ]),
+    [["stop", "dispose"]],
+  );
+
+  const sameTimeContract = await validContract();
+  sameTimeContract.tracks[1]!.events[0]!.durationSeconds = 2;
+  const sameTime = createCharacterSemanticEventEvaluator(
+    sameTimeContract,
+    validationContext,
+    waveTrackId,
+  );
+  assert.equal(sameTime.ok, true);
+  if (!sameTime.ok) return;
+  sameTime.value.play();
+  assert.deepEqual(
+    sameTime.value.advance(2.31).map((command) => [
+      command.command,
+      command.cycle,
+    ]),
+    [
+      ["start", 0],
+      ["stop", 0],
+      ["start", 1],
+    ],
+  );
+});
+
+test("advance overflow and crossing budgets reject without partial mutation", async () => {
+  const contract = await validContract();
+  const validationContext = await context();
+  const budgeted = createCharacterSemanticEventEvaluator(
+    contract,
+    validationContext,
+    walkTrackId,
+  );
+  assert.equal(budgeted.ok, true);
+  if (!budgeted.ok) return;
+  budgeted.value.play();
+  const beforeMax = budgeted.value.snapshot;
+  assert.throws(
+    () => budgeted.value.advance(Number.MAX_VALUE),
+    (error) =>
+      error instanceof SemanticEventEvaluationError &&
+      error.code ===
+        SemanticEventEvaluationErrorCode.ADVANCE_BUDGET_EXCEEDED,
+  );
+  assert.deepEqual(budgeted.value.snapshot, beforeMax);
+
+  assert.throws(
+    () =>
+      budgeted.value.advance(
+        1.2 * (MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE + 2),
+      ),
+    (error) =>
+      error instanceof SemanticEventEvaluationError &&
+      error.code ===
+        SemanticEventEvaluationErrorCode.ADVANCE_BUDGET_EXCEEDED,
+  );
+  assert.deepEqual(budgeted.value.snapshot, beforeMax);
+
+  const reasonable = createCharacterSemanticEventEvaluator(
+    contract,
+    validationContext,
+    walkTrackId,
+  );
+  assert.equal(reasonable.ok, true);
+  if (!reasonable.ok) return;
+  reasonable.value.play();
+  assert.ok(
+    reasonable.value.advance(120).length <
+      MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE,
+  );
+
+  const hugeDurationContext = structuredClone(validationContext);
+  const walkClip = hugeDurationContext.clips.find(
+    (clip) => clip.clipId === "stickman-walk-cycle",
+  )!;
+  walkClip.durationSeconds = Number.MAX_VALUE;
+  const overflow = createCharacterSemanticEventEvaluator(
+    contract,
+    hugeDurationContext,
+    walkTrackId,
+  );
+  assert.equal(overflow.ok, true);
+  if (!overflow.ok) return;
+  overflow.value.play();
+  overflow.value.advance(Number.MAX_VALUE * 0.75);
+  const beforeOverflow = overflow.value.snapshot;
+  assert.throws(
+    () => overflow.value.advance(Number.MAX_VALUE * 0.75),
+    (error) =>
+      error instanceof SemanticEventEvaluationError &&
+      error.code ===
+        SemanticEventEvaluationErrorCode.ACCUMULATED_TIME_OVERFLOW,
+  );
+  assert.deepEqual(overflow.value.snapshot, beforeOverflow);
 });

@@ -5,6 +5,8 @@ import Ajv, { type ValidateFunction } from "ajv";
 
 import {
   SemanticEventErrorCode,
+  sortSemanticEventDiagnostics,
+  type SemanticEventDiagnostic,
   type SemanticEventResult,
 } from "./diagnostics";
 import type {
@@ -34,9 +36,79 @@ const validateShape = ajv.compile<CharacterSemanticEventContract>(
   characterSemanticEventsSchema,
 ) as ValidateFunction<CharacterSemanticEventContract>;
 
+const validationContextSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["clips", "rigLayout"],
+  properties: {
+    clips: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["clipId", "durationSeconds"],
+        properties: {
+          clipId: { type: "string", minLength: 1 },
+          durationSeconds: { type: "number", exclusiveMinimum: 0 },
+        },
+      },
+    },
+    rigLayout: {
+      type: "object",
+      required: ["layoutId", "schemaVersion"],
+      properties: {
+        layoutId: { type: "string", minLength: 1 },
+        schemaVersion: { type: "string", minLength: 1 },
+        sockets: {
+          type: "array",
+          items: {
+            type: "object",
+            required: ["socketId", "parentPartId"],
+            properties: {
+              socketId: { type: "string", minLength: 1 },
+              parentPartId: { type: "string", minLength: 1 },
+            },
+          },
+        },
+      },
+    },
+  },
+} as const;
+
+const validateContext = ajv.compile<SemanticEventValidationContext>(
+  validationContextSchema,
+) as ValidateFunction<SemanticEventValidationContext>;
+
+function contextSchemaErrors(): SemanticEventDiagnostic[] {
+  return sortSemanticEventDiagnostics(
+    (validateContext.errors ?? []).map((error) => ({
+      code: SemanticEventErrorCode.SCHEMA_VALIDATION_ERROR,
+      path: `/context${error.instancePath}`,
+      message: `Semantic-event validation context ${error.keyword} validation failed${error.message === undefined ? "." : `: ${error.message}.`}`,
+      details: { keyword: error.keyword, params: error.params },
+    })),
+  );
+}
+
+export function validateCharacterSemanticEventInput(
+  value: unknown,
+  context: unknown,
+): SemanticEventResult<CharacterSemanticEventContract> {
+  if (!validateShape(value)) {
+    return { ok: false, errors: mapSchemaErrors(validateShape.errors) };
+  }
+  if (!validateContext(context)) {
+    return { ok: false, errors: contextSchemaErrors() };
+  }
+  const errors = validateCharacterSemanticEvents(value, context);
+  return errors.length === 0
+    ? { ok: true, value, errors: [] }
+    : { ok: false, errors };
+}
+
 export function parseCharacterSemanticEvents(
   text: string,
-  context: SemanticEventValidationContext,
+  context: unknown,
 ): SemanticEventResult<CharacterSemanticEventContract> {
   let value: unknown;
   try {
@@ -53,11 +125,5 @@ export function parseCharacterSemanticEvents(
       ],
     };
   }
-  if (!validateShape(value)) {
-    return { ok: false, errors: mapSchemaErrors(validateShape.errors) };
-  }
-  const errors = validateCharacterSemanticEvents(value, context);
-  return errors.length === 0
-    ? { ok: true, value, errors: [] }
-    : { ok: false, errors };
+  return validateCharacterSemanticEventInput(value, context);
 }

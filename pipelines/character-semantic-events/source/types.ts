@@ -29,11 +29,20 @@ export interface AudioEventPayload {
   pitch: number;
 }
 
-export interface GameplayEventPayload {
+export interface GameplayWindowEventPayload {
   kind: "gameplay";
-  action: "window-open" | "window-close" | "signal";
-  windowId?: string;
+  action: "window-open" | "window-close";
+  windowId: string;
 }
+
+export interface GameplaySignalEventPayload {
+  kind: "gameplay";
+  action: "signal";
+}
+
+export type GameplayEventPayload =
+  | GameplayWindowEventPayload
+  | GameplaySignalEventPayload;
 
 export type SemanticEventPayload =
   | VfxEventPayload
@@ -100,12 +109,48 @@ export interface SemanticEventValidationContext {
   rigLayout: SemanticEventRigLayoutContext;
 }
 
-export interface EvaluatedSemanticEvent extends CharacterSemanticEvent {
+export interface EmittedSemanticEvent extends CharacterSemanticEvent {
+  readonly command: "emit";
   readonly schemaVersion: string;
   readonly trackId: string;
   readonly clipId: string;
   readonly cycle: number;
 }
+
+export interface StartedSemanticEvent extends CharacterSemanticEvent {
+  readonly command: "start";
+  readonly schemaVersion: string;
+  readonly trackId: string;
+  readonly clipId: string;
+  readonly cycle: number;
+  readonly instanceId: string;
+}
+
+export type SemanticEventStopReason =
+  | "duration"
+  | "exact-reset"
+  | "track-switch"
+  | "dispose";
+
+export interface StoppedSemanticEvent {
+  readonly command: "stop";
+  readonly schemaVersion: string;
+  readonly trackId: string;
+  readonly clipId: string;
+  readonly cycle: number;
+  readonly eventId: string;
+  readonly eventKind: "vfx";
+  readonly semanticCueId: string;
+  readonly lifecycle: "looping" | "persistent";
+  readonly instanceId: string;
+  readonly reason: SemanticEventStopReason;
+  readonly absoluteTimeSeconds: number;
+}
+
+export type EvaluatedSemanticEvent =
+  | EmittedSemanticEvent
+  | StartedSemanticEvent
+  | StoppedSemanticEvent;
 
 export type SemanticEventPlaybackStatus = "stopped" | "playing" | "paused";
 
@@ -116,4 +161,5 @@ export interface SemanticEventEvaluatorSnapshot {
   readonly absoluteTimeSeconds: number;
   readonly localTimeSeconds: number;
   readonly completedCycles: number;
+  readonly activeInstanceIds: readonly string[];
 }

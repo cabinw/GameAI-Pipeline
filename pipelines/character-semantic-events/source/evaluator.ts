@@ -1,8 +1,10 @@
 import {
+  SemanticEventErrorCode,
   SemanticEventEvaluationError,
   SemanticEventEvaluationErrorCode,
   type SemanticEventResult,
 } from "./diagnostics";
+import { validateCharacterSemanticEventInput } from "./parser";
 import type {
   CharacterSemanticEvent,
   CharacterSemanticEventContract,
@@ -10,16 +12,49 @@ import type {
   EvaluatedSemanticEvent,
   SemanticEventEvaluatorSnapshot,
   SemanticEventPlaybackStatus,
+  SemanticEventStopReason,
   SemanticEventValidationContext,
+  StartedSemanticEvent,
+  StoppedSemanticEvent,
 } from "./types";
-import { validateCharacterSemanticEvents } from "./validator";
 
 const BOUNDARY_EPSILON = 1e-9;
+
+export const MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE = 10_000;
+export const MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE = 10_000;
 
 interface RuntimeTrack {
   readonly track: CharacterSemanticEventTrack;
   readonly duration: number;
 }
+
+interface ActiveInstance {
+  readonly schemaVersion: string;
+  readonly trackId: string;
+  readonly clipId: string;
+  readonly event: CharacterSemanticEvent;
+  readonly cycle: number;
+  readonly instanceId: string;
+  readonly stopAbsoluteTimeSeconds?: number;
+}
+
+interface AuthoredCandidate {
+  readonly type: "authored";
+  readonly absoluteTime: number;
+  readonly boundaryPhase: number;
+  readonly event: CharacterSemanticEvent;
+  readonly cycle: number;
+}
+
+interface StopCandidate {
+  readonly type: "stop";
+  readonly absoluteTime: number;
+  readonly boundaryPhase: 0;
+  readonly instanceId: string;
+  readonly reason: "duration";
+}
+
+type Candidate = AuthoredCandidate | StopCandidate;
 
 function eventOrder(
   left: CharacterSemanticEvent,
@@ -32,19 +67,89 @@ function eventOrder(
   );
 }
 
-function eventAtCycle(
+function instanceId(
+  trackId: string,
+  eventId: string,
+  cycle: number,
+): string {
+  return `${trackId}:${eventId}:${cycle}`;
+}
+
+function authoredCommand(
   schemaVersion: string,
   track: CharacterSemanticEventTrack,
   event: CharacterSemanticEvent,
   cycle: number,
 ): EvaluatedSemanticEvent {
-  return {
+  const common = {
     ...event,
     schemaVersion,
     trackId: track.trackId,
     clipId: track.clipId,
     cycle,
   };
+  return event.lifecycle === "one-shot"
+    ? { ...common, command: "emit" }
+    : {
+        ...common,
+        command: "start",
+        instanceId: instanceId(track.trackId, event.eventId, cycle),
+      };
+}
+
+function activeFromStart(
+  command: StartedSemanticEvent,
+  absoluteTime: number,
+): ActiveInstance {
+  return {
+    schemaVersion: command.schemaVersion,
+    trackId: command.trackId,
+    clipId: command.clipId,
+    event: command,
+    cycle: command.cycle,
+    instanceId: command.instanceId,
+    ...(command.lifecycle === "looping"
+      ? {
+          stopAbsoluteTimeSeconds:
+            absoluteTime + command.durationSeconds!,
+        }
+      : {}),
+  };
+}
+
+function stopCommand(
+  active: ActiveInstance,
+  reason: SemanticEventStopReason,
+  absoluteTimeSeconds: number,
+): StoppedSemanticEvent {
+  return {
+    command: "stop",
+    schemaVersion: active.schemaVersion,
+    trackId: active.trackId,
+    clipId: active.clipId,
+    cycle: active.cycle,
+    eventId: active.event.eventId,
+    eventKind: "vfx",
+    semanticCueId: active.event.semanticCueId,
+    lifecycle: active.event.lifecycle as "looping" | "persistent",
+    instanceId: active.instanceId,
+    reason,
+    absoluteTimeSeconds,
+  };
+}
+
+function candidateOrder(left: Candidate, right: Candidate): number {
+  const boundary =
+    left.absoluteTime - right.absoluteTime ||
+    left.boundaryPhase - right.boundaryPhase;
+  if (boundary !== 0) return boundary;
+  if (left.type === "stop" && right.type === "stop") {
+    return left.instanceId.localeCompare(right.instanceId);
+  }
+  if (left.type === "authored" && right.type === "authored") {
+    return eventOrder(left.event, right.event);
+  }
+  return left.type === "stop" ? -1 : 1;
 }
 
 export class CharacterSemanticEventEvaluator {
@@ -53,10 +158,12 @@ export class CharacterSemanticEventEvaluator {
   #active: RuntimeTrack;
   #status: SemanticEventPlaybackStatus = "stopped";
   #absoluteTimeSeconds = 0;
+  #activeInstances = new Map<string, ActiveInstance>();
 
   public constructor(
     contract: CharacterSemanticEventContract,
     context: SemanticEventValidationContext,
+    initialTrackId: string,
     validatedToken: symbol,
   ) {
     if (validatedToken !== evaluatorValidationToken) {
@@ -80,7 +187,7 @@ export class CharacterSemanticEventEvaluator {
         },
       ]),
     );
-    this.#active = this.#tracks.values().next().value as RuntimeTrack;
+    this.#active = this.#tracks.get(initialTrackId)!;
   }
 
   public get snapshot(): SemanticEventEvaluatorSnapshot {
@@ -98,6 +205,7 @@ export class CharacterSemanticEventEvaluator {
       absoluteTimeSeconds: this.#absoluteTimeSeconds,
       localTimeSeconds,
       completedCycles,
+      activeInstanceIds: [...this.#activeInstances.keys()].sort(),
     };
   }
 
@@ -116,13 +224,14 @@ export class CharacterSemanticEventEvaluator {
     return [];
   }
 
-  public exactReset(): readonly [] {
+  public exactReset(): readonly EvaluatedSemanticEvent[] {
+    const cleanup = this.#cleanup("exact-reset");
     this.#absoluteTimeSeconds = 0;
     this.#status = "stopped";
-    return [];
+    return cleanup;
   }
 
-  public switchTrack(trackId: string): readonly [] {
+  public switchTrack(trackId: string): readonly EvaluatedSemanticEvent[] {
     const next = this.#tracks.get(trackId);
     if (next === undefined) {
       throw new SemanticEventEvaluationError(
@@ -130,9 +239,16 @@ export class CharacterSemanticEventEvaluator {
         `Unknown semantic event track ${trackId}.`,
       );
     }
+    const cleanup = this.#cleanup("track-switch");
     this.#active = next;
     this.#absoluteTimeSeconds = 0;
-    return [];
+    return cleanup;
+  }
+
+  public dispose(): readonly EvaluatedSemanticEvent[] {
+    const cleanup = this.#cleanup("dispose");
+    this.#status = "stopped";
+    return cleanup;
   }
 
   public seek(_timeSeconds: number): never {
@@ -159,63 +275,197 @@ export class CharacterSemanticEventEvaluator {
 
     const start = this.#absoluteTimeSeconds;
     const end = start + deltaSeconds;
+    if (!Number.isFinite(end)) {
+      throw new SemanticEventEvaluationError(
+        SemanticEventEvaluationErrorCode.ACCUMULATED_TIME_OVERFLOW,
+        "Semantic-event accumulated time must remain finite.",
+      );
+    }
+
     const { duration, track } = this.#active;
     const firstCycle = Math.max(0, Math.floor(start / duration) - 1);
     const lastCycle = Math.floor((end + BOUNDARY_EPSILON) / duration);
-    const crossed: Array<{
-      absoluteTime: number;
-      boundaryPhase: number;
-      event: CharacterSemanticEvent;
-      cycle: number;
-    }> = [];
+    const cycleCount = lastCycle - firstCycle + 1;
+    const potentialAuthoredCount = cycleCount * track.events.length;
+    if (
+      !Number.isSafeInteger(firstCycle) ||
+      !Number.isSafeInteger(lastCycle) ||
+      cycleCount > MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE ||
+      potentialAuthoredCount > MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE
+    ) {
+      throw new SemanticEventEvaluationError(
+        SemanticEventEvaluationErrorCode.ADVANCE_BUDGET_EXCEEDED,
+        `Semantic-event advance exceeds the ${MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE}-cycle or ${MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE}-command budget.`,
+      );
+    }
+
+    const candidates: Candidate[] = [];
+    for (const active of this.#activeInstances.values()) {
+      const stop = active.stopAbsoluteTimeSeconds;
+      if (
+        stop !== undefined &&
+        stop > start + BOUNDARY_EPSILON &&
+        stop <= end + BOUNDARY_EPSILON
+      ) {
+        candidates.push({
+          type: "stop",
+          absoluteTime: stop,
+          boundaryPhase: 0,
+          instanceId: active.instanceId,
+          reason: "duration",
+        });
+      }
+    }
 
     for (let cycle = firstCycle; cycle <= lastCycle; cycle += 1) {
       for (const event of track.events) {
         const isZero = event.timeSeconds === 0;
         if (isZero && cycle === 0) continue;
         const absoluteTime = cycle * duration + event.timeSeconds;
+        if (!Number.isFinite(absoluteTime)) {
+          throw new SemanticEventEvaluationError(
+            SemanticEventEvaluationErrorCode.ACCUMULATED_TIME_OVERFLOW,
+            "Semantic-event boundary time must remain finite.",
+          );
+        }
         if (
           absoluteTime > start + BOUNDARY_EPSILON &&
           absoluteTime <= end + BOUNDARY_EPSILON
         ) {
-          crossed.push({
+          candidates.push({
+            type: "authored",
             absoluteTime,
-            boundaryPhase: isZero ? 1 : 0,
+            boundaryPhase: isZero ? 2 : 1,
             event,
             cycle,
           });
+          if (event.lifecycle === "looping") {
+            const stop = absoluteTime + event.durationSeconds!;
+            if (!Number.isFinite(stop)) {
+              throw new SemanticEventEvaluationError(
+                SemanticEventEvaluationErrorCode.ACCUMULATED_TIME_OVERFLOW,
+                "Semantic-event lifecycle stop time must remain finite.",
+              );
+            }
+            if (
+              stop > start + BOUNDARY_EPSILON &&
+              stop <= end + BOUNDARY_EPSILON
+            ) {
+              candidates.push({
+                type: "stop",
+                absoluteTime: stop,
+                boundaryPhase: 0,
+                instanceId: instanceId(
+                  track.trackId,
+                  event.eventId,
+                  cycle,
+                ),
+                reason: "duration",
+              });
+            }
+          }
         }
       }
     }
-    crossed.sort(
-      (left, right) =>
-        left.absoluteTime - right.absoluteTime ||
-        left.boundaryPhase - right.boundaryPhase ||
-        eventOrder(left.event, right.event),
-    );
+
+    if (
+      candidates.length > MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE ||
+      this.#activeInstances.size + candidates.length >
+        MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE * 2
+    ) {
+      throw new SemanticEventEvaluationError(
+        SemanticEventEvaluationErrorCode.ADVANCE_BUDGET_EXCEEDED,
+        `Semantic-event advance exceeds the ${MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE}-command budget.`,
+      );
+    }
+
+    candidates.sort(candidateOrder);
+    const activeInstances = new Map(this.#activeInstances);
+    const commands: EvaluatedSemanticEvent[] = [];
+    for (const candidate of candidates) {
+      if (candidate.type === "stop") {
+        const active = activeInstances.get(candidate.instanceId);
+        if (active === undefined) continue;
+        activeInstances.delete(candidate.instanceId);
+        commands.push(
+          stopCommand(active, candidate.reason, candidate.absoluteTime),
+        );
+        continue;
+      }
+      const command = authoredCommand(
+        this.#schemaVersion,
+        track,
+        candidate.event,
+        candidate.cycle,
+      );
+      commands.push(command);
+      if (command.command === "start") {
+        activeInstances.set(
+          command.instanceId,
+          activeFromStart(command, candidate.absoluteTime),
+        );
+      }
+    }
+
+    if (
+      activeInstances.size > MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE
+    ) {
+      throw new SemanticEventEvaluationError(
+        SemanticEventEvaluationErrorCode.ADVANCE_BUDGET_EXCEEDED,
+        `Semantic-event active instances exceed the ${MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE}-instance budget.`,
+      );
+    }
+
     this.#absoluteTimeSeconds = end;
-    return crossed.map(({ event, cycle }) =>
-      eventAtCycle(this.#schemaVersion, track, event, cycle),
-    );
+    this.#activeInstances = activeInstances;
+    return commands;
+  }
+
+  #cleanup(
+    reason: Exclude<SemanticEventStopReason, "duration">,
+  ): EvaluatedSemanticEvent[] {
+    const commands = [...this.#activeInstances.values()]
+      .sort((left, right) => left.instanceId.localeCompare(right.instanceId))
+      .map((active) =>
+        stopCommand(active, reason, this.#absoluteTimeSeconds),
+      );
+    this.#activeInstances.clear();
+    return commands;
   }
 }
 
 const evaluatorValidationToken = Symbol("validated-semantic-events");
 
 export function createCharacterSemanticEventEvaluator(
-  contract: CharacterSemanticEventContract,
-  context: SemanticEventValidationContext,
+  contract: unknown,
+  context: unknown,
+  initialTrackId: string,
 ): SemanticEventResult<CharacterSemanticEventEvaluator> {
-  const errors = validateCharacterSemanticEvents(contract, context);
-  return errors.length > 0
-    ? { ok: false, errors }
-    : {
-        ok: true,
-        value: new CharacterSemanticEventEvaluator(
-          contract,
-          context,
-          evaluatorValidationToken,
-        ),
-        errors: [],
-      };
+  const validated = validateCharacterSemanticEventInput(contract, context);
+  if (!validated.ok) return validated;
+  const initialTrack = validated.value.tracks.find(
+    (track) => track.trackId === initialTrackId,
+  );
+  if (initialTrack === undefined) {
+    return {
+      ok: false,
+      errors: [
+        {
+          code: SemanticEventErrorCode.UNKNOWN_INITIAL_TRACK_ID,
+          path: "/initialTrackId",
+          message: `Unknown initial semantic-event track ${String(initialTrackId)}.`,
+        },
+      ],
+    };
+  }
+  return {
+    ok: true,
+    value: new CharacterSemanticEventEvaluator(
+      validated.value,
+      context as SemanticEventValidationContext,
+      initialTrack.trackId,
+      evaluatorValidationToken,
+    ),
+    errors: [],
+  };
 }
