@@ -8,9 +8,12 @@ External visual review: **PASS**.
 TASK-013R7 publishes the externally accepted R1-R6 recovery chain through one
 canonical engine-neutral Cocos adapter facade and one Creator-owned canonical
 Scene. It adds no attachment family or runtime capability. The accepted R6
-plan remains the runtime source of truth, and the original monolithic
-TASK-013 Cocos demo remains tracked only as a superseded, non-production
-reference.
+behavior is preserved as a derived Cocos representation. The tracked
+engine-neutral 12-state contract is authoritative,
+`resolveCharacterLoadout` validates and resolves that contract, and the
+generator converts the resolved output into the R6-compatible Cocos plan.
+The original monolithic TASK-013 Cocos demo remains tracked only as a
+superseded, non-production provenance reference.
 
 ## Canonical runtime surface
 
@@ -43,9 +46,14 @@ sorting, reset defaults, or tolerance values.
 
 ## Canonical boundary and parity
 
+- The engine-neutral contract defines the complete unique 4-by-3 matrix:
+  base/garment/accessory membership crossed with no/left/right prop state.
+- `resolveCharacterLoadout` is the single semantic validation and resolution
+  boundary for all 12 states. The generated Cocos plan is derived output and
+  is not a second state authority.
 - One canonical descriptor identifies the adapter, schema version, Scene,
-  implementation source, state IDs, semantic clip IDs, sorting ranges,
-  resource IDs, reset defaults, and spatial tolerance.
+  resolved state IDs, semantic clip IDs, sorting ranges, resource IDs, reset
+  defaults, and spatial tolerance.
 - The descriptor is deterministically generated into the Creator runtime
   mirror.
 - Canonical and accepted R6 plans are structurally equal.
@@ -62,11 +70,14 @@ sorting, reset defaults, or tolerance values.
 ## Automated verification
 
 - Working copy: `CI=true pnpm verify` — PASS.
-- Total tests: 337 passed, 0 failed.
-- Extension tests: 185 passed, 0 failed.
+- Total tests: 349 passed, 0 failed.
 - Tracked-files-only `pnpm install --frozen-lockfile` and
-  `CI=true pnpm verify` — PASS, 337 passed, 0 failed.
+  `CI=true pnpm verify` — PASS, 349 passed, 0 failed.
 - Generated canonical runtime mirror: byte-deterministic.
+- Exact expected generated-file closure: PASS; missing, stale, and unexpected
+  generated files fail verification.
+- Post-verify `git diff --exit-code` and empty tracked
+  `git status --porcelain`: PASS.
 - Creator Scene/script/resource metadata audit: PASS.
 - Global metadata audit: PASS.
 - Exactly one canonical Scene component: PASS.
@@ -193,6 +204,11 @@ the reviewed evidence manifest with status
 
 ## Draft PR #9 pre-merge remediation
 
+The externally reviewed runtime implementation is
+`d9e7bfae0151dec71ebb58456f69b900eed9cf3a`. The following commit titled
+`docs: accept TASK-013R7 pre-merge remediation` is documentation-only; it
+records this acceptance without changing the reviewed runtime.
+
 The focused remediation leaves the accepted visual design, controls, state
 membership, resource count, animation IDs, sorting, and Reset defaults
 unchanged while hardening the pre-merge boundaries:
@@ -214,6 +230,43 @@ unchanged while hardening the pre-merge boundaries:
 - affected generators reject missing, stale, or unexpected generated files
   and record transitive provenance.
 
+Runtime readiness is strictly ordered:
+
+`loading → resources-passed → nodes-built → reset-complete → ready`.
+
+Keyboard input is registered only in `ready`. Exactly one handler is active
+after successful readiness; loading, terminal failure, rebuild teardown,
+disable, and destroy expose zero active handlers. A stale generation cannot
+dispatch actions into a rebuilding runtime.
+
+The added stable semantic validation codes are:
+
+- `DUPLICATE_ATTACHMENT_SLOT_ID_ACROSS_FAMILIES`
+- `DUPLICATE_WEARABLE_SET_ID_ACROSS_FAMILIES`
+- `DUPLICATE_PROP_STATE_ID_ACROSS_FAMILIES`
+- `DUPLICATE_ATTACHMENT_SEAM_ID_ACROSS_FAMILIES`
+- `DUPLICATE_LOADOUT_STATE_ID`
+- `DUPLICATE_EXCLUSIVE_GROUP_ID`
+- `UNKNOWN_LOADOUT_PROP_STATE`
+- `UNKNOWN_ATTACHMENT_SLOT_MEMBER`
+- `UNKNOWN_WEARABLE_SET_MEMBER`
+- `UNKNOWN_EXCLUSIVE_GROUP_MEMBER`
+- `INVALID_EXCLUSIVE_GROUP_DECLARATION`
+- `CONFLICTING_EXCLUSIVE_GROUP_DECLARATION`
+- `INCOMPATIBLE_LOADOUT_RIG`
+
+Existing duplicate attachment, draw-order, dependency, exclusivity, state,
+schema-version, and semantic-animation diagnostics remain fail-closed. No
+duplicate is silently overwritten during `Map` construction, and an unknown
+prop state is never interpreted as no prop.
+
+Accessory validation now derives the expected socket world position from the
+evaluated rig pose and declared slot, while deriving the actual anchor world
+position independently from the resolved attachment transform. A negative
+fixture perturbs the attachment anchor by `3 px` and measures a real `3 px`
+error. Runtime duplicate validation independently counts both primary prop
+nodes and hand-overlay nodes.
+
 The uninterrupted Creator 3.8.8 remediation gate passed with 35/35 resources,
 all 12 states, Rest, Wave, Prop Swing, Integration Stress, Pause/Resume,
 spatial Debug, Transform Stress, two lifecycle rebuilds, post-rebuild
@@ -222,15 +275,37 @@ joint, Skeleton, accessory socket, garment seam, and prop grip errors were
 `0.000 px`; duplicate, sorting, role, non-finite, unknown-member, and viewport
 violation counts were 0.
 
-Replacement live evidence is published separately on
-`evidence/task-013r7-pr-remediation` with review status
-`pending-external-visual-review`. This does not change the earlier accepted
-and superseded evidence history recorded above, and does not finalize or merge
-Draft PR #9.
+External visual review of the replacement remediation evidence: **PASS**.
+
+- Reviewed runtime implementation:
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`
+- Evidence branch: `evidence/task-013r7-pr-remediation`
+- Evidence head: `392b85a95535d7423c8b6dea34af87a9ee225300`
+- Publication commit: `f213373700eb090403419c664262f52177d43768`
+- Recording:
+  `task-013r7-pr-remediation-live-cocos-web-preview.mp4`
+- Size/duration/frames: 1,831,062 bytes, 72.000 seconds, 2,160 frames
+- Codec/profile: H.264 High
+- Resolution/frame rate/pixel format: 1280x720, 30 fps, `yuv420p`
+- SHA-256:
+  `30fa9988defc305388b93a2bc4b079ff42d00f7b4558ef630986c63e48960abe`
+- Local and uploaded-copy metadata/SHA identity: PASS
+- Complete FFmpeg decode: PASS
+
+The full timeline visibly passed canonical identity and HUD visibility, all
+12 states, no/left/right prop, Rest, Wave, Prop Swing, Integration Stress,
+Pause/Resume, spatial Debug, Transform Stress, two rebuilds, post-rebuild
+controls, Exact Reset, and the final clean Debug-OFF state. No missing part,
+duplicate attachment, layering error, drift, or residual debug geometry was
+visible. This remediation evidence supplements rather than rewrites the
+earlier accepted identity-repair evidence and the superseded original video
+history recorded above.
 
 ## Limits
 
-TASK-013R7 does not add a new attachment family, schema or resolver change,
-old monolithic demo repair, Red Cap reconstruction, IK, physics, blending,
-root motion, VFX, Unity/Godot adapters, Windows validation, TASK-014, or a
-merge.
+TASK-013R7 does not add a new attachment family or schema, old monolithic demo
+repair, Red Cap reconstruction, IK, physics, blending, root motion, VFX,
+Unity/Godot adapters, Windows validation, TASK-014, or new user-facing
+loadout behavior. Its resolver changes are limited to making the existing
+engine-neutral 12-state contract authoritative and adding fail-closed
+semantic validation.

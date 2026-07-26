@@ -2,14 +2,24 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
-## Active plan: TASK-013R7 Pre-Merge Remediation
+## Accepted plan: TASK-013R7 Pre-Merge Remediation
 
-- Status: Remediation complete; replacement evidence pending external review
+- Status: Accepted after external visual review
 - Started: 2026-07-26
+- Accepted: 2026-07-26
 - Branch: `recovery/task-013r7-full-loadout-release-candidate`
 - Draft PR: `#9`
 - Baseline R7 acceptance commit:
   `c4d8f3258308ed0b1bbb570e9a264cfe0ae4d6e9`
+- Reviewed runtime implementation commit:
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`
+- Documentation-only acceptance commit: the following commit titled
+  `docs: accept TASK-013R7 pre-merge remediation`; it records acceptance and
+  does not change the reviewed runtime.
+- Reviewed remediation evidence head:
+  `392b85a95535d7423c8b6dea34af87a9ee225300`
+- Reviewed remediation evidence publication:
+  `f213373700eb090403419c664262f52177d43768`
 - Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
 - Frozen TASK-013 feature:
   `5170185fdca666300c4d61488f17e15aa18656be`
@@ -64,12 +74,33 @@ SHA.
    closure, clean-tree checks, the uninterrupted Creator 3.8.8 gate, local
    media validation, temporary evidence publication, uploaded-copy identity,
    and full decode.
-9. Append and push focused commits, update Draft PR #9 in place, keep it
-   Draft, and stop.
+9. Append and push focused implementation commits, update Draft PR #9 in
+   place, keep it Draft, and stop for external visual review.
 
 ### Remediation result
 
 - Working-copy verification: 349 tests passed, 0 failed.
+- Tracked-files-only frozen-install verification: 349 tests passed, 0
+  failed.
+- The tracked engine-neutral 12-state contract is authoritative;
+  `resolveCharacterLoadout` validates and resolves it, and generation derives
+  the R6-compatible Cocos plan from that resolved output.
+- Stable fail-closed validation covers duplicate merged slot, wearable-set,
+  prop-state, seam, loadout-state, and exclusive-group IDs; unknown prop,
+  slot, set, and group members; invalid/conflicting exclusive groups; and
+  incompatible rig references.
+- The accessory spatial negative test independently perturbs the resolved
+  anchor by `3 px` and reports `3 px` drift.
+- Runtime input registration follows resource PASS, node construction,
+  playback creation, Exact Reset, and lifecycle READY. Handler count is
+  exactly 1 in READY and 0 while loading, failed, rebuilding, disabled, or
+  destroyed.
+- Primary prop and hand-overlay duplicate nodes are independently guarded.
+- Exact generated-file-set closure, transitive provenance, and post-verify
+  clean-tree checks: PASS. The superseded monolith generator is available
+  only through the explicit `legacy:verify-task013-provenance` command.
+- Garment seam validation measures transformed world-space AABB overlap; it
+  does not claim oriented-polygon intersection or cloth simulation.
 - Creator 3.8.8 clean-open, R6 Scene switch, canonical Scene reopen, and
   second runtime initialization: PASS.
 - Canonical runtime: 35/35 resources, all 12 states, four semantic clips,
@@ -77,9 +108,11 @@ SHA.
   post-rebuild switching, and Exact Reset: PASS.
 - Runtime guards: all spatial, duplicate, sorting, role, finite-coordinate,
   and viewport counters remained 0; Creator and Preview consoles were clean.
-- The feature branch is frozen after the focused remediation commit while
-  replacement live evidence is published separately on
-  `evidence/task-013r7-pr-remediation`.
+- Replacement live evidence on `evidence/task-013r7-pr-remediation` passed
+  external visual review. Its 72-second uploaded copy is byte-identical to
+  the reviewed local media, has SHA-256
+  `30fa9988defc305388b93a2bc4b079ff42d00f7b4558ef630986c63e48960abe`,
+  and fully decodes.
 
 ### Done when
 
@@ -107,10 +140,14 @@ SHA.
 - Branch: `recovery/task-013r7-full-loadout-release-candidate`
 - Original implementation commit:
   `37b7134fbb88ebf7f2b2ea2823c9ce2d597531d9`
-- Final reviewed implementation commit:
+- Identity-repair reviewed implementation commit:
   `ce5bb6d1f0b7f1676243ded6e2781d915f7005b4`
-- Reviewed evidence commit:
+- Identity-repair reviewed evidence commit:
   `ebd447ad6e7158d1dfa26f7ea5e60bc74daa851f`
+- Final reviewed runtime implementation commit:
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`
+- Final reviewed remediation evidence head:
+  `392b85a95535d7423c8b6dea34af87a9ee225300`
 - Baseline / frozen accepted R6:
   `5d708cb676c626244218e82a9e2fd9343aa5f736`
 - Frozen accepted R5:
@@ -130,8 +167,10 @@ SHA.
 Publish the accepted R1-R6 recovery chain through one canonical,
 engine-neutral Cocos adapter entry point and one Creator-owned canonical
 release-candidate Scene. Prove exact parity with accepted R6 without adding a
-new attachment capability, changing engine-neutral contracts, or reviving the
-superseded monolithic TASK-013 runtime.
+new attachment capability or reviving the superseded monolithic TASK-013
+runtime. The pre-merge remediation makes the existing engine-neutral
+12-state contract authoritative and hardens its resolver validation without
+changing accepted behavior.
 
 ### Boundaries
 
@@ -148,8 +187,9 @@ superseded monolithic TASK-013 runtime.
 - Mark the original `composable-full-loadout-reference.scene` runtime as
   superseded and non-production in documentation only; do not delete or
   modify it.
-- Do not add capabilities, broadly rewrite R1-R6, change a schema/resolver,
-  create a PR, merge, start TASK-014, or implement Unity/Godot adapters.
+- Do not add capabilities, broadly rewrite R1-R6, change a schema, start
+  TASK-014, or implement Unity/Godot adapters. Resolver changes are limited
+  to authoritative 12-state resolution and fail-closed semantic validation.
 
 ### Execution
 
@@ -209,9 +249,20 @@ superseded monolithic TASK-013 runtime.
 
 ### Implementation acceptance
 
-- Working-copy `CI=true pnpm verify`: PASS, 337 passed, 0 failed.
+- Working-copy `CI=true pnpm verify`: PASS, 349 passed, 0 failed.
 - Tracked-files-only frozen install and `CI=true pnpm verify`: PASS,
-  337 passed, 0 failed.
+  349 passed, 0 failed.
+- Engine-neutral 12-state contract → `resolveCharacterLoadout` → derived
+  R6-compatible Cocos plan: PASS with exact behavioral parity.
+- Runtime readiness and input gating: PASS; exactly one input handler exists
+  only in READY and zero exist during loading, failure, rebuild, disable, or
+  destroy.
+- Stable merged-ID, reference, exclusivity, prop-state, and rig-compatibility
+  negative tests: PASS. The independent accessory-anchor perturbation reports
+  the expected `3 px` drift.
+- Duplicate primary prop and hand-overlay validation: PASS.
+- Exact generated-output closure, explicit legacy provenance-only generation,
+  deterministic tracked-only regeneration, and post-verify clean tree: PASS.
 - Creator-owned canonical Scene identity and metadata: PASS.
 - Canonical/R6 automated descriptor, state, resource, input, sorting, clip,
   reset, and tolerance parity: PASS.
@@ -254,6 +305,12 @@ superseded monolithic TASK-013 runtime.
   complete decode PASS.
 - The original video is retained in the reviewed manifest with status
   `superseded-canonical-hud-identity-mismatch`.
+- External visual review of the final 72-second pre-merge remediation
+  evidence for runtime
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`: PASS. Evidence head
+  `392b85a95535d7423c8b6dea34af87a9ee225300`, video SHA-256
+  `30fa9988defc305388b93a2bc4b079ff42d00f7b4558ef630986c63e48960abe`,
+  uploaded-copy identity PASS, and full FFmpeg decode PASS.
 
 ## Accepted plan: TASK-013R6 Generic One-Handed Prop Integration
 
