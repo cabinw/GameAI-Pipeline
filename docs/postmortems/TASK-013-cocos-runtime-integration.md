@@ -72,3 +72,30 @@ lifecycle separation, manifest loading, semantic input, global sorting,
 world-to-overlay-local projection, and runtime spatial assertions. Reconnect
 Full Loadout only after those capabilities pass one uninterrupted Creator
 acceptance run.
+
+## Resolution
+
+The seven-patch sequence was a single boundary-failure pattern: each local
+repair made the next previously unreachable Creator lifecycle, rendering, or
+spatial defect observable. TASK-013R1-R7 succeeded because recovery restarted
+with a minimal measurable harness, accepted each generic boundary
+independently, then reintroduced the base rig, attachments, garments, props,
+and canonical facade in externally reviewed increments.
+
+The final architecture keeps the tracked engine-neutral 12-state contract and
+`resolveCharacterLoadout` authoritative. The generated R6-compatible plan is
+derived output. Canonical V2 supplies a neutral adapter identity and reuses the
+accepted lifecycle/readiness, terminal manifest, semantic input, global
+sorting, world-to-overlay projection, and runtime spatial assertions without
+reviving the monolith.
+
+Permanent acceptance rule: source-string checks and headless evidence are
+secondary safeguards. They cannot replace Creator scene serialization,
+Editor/runtime lifecycle, resource, input, visual, sorting, projection, and
+spatial gates. Conversely, visual acceptance cannot replace deterministic
+contract, resolver, negative, generation, and clean-checkout tests.
+
+PR #9 integrated the recovered baseline into `main` as
+`2e6f54191f4eff7f2699bda24336c1ada8cff35a`. The Character Loadout milestone
+is the completed v0.2.0 documentation baseline. The Git tag and GitHub Release
+remain pending separate approval, and TASK-014 has not started.

@@ -1,6 +1,75 @@
 # Implementation Plans
 
-Use this file for active multi-file or architectural work. Keep one active plan at a time.
+Use this file for multi-file or architectural work. Keep one active plan at a
+time. There is no active implementation plan after the release closeout
+recorded below.
+
+## Completed plan: RELEASE-0.2.0 Character Loadout Baseline Closeout
+
+- Status: Complete
+- Started: 2026-07-26
+- Completed: 2026-07-26
+- Branch: `docs/release-v0.2.0-character-loadout`
+- Baseline `main`: `2e6f54191f4eff7f2699bda24336c1ada8cff35a`
+- Declared budget: 10 documentation files, 0 generated-output files, 0
+  runtime/code/schema/asset/Scene/package/lockfile/test files.
+- Tag status: `v0.2.0` does not exist; tag and GitHub Release creation are
+  deferred until this documentation Draft PR is reviewed and merged.
+
+### Goal
+
+Close the completed Character Loadout milestone as a durable v0.2.0
+documentation baseline. Record supported architecture, canonical Cocos entry
+points, compatibility, verification, limitations, migration guidance,
+historical references, and the next unstarted roadmap areas without changing
+runtime or generated behavior.
+
+### Boundaries
+
+- Documentation only: no runtime, schema, resolver, generator, fixture,
+  Scene, asset, package-version, lockfile, or test changes.
+- Do not start TASK-014 or mark any future roadmap item as started.
+- Do not create `v0.2.0`, a GitHub Release, or a non-Draft PR.
+- Do not delete recovery branches, evidence history, or legacy/provenance
+  files.
+
+### Execution
+
+1. Confirm exact main, post-merge CI, tags, clean tree, protected refs, no
+   TASK-014 implementation, and zero tracked MP4 files.
+2. Record this plan and
+   `tasks/RELEASE-0.2.0-character-loadout-baseline.md`.
+3. Update the project status, roadmap, changelog, release baseline,
+   compatibility matrix, documentation index, postmortem resolution, and
+   PR-size/acceptance policy.
+4. Run working-copy and tracked-files-only frozen verification, validate
+   Markdown links and repository paths, and prove the diff is docs-only.
+5. Commit and push the documentation branch, open one Draft PR into `main`,
+   and stop for review without tagging, releasing, merging, or starting
+   TASK-014.
+
+### Done when
+
+- Every required release document exists and accurately distinguishes
+  verified support from future architecture direction.
+- Both verification modes remain 349/349 and generation leaves tracked files
+  unchanged.
+- Relative Markdown links and referenced repository paths resolve.
+- The complete diff contains only intended documentation files, with no
+  tracked MP4.
+- One Draft PR targets `main`; `v0.2.0`, GitHub Release, and TASK-014 remain
+  absent.
+
+### Closeout result
+
+- TASK-013 and recovery milestones R1-R7 are closed and integrated through
+  PR #9 at the recorded `main` baseline.
+- Working-copy verification passed 349/349 tests.
+- Tracked-files-only frozen-install verification passed 349/349 tests.
+- Link, repository-path, documentation-only scope, clean-tree generation,
+  and zero-tracked-MP4 checks passed.
+- This documentation branch stops at a Draft PR for human review. Tagging,
+  GitHub Release publication, merging, and TASK-014 remain unstarted.
 
 ## Accepted plan: TASK-013R7 Pre-Merge Remediation
 
