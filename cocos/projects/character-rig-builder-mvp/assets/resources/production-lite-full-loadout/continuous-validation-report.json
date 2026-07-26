@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "TASK-013",
+  "sampleRateHz": 60,
+  "clipIds": [
+    "production-lite-full-loadout-rest",
+    "production-lite-full-loadout-walk",
+    "production-lite-full-loadout-wave",
+    "production-lite-full-loadout-prop-swing",
+    "production-lite-full-loadout-integration-stress"
+  ],
+  "totalSampleCount": 605,
+  "maximumGarmentSeamError": 0,
+  "maximumAccessorySocketError": 0,
+  "maximumPropGripError": 0,
+  "maximumLayerOrderViolations": 0,
+  "firstFailure": null,
+  "status": "passed"
+}

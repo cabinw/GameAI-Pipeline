@@ -12,10 +12,12 @@ declare module "cc" {
     property: PropertyDecorator;
   };
 
-  export interface Vec3 {
-    readonly x: number;
-    readonly y: number;
-    readonly z: number;
+  export class Vec3 {
+    x: number;
+    y: number;
+    z: number;
+
+    constructor(x?: number, y?: number, z?: number);
   }
 
   export class Component {
@@ -37,7 +39,10 @@ declare module "cc" {
     setPosition(x: number, y: number, z?: number): void;
     setRotationFromEuler(x: number, y: number, z: number): void;
     setScale(x: number, y: number, z?: number): void;
+    getWorldPosition(out?: Vec3): Vec3;
     addComponent<T extends Component>(component: new () => T): T;
+    getComponent<T extends Component>(component: new () => T): T | null;
+    removeFromParent(): void;
     destroy(): boolean;
   }
 
@@ -54,22 +59,42 @@ declare module "cc" {
     lineTo(x: number, y: number): void;
     circle(centerX: number, centerY: number, radius: number): void;
     rect(x: number, y: number, width: number, height: number): void;
+    clear(): void;
     fill(): void;
     stroke(): void;
   }
 
   export class Label extends Component {
+    static readonly Overflow: {
+      readonly CLAMP: number;
+    };
     string: string;
     fontSize: number;
     lineHeight: number;
+    horizontalAlign: number;
+    verticalAlign: number;
+    enableWrapText: boolean;
+    overflow: number;
     color: Color;
   }
+
+  export const HorizontalTextAlignment: {
+    readonly LEFT: number;
+  };
+
+  export const VerticalTextAlignment: {
+    readonly TOP: number;
+  };
 
   export class Sorting2D extends Component {
     sortingOrder: number;
   }
 
   export class SpriteFrame {}
+
+  export class JsonAsset {
+    readonly json: unknown;
+  }
 
   export class Sprite extends Component {
     static readonly SizeMode: {
@@ -88,7 +113,12 @@ declare module "cc" {
   };
 
   export class UITransform extends Component {
+    readonly anchorPoint: { readonly x: number; readonly y: number };
+    readonly contentSize: { readonly width: number; readonly height: number };
+    setAnchorPoint(x: number, y: number): void;
     setContentSize(width: number, height: number): void;
+    convertToNodeSpaceAR(worldPoint: Vec3, out?: Vec3): Vec3;
+    convertToWorldSpaceAR(nodePoint: Vec3, out?: Vec3): Vec3;
   }
 
   export class UIOpacity extends Component {
@@ -112,6 +142,16 @@ declare module "cc" {
     readonly DIGIT_4: number;
     readonly DIGIT_5: number;
     readonly DIGIT_6: number;
+    readonly DIGIT_7: number;
+    readonly F1: number;
+    readonly F2: number;
+    readonly F3: number;
+    readonly F4: number;
+    readonly F5: number;
+    readonly F6: number;
+    readonly F7: number;
+    readonly F8: number;
+    readonly ESCAPE: number;
     readonly SPACE: number;
     readonly KEY_R: number;
     readonly KEY_J: number;
@@ -122,6 +162,7 @@ declare module "cc" {
     readonly KEY_E: number;
     readonly KEY_O: number;
     readonly KEY_Q: number;
+    readonly KEY_W: number;
     readonly KEY_V: number;
     readonly KEY_C: number;
     readonly KEY_G: number;
@@ -129,6 +170,9 @@ declare module "cc" {
     readonly KEY_K: number;
     readonly KEY_M: number;
     readonly KEY_H: number;
+    readonly KEY_P: number;
+    readonly KEY_T: number;
+    readonly KEY_Y: number;
     readonly KEY_Z: number;
     readonly KEY_X: number;
   };
@@ -150,5 +194,18 @@ declare module "cc" {
     readonly Enum: {
       readonly UI_2D: number;
     };
+  };
+
+  export class Director {
+    static readonly EVENT_AFTER_DRAW: string;
+  }
+
+  export const director: {
+    getScene(): { readonly name: string } | null;
+    once(
+      eventType: string,
+      callback: () => void,
+      target?: object,
+    ): () => void;
   };
 }

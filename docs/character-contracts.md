@@ -171,6 +171,47 @@ has the same parent. The attachment local transform places its authored grip
 on that socket; automated animation sampling verifies coincidence. No engine
 node, inverse solver, or item-specific behavior is implied.
 
+## Composable character loadouts
+
+TASK-013 adds an engine-neutral composition layer above unchanged Attachment
+Layout 1.0 documents. A loadout groups layouts by stable `familyId`, declares
+named states with enabled families and an optional prop state, and may declare
+state dependencies, exclusions, required attachments, exclusive groups, and
+required semantic clip IDs.
+
+`resolveCharacterLoadout` validates the complete cross-family namespace and
+rig compatibility, resolves dependency closure, applies family and prop
+state, resolves ordinary attachment transforms, and produces immutable
+enabled attachments plus one globally sorted body/attachment layer list.
+Family, state, slot, attachment, wearable-set, prop-state, JSON-property, and
+source-file order are not semantic.
+
+Stable diagnostics include duplicate IDs across families, conflicting
+exclusive occupants, unknown state/family/dependency references, cyclic and
+contradictory dependencies, missing required state attachments, invalid
+global draw order, missing/duplicate semantic animation IDs, and loadout
+schema/rig incompatibility.
+
+Merged-loadout validation uses stable `CharacterLoadoutError.code` values:
+`DUPLICATE_ATTACHMENT_SLOT_ID_ACROSS_FAMILIES`,
+`DUPLICATE_WEARABLE_SET_ID_ACROSS_FAMILIES`,
+`DUPLICATE_PROP_STATE_ID_ACROSS_FAMILIES`,
+`DUPLICATE_ATTACHMENT_SEAM_ID_ACROSS_FAMILIES`,
+`DUPLICATE_EXCLUSIVE_GROUP_ID`, `UNKNOWN_LOADOUT_PROP_STATE`,
+`UNKNOWN_ATTACHMENT_SLOT_MEMBER`, `UNKNOWN_WEARABLE_SET_MEMBER`,
+`UNKNOWN_EXCLUSIVE_GROUP_MEMBER`, `INVALID_EXCLUSIVE_GROUP_DECLARATION`, and
+`CONFLICTING_EXCLUSIVE_GROUP_DECLARATION`. These checks run before lookup-map
+construction, so duplicate declarations cannot silently overwrite one
+another and an unknown prop state can never mean “no prop.”
+
+The current loadout document is semantically validated through the typed
+runtime contract rather than a dedicated full JSON Schema/parser. Adding that
+structural parser is deferred to a separately versioned schema task; this
+does not defer or weaken the runtime rejection rules above.
+
+This is a resolver contract, not a Cocos contract. Engine adapters receive
+only resolved state/layer data and resource metadata.
+
 ## Deliberate limitations
 
 - Referenced image and JSON files are not opened or checked for existence in TASK-001.

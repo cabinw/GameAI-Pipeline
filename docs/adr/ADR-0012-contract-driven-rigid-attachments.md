@@ -38,6 +38,10 @@ be duplicated for every equipment combination.
   without item- or engine-specific fields.
 - Generic `behind-target`, `in-front-of-target`, and `target-overlay` roles
   describe prop/hand composition in the same global ordering domain.
+- A separate engine-neutral loadout resolver composes multiple Attachment
+  Layout families, named state dependencies/exclusions, exclusive groups,
+  required presence, semantic clip identity, and global body/attachment
+  ordering without revising Attachment Layout 1.0.
 
 ## Consequences
 
@@ -54,3 +58,5 @@ be duplicated for every equipment combination.
   seams do not introduce clothing-specific evaluation or cloth behavior.
 - One-handed prop grip alignment is forward-authored and sampled; the core
   does not perform IK, inverse grip solving, physics, or hand switching.
+- Engine adapters consume the immutable resolved character; they do not
+  reconstruct family-specific composition or infer attachment state.

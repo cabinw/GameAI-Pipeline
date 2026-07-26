@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0.0",
+  "attachmentLayoutId": "production-lite-full-loadout-accessories",
+  "rig": {
+    "layoutId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "slots": [
+    {
+      "slotId": "headwear",
+      "parentPartId": "head",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 60
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "defaultEnabled": true
+    },
+    {
+      "slotId": "face-accessory",
+      "parentPartId": "head",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 25
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "defaultEnabled": true
+    }
+  ],
+  "attachments": [
+    {
+      "attachmentId": "cap-back",
+      "slotId": "headwear",
+      "file": "attachments/cap-back.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.609375
+      },
+      "drawOrder": 0.5,
+      "layerRole": "back"
+    },
+    {
+      "attachmentId": "sunglasses",
+      "slotId": "face-accessory",
+      "file": "attachments/sunglasses.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5142857142857142
+      },
+      "drawOrder": 12.5,
+      "layerRole": "front"
+    },
+    {
+      "attachmentId": "cap-front",
+      "slotId": "headwear",
+      "file": "attachments/cap-front.png",
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6428571428571429
+      },
+      "drawOrder": 13.5,
+      "layerRole": "front"
+    }
+  ]
+}

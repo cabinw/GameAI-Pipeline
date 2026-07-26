@@ -44,3 +44,9 @@ jobs:
         run: pnpm verify
         env:
           CI: "true"
+
+      - name: Verify tracked generated outputs are clean
+        shell: bash
+        run: |
+          git diff --exit-code
+          test -z "$(git status --porcelain --untracked-files=no)"

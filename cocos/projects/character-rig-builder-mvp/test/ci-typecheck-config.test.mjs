@@ -14,9 +14,12 @@ const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const expectedCcImports = [
   "Color",
   "Component",
+  "Director",
   "EventKeyboard",
   "Graphics",
+  "HorizontalTextAlignment",
   "Input",
+  "JsonAsset",
   "KeyCode",
   "Label",
   "Layers",
@@ -26,7 +29,10 @@ const expectedCcImports = [
   "SpriteFrame",
   "UIOpacity",
   "UITransform",
+  "Vec3",
+  "VerticalTextAlignment",
   "_decorator",
+  "director",
   "input",
   "resources",
 ];

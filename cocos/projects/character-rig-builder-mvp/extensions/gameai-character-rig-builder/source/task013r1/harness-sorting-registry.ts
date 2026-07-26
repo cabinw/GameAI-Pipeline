@@ -1,0 +1,138 @@
+export type HarnessSortingRole =
+  | "production-root"
+  | "production-child"
+  | "production-attachment"
+  | "debug-geometry"
+  | "debug-label"
+  | "hud";
+
+export interface HarnessSortingPolicy {
+  readonly production: Readonly<{ minimum: number; maximum: number }>;
+  readonly debug: Readonly<{ minimum: number; maximum: number }>;
+  readonly hud: Readonly<{ minimum: number; maximum: number }>;
+  readonly orderByRole: Readonly<Record<HarnessSortingRole, number>>;
+}
+
+export const HARNESS_SORTING_POLICY: HarnessSortingPolicy = Object.freeze({
+  production: Object.freeze({ minimum: 10, maximum: 99 }),
+  debug: Object.freeze({ minimum: 100, maximum: 199 }),
+  hud: Object.freeze({ minimum: 200, maximum: 209 }),
+  orderByRole: Object.freeze({
+    "production-root": 10,
+    "production-child": 11,
+    "production-attachment": 12,
+    "debug-geometry": 100,
+    "debug-label": 101,
+    hud: 200,
+  }),
+});
+
+export function validateHarnessSortingPolicy(
+  policy: HarnessSortingPolicy = HARNESS_SORTING_POLICY,
+): HarnessSortingPolicy {
+  const ranges = [policy.production, policy.debug, policy.hud];
+  if (
+    ranges.some(
+      (range) =>
+        !Number.isInteger(range.minimum) ||
+        !Number.isInteger(range.maximum) ||
+        range.minimum > range.maximum ||
+        range.minimum < -32768 ||
+        range.maximum > 32767,
+    ) ||
+    policy.production.maximum >= policy.debug.minimum ||
+    policy.debug.maximum >= policy.hud.minimum
+  ) {
+    throw new Error("TASK_013R1_SORTING_POLICY_INVALID");
+  }
+  for (const [role, order] of Object.entries(policy.orderByRole)) {
+    const range = role.startsWith("production")
+      ? policy.production
+      : role.startsWith("debug")
+        ? policy.debug
+        : policy.hud;
+    if (order < range.minimum || order > range.maximum) {
+      throw new Error(`TASK_013R1_SORTING_ROLE_INVALID: ${role}=${order}`);
+    }
+  }
+  return policy;
+}
+
+export function harnessSortingOrder(
+  role: HarnessSortingRole,
+  policy: HarnessSortingPolicy = HARNESS_SORTING_POLICY,
+): number {
+  validateHarnessSortingPolicy(policy);
+  const order = policy.orderByRole[role];
+  if (order === undefined) {
+    throw new Error(`TASK_013R1_SORTING_ROLE_UNKNOWN: ${String(role)}`);
+  }
+  return order;
+}
+
+export function harnessProductionSortingOrder(
+  drawOrder: number,
+  policy: HarnessSortingPolicy = HARNESS_SORTING_POLICY,
+): number {
+  validateHarnessSortingPolicy(policy);
+  if (!Number.isInteger(drawOrder) || drawOrder < 0) {
+    throw new Error(
+      `TASK_013R1_PRODUCTION_DRAW_ORDER_INVALID: ${drawOrder}`,
+    );
+  }
+  const order = policy.production.minimum + drawOrder;
+  if (order > policy.production.maximum) {
+    throw new Error(
+      `TASK_013R1_PRODUCTION_DRAW_ORDER_OUT_OF_RANGE: ${drawOrder}`,
+    );
+  }
+  return order;
+}
+
+export interface HarnessProductionSortEntry {
+  readonly semanticId: string;
+  readonly drawOrder: number;
+}
+
+export function resolveHarnessProductionSortingOrders(
+  entries: readonly HarnessProductionSortEntry[],
+  policy: HarnessSortingPolicy = HARNESS_SORTING_POLICY,
+): ReadonlyMap<string, number> {
+  validateHarnessSortingPolicy(policy);
+  if (entries.length === 0) {
+    throw new Error("TASK_013R1_PRODUCTION_SORT_ENTRIES_EMPTY");
+  }
+  const ids = new Set<string>();
+  const drawOrders = new Set<number>();
+  const ordered = [...entries].sort(
+    (left, right) =>
+      left.drawOrder - right.drawOrder ||
+      left.semanticId.localeCompare(right.semanticId),
+  );
+  for (const entry of ordered) {
+    if (
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(entry.semanticId) ||
+      !Number.isFinite(entry.drawOrder) ||
+      ids.has(entry.semanticId) ||
+      drawOrders.has(entry.drawOrder)
+    ) {
+      throw new Error(
+        `TASK_013R1_PRODUCTION_SORT_ENTRY_INVALID: ${entry.semanticId}`,
+      );
+    }
+    ids.add(entry.semanticId);
+    drawOrders.add(entry.drawOrder);
+  }
+  if (
+    policy.production.minimum + ordered.length - 1 >
+    policy.production.maximum
+  ) {
+    throw new Error("TASK_013R1_PRODUCTION_SORT_RANGE_EXHAUSTED");
+  }
+  return new Map(
+    ordered.map(
+      (entry, index) =>
+        [entry.semanticId, policy.production.minimum + index] as const,
+    ),
+  );
+}

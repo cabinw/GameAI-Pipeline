@@ -49,6 +49,39 @@ export function composeAttachmentWorldTransform(
   );
 }
 
+const IDENTITY_ATTACHMENT_TRANSFORM: AttachmentTransform = Object.freeze({
+  position: Object.freeze({ x: 0, y: 0 }),
+  rotationDegrees: 0,
+  scale: Object.freeze({ x: 1, y: 1 }),
+});
+
+/**
+ * Measures two independently derived runtime quantities: the declared slot
+ * world position and the resolved attachment-anchor world position.
+ */
+export function measureAttachmentSocketToAnchorError(
+  parentWorld: AffineTransform2D,
+  attachment: Pick<
+    ResolvedAttachment,
+    "slotTransform" | "attachmentTransform"
+  >,
+): number {
+  const expectedSocket = composeAttachmentWorldTransform(
+    parentWorld,
+    attachment.slotTransform,
+    IDENTITY_ATTACHMENT_TRANSFORM,
+  );
+  const actualAnchor = composeAttachmentWorldTransform(
+    parentWorld,
+    attachment.slotTransform,
+    attachment.attachmentTransform,
+  );
+  return Math.hypot(
+    expectedSocket.tx - actualAnchor.tx,
+    expectedSocket.ty - actualAnchor.ty,
+  );
+}
+
 export function resolveAttachmentLayout(
   layout: AttachmentLayout,
   slotOverrides: Readonly<Record<string, boolean>> = {},

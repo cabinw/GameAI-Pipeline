@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0.0",
+  "loadoutId": "production-lite-full-loadout",
+  "rig": {
+    "layoutId": "production-lite-character-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "families": [
+    {
+      "familyId": "accessories",
+      "attachmentLayoutFile": "families/accessories.attachment-layout.json"
+    },
+    {
+      "familyId": "garment",
+      "attachmentLayoutFile": "families/garment.attachment-layout.json"
+    },
+    {
+      "familyId": "prop",
+      "attachmentLayoutFile": "families/prop.attachment-layout.json"
+    }
+  ],
+  "states": [
+    {
+      "stateId": "base-only-with-no-prop",
+      "enabledFamilyIds": [
+        "prop"
+      ]
+    },
+    {
+      "stateId": "base-only-with-left-hand-prop",
+      "enabledFamilyIds": [
+        "prop"
+      ],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "base-only-with-right-hand-prop",
+      "enabledFamilyIds": [
+        "prop"
+      ],
+      "propStateId": "right-hand-prop"
+    },
+    {
+      "stateId": "garment-only-with-no-prop",
+      "enabledFamilyIds": [
+        "garment",
+        "prop"
+      ]
+    },
+    {
+      "stateId": "garment-only-with-left-hand-prop",
+      "enabledFamilyIds": [
+        "garment",
+        "prop"
+      ],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "garment-only-with-right-hand-prop",
+      "enabledFamilyIds": [
+        "garment",
+        "prop"
+      ],
+      "propStateId": "right-hand-prop"
+    },
+    {
+      "stateId": "accessories-only-with-no-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "prop"
+      ],
+      "requiredAttachmentIds": [
+        "cap-back",
+        "cap-front",
+        "sunglasses"
+      ]
+    },
+    {
+      "stateId": "accessories-only-with-left-hand-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "prop"
+      ],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "accessories-only-with-right-hand-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "prop"
+      ],
+      "propStateId": "right-hand-prop"
+    },
+    {
+      "stateId": "garment-and-accessories-with-no-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "garment",
+        "prop"
+      ]
+    },
+    {
+      "stateId": "garment-and-accessories-with-left-hand-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "garment",
+        "prop"
+      ],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "garment-and-accessories-with-right-hand-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "garment",
+        "prop"
+      ],
+      "propStateId": "right-hand-prop"
+    }
+  ],
+  "exclusiveGroups": [
+    {
+      "groupId": "active-prop",
+      "attachmentIds": [
+        "toolbox-left",
+        "toolbox-right"
+      ],
+      "maximumEnabled": 1
+    },
+    {
+      "groupId": "active-hand-overlay",
+      "attachmentIds": [
+        "hand-overlay-left",
+        "hand-overlay-right"
+      ],
+      "maximumEnabled": 1
+    }
+  ],
+  "requiredSemanticClipIds": [
+    "production-lite-full-loadout-rest",
+    "production-lite-full-loadout-walk",
+    "production-lite-full-loadout-wave",
+    "production-lite-full-loadout-prop-swing",
+    "production-lite-full-loadout-integration-stress"
+  ]
+}

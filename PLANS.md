@@ -2,6 +2,1249 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Accepted plan: TASK-013R7 Pre-Merge Remediation
+
+- Status: Accepted after external visual review
+- Started: 2026-07-26
+- Accepted: 2026-07-26
+- Branch: `recovery/task-013r7-full-loadout-release-candidate`
+- Draft PR: `#9`
+- Baseline R7 acceptance commit:
+  `c4d8f3258308ed0b1bbb570e9a264cfe0ae4d6e9`
+- Reviewed runtime implementation commit:
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`
+- Documentation-only acceptance commit: the following commit titled
+  `docs: accept TASK-013R7 pre-merge remediation`; it records acceptance and
+  does not change the reviewed runtime.
+- Reviewed remediation evidence head:
+  `392b85a95535d7423c8b6dea34af87a9ee225300`
+- Reviewed remediation evidence publication:
+  `f213373700eb090403419c664262f52177d43768`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Resolve the focused pre-merge findings in Draft PR #9 without changing the
+accepted visual design or user-facing loadout behavior. Make the
+engine-neutral 12-state contract authoritative, gate runtime input on terminal
+readiness, harden semantic validation, replace tautological accessory
+measurement, close generated-output sets, isolate legacy generation, and
+publish replacement live Creator evidence from the final appended feature
+SHA.
+
+### Boundaries
+
+- Append focused commits only; do not rewrite accepted or protected history.
+- Keep PR #9 Draft and do not merge it.
+- Preserve the canonical V2 Scene, accepted R1-R6 harnesses, historical
+  monolith, generated mirrors, loadout appearance, controls, reset defaults,
+  resource count, sorting, and semantic clips.
+- Do not add TASK-014, automatic fitting, IK, physics, mesh/cloth behavior,
+  animation blending, root motion, two-handed props, Red Cap reconstruction,
+  or cross-engine adapters.
+
+### Execution
+
+1. Audit every PR #9 file and record a focused remediation task before code
+   changes.
+2. Extend the engine-neutral loadout resolver with stable duplicate,
+   reference, exclusivity, and prop-state diagnostics; define and resolve the
+   complete canonical 12-state matrix from the tracked source contract.
+3. Derive the R6-compatible Cocos plan from those resolved canonical states
+   and preserve exact parity through deterministic tests.
+4. Register runtime input only after manifest PASS, node construction,
+   playback creation, exact Reset, and lifecycle READY; failure and teardown
+   leave zero handlers and no partial runtime.
+5. Measure accessory socket and attachment-anchor world positions
+   independently, validate duplicate primary/overlay nodes, and state the
+   AABB seam boundary accurately.
+6. Correct the canonical adapter ID, README entry points, ADR/acceptance
+   wording, and isolate monolith generation behind an explicit legacy
+   provenance command.
+7. Enforce exact generated file sets and transitive provenance, add
+   post-verify clean-tree CI closure, and publish a retention report without
+   deleting accepted files.
+8. Pass working-copy and tracked-files-only verification, exact-output
+   closure, clean-tree checks, the uninterrupted Creator 3.8.8 gate, local
+   media validation, temporary evidence publication, uploaded-copy identity,
+   and full decode.
+9. Append and push focused implementation commits, update Draft PR #9 in
+   place, keep it Draft, and stop for external visual review.
+
+### Remediation result
+
+- Working-copy verification: 349 tests passed, 0 failed.
+- Tracked-files-only frozen-install verification: 349 tests passed, 0
+  failed.
+- The tracked engine-neutral 12-state contract is authoritative;
+  `resolveCharacterLoadout` validates and resolves it, and generation derives
+  the R6-compatible Cocos plan from that resolved output.
+- Stable fail-closed validation covers duplicate merged slot, wearable-set,
+  prop-state, seam, loadout-state, and exclusive-group IDs; unknown prop,
+  slot, set, and group members; invalid/conflicting exclusive groups; and
+  incompatible rig references.
+- The accessory spatial negative test independently perturbs the resolved
+  anchor by `3 px` and reports `3 px` drift.
+- Runtime input registration follows resource PASS, node construction,
+  playback creation, Exact Reset, and lifecycle READY. Handler count is
+  exactly 1 in READY and 0 while loading, failed, rebuilding, disabled, or
+  destroyed.
+- Primary prop and hand-overlay duplicate nodes are independently guarded.
+- Exact generated-file-set closure, transitive provenance, and post-verify
+  clean-tree checks: PASS. The superseded monolith generator is available
+  only through the explicit `legacy:verify-task013-provenance` command.
+- Garment seam validation measures transformed world-space AABB overlap; it
+  does not claim oriented-polygon intersection or cloth simulation.
+- Creator 3.8.8 clean-open, R6 Scene switch, canonical Scene reopen, and
+  second runtime initialization: PASS.
+- Canonical runtime: 35/35 resources, all 12 states, four semantic clips,
+  Pause/Resume, spatial Debug, Transform Stress, two lifecycle rebuilds,
+  post-rebuild switching, and Exact Reset: PASS.
+- Runtime guards: all spatial, duplicate, sorting, role, finite-coordinate,
+  and viewport counters remained 0; Creator and Preview consoles were clean.
+- Replacement live evidence on `evidence/task-013r7-pr-remediation` passed
+  external visual review. Its 72-second uploaded copy is byte-identical to
+  the reviewed local media, has SHA-256
+  `30fa9988defc305388b93a2bc4b079ff42d00f7b4558ef630986c63e48960abe`,
+  and fully decodes.
+
+### Done when
+
+- Input handlers are 0 while loading/failed/disabled/destroyed/rebuilding and
+  exactly 1 only after full runtime readiness.
+- One engine-neutral contract owns exactly 12 unique canonical states and the
+  derived Cocos plan remains behaviorally equal to accepted R6.
+- Every requested invalid semantic mutation fails with a stable code before
+  any lossy `Map` construction or fallback.
+- Accessory socket drift is measured from independent expected/actual world
+  quantities and a perturbed fixture produces a non-zero failure.
+- Canonical adapter ID is
+  `composable-character-loadout-reference-v2`; legacy generation is explicit,
+  non-canonical, and tested as unselectable by the canonical facade/Scene.
+- Generators reject stale/unexpected outputs, tracked-only regeneration is
+  deterministic, and post-verify tracked state is clean.
+- Both automated modes, Creator gate, spatial/duplicate guards, and
+  replacement evidence upload verification pass from the final feature SHA.
+
+## Accepted plan: TASK-013R7 Recovered Full-Loadout Release Candidate
+
+- Status: Accepted after external visual review
+- Started: 2026-07-26
+- Accepted: 2026-07-26
+- Branch: `recovery/task-013r7-full-loadout-release-candidate`
+- Original implementation commit:
+  `37b7134fbb88ebf7f2b2ea2823c9ce2d597531d9`
+- Identity-repair reviewed implementation commit:
+  `ce5bb6d1f0b7f1676243ded6e2781d915f7005b4`
+- Identity-repair reviewed evidence commit:
+  `ebd447ad6e7158d1dfa26f7ea5e60bc74daa851f`
+- Final reviewed runtime implementation commit:
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`
+- Final reviewed remediation evidence head:
+  `392b85a95535d7423c8b6dea34af87a9ee225300`
+- Baseline / frozen accepted R6:
+  `5d708cb676c626244218e82a9e2fd9343aa5f736`
+- Frozen accepted R5:
+  `1f87032bf45e806c9db6360c9a7837c97baa93b2`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Publish the accepted R1-R6 recovery chain through one canonical,
+engine-neutral Cocos adapter entry point and one Creator-owned canonical
+release-candidate Scene. Prove exact parity with accepted R6 without adding a
+new attachment capability or reviving the superseded monolithic TASK-013
+runtime. The pre-merge remediation makes the existing engine-neutral
+12-state contract authoritative and hardens its resolver validation without
+changing accepted behavior.
+
+### Boundaries
+
+- Wrap or re-export the accepted R6 plan, state, manifest, semantic input,
+  sorting, animation, reset, lifecycle, projection, and spatial boundaries.
+- Keep the R6 Scene unchanged and available for the required live parity
+  smoke test.
+- Create and save the canonical Scene and script identities through Cocos
+  Creator 3.8.8. Generators may mirror deterministic source modules but may
+  not synthesize Scene UUIDs or component class IDs.
+- Preserve the exact 12-state matrix, no/left/right prop behavior, four
+  semantic clips, default reset state, resource set, global ordering, and
+  `0.5 px` tolerance.
+- Mark the original `composable-full-loadout-reference.scene` runtime as
+  superseded and non-production in documentation only; do not delete or
+  modify it.
+- Do not add capabilities, broadly rewrite R1-R6, change a schema, start
+  TASK-014, or implement Unity/Godot adapters. Resolver changes are limited
+  to authoritative 12-state resolution and fail-closed semantic validation.
+
+### Execution
+
+1. Record TASK-013R7 scope, acceptance criteria, canonical boundary, and
+   supersession decision before implementation.
+2. Add a small canonical adapter facade and deterministic descriptor that
+   consume the accepted R6 modules.
+3. Add canonical/R6 parity tests for state IDs and membership, resource
+   manifest, semantic inputs, sorting, clip IDs, reset defaults, and spatial
+   tolerance.
+4. Create and save the canonical Creator-owned Scene through Creator 3.8.8
+   and validate Scene/component metadata from tracked files.
+5. Pass working-copy and tracked-files-only frozen verification.
+6. Run the uninterrupted canonical Creator gate, including two lifecycle
+   rebuilds and post-rebuild switching.
+7. Open the accepted R6 Scene and smoke-test default, left prop, right prop,
+   Integration Stress, and Exact Reset for live parity.
+8. Stop immediately without patching or publishing evidence if any live
+   difference or defect appears.
+9. If all gates pass, commit/push one R7 release-candidate implementation,
+   record one canonical Creator Web Preview video, publish and re-download
+   `evidence/task-013r7`, verify byte/hash/frame/metadata/decode identity, and
+   stop for external review.
+
+### Focused release-blocking identity repair
+
+- External review found that the canonical V2 Web Preview inherited the
+  visible `TASK-013R6` HUD title from the shared runtime.
+- Add one typed display identity at the adapter boundary. The accepted R6
+  component keeps its existing identity; the canonical component injects a
+  neutral production identity from the canonical facade.
+- HUD title and ready diagnostics must consume the injected identity. Scene
+  filename, script filename, branch name, task ID, and asset-name conditionals
+  are not identity sources.
+- Preserve plans, resources, inputs, sorting, animation IDs, reset defaults,
+  loadout states, lifecycle, projection, and runtime validation behavior
+  exactly.
+- Re-run both automated verification modes and the focused Creator parity
+  gate. If no other defect appears, append one feature commit and replacement
+  evidence while preserving the superseded original evidence entry.
+
+### Done when
+
+- The canonical facade and accepted R6 expose equivalent plans, 12-state
+  membership, manifests, input mappings, sorting, clip IDs, reset defaults,
+  and spatial tolerance.
+- The canonical Scene owns valid Creator metadata and contains exactly one
+  canonical adapter component.
+- Clean open, scene switch/reopen, second initialization, 35-resource
+  terminal PASS, every state/clip/control, transform stress, Debug ON/OFF,
+  two rebuilds, post-rebuild switching, and Exact Reset pass without console
+  errors, duplicates, drift, fallback, or ordering violations.
+- Canonical and accepted R6 live behavior match for the required parity smoke.
+- Both verification modes, local media validation, and uploaded-copy
+  verification pass while all frozen/protected refs and the old demo remain
+  unchanged.
+
+### Implementation acceptance
+
+- Working-copy `CI=true pnpm verify`: PASS, 349 passed, 0 failed.
+- Tracked-files-only frozen install and `CI=true pnpm verify`: PASS,
+  349 passed, 0 failed.
+- Engine-neutral 12-state contract → `resolveCharacterLoadout` → derived
+  R6-compatible Cocos plan: PASS with exact behavioral parity.
+- Runtime readiness and input gating: PASS; exactly one input handler exists
+  only in READY and zero exist during loading, failure, rebuild, disable, or
+  destroy.
+- Stable merged-ID, reference, exclusivity, prop-state, and rig-compatibility
+  negative tests: PASS. The independent accessory-anchor perturbation reports
+  the expected `3 px` drift.
+- Duplicate primary prop and hand-overlay validation: PASS.
+- Exact generated-output closure, explicit legacy provenance-only generation,
+  deterministic tracked-only regeneration, and post-verify clean tree: PASS.
+- Creator-owned canonical Scene identity and metadata: PASS.
+- Canonical/R6 automated descriptor, state, resource, input, sorting, clip,
+  reset, and tolerance parity: PASS.
+- Creator 3.8.8 canonical live gate: PASS for all 12 loadout states, four
+  semantic clips, Pause/Resume, transform stress, Debug ON/OFF, two lifecycle
+  rebuilds, post-rebuild input, and Exact Reset.
+- Lifecycle counters advanced from `SETUP 1 / TEARDOWN 0 / REBUILDS 0` to
+  `SETUP 3 / TEARDOWN 2 / REBUILDS 2`.
+- Resource terminal state remained 35/35 PASS with zero duplicate requests.
+- Maximum projected joint, Skeleton, accessory socket, garment seam, and prop
+  grip errors were all `0.000 px`; sorting, role, duplicate, non-finite, and
+  debug-region violations were all 0.
+- Accepted R6 live parity smoke: PASS for default, left prop, right prop,
+  Integration Stress, and Exact Reset.
+- Creator and Preview Consoles: 0 relevant warnings, 0 errors.
+- No live difference or defect occurred after the hard-stop gate began.
+- Focused canonical identity gate: PASS. Canonical V2 visibly reports
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2`; accepted R6 visibly retains
+  `TASK-013R6 · GENERIC ONE-HANDED PROP INTEGRATION`.
+- Focused canonical smoke after returning from R6: PASS for no/left/right
+  prop, garment/accessories combined, Integration Stress, one rebuild, and
+  Exact Reset with 35/35 resources and all spatial/duplicate counters at 0.
+- Creator and Preview consoles remained clean during the focused identity
+  gate. No second runtime or visual defect appeared.
+- External visual review of the replacement evidence: PASS.
+- The canonical Creator-owned V2 Scene and
+  `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2` HUD identity were visible; no
+  `TASK-013R6` identity appeared in the canonical preview.
+- The reviewed replacement demonstrated all 12 loadout states, no/left/right
+  prop states, Wave, Prop Swing, Integration Stress, Pause/Resume, spatial
+  Debug overlays, Transform Stress, two lifecycle rebuilds, post-rebuild
+  switching, Exact Reset, and the final authored Rest state at `STOPPED`
+  `0.00s` with no prop, Stress OFF, and Debug OFF.
+- Lifecycle counters advanced from `1 / 0 / 0` to `3 / 2 / 2`; spatial,
+  duplicate, sorting, and role violation counts remained 0.
+- Replacement video
+  `task-013r7-recovered-full-loadout-release-candidate-v2.mp4`: 2,790 frames,
+  SHA-256
+  `84424ea760bbeb721e0610afa380450623f702f5ebd6cadf8acff8f4563420a8`,
+  complete decode PASS.
+- The original video is retained in the reviewed manifest with status
+  `superseded-canonical-hud-identity-mismatch`.
+- External visual review of the final 72-second pre-merge remediation
+  evidence for runtime
+  `d9e7bfae0151dec71ebb58456f69b900eed9cf3a`: PASS. Evidence head
+  `392b85a95535d7423c8b6dea34af87a9ee225300`, video SHA-256
+  `30fa9988defc305388b93a2bc4b079ff42d00f7b4558ef630986c63e48960abe`,
+  uploaded-copy identity PASS, and full FFmpeg decode PASS.
+
+## Accepted plan: TASK-013R6 Generic One-Handed Prop Integration
+
+- Status: Accepted after external visual review
+- Started: 2026-07-25
+- Accepted: 2026-07-26
+- Branch: `recovery/task-013r6-one-handed-prop-integration`
+- Implementation commit:
+  `fe981463962231969b4eff446ff03bf44b7b8a69`
+- Reviewed evidence commit:
+  `7a70d873d5e8516deaeab6eccdc62f6e57f72db7`
+- Baseline / frozen accepted R5:
+  `1f87032bf45e806c9db6360c9a7837c97baa93b2`
+- Frozen accepted R4:
+  `90a8bf3acf8712f3c4923d25e7b9e50359f47a2b`
+- Frozen accepted R3:
+  `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
+- Frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted recovered adapter with one generic contract-resolved
+one-handed prop capability. Compose no-prop, left-hand, and right-hand prop
+states with the accepted garment/accessory matrix while preserving lifecycle,
+manifest, semantic input, sorting, projection, spatial assertion, and
+Creator-owned Scene boundaries.
+
+### Boundaries
+
+- Consume the existing TASK-012 engine-neutral prop contracts, authored hand
+  sockets, grip anchors, transforms, layer roles, source assets, and semantic
+  animation data.
+- Create a separate Creator-owned R6 Scene; do not clone or modify the old
+  Full Loadout Scene or frozen monolithic TASK-013 implementation.
+- Keep shared runtime free of toolbox, briefcase, hand-side inference,
+  filename semantics, Canvas correction constants, and implicit mirroring.
+- Reuse and generically extend the accepted R1-R5 lifecycle, generation token,
+  terminal manifest, input registry, global Sorting2D registry, Base Rig,
+  attachment collection, garment seams, world-to-overlay projector, and
+  runtime spatial assertions.
+- Do not add two-handed props, inverse grip solving, IK, physics, collision,
+  combat, cloth/mesh behavior, automatic fitting, root motion, blending,
+  Red Cap reconstruction, cross-engine work, Full Loadout migration, R7, or
+  TASK-014.
+
+### Execution
+
+1. Record TASK-013R6 scope and acceptance criteria before implementation.
+2. Build a deterministic generic prop bridge plan covering the 12-state
+   garment/accessory/prop cross-product.
+3. Extend manifest, state/input registry, sorting, runtime attachment
+   collection, grip measurement, lifecycle, and exact Reset through small
+   separately tested modules.
+4. Add Rest, Wave, Prop Swing, and Integration Stress through explicit
+   semantic clip IDs.
+5. Create and save an isolated Creator-owned R6 Scene through Creator 3.8.8.
+6. Add deterministic TypeScript, 60 Hz, tracked-files-only, metadata,
+   manifest, sorting, grip, state, lifecycle, duplicate, and Reset tests.
+7. Pass working-copy and tracked-files-only frozen verification.
+8. Run the complete Creator clean-open, switch/reopen, Console, 12-state,
+   control, animation, transform, debug, rebuild, and Reset gate once.
+9. If any live defect appears, stop without patching or recording evidence.
+10. If the entire gate passes, commit/push one reviewed R6 implementation,
+    capture and validate the Creator Web Preview video, publish
+    `evidence/task-013r6`, verify the uploaded copy, and stop for external
+    review.
+
+### Done when
+
+- All 12 states resolve deterministically with exact garment, accessory, and
+  prop membership and exactly zero or one active prop as declared.
+- Manifest completion precedes construction and every resource loads exactly
+  once.
+- Rest, Wave, Prop Swing, and Integration Stress keep joint, Skeleton,
+  accessory socket, garment seam, and active hand-socket/grip errors at
+  `<= 0.5 px`, including translation, non-unit scale, rotation, and nested
+  transform stress.
+- Unknown prop states, hand sockets, attachment slots, resources, parents,
+  roles, and semantic clips fail closed without fallback.
+- Duplicate prop/garment/accessory nodes, listeners, requests, non-finite
+  coordinates, sorting/front-back violations, and out-of-viewport debug
+  geometry are zero.
+- Lifecycle rebuild leaves one character and the expected active sets; exact
+  Reset restores authored Rest, stopped time zero, documented defaults,
+  transform stress OFF, Debug OFF, and no residual geometry.
+- Both verification modes, the uninterrupted Creator gate, local media
+  checks, and uploaded-copy verification pass while every frozen/protected
+  reference and the old demo remain unchanged.
+
+### Implementation acceptance result
+
+- Working-copy `CI=true pnpm verify`: PASS, 327/327 tests.
+- Tracked-files-only frozen install and `CI=true pnpm verify`: PASS,
+  327/327 tests.
+- Creator 3.8.8 clean open, R5 switch/reopen, Creator Console, Preview
+  Console, 12-state matrix, four clips, Pause/Resume, debug overlays,
+  transform stress, lifecycle rebuild, post-rebuild switches, and Exact
+  Reset: PASS in one uninterrupted run.
+- Manifest: 35/35 PASS with 0 duplicate requests.
+- Lifecycle after rebuild: setup 2, teardown 1, rebuild 1.
+- Maximum joint, Skeleton, accessory socket, garment seam, and prop grip
+  errors: `0.000 px`.
+- Duplicate active attachment nodes, input handlers, resource requests,
+  non-finite coordinates, sorting/front-back violations, and debug geometry
+  outside the character region: 0.
+- 60 Hz prop validation: 580 samples across both hands and both required
+  stress clips, maximum grip error `0.000 px`.
+- External visual review: PASS.
+- Uploaded-copy SHA-256 identity and complete 4,567-frame decode: PASS.
+- Visual review accepted all 12 states, no/left/right prop behavior,
+  hand-over-handle layering, four clips, Pause/Resume, Transform Stress,
+  spatial overlays, post-rebuild switching, Exact Reset, and zero duplicate,
+  sorting, role, resource, or spatial errors.
+- Evidence capture began at setup 2, teardown 1, rebuild 1 and visibly
+  performed another rebuild, ending at setup 3, teardown 2, rebuild 2. This
+  is accepted repeated-rebuild coverage rather than a counter discrepancy.
+
+## Accepted plan: TASK-013R5 Multi-Part Garment Layering Bridge
+
+- Status: Accepted after external visual review
+- Started: 2026-07-25
+- Accepted: 2026-07-25
+- Branch: `recovery/task-013r5-garment-layering`
+- Implementation commit:
+  `f5083ca767ea0b5b7bb11109e09c8440e0b8e5e4`
+- Reviewed evidence commit:
+  `f0ded791e75811f3b9a48c7030a167b06576d68d`
+- Baseline / frozen accepted R4:
+  `90a8bf3acf8712f3c4923d25e7b9e50359f47a2b`
+- Frozen accepted R3:
+  `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
+- Frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the recovered adapter from the accepted Base Rig and generic head
+accessories to one contract-resolved multi-part wearable set. Reuse the
+production-lite TASK-011 garment fixture to prove deterministic state
+composition, global front/back sorting, live seam measurements, resource
+loading, lifecycle behavior, and exact Reset without reconnecting the old
+Full Loadout demo.
+
+### Boundaries
+
+- Create a separate Creator-owned R5 Scene; do not clone or modify the old
+  Full Loadout Scene.
+- Consume existing engine-neutral rig, attachment, wearable-set, seam, and
+  animation data. Do not create a second Cocos source for pivots, hierarchy,
+  placement, membership, seam constraints, roles, or clip IDs.
+- Reuse and generically extend the accepted R1-R4 lifecycle, manifest, input,
+  sorting, projection, spatial, Base Rig, and attachment collection modules.
+- Keep shared runtime free of jacket, collar, sleeve, cuff, cap, and
+  sunglasses branches. Fixture labels remain outside generic logic.
+- Do not add props, grip, automatic fitting, cloth/mesh behavior, Full
+  Loadout migration, Red Cap, cross-engine work, R6, or TASK-014.
+
+### Execution
+
+1. Record TASK-013R5 scope and acceptance criteria before implementation.
+2. Build a deterministic generic wearable bridge plan for Base only, Garment
+   only, Accessories only, and Garment plus accessories.
+3. Extend manifest, state/input registry, sorting, runtime collection, seam
+   measurement, spatial assertions, lifecycle, and exact Reset through small
+   testable modules.
+4. Create and save an isolated Creator-owned R5 Scene through Creator 3.8.8.
+5. Add pure TypeScript, tracked-files-only, metadata, state, resource,
+   ordering, seam, lifecycle, duplicate, and spatial regression tests.
+6. Pass working-copy and tracked-files-only frozen verification.
+7. Run the complete clean-open, scene-switch/reopen, Console, resource,
+   state/control, animation, transform, debug, rebuild, and Reset Creator gate
+   once without interruption.
+8. If any live defect appears, stop without patching or recording evidence.
+9. If the entire gate passes, commit/push one reviewed R5 implementation,
+   record and validate the required video, publish `evidence/task-013r5`,
+   verify the uploaded copy, and stop for external review.
+
+### Done when
+
+- All four states resolve deterministically with exact garment/accessory
+  membership and counts and no duplicate IDs, nodes, requests, or listeners.
+- Manifest completion precedes construction and every resource loads exactly
+  once.
+- Global/front-back ordering remains stable and every garment seam,
+  accessory socket/anchor, joint marker, and Skeleton endpoint error is
+  `<= 0.5 px` under Rest, Wave, Integration Stress, and root transform stress.
+- Unknown slots, non-finite positions, sorting/front-back violations, and
+  out-of-region debug geometry are zero.
+- Lifecycle rebuild leaves one character and the expected state; exact Reset
+  restores authored Rest, stopped time zero, default garment/accessory state,
+  transform stress OFF, Debug OFF, and no residual geometry.
+- Both verification modes, the uninterrupted Creator gate, media checks, and
+  uploaded-copy verification pass while all frozen/protected refs and the old
+  demo remain unchanged.
+
+### Implementation result
+
+- A new Creator-owned `task-013r5-garment-layering.scene` contains only
+  Canvas, Camera, and one R5 bridge component at rest. Runtime construction
+  remains gated on terminal manifest success.
+- One deterministic generic garment bridge plan consumes the existing
+  TASK-011 engine-neutral Attachment Layout, including 12 slots, 14
+  attachment parts, one 11-member wearable set, 10 seam constraints, three
+  head-accessory parts, and four loadout states.
+- The runtime reuses the accepted lifecycle, resource coordinator, semantic
+  control, sorting, Base Rig, projector, and spatial assertion boundaries.
+  It adds small fixture-neutral garment plan, manifest, state, input, runtime
+  collection, and spatial modules instead of reconnecting the old Full
+  Loadout component.
+- The uninterrupted Creator 3.8.8 gate passed clean open, R4 scene
+  switch/R5 reopen, Preview and Creator Consoles, all four states and every
+  semantic control, Wave and Integration Stress seam inspection,
+  Pause/Resume, transform stress, lifecycle rebuild, post-rebuild garment and
+  accessory toggles, exact Reset, and final Debug OFF cleanup.
+- Live HUD results remained 31/31 resources, 17 base parts, 17 joints,
+  11 garment parts, three accessory parts, 10/10 active seams in garment
+  states, setup 2/teardown 1/rebuild 1 after lifecycle rebuild, and zero
+  marker, Skeleton, socket, seam, duplicate, sorting, role, non-finite,
+  unknown-slot, and out-of-viewport errors.
+- Working-copy and tracked-files-only frozen verification each passed
+  313 tests with zero failures.
+- External visual review independently verified the uploaded video SHA-256,
+  H.264 High 1280x720 30 fps yuv420p encoding, and complete decode of all
+  4,095 frames.
+- The reviewed recording visibly verifies all four state counts, garment
+  layering around the torso, arms, and cuffs, garment seams in Rest, Wave,
+  and Integration Stress, accessory socket alignment, joint/Skeleton debug
+  alignment, Pause/Resume, transform stress, lifecycle rebuild at setup 2 /
+  teardown 1 / rebuild 1, post-rebuild garment/accessory switching, exact
+  Reset to STOPPED 0.00 seconds, and the final Stress-OFF/Debug-OFF state.
+- The reviewed runtime reported zero spatial, sorting, front/back, duplicate,
+  and resource errors. The temporary `evidence/task-013r5` branch may be
+  removed after this acceptance documentation is safely pushed; the ignored
+  local recording remains preserved and the accepted R5 branch is then
+  frozen.
+
+## Accepted plan: TASK-013R4 Head Accessory Layering Bridge
+
+- Status: Accepted after external visual review
+- Started: 2026-07-25
+- Accepted: 2026-07-25
+- Branch: `recovery/task-013r4-head-accessory-layering`
+- Implementation commit:
+  `52222633fc0ed9fc88004166420de22a1a3146ea`
+- Baseline / frozen accepted R3:
+  `47ce5c74113a7f9321a47abc55a5c0ea7a0d3c8c`
+- Frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Extend the accepted generic single-attachment bridge to a deterministic
+collection of simultaneously active head attachments. Use the existing
+production-lite cap and sunglasses fixtures to prove generic slot resolution,
+enabled-state groups, front/back layer roles, resource loading, runtime
+mounting, socket/anchor measurement, and lifecycle behavior without
+reconnecting the old Full Loadout demo.
+
+### Boundaries
+
+- Create a new Creator-owned R4 scene; do not clone or modify the old Full
+  Loadout scene.
+- Consume the existing Attachment Layout contract and resolver output. Do not
+  add a Cocos-specific attachment, slot, pivot, state, or layer source.
+- Reuse the accepted R1-R3 lifecycle, resource, semantic input, sorting,
+  projection, spatial assertion, Base Rig, and generic attachment modules.
+- Extend generic runtime identity from one resolved attachment to a collection
+  keyed by declared attachment and slot IDs, never display or file names.
+- Resolve front/back placement from declared role/order semantics through the
+  global sorting registry; no attachment-specific sorting constants or magic
+  offsets.
+- Do not add garments, seams, props, grip, comparison views, Full Loadout
+  presets, Red Cap, VFX, Unity, Godot, R5, or TASK-014 behavior.
+
+### Execution
+
+1. Record TASK-013R4 scope and acceptance criteria before implementation.
+2. Add a deterministic generic multi-attachment bridge plan for Base only,
+   Cap only, Sunglasses only, and Cap plus sunglasses.
+3. Extend the resource manifest, semantic state/input registry, global sorting
+   validation, runtime attachment collection, and per-attachment spatial
+   measurements without fixture-specific branches.
+4. Create and save an isolated Creator-owned R4 scene through Creator 3.8.8.
+5. Add pure TypeScript, tracked-files-only, metadata, manifest, lifecycle,
+   state, ordering, duplicate, and spatial regression tests.
+6. Pass working-copy and tracked-files-only frozen verification.
+7. Pass the complete Creator clean-open, scene-switch/reopen, Console,
+   resource, four-state, animation, transform, debug, rebuild, and Reset gate
+   in one uninterrupted run.
+8. Commit and push one reviewed R4 feature commit.
+9. Prepare a recording checklist, capture every required item in one Creator
+   Web Preview video, decode/hash/publish it on `evidence/task-013r4`, and
+   independently verify the uploaded copy.
+10. Stop for external visual review without a PR or further attachment work.
+
+### Done when
+
+- All four states resolve deterministically and display exactly their declared
+  active attachment parts with no duplicate IDs, requests, nodes, or
+  prohibited slot collisions.
+- Cap back/front and sunglasses retain stable declared front/back ordering in
+  Rest, Wave, Integration Stress, and root transform stress.
+- Every active socket-to-anchor error, maximum joint-marker error, and maximum
+  Skeleton endpoint error is `<= 0.5 px`.
+- Unknown slots/roles/attachments/parents/resources, non-finite positions,
+  sorting/front-back violations, and out-of-region debug geometry are zero.
+- Lifecycle rebuild leaves one character and the expected attachment set;
+  exact Reset restores authored Rest, stopped time zero, the documented
+  default accessory state, no duplicates, and Debug OFF.
+- Both verification modes, the uninterrupted Creator gate, media checks, and
+  uploaded-copy verification pass while all frozen/protected refs and the old
+  demo remain unchanged.
+
+### Implementation result
+
+- A new Creator-owned
+  `task-013r4-head-accessory-layering.scene` contains only Canvas, Camera, and
+  one R4 bridge component at rest; runtime construction remains manifest
+  gated.
+- One generic collection plan resolves two declared slots and three declared
+  attachment parts from the existing engine-neutral Attachment Layout.
+- The required states resolve to exact active counts:
+  Base only 0, Cap only 2, Sunglasses only 1, and Cap plus sunglasses 3.
+- Front/back ordering is role driven and remains
+  `hair-back < cap-back < head < sunglasses < hair-front < cap-front`.
+- Working-copy and tracked-files-only frozen verification both pass with 300
+  tests and 0 failures.
+- The uninterrupted Creator 3.8.8 gate passed clean import, accepted-scene
+  switch/reopen, Console checks, 20/20 resources, all states, repeated
+  switching, Rest/Wave/Integration Stress, Pause/Resume, transform stress,
+  lifecycle rebuild, post-rebuild switching, exact Reset, and Debug OFF.
+- Runtime maxima are `0.000 px` for joint markers, Skeleton endpoints, and
+  every active socket-to-anchor measurement. Unknown slots, duplicates,
+  sorting/front-back violations, non-finite positions, and outside debug
+  geometry are all 0.
+- Lifecycle rebuild ended at setup 2, teardown 1, rebuild 1 with one character,
+  three default-state attachment parts, no duplicate handlers, and no
+  duplicate resource requests.
+- External visual review: PASS.
+- The 90-second, 2,700-frame Creator Web Preview recording visibly verified
+  all four attachment states and their exact 0/2/1/3 part counts, repeated
+  switching, Wave, Integration Stress, Pause/Resume, transform stress,
+  socket/anchor and Skeleton alignment, lifecycle rebuild, post-rebuild Base
+  and Cap switching, exact Reset, and final Debug-OFF cleanup.
+- The visible lifecycle counters were setup 2, teardown 1, rebuild 1.
+  Resources remained 20/20 PASS and all duplicate, sorting, front/back,
+  spatial, unknown-slot, non-finite, and outside-debug diagnostics remained 0.
+- Evidence commit:
+  `6796a7a0744bc0add48f8eba79a453cf2f5ac32f`.
+- Evidence media SHA-256:
+  `39052cdc157493dc3b5dc09ca6f4b1f9b8c1cc34072d2f6c78c7e3b71c5b0325`.
+  The uploaded copy matched its local SHA-256 and metadata and completed a
+  full FFmpeg decode.
+- The temporary `evidence/task-013r4` branch may be removed after this
+  acceptance documentation is safely pushed. The ignored local recording
+  remains available and no MP4 is tracked on the feature branch.
+- No engine-neutral schema/resolver, accepted R1-R3 boundary, old Full Loadout
+  scene, garment, prop, or protected reference changed.
+
+## Accepted plan: TASK-013R3 Single Attachment Bridge
+
+- Status: Accepted after external visual review
+- Started: 2026-07-25
+- Accepted: 2026-07-25
+- Branch: `recovery/task-013r3-single-attachment-bridge`
+- Implementation commit:
+  `645957e0e2a6442509881e1920f2905192d2a24c`
+- Baseline / frozen accepted R2:
+  `726859ebec11d6a09ecab5984fe1352fd62fd93a`
+- Frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Bridge exactly one resolved engine-neutral rigid attachment into the accepted
+17-part Base Rig runtime. Use the production-lite sunglasses fixture only as
+acceptance data while keeping slot resolution, node construction, resource
+loading, enable state, sorting, socket/anchor measurement, lifecycle, and
+semantic controls generic.
+
+### Boundaries
+
+- Create a new Creator-owned R3 scene; do not clone or modify the old
+  Full Loadout scene.
+- Consume the existing Attachment Layout contract and
+  `resolveAttachmentLayout`; do not define a Cocos-specific attachment state,
+  pivot, slot, or semantic clip source.
+- Reuse the accepted R1 lifecycle, resource, sorting, projection, and spatial
+  boundaries and the R2 Base Rig Bridge modules.
+- The runtime adapter understands only generic IDs, slots, parent parts,
+  transforms, anchors, enabled state, resource paths, and global draw order.
+- Do not add cap layering, multiple attachments, garments, props, grip,
+  comparison views, loadout presets, Red Cap, VFX, Unity, or Godot behavior.
+- Unknown slot, attachment, parent, resource, semantic action, or clip fails
+  clearly without fallback.
+
+### Execution
+
+1. Record TASK-013R3 scope and acceptance criteria before implementation.
+2. Add a deterministic single-attachment bridge plan resolved from the
+   engine-neutral rig and attachment contract.
+3. Extend the manifest, semantic state/input registry, sorting validation, and
+   spatial measurement for one generic attachment.
+4. Build a separate Creator-owned scene and small runtime component by
+   composing accepted modules instead of copying them into a monolith.
+5. Add pure TypeScript, tracked-files-only, metadata, manifest, lifecycle,
+   state, sorting, and socket/anchor regression tests.
+6. Pass working-copy and tracked-files-only frozen verification.
+7. Pass the complete Creator open/switch/reopen, Console, resource, state,
+   animation, transform, attachment, debug, rebuild, and Reset gate in one
+   uninterrupted run.
+8. Commit and push one reviewed R3 feature commit.
+9. Record, decode, hash, publish, re-download, and re-decode the temporary
+   `evidence/task-013r3` review video.
+10. Stop for external visual review without a PR or further attachment work.
+
+### Done when
+
+- Base-only and Base-plus-attachment states are selected through the one
+  semantic input registry and correctly reported by the HUD.
+- The enabled runtime has exactly one attachment parented through its declared
+  slot; disabling removes it completely and re-enabling never duplicates it.
+- Rest, Wave, Integration Stress, root transform stress, lifecycle rebuild,
+  Pause/Resume, and exact Reset preserve the declared attachment relationship.
+- Maximum joint-marker, skeleton-endpoint, and socket-to-anchor errors are each
+  `<= 0.5 px`.
+- Unknown slots, duplicate attachment nodes/requests/listeners, non-finite
+  positions, out-of-region debug geometry, and sorting violations are zero.
+- Both verification modes and the uninterrupted Creator gate pass.
+- Feature and evidence branches are pushed while all frozen/protected refs and
+  the old demo remain unchanged.
+
+### Acceptance result
+
+- A new Creator-owned
+  `assets/task-013r3-single-attachment-bridge.scene` contains only Canvas,
+  Camera, and one R3 bridge component.
+- The generator resolves the existing engine-neutral attachment contract into
+  one deterministic generic bridge plan; the runtime core contains no
+  sunglasses-specific behavior.
+- The terminal manifest loads 17 base parts and one attachment resource with
+  18 unique requests, 0 failures, and 0 duplicate requests.
+- Base-only and attachment-enabled states derive from the same semantic input
+  registry used by the HUD and dispatcher.
+- Rest, Wave, Integration Stress, Pause/Resume, transform stress, lifecycle
+  rebuild, exact Reset, and Debug OFF passed in one Creator 3.8.8 run.
+- Scene switch/reopen and a second preview initialization passed; Creator and
+  Preview Consoles had 0 relevant warnings or errors.
+- Maximum projected joint-marker, skeleton-endpoint, and socket-to-anchor
+  errors were each `0.000 px` against the `0.5 px` tolerance.
+- Duplicate attachment nodes, input handlers, and resource requests were 0;
+  non-finite positions, unknown slots, sorting violations, and out-of-region
+  debug geometry were 0.
+- Working-copy and tracked-files-only frozen verification each passed all 287
+  tests.
+- External visual review: PASS.
+- The original 64-second Creator Web Preview recording passed the core visual
+  coverage for Base-only/attachment-enabled states, attachment
+  disable/re-enable, Rest, Wave, Integration Stress, Pause/Resume, joint and
+  Skeleton alignment, socket/anchor alignment, and transform stress.
+- A focused 70-second, 2,100-frame supplemental recording passed the remaining
+  visual coverage for lifecycle rebuild, post-rebuild attachment
+  disable/re-enable and Wave follow, exact Reset, and final Debug-OFF cleanup.
+- The supplemental recording visibly reports setup 2, teardown 1, rebuild 1,
+  18/18 resources passed, 0 attachment/input/resource duplicates, spatial
+  PASS, and `0.000 px` socket-to-anchor error.
+- Original recording SHA-256:
+  `2446cf4c8d548af25645e6854eb8a12486bb10cc4be1e2b0db58b84dc1e53ab6`.
+- Supplemental recording SHA-256:
+  `959d8fce394c5a628e57bf36a76462bcec4f81b38bb1d3da7da856179c96e22d`.
+- Both uploaded copies were downloaded and verified for SHA identity,
+  metadata, frame count, and complete decode. The final evidence manifest's
+  `uploadedCopyVerification` field explicitly names the original media only;
+  the supplemental copy was independently verified outside that field.
+- The temporary `evidence/task-013r3` branch may be removed after this
+  acceptance documentation is safely pushed. Ignored local recordings remain
+  available and no MP4 is tracked on the feature branch.
+
+## Accepted plan: TASK-013R2 Base Rig Bridge
+
+- Status: Accepted after external visual review
+- Started: 2026-07-25
+- Accepted: 2026-07-25
+- Branch: `recovery/task-013r2-base-rig-bridge`
+- Implementation commit:
+  `fda803194a517960d9edec6ea362a929a0966827`
+- Baseline / frozen accepted R1:
+  `f03e6ea07d2b261f9ec521a31e1677bc10282b5a`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Connect only the production-lite base character to the accepted R1 runtime
+adapter boundaries and prove that the lifecycle, manifest, semantic controls,
+sorting, projection, and runtime spatial assertions scale from two joints to
+the complete engine-neutral base rig hierarchy.
+
+### Boundaries
+
+- Use a new Creator-owned scene.
+- Consume the existing engine-neutral rig and Rest/Wave/Integration Stress
+  clips without defining Cocos-specific pivots, hierarchy, or clip IDs.
+- Reuse and generically extend R1 modules; do not copy them into a monolithic
+  component.
+- Do not modify the old Full Loadout scene or add accessories, garments,
+  props, grip, loadout presets, Red Cap, VFX, Unity, or Godot behavior.
+- No Canvas compensation or character-specific debug offset.
+
+### Execution
+
+1. Record TASK-013R2 scope and acceptance criteria.
+2. Add deterministic base-rig resource planning and semantic clip state.
+3. Extend the reusable runtime projection/measurement surface for arbitrary
+   joint hierarchies.
+4. Create and save a new scene through Creator 3.8.8.
+5. Add pure TypeScript, tracked-files-only, metadata, manifest, lifecycle, and
+   spatial regression tests.
+6. Pass both verification modes.
+7. Pass the complete Creator open/switch/reopen, Console, Preview, animation,
+   transform, debug, rebuild, and Reset gate in one uninterrupted run.
+8. Commit and push one reviewed R2 feature commit.
+9. Record, decode, hash, publish, re-download, and re-decode the temporary
+   `evidence/task-013r2` review video.
+10. Stop for external visual review without a PR or further attachment work.
+
+### Done when
+
+- Every declared base part and joint is present exactly once.
+- Rest reconstructs the authored base rig and Wave/Integration Stress visibly
+  articulate the expected hierarchy.
+- Marker and skeleton endpoint errors are each `<= 0.5 px`.
+- Unknown parents, cycles, non-finite transforms, out-of-region debug lines,
+  duplicate requests/listeners, and sorting violations are all zero.
+- Exact Reset is stopped at time zero in authored Rest.
+- Both verification modes and the uninterrupted Creator gate pass.
+- Feature and evidence branches are pushed while all frozen/protected refs and
+  the old demo remain unchanged.
+
+### Acceptance result
+
+- The Creator-owned scene is
+  `assets/task-013r2-base-rig-bridge.scene`; it contains only the Canvas and
+  its Camera and owns exactly one `GameAITask013R2BaseRigBridge` component.
+- The runtime resolves the existing production-lite plan into 17 Sprite parts,
+  17 real joints, and 16 live parent-child skeleton segments.
+- Rest, Wave, and Integration Stress are selected by explicit semantic clip
+  IDs; the HUD and dispatcher are generated from one eight-action input
+  registry.
+- The R1 lifecycle, terminal resource coordinator, global sorting policy, and
+  world-to-overlay-local projector are reused. R1 resource, sorting, and
+  hierarchy-spatial boundaries were extended generically rather than copied.
+- Working-copy verification and tracked-files-only frozen verification pass.
+- The uninterrupted Creator 3.8.8 gate passes with clean Creator and Preview
+  Consoles, 17/17 resources, one input response after rebuild, one visible
+  character after reopen/rebuild, zero non-finite/unknown-parent/cycle/
+  out-of-region/sorting violations, and maximum marker and skeleton errors of
+  `0.000 px`.
+- Exact Reset returns to `production-lite-rest-idle`, `STOPPED`, time `0.00`,
+  transform stress enabled, and debug disabled.
+- External visual review: PASS.
+- The reviewed 54-second, 1,620-frame Creator Web Preview video shows one
+  coherent 17-part character, correct Rest assembly, Wave and Integration
+  Stress hierarchy articulation, aligned 17-joint/16-segment diagnostics,
+  Pause/Resume, transform stress, one-character lifecycle rebuild, exact
+  Reset, and debug-OFF cleanup without clipping, duplication, flicker, jumps,
+  drift, or layer anomalies.
+- Reviewed video SHA-256:
+  `8a9f142bd496b001e6e2842ad9d0f8fee28bb583820b887910444526de517219`.
+- The Canvas-only recording validates visible Web Preview behavior. Creator
+  Console cleanliness and scene-switch/reopen lifecycle results remain
+  supported by the recorded live acceptance procedure and automated/runtime
+  diagnostics because those editor surfaces are not pixels inside the
+  captured Canvas.
+- The temporary `evidence/task-013r2` branch may be removed after this
+  acceptance documentation is safely pushed. The accepted R2 branch is then
+  frozen at its final acceptance commit.
+
+## Accepted plan: TASK-013R1 Minimal Cocos Runtime Adapter Harness
+
+- Status: Accepted after external visual review
+- Started: 2026-07-25
+- Accepted: 2026-07-25
+- Branch: `recovery/task-013r1-minimal-cocos-harness`
+- Implementation commit:
+  `8543fc61742b8a95b7c9ded6ad7347e49cd3ca63`
+- Baseline: `5170185fdca666300c4d61488f17e15aa18656be`
+- Frozen feature: `feat/task-013-composable-character-loadout` at
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Build a separate Creator-owned two-joint runtime harness that proves scene
+identity, Editor/runtime lifecycle separation, complete manifest loading,
+semantic input, global sorting, world-to-overlay-local projection, runtime
+spatial assertions, transform stress, and exact Reset before any Full Loadout
+reconnection.
+
+### Boundaries
+
+- Do not modify or delete the existing Full Loadout demo, contracts, resolver,
+  production assets, or evidence.
+- Do not clone TASK-010 through TASK-013 scenes.
+- Creator owns scene and script `.meta` identities.
+- No hard-coded Canvas or character compensation offset.
+- Static tests are secondary to actual runtime measurements.
+
+### Execution
+
+1. Record the postmortem, TASK-013R1 specification, and ADR-0013.
+2. Create a separate Creator-authored scene and minimal primitive fixture.
+3. Implement small lifecycle, manifest, input, sorting, projection, and
+   measurement modules.
+4. Add pure TypeScript, tracked-files-only, and runtime assertions.
+5. Pass working-copy and frozen tracked-files-only verification.
+6. Pass the complete Creator first-open, switch, reopen, Preview, transform,
+   animation, debug, teardown, and Reset gate in one run.
+7. Commit and push one reviewed recovery commit.
+8. Record, decode, hash, publish, re-download, and re-decode one real Creator
+   Web Preview video on `evidence/task-013r1`.
+9. Stop for external review without a PR or Full Loadout reconnection.
+
+### Done when
+
+- Both verification modes pass.
+- Creator and Preview consoles contain zero relevant warnings/errors.
+- Maximum marker, skeleton endpoint, and locked grip error are each
+  `<= 0.5 px`.
+- Debug OFF leaves no active debug renderers.
+- Scene reopen and disable/enable produce no duplicate nodes or input response.
+- The recovery and evidence branches are pushed while all protected refs and
+  the old demo remain unchanged.
+
+### Acceptance result
+
+- External visual review: PASS.
+- Reviewed video:
+  `task-013r1-cocos-runtime-harness.mp4`.
+- Reviewed video SHA-256:
+  `7f0122f81151950ac21e3276b8fe1c07fc12ec7449edfe431296e446157c4c3a`.
+- The Canvas-only recording confirms the visible HUD, animation, debug
+  alignment, transform stress, lifecycle rebuild, exact Reset, and debug-OFF
+  behavior. Creator Console and scene-switch/reopen results remain supported
+  by the recorded live acceptance procedure and automated/runtime diagnostics,
+  because those editor surfaces are not pixels inside the captured Canvas.
+- The temporary `evidence/task-013r1` branch may be removed after this
+  acceptance documentation is safely pushed. The accepted recovery branch is
+  frozen at its final acceptance commit.
+
+## Frozen prior plan: TASK-013 Creator Scene-Load Repair
+
+- Status: In progress
+- Started: 2026-07-24
+- Branch: `feat/task-013-composable-character-loadout`
+- Original implementation:
+  `6e8dab87039ccbe1a842eaf76517825d4568d755`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Confirmed defect
+
+The TASK-013 scene generator cloned the TASK-012 serialized scene with blind
+string replacement, manufactured script/scene UUIDs, and removed every
+non-underscore component field. Cocos serializes the component owner as the
+public `node` field, so the generated `GameAIComposableLoadoutDemo` retained a
+registered class identity but lost its required node reference. Creator 3.8.8
+therefore rejected the scene during component activation.
+
+After the scene-load repair opened successfully, the 1280x720 Web Preview
+exposed a second focused defect: the 155 px HUD used a centered anchor at
+`y = 330` under the character root's additional 24 px offset. Its calculated
+top exceeded the Canvas, clipping every status row except shortcuts.
+
+After the lifecycle-safe anchor repair passed with exact runtime bounds, live
+Preview exposed a fourth focused defect: the single shortcut row exceeded the
+fixed Label width and was clipped by the intentional `CLAMP` overflow policy.
+This is a deterministic text-allocation defect, not a geometry defect.
+
+After the nine-row HUD repair passed, Creator's editor console exposed a fifth
+focused defect: the runtime component still used `@executeInEditMode`, so
+scene activation issued 39 runtime `resources.load()` calls through the editor
+asset pipeline. All failed with the same editor-only path-request parse error,
+while the identical resources loaded successfully in Web Preview. The 39
+calls comprised 17 base parts, 18 attachments, and four requests for the
+active full-loadout reference; the complete unique runtime plan contains 43
+resources, including all eight references.
+
+After resource loading passed in live Preview, interaction acceptance exposed
+a sixth focused defect: the HUD documented `K Skeleton · Y Grip`, but the
+runtime dispatcher mapped K to grip markers and Y to the skeleton. The HUD
+and dispatcher were maintained as separate hand-authored tables, so tests did
+not enforce their agreement.
+
+After the shared control binding repaired the K/Y semantic mapping, live
+Preview exposed a seventh focused defect: Y correctly activated the
+`grip markers` group, but its Graphics renderer retained the default sort
+order beneath the prop and hand-overlay Sprites. The active-state transition
+therefore produced no visible pixels. The remaining debug renderers also rely
+on default order or sibling insertion, so this is a shared debug-overlay
+sorting defect rather than a Grip-only exception.
+
+### Repair plan
+
+1. Track stable script and scene metadata generated by Creator 3.8.8.
+2. Make the generator read and validate the source/target script and scene
+   metadata, derive compressed class IDs from those tracked UUIDs, transform
+   the parsed scene structurally, and preserve the component-node link.
+3. Validate every tracked character-pipeline scene against its scene metadata,
+   component script metadata, component-node ownership, and the global asset
+   UUID namespace.
+4. Prove generator idempotence, metadata preservation, rejection of synthetic
+   identities, and input-property-order independence.
+5. Run working-copy and tracked-files-only verification, then open and reopen
+   the scene in a clean Creator 3.8.8 project before attempting Web Preview or
+   live evidence.
+6. Generate a top-left anchored HUD layout from the tested semantic-control
+   source, parent it directly to the design Canvas, and keep its calculated
+   1280x720 bounds inside documented 25 px side and 14 px top insets.
+7. Prove every required status row fits the HUD without overlap, generation is
+   idempotent, and runtime layout remains generator-owned.
+8. Isolate the final `HUDLabel` transform from Label initialization by placing
+   it under a Label-free `HUDContainer`, applying CLAMP overflow and final
+   anchor/size/position only after Label creation.
+9. After the first rendered frame, measure the actual container and label
+   transforms, log their bounds once, and fail with
+   `TASK_013_HUD_RUNTIME_BOUNDS_INVALID` if either leaves the safe region.
+10. Format the HUD as three bounded status rows and six bounded help rows,
+    render them in separate lifecycle-safe child Labels, and reject excess
+    line count, text width, region overlap, or character overlap with
+    `TASK_013_HUD_TEXT_OVERFLOW`.
+11. Remove editor-mode execution from the runtime-only acceptance component
+    and derive one sorted, duplicate-free resource manifest from the same
+    generic Cocos plan used by the character adapter.
+12. Validate all 43 manifest entries against tracked PNG files, PNG metadata,
+    `spriteFrame` subMeta records, path suffixes, and unique asset/subasset
+    UUIDs during generation and tests.
+13. Load each manifest path exactly once in Preview, report expected, loaded,
+    failed, and duplicate-request counts, build only after complete success,
+    and fail each missing path once with
+    `TASK_013_RESOURCE_LOAD_FAILED`.
+14. Display `RESOURCES N/43 LOADING|PASS|FAIL` in the existing HUD validation
+    row and keep state changes on the already-loaded SpriteFrame map.
+15. Replace the separate HUD shortcut strings and runtime key tables with one
+    validated semantic control-binding definition covering F1–F8, Q/W/E,
+    clips 1–5, Space, Esc, R/A/O, and every debug action.
+16. Give every binding an explicit semantic action ID, displayed key, Cocos
+    KeyCode name, HUD label/group/order, and typed runtime action. Reject
+    duplicate keys/actions and missing required controls independently of
+    declaration order.
+17. Generate all six HUD help rows from the same bindings used by runtime
+    dispatch and prove the canonical `K → Skeleton`, `Y → Grip markers`
+    mapping in static and live acceptance.
+18. Extend each shared debug binding with its semantic group ID, marker type,
+    expected renderer count, and deterministic sorting role; reject incomplete
+    or inconsistent definitions.
+19. Derive non-overlapping production, debug, and HUD Sorting2D ranges from
+    the resolved plan's production maximum, keep all orders in Cocos 3.8.8's
+    signed 16-bit range, and assign every Graphics and debug/HUD Label an
+    explicit order without changing transform inheritance.
+20. Render Grip as distinct socket and anchor crosshairs plus a connecting
+    line and PASS/FAIL label, validate every debug group's nodes, renderers,
+    active transition, and sort order once per toggle, and emit one bounded
+    runtime diagnostic.
+21. Prove all ten debug groups remain visible and deterministic under reordered
+    plan inputs, cannot overlap production/HUD ranges, and do not alter
+    production loadout or seam/socket/grip validation state.
+
+### Done when
+
+- Creator opens the TASK-013 scene twice without Missing class, invalid node,
+  unresolved asset, `_activeInHierarchy`, or `_removeComponent` errors.
+- The generator contains no manufactured component/scene UUID and cannot emit
+  the known synthetic identities.
+- Both verification modes pass, Creator import leaves tracked files unchanged,
+  and live Web Preview matches the accepted headless reference.
+- One ignored H.264 live-runtime video is appended to the existing evidence
+  branch without rewriting its original commit.
+
+## Previous active plan: TASK-013 Composable Full Character Loadout Reference
+
+- Status: Implementation complete; evidence publication pending
+- Started: 2026-07-24
+- Baseline: `main` at `317fd451c6a808cd41788e7ce8e0916701992642`
+- Branch: `feat/task-013-composable-character-loadout`
+- TASK-012 squash merge:
+  `317fd451c6a808cd41788e7ce8e0916701992642`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Compose the accepted TASK-010 head accessories, TASK-011 multi-part garment,
+and TASK-012 one-handed prop through one deterministic, engine-neutral
+character-loadout resolver. Prove all eight required loadout presets plus
+no-prop/left/right prop states on the production-lite character, exact Rest
+reconstruction, dense motion validation, and a single generic Cocos Creator
+3.8.x acceptance scene without adding a new attachment feature family.
+
+### Contract decisions
+
+- Resolve attachment families through generic IDs, exclusive slots, dependency
+  state, transforms, global layer roles, and draw order; never recognize
+  fixture asset names in framework behavior.
+- Keep Attachment Layout 1.0 backward compatible. Extend contracts only for a
+  demonstrated engine-neutral integration gap, with optional fields and stable
+  diagnostics.
+- Emit one engine-neutral resolved character consumed by a thin generic Cocos
+  adapter. The adapter performs no fitting, state selection, or demo-specific
+  composition.
+- Treat semantic animation IDs as the only control identity and validate
+  garment seams, accessory sockets, grip lock, state, transforms, presence,
+  and ordering at every 60 Hz sample.
+- Generate all fixture and Cocos mirror outputs from tracked editable source
+  descriptions. Keep acceptance MP4s ignored under `artifacts/TASK-013`.
+
+### Execution
+
+1. Record TASK-013 and inspect the accepted TASK-010 through TASK-012
+   contracts, generators, validators, evaluators, fixtures, adapters, tests,
+   and acceptance reports.
+2. Implement a deterministic generic loadout composition path and stable
+   validation for cross-family IDs, exclusive slots, dependencies, attachment
+   references, required counterparts, global roles/orders, transforms, seams,
+   sockets, grips, schema versions, and semantic animation IDs.
+3. Create the production-lite full-loadout source, transparent parts,
+   engine-neutral contracts, five semantic clips, eight exact Rest variants,
+   reconstruction/diff reports, and authoring provenance.
+4. Validate every required clip at 60 Hz and report total samples, maximum
+   seam/socket/grip errors, layer violations, and the first failing clip/time.
+5. Generate one generic Cocos resource mirror, adapter, acceptance scene,
+   semantic controls, comparison modes, complete debug views, runtime HUD, and
+   exact stopped Rest reset.
+6. Add automated coverage for all presets and prop states, reordered inputs,
+   invalid mutations, reconstruction, continuous validation, semantic
+   controls, reset, adapter neutrality, reproducibility, and tracked-only use;
+   retain TASK-010 through TASK-012 regression coverage.
+7. Document behavior and limitations and defer the engine-neutral
+   Socket-bound VFX Cue System as roadmap-only work after this milestone.
+8. Run working-copy and tracked-files-only frozen verification; commit and
+   push the feature branch with no tracked MP4.
+9. Record, inspect, fully decode, hash, and publish the two required H.264
+   evidence videos and manifest on temporary branch `evidence/task-013`, then
+   stop for external visual review without opening a PR.
+
+### Done when
+
+- All eight Rest variants reconstruct with zero RGBA, alpha, seam, and bounds
+  difference and all no-prop/left/right states resolve deterministically.
+- The five semantic clips pass all 60 Hz validations with exact authored Rest
+  reset and stable global ordering.
+- The Cocos acceptance scene uses only the generic resolved character result
+  and exposes every required control, view, marker, and runtime-derived HUD
+  identity.
+- Working-copy and tracked-files-only frozen verification pass with all prior
+  regression tests preserved and generated resources reproducible.
+- Feature and evidence branches are pushed, uploaded videos fully decode and
+  match the manifest, no TASK-013 PR exists, the feature branch tracks no MP4,
+  `main` remains at the Phase A integration SHA, the working tree is clean,
+  and the protected archive remains unchanged.
+
+### Deferred roadmap decision
+
+After TASK-013, design—but do not implement—an engine-neutral Socket-bound VFX
+Cue System covering generic effect IDs, socket-local transforms, layer roles,
+follow policies, one-shot/looping/persistent lifecycles, animation/gameplay
+cues, and Cocos/Unity/Godot adapter targets. TASK-013 adds no VFX schema,
+runtime, assets, events, particles, or tests.
+
+### Implementation result
+
+- One generic loadout resolver composes three unchanged Attachment Layout 1.0
+  families and emits immutable engine-neutral states and global layers.
+- Eight exact Rest presets reconstruct with zero RGBA, alpha, seam, and bounds
+  difference; no-prop, left-hand, and right-hand states are explicit.
+- Five semantic clips pass 60 Hz validation across 605 samples with zero seam,
+  accessory socket, grip, or layer-order error.
+- One Cocos Creator 3.8.x scene consumes the generic resolved-character plan
+  and exposes the required semantic controls, runtime-derived HUD, comparison
+  views, diagnostics, and exact stopped Rest reset.
+- The Socket-bound VFX Cue System is recorded only as deferred roadmap work;
+  TASK-013 includes no VFX implementation.
+
+### Verification
+
+- Working-copy `CI=true pnpm verify`: PASS, 222 tests.
+- Tracked-files-only archive after `pnpm install --frozen-lockfile`:
+  `CI=true pnpm verify` PASS, 222 tests.
+
 ## Completed correction: TASK-012 Semantic Prop Demo Controls
 
 - Status: Complete; external manual visual acceptance passed
