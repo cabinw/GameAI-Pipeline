@@ -7,58 +7,73 @@
 - Versioned schemas and reproducible examples
 - Initial Character Pipeline specification
 
-## v0.2 — Character Pipeline
+## v0.2.0 — Character Loadout Baseline — Completed
 
-- Master character specification
-- Asset validation
-- Auto Cutter prototype
-- Rig layout schema
-- Red Cap Target golden fixture
+- Versioned engine-neutral character, rig-layout, animation, and attachment
+  contracts with stable validation diagnostics
+- Deterministic asset intake, source-space rig generation, exact Rest
+  reconstruction, and generated-output closure
+- Rigid base-rig playback with semantic clip IDs and Exact Reset
+- Layered head accessories, multi-part garments with authored AABB seams, and
+  one-handed props with socket/grip validation
+- One authoritative 12-state loadout contract and resolver
+- Recovered Creator-owned canonical Cocos V2 adapter with lifecycle,
+  readiness, semantic input, global sorting, debug projection, and runtime
+  spatial assertions
+- Working-copy and tracked-files-only 349/349 verification plus accepted
+  Cocos Creator 3.8.8 evidence
 
-## v0.3 — Cocos Rig Builder
+## Next roadmap — Not started
 
-- Cocos Creator 3.8.x editor extension
-- Rigid Sprite node hierarchy generation
-- Anchors, rest pose, draw order, sockets, and hit areas
-- Idempotent regeneration and diagnostic reports
+### Character Semantic Events and VFX
 
-## v0.4 — Animation Pipeline
+Design an engine-neutral semantic-event and socket-bound VFX cue system.
+Future design should cover generic event/effect IDs, socket-local transforms,
+layer roles, follow policies, one-shot/looping/persistent lifecycles,
+animation-timeline and gameplay triggers, and adapter-neutral cue delivery.
+No TASK-014 implementation has started.
 
-- Versioned animation JSON
-- Runtime animator
-- Idle, walk, look-around, exchange, hit, and fall presets
-- Preview and visual regression workflow
+### Animation authoring improvements
 
-## v0.5 — NPC Factory
+Improve semantic clip authoring, editing, preview, event timing, transition
+design, and broader motion coverage without assuming IK or blending exists.
 
-- Shared body templates
-- Skin and accessory variants
-- Deterministic NPC generation
-- Crowd performance fixtures
+### AI asset intake, cutting, and automatic fitting
 
-## v0.6 — Level Pipeline
+Explore assisted source-art intake, deterministic cutting, semantic part
+identification, and authored/validated fitting workflows. Automatic fitting
+is not part of v0.2.0.
 
-- Level DSL
-- Target, decoy, path, timing, and interaction generation
-- Cocos scene integration
+### Production editor UI
 
-## v0.7 — Ad Pipeline
+Turn validated pipeline operations into a production-oriented authoring and
+inspection workflow instead of acceptance-only fixtures.
 
-- Playable scenario definitions
-- Capture plans and creative scripts
-- Variant production and metadata
+### Unity adapter
 
-## v1.0 — Reproducible GameAI Framework
+Implement a separate adapter that consumes engine-neutral resolved contracts.
+Architecture permits this direction; no Unity runtime has been implemented or
+verified.
 
-Generate validated, playable casual-game content from structured specifications.
+### Godot adapter
 
-## Deferred after the full-loadout integration milestone
+Implement a separate adapter that consumes engine-neutral resolved contracts.
+Architecture permits this direction; no Godot runtime has been implemented or
+verified.
 
-Design an engine-neutral Socket-bound VFX Cue System. The future proposal
-should cover generic effect IDs, character-socket attachment, local position/
-rotation/scale, layer roles, independent position/rotation/scale follow
-policies, one-shot/looping/persistent lifecycles, animation-timeline and
-gameplay-triggered cues, and Cocos/Unity/Godot adapter targets.
+### Windows validation
 
-TASK-013 intentionally implements no VFX schema, runtime, asset, particle,
-animation effect event, gameplay effect event, or VFX test.
+Validate the supported toolchain, native image dependency, generation, and
+engine workflow on Windows. No Windows development environment has been
+accepted.
+
+### Original Red Cap reconstruction
+
+Return to production reconstruction only through the accepted provenance,
+rig, articulation, adapter, and visual gates. It remains deferred.
+
+## Long-term direction
+
+Advance from reproducible character construction toward NPC, level, UI, FX,
+audio, and playable-ad pipelines while preserving the repository rule:
+structured input → validation → deterministic generation → verification.

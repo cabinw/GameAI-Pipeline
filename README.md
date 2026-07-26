@@ -141,29 +141,55 @@ historical provenance and deterministic regression. Its generators are not
 part of the normal build and run only through the explicit
 `legacy:verify-task013-provenance` command.
 
-## Status
+## Current status — v0.2.0 Character Loadout Baseline
 
-The project is in **v0.2 Character Pipeline**. TASK-001 established the
-engine-neutral contracts, TASK-002 added safe asset intake, TASK-003 added
-deterministic annotated Rig Layout generation, and TASK-004 added the first
-production Cocos Creator 3.8.8 scene-rig builder. TASK-005 adds the first
-versioned, data-driven Joint animation runtime and subtle Red Cap idle.
-TASK-006.2 replaces the rejected masked Red Cap articulation evidence with
-final-owner validation and real unmasked rendering. TASK-007 then establishes
-a separate minimal 16-part stickman reference with deterministic hierarchy
-evaluation and three Cocos-verified clips before complex-character animation
-work resumes. TASK-008 extends that proof to real transparent PNG parts while
-retaining the same engine-independent hierarchy, pivots, transforms, and
-animation sampling. TASK-009 advances the fixture to production-like organic
-sprites, explicit hair and limb layering, exact reference reconstruction, and
-controlled articulation stress without adding a new runtime.
-TASK-010 then proves optional contract-driven headwear and face accessories
-with inherited transforms and stable front/back occlusion, while original Red
-Cap reconstruction and cross-engine work remain deferred. TASK-011 extends
-that contract with grouped wearable sets and seam validation across a rigid
-multi-part garment without adding clothing-specific core behavior. TASK-012
-then proves generic socket-targeted one-handed props, authored grip lock,
-target-relative ordering, and dense interpolated-pose validation without
-adding item-specific core behavior. TASK-013 integrates those accepted
-families into one deterministic resolved character and one generic Cocos
-adapter without creating another attachment schema family.
+The Character Pipeline now validates deterministic Character Rig, Rig Layout,
+Rig Animation, and rigid Attachment Layout data; reconstructs authored
+production-lite characters; resolves composable loadouts; and adapts the
+resolved result to Cocos Creator.
+
+The authoritative flow is:
+
+```text
+engine-neutral contracts
+→ semantic validation and resolveCharacterLoadout
+→ immutable resolved rig/loadout
+→ generated R6-compatible Cocos plan
+→ canonical Cocos V2 adapter
+```
+
+The baseline supports a 17-part rigid base rig, layered head accessories, an
+11-part garment with authored AABB seam validation, and no/left/right
+one-handed props with hand overlays and sampled grip lock. The canonical
+12-state matrix composes base/accessories/garment membership with all three
+prop states.
+
+Engine-neutral animation data supports Rest, Walk, Wave, Prop Swing, and
+Integration Stress. The canonical V2 runtime exposes the accepted Rest, Wave,
+Prop Swing, and Integration Stress controls plus Pause/Resume and Exact Reset.
+
+Canonical production-facing entry points:
+
+- Scene:
+  `cocos/projects/character-rig-builder-mvp/assets/composable-character-loadout-reference-v2.scene`
+- Adapter:
+  `cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/source/composable-loadout/canonical-loadout-adapter.ts`
+- Adapter ID: `composable-character-loadout-reference-v2`
+
+The baseline passes 349/349 automated tests in both the working copy and a
+tracked-files-only frozen install. Its Creator 3.8.8 acceptance passed clean
+open/switch/reopen, 35/35 resources, all 12 states, semantic controls,
+runtime/spatial diagnostics, two lifecycle rebuilds, and Exact Reset with
+clean Creator and Preview consoles.
+
+The original `composable-full-loadout-reference.scene` is superseded and
+non-production. It remains only for historical provenance and deterministic
+legacy verification.
+
+Current limitations include rigid sprites, authored fitting and grip
+positions, transformed-AABB rather than cloth seam validation, in-place
+motion, and no IK, automatic fitting, cloth/prop physics, mesh deformation,
+animation blending, root motion, VFX runtime, Unity/Godot adapter, Windows
+validation, or production Red Cap reconstruction. See the
+[v0.2.0 release baseline](docs/releases/v0.2.0-character-loadout-baseline.md)
+and [compatibility matrix](docs/compatibility.md).

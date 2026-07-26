@@ -23,6 +23,24 @@ Task → plan → implementation → validation → documentation → pull reque
 
 Before editing code, update `PLANS.md` for work spanning multiple files or architectural boundaries.
 
+## Pull request sizing and evidence policy
+
+- Keep one runtime capability per pull request.
+- Declare the expected changed-file count and generated-output budget before
+  implementation.
+- A pull request expected to exceed 100 files or 25,000 changed lines requires
+  an explicit split decision before coding begins.
+- Report hand-authored code separately from generated mirrors, PNG assets, and
+  Scene/`.meta` pairs.
+- Keep evidence videos on temporary evidence branches; never add them to a
+  feature or documentation branch.
+- A recovery harness cannot silently become a canonical production surface.
+  Promotion requires an explicit task/ADR, a neutral identity, parity tests,
+  and Creator runtime acceptance.
+- Visual acceptance complements but never replaces contract tests. Contract
+  tests and headless evidence complement but never replace Creator lifecycle,
+  runtime, spatial, and visual acceptance.
+
 ## Repository boundaries
 
 - `framework/`: engine-agnostic reusable foundations.
