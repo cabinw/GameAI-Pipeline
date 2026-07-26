@@ -1,0 +1,79 @@
+export const SemanticEventErrorCode = {
+  JSON_PARSE_ERROR: "SEMANTIC_EVENT_JSON_PARSE_ERROR",
+  SCHEMA_VALIDATION_ERROR: "SEMANTIC_EVENT_SCHEMA_VALIDATION_ERROR",
+  UNSUPPORTED_SCHEMA_VERSION: "UNSUPPORTED_SEMANTIC_EVENT_SCHEMA_VERSION",
+  INCOMPATIBLE_RIG_LAYOUT: "INCOMPATIBLE_SEMANTIC_EVENT_RIG_LAYOUT",
+  DUPLICATE_TRACK_ID: "DUPLICATE_SEMANTIC_EVENT_TRACK_ID",
+  DUPLICATE_EVENT_ID: "DUPLICATE_SEMANTIC_EVENT_ID",
+  DUPLICATE_VFX_CUE_ID: "DUPLICATE_VFX_CUE_ID",
+  UNKNOWN_CLIP_ID: "UNKNOWN_SEMANTIC_EVENT_CLIP_ID",
+  INVALID_EVENT_TIME: "INVALID_SEMANTIC_EVENT_TIME",
+  EVENT_TIME_OUTSIDE_CLIP: "SEMANTIC_EVENT_TIME_OUTSIDE_CLIP",
+  UNKNOWN_SOCKET_ID: "UNKNOWN_SEMANTIC_EVENT_SOCKET_ID",
+  MISSING_CUE_ID: "MISSING_SEMANTIC_EVENT_CUE_ID",
+  INVALID_LOCAL_TRANSFORM: "INVALID_SEMANTIC_EVENT_LOCAL_TRANSFORM",
+  INVALID_LIFECYCLE: "INVALID_SEMANTIC_EVENT_LIFECYCLE",
+  INVALID_DURATION: "INVALID_SEMANTIC_EVENT_DURATION",
+  INCOMPATIBLE_LIFECYCLE_EVENT_KIND:
+    "INCOMPATIBLE_SEMANTIC_EVENT_LIFECYCLE_KIND",
+  INVALID_FOLLOW_POLICY: "INVALID_SEMANTIC_EVENT_FOLLOW_POLICY",
+  INVALID_SAME_TIME_ORDER: "INVALID_SEMANTIC_EVENT_SAME_TIME_ORDER",
+  UNSUPPORTED_EVENT_KIND: "UNSUPPORTED_SEMANTIC_EVENT_KIND",
+  PAYLOAD_KIND_MISMATCH: "SEMANTIC_EVENT_PAYLOAD_KIND_MISMATCH",
+  UNKNOWN_VFX_CUE_ID: "UNKNOWN_VFX_CUE_ID",
+  MISSING_GAMEPLAY_WINDOW_ID: "MISSING_GAMEPLAY_WINDOW_ID",
+  UNEXPECTED_GAMEPLAY_WINDOW_ID: "UNEXPECTED_GAMEPLAY_WINDOW_ID",
+  UNMATCHED_GAMEPLAY_WINDOW_CLOSE: "UNMATCHED_GAMEPLAY_WINDOW_CLOSE",
+  DUPLICATE_GAMEPLAY_WINDOW_OPEN: "DUPLICATE_GAMEPLAY_WINDOW_OPEN",
+  UNCLOSED_GAMEPLAY_WINDOW: "UNCLOSED_GAMEPLAY_WINDOW",
+  UNKNOWN_INITIAL_TRACK_ID: "UNKNOWN_SEMANTIC_EVENT_INITIAL_TRACK_ID",
+} as const;
+
+export type SemanticEventErrorCode =
+  (typeof SemanticEventErrorCode)[keyof typeof SemanticEventErrorCode];
+
+export interface SemanticEventDiagnostic {
+  readonly code: SemanticEventErrorCode;
+  readonly path: string;
+  readonly message: string;
+  readonly details?: Readonly<Record<string, unknown>>;
+}
+
+export type SemanticEventResult<T> =
+  | { ok: true; value: T; errors: readonly [] }
+  | { ok: false; errors: readonly SemanticEventDiagnostic[] };
+
+export const SemanticEventEvaluationErrorCode = {
+  INVALID_DELTA: "INVALID_SEMANTIC_EVENT_DELTA",
+  UNSUPPORTED_REVERSE_PLAYBACK: "UNSUPPORTED_SEMANTIC_EVENT_REVERSE_PLAYBACK",
+  UNSUPPORTED_SEEK: "UNSUPPORTED_SEMANTIC_EVENT_SEEK",
+  UNKNOWN_TRACK_ID: "UNKNOWN_SEMANTIC_EVENT_EVALUATOR_TRACK_ID",
+  ACCUMULATED_TIME_OVERFLOW:
+    "SEMANTIC_EVENT_ACCUMULATED_TIME_OVERFLOW",
+  ADVANCE_BUDGET_EXCEEDED:
+    "SEMANTIC_EVENT_ADVANCE_BUDGET_EXCEEDED",
+} as const;
+
+export type SemanticEventEvaluationErrorCode =
+  (typeof SemanticEventEvaluationErrorCode)[keyof typeof SemanticEventEvaluationErrorCode];
+
+export class SemanticEventEvaluationError extends Error {
+  public constructor(
+    public readonly code: SemanticEventEvaluationErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = "SemanticEventEvaluationError";
+  }
+}
+
+export function sortSemanticEventDiagnostics(
+  diagnostics: readonly SemanticEventDiagnostic[],
+): SemanticEventDiagnostic[] {
+  return [...diagnostics].sort(
+    (left, right) =>
+      left.path.localeCompare(right.path) ||
+      left.code.localeCompare(right.code) ||
+      left.message.localeCompare(right.message),
+  );
+}

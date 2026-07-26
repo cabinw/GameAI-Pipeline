@@ -14,6 +14,7 @@
 - [Character asset intake](character-asset-intake.md)
 - [Rig layout generation](rig-layout-generator.md)
 - [Rig animation](rig-animation.md)
+- [Character semantic events and VFX cues RFC](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md)
 - [Cocos Scene Rig Builder](cocos-scene-rig-builder.md)
 
 ## Architecture decisions
@@ -23,6 +24,7 @@
 - [Contract-driven rigid attachments](adr/ADR-0012-contract-driven-rigid-attachments.md)
 - [Minimal runtime adapter boundaries](adr/ADR-0013-minimal-cocos-runtime-adapter-boundaries.md)
 - [Recovered canonical loadout adapter](adr/ADR-0014-recovered-cocos-loadout-release-candidate.md)
+- [Engine-neutral character semantic events](adr/ADR-0015-engine-neutral-character-semantic-events.md)
 
 ## Acceptance and learning
 

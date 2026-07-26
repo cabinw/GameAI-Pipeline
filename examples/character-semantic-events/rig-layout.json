@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "layoutId": "semantic-event-stickman-layout",
+  "sourceCanvas": { "width": 100, "height": 200 },
+  "referenceScale": 1,
+  "drawOrderPolicy": "unique",
+  "parts": [
+    {
+      "partId": "pelvis",
+      "file": "parts/pelvis.png",
+      "parentId": null,
+      "originalRect": { "x": 40, "y": 80, "width": 20, "height": 20 },
+      "trimOffset": { "x": 0, "y": 0 },
+      "anchor": { "x": 0.5, "y": 0.5 },
+      "restPose": {
+        "position": { "x": 0, "y": 0 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 },
+        "opacity": 1
+      },
+      "drawOrder": 0
+    },
+    {
+      "partId": "foot-left",
+      "file": "parts/foot-left.png",
+      "parentId": "pelvis",
+      "originalRect": { "x": 25, "y": 170, "width": 25, "height": 10 },
+      "trimOffset": { "x": 0, "y": 0 },
+      "anchor": { "x": 0.5, "y": 0.5 },
+      "restPose": {
+        "position": { "x": -10, "y": -80 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 },
+        "opacity": 1
+      },
+      "drawOrder": 1
+    },
+    {
+      "partId": "hand-left",
+      "file": "parts/hand-left.png",
+      "parentId": "pelvis",
+      "originalRect": { "x": 70, "y": 70, "width": 10, "height": 10 },
+      "trimOffset": { "x": 0, "y": 0 },
+      "anchor": { "x": 0.5, "y": 0.5 },
+      "restPose": {
+        "position": { "x": 30, "y": 20 },
+        "rotationDegrees": 0,
+        "scale": { "x": 1, "y": 1 },
+        "opacity": 1
+      },
+      "drawOrder": 2
+    }
+  ],
+  "sockets": [
+    {
+      "socketId": "foot-left-contact",
+      "parentPartId": "foot-left",
+      "position": { "x": 0, "y": -5 },
+      "rotationDegrees": 0
+    },
+    {
+      "socketId": "hand-left-trail",
+      "parentPartId": "hand-left",
+      "position": { "x": 0, "y": 0 },
+      "rotationDegrees": 0
+    }
+  ],
+  "hitAreas": []
+}

@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "1.0.0",
+  "rig": {
+    "layoutId": "semantic-event-stickman-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "vfxCues": [
+    {
+      "cueId": "footstep-dust",
+      "effectKind": "burst",
+      "visualIntent": "A small ground-contact dust puff.",
+      "color": { "r": 0.72, "g": 0.64, "b": 0.52, "a": 0.8 },
+      "intensity": 0.6,
+      "size": 0.8,
+      "defaultDurationSeconds": 0.25
+    },
+    {
+      "cueId": "hand-swing-trail",
+      "effectKind": "trail",
+      "visualIntent": "A short arc following the swinging hand.",
+      "intensity": 0.8,
+      "size": 1,
+      "defaultDurationSeconds": 0.4
+    }
+  ],
+  "tracks": [
+    {
+      "trackId": "walk-semantic-events",
+      "clipId": "stickman-walk-cycle",
+      "events": [
+        {
+          "eventId": "walk-footstep-zero",
+          "timeSeconds": 0,
+          "eventKind": "vfx",
+          "semanticCueId": "footstep-dust",
+          "socketId": "foot-left-contact",
+          "localTransform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "layerRole": "behind-character",
+          "followPolicy": {
+            "position": true,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "durationSeconds": 0.25,
+          "order": 0,
+          "payload": {
+            "kind": "vfx",
+            "cueDefinitionId": "footstep-dust"
+          }
+        },
+        {
+          "eventId": "walk-audio-left",
+          "timeSeconds": 0.6,
+          "eventKind": "audio",
+          "semanticCueId": "footstep-soft",
+          "socketId": "foot-left-contact",
+          "localTransform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "followPolicy": {
+            "position": true,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "order": 1,
+          "payload": { "kind": "audio", "volume": 0.75, "pitch": 1 }
+        },
+        {
+          "eventId": "walk-footstep-mid",
+          "timeSeconds": 0.6,
+          "eventKind": "vfx",
+          "semanticCueId": "footstep-dust",
+          "socketId": "foot-left-contact",
+          "localTransform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "layerRole": "behind-character",
+          "followPolicy": {
+            "position": true,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "durationSeconds": 0.25,
+          "order": 1,
+          "payload": {
+            "kind": "vfx",
+            "cueDefinitionId": "footstep-dust"
+          }
+        },
+        {
+          "eventId": "walk-hit-active",
+          "timeSeconds": 0.9,
+          "eventKind": "gameplay",
+          "semanticCueId": "hit-active",
+          "localTransform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "followPolicy": {
+            "position": false,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "order": 0,
+          "payload": {
+            "kind": "gameplay",
+            "action": "window-open",
+            "windowId": "primary-hit"
+          }
+        },
+        {
+          "eventId": "walk-hit-end",
+          "timeSeconds": 1.2,
+          "eventKind": "gameplay",
+          "semanticCueId": "hit-end",
+          "localTransform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "followPolicy": {
+            "position": false,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "order": 0,
+          "payload": {
+            "kind": "gameplay",
+            "action": "window-close",
+            "windowId": "primary-hit"
+          }
+        }
+      ]
+    },
+    {
+      "trackId": "wave-semantic-events",
+      "clipId": "stickman-arm-wave",
+      "events": [
+        {
+          "eventId": "wave-hand-trail",
+          "timeSeconds": 0.3,
+          "eventKind": "vfx",
+          "semanticCueId": "hand-swing-trail",
+          "socketId": "hand-left-trail",
+          "localTransform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "layerRole": "in-front-of-character",
+          "followPolicy": {
+            "position": true,
+            "rotation": true,
+            "scale": true
+          },
+          "lifecycle": "looping",
+          "durationSeconds": 0.4,
+          "order": 0,
+          "payload": {
+            "kind": "vfx",
+            "cueDefinitionId": "hand-swing-trail"
+          }
+        }
+      ]
+    }
+  ]
+}
