@@ -3,6 +3,97 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Active plan: TASK-014A Engine-Neutral Character Semantic Event Contract
+
+- Status: Complete
+- Started: 2026-07-26
+- Branch: `feat/task-014a-semantic-event-contract`
+- Baseline `main`: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Release baseline: `v0.2.0`
+- Automated baseline: 349/349 tests
+- Declared PR budget: at most 30 changed files and 6,000 changed lines;
+  textual fixtures only and zero generated binary, Scene, `.meta`, VFX,
+  audio, or evidence files. This is below the mandatory split thresholds of
+  100 files and 25,000 lines.
+
+### Goal
+
+Define a versioned engine-neutral character semantic-event and VFX-cue
+contract, stable semantic validation, and a deterministic animation-timeline
+event evaluator. Prove boundary behavior for normal forward playback,
+skipped frames, loops, pause/resume, exact reset, and clip switching without
+implementing any engine adapter or effect.
+
+### Boundaries
+
+- Add one engine-neutral workspace package, one canonical JSON Schema, small
+  textual fixtures, tests, RFC/ADR/task records, and contract documentation.
+- Keep semantic events separate from VFX cue definitions and use
+  event-kind-specific typed payloads rather than an unrestricted payload.
+- Validate clip IDs against declared animation clips and socket IDs against
+  an engine-neutral Rig Layout.
+- Represent gameplay-triggered injection only in architecture; the MVP
+  evaluator consumes animation-timeline progress only.
+- Do not modify TASK-013/R1-R7 behavior, Cocos runtime code, Creator Scenes or
+  metadata, Full Loadout inputs/outputs, art/audio assets, gameplay code, or
+  start TASK-014B.
+- Reverse playback, arbitrary seeking, and network synchronization remain
+  explicitly unsupported.
+
+### Execution
+
+1. Record the RFC, accepted architecture decision, and full task acceptance
+   criteria before contract implementation.
+2. Add the canonical 1.0 schema and matching TypeScript discriminated unions
+   for event tracks, semantic events, VFX cue definitions, transforms,
+   follow policy, lifecycle, and typed VFX/audio/gameplay payloads.
+3. Parse and validate documents fail-closed with stable codes, including
+   cross-document animation clip and Rig Layout socket compatibility.
+4. Implement a stateful deterministic evaluator using `(previousTime,
+   currentTime]`, explicit loop counts, stable same-time ordering, and
+   lifecycle operations for play, pause, resume, exact reset, and clip
+   switching.
+5. Add valid and negative textual fixtures plus exhaustive validation and
+   evaluator boundary tests.
+6. Synchronize character-contract, rig-animation, index, roadmap, and plan
+   documentation; explicitly record that no Cocos VFX runtime or rendered
+   effect exists.
+7. Run package tests and the complete `CI=true pnpm verify`, inspect scope and
+   generated-output cleanliness, and record the final result.
+
+### Done when
+
+- Canonical schema, public types, parser, validation, diagnostics, fixtures,
+  and documentation agree and remain engine neutral.
+- Every required stable validation error is directly covered.
+- Deterministic evaluation covers same-time order, skipped frames, one and
+  multiple loop crossings, pause/resume, exact reset, clip switching, replay,
+  and the documented zero/duration boundary policy without duplicate firing.
+- Unsupported reverse playback or ambiguous seeking fails clearly before
+  event delivery.
+- Full verification passes with no unrelated or engine-runtime changes and
+  the final diff remains within the declared PR budget.
+
+### Result
+
+- Added the canonical Character Semantic Events 1.0 schema and standalone
+  `@gameai/character-semantic-events` engine-neutral package.
+- Semantic events and VFX cue definitions remain separate; VFX, audio, and
+  gameplay payloads are discriminated and all published diagnostics have
+  direct coverage.
+- Deterministic evaluation passes same-time ordering, skipped frames, one and
+  multiple loops, Pause/Resume, Exact Reset, clip switching, replay,
+  zero/duration boundaries, and floating-boundary regression tests.
+- Package verification passed 11/11 tests. Complete `CI=true pnpm verify`
+  passed 360/360 tests with accepted TASK-013/R1-R7 regression behavior
+  unchanged.
+- Final scope is 29 changed files and approximately 4,150 changed lines, below
+  both declared and mandatory split thresholds. There are no binary/generated
+  assets, Cocos files, Scenes, `.meta` files, or evidence media.
+- TASK-014A defines contracts, validation, and evaluation only. No Cocos VFX
+  runtime exists and no visual effect was rendered; TASK-014B remains
+  unstarted.
+
 ## Completed plan: Cocos Scene Generation / Metadata Audit Race
 
 - Status: Accepted

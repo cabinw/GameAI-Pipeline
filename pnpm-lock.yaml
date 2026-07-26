@@ -105,6 +105,19 @@ importers:
         specifier: 'catalog:'
         version: 5.8.2
 
+  pipelines/character-semantic-events:
+    dependencies:
+      ajv:
+        specifier: 'catalog:'
+        version: 8.17.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
   pipelines/rig-animation:
     dependencies:
       ajv:

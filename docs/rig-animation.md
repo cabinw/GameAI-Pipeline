@@ -137,6 +137,28 @@ never bundled into the scene runtime.
 The real Creator acceptance procedure and evidence are recorded in
 `docs/acceptance/TASK-005-red-cap-idle.md`.
 
+## Semantic animation-timeline events
+
+TASK-014A keeps event data in a separate Character Semantic Events 1.0
+contract rather than changing Rig Animation 1.0. An event track binds to a
+semantic `animationId` and is validated against that clip's finite positive
+duration before an evaluator can be created.
+
+Normal forward evaluation uses `(previousTime, currentTime]` and orders events
+by `timeSeconds`, `order`, and `eventId`. Skipped frames and one or more loop
+crossings enumerate every crossed event. Pause emits nothing; Resume continues
+without duplication; Exact Reset emits nothing; and switching clips clears
+old-clip progress without emitting old-clip events.
+
+Initial Rest and the first open boundary at time zero emit nothing. On a loop
+wrap, a zero-time event fires once for the new cycle. An exact-duration event
+fires once for the ending cycle before that new-cycle zero event. Reverse
+playback and arbitrary seeking fail explicitly.
+
+See [Character Contracts](character-contracts.md) and
+[RFC-0014](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md). This
+engine-neutral evaluator does not deliver to Cocos and did not render a VFX.
+
 ## Current limitations
 
 - One animation plays at a time; there is no blending, state machine, IK,
@@ -146,6 +168,9 @@ The real Creator acceptance procedure and evidence are recorded in
   unchanged; Walk, Hit, blending, and state-machine behavior are still absent.
 - Runtime validation assumes Main supplied normalized, already validated data;
   Scene Script does not duplicate JSON-contract parsing.
+- TASK-014A does not add event delivery to `RigAnimationPlayer`, a Cocos VFX
+  runtime, gameplay-triggered injection, reverse playback, seeking, or network
+  synchronization.
 - The TASK-007 walk cycle is a minimal in-place articulation reference, not a
   production locomotion system; it adds no root motion, foot locking, IK,
   blending, or state machine.

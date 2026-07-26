@@ -23,15 +23,22 @@
 - Working-copy and tracked-files-only 349/349 verification plus accepted
   Cocos Creator 3.8.8 evidence
 
-## Next roadmap — Not started
+## Next roadmap
 
 ### Character Semantic Events and VFX
 
-Design an engine-neutral semantic-event and socket-bound VFX cue system.
-Future design should cover generic event/effect IDs, socket-local transforms,
-layer roles, follow policies, one-shot/looping/persistent lifecycles,
-animation-timeline and gameplay triggers, and adapter-neutral cue delivery.
-No TASK-014 implementation has started.
+TASK-014A completes the engine-neutral Character Semantic Events 1.0 and VFX
+cue-definition contract, stable validation, textual fixtures, and
+deterministic animation-timeline evaluator. It covers generic cue IDs,
+Rig Layout sockets, local transforms, layer roles, follow policies,
+one-shot/looping/persistent lifecycle compatibility, typed VFX/audio/gameplay
+payloads, skipped frames, loop crossings, Pause/Resume, Exact Reset, and clip
+switching.
+
+TASK-014A is contracts and evaluation only. Gameplay-triggered injection,
+engine adapter delivery, Cocos VFX runtime, effect/audio assets, gameplay
+execution, reverse/seek/network behavior, and TASK-014B have not started. No
+visual effect was rendered.
 
 ### Animation authoring improvements
 

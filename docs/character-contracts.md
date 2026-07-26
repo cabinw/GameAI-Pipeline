@@ -8,6 +8,8 @@ TASK-001 defines the engine-neutral inputs that a future Character Rig Builder m
 - `schemas/rig-layout.schema.json` describes source geometry, the rigid part hierarchy, rest pose, draw order, sockets, and hit areas.
 - `schemas/attachment-layout.schema.json` describes optional generic slots and
   rigid sprite attachments bound to a compatible Rig Layout.
+- `schemas/character-semantic-events.schema.json` describes animation-timeline
+  semantic events and separate engine-neutral VFX cue definitions.
 - `examples/red-cap-target/` is the first textual golden fixture.
 - `@gameai/character-contracts` exports matching TypeScript types, parsers, canonical schema objects, semantic validators, and stable diagnostics.
 
@@ -212,10 +214,64 @@ does not defer or weaken the runtime rejection rules above.
 This is a resolver contract, not a Cocos contract. Engine adapters receive
 only resolved state/layer data and resource metadata.
 
+## Character semantic events
+
+TASK-014A adds the standalone
+`@gameai/character-semantic-events` package and Character Semantic Events 1.0
+contract. It does not change Character Rig, Rig Layout, Rig Animation,
+Attachment Layout, or the TASK-013 loadout resolver.
+
+A semantic event belongs to a stable event-track ID and semantic animation
+clip ID. It declares clip-local time, unique event ID, kind, semantic cue ID,
+optional Rig Layout socket, local transform, optional generic layer role,
+per-component follow policy, lifecycle, applicable duration, same-time order,
+and a kind-discriminated payload. MVP kinds are `vfx`, `audio`, and
+`gameplay`; an unrestricted arbitrary payload is not part of the contract.
+
+VFX cue definitions are a separate collection. They describe a stable cue ID,
+generic burst/trail/continuous intent, and optional engine-neutral visual
+hints. They contain no Cocos, Unity, or Godot resource type.
+
+Validation receives declared semantic clips and a validated engine-neutral Rig
+Layout. Unknown clip IDs and socket IDs fail before evaluator construction.
+Socket bindings use Rig Layout `socketId`, never a Cocos node name.
+
+Stable validation codes are exported by the package:
+
+- `SEMANTIC_EVENT_JSON_PARSE_ERROR`
+- `SEMANTIC_EVENT_SCHEMA_VALIDATION_ERROR`
+- `UNSUPPORTED_SEMANTIC_EVENT_SCHEMA_VERSION`
+- `INCOMPATIBLE_SEMANTIC_EVENT_RIG_LAYOUT`
+- `DUPLICATE_SEMANTIC_EVENT_TRACK_ID`
+- `DUPLICATE_SEMANTIC_EVENT_ID`
+- `DUPLICATE_VFX_CUE_ID`
+- `UNKNOWN_SEMANTIC_EVENT_CLIP_ID`
+- `INVALID_SEMANTIC_EVENT_TIME`
+- `SEMANTIC_EVENT_TIME_OUTSIDE_CLIP`
+- `UNKNOWN_SEMANTIC_EVENT_SOCKET_ID`
+- `MISSING_SEMANTIC_EVENT_CUE_ID`
+- `INVALID_SEMANTIC_EVENT_LOCAL_TRANSFORM`
+- `INVALID_SEMANTIC_EVENT_LIFECYCLE`
+- `INVALID_SEMANTIC_EVENT_DURATION`
+- `INCOMPATIBLE_SEMANTIC_EVENT_LIFECYCLE_KIND`
+- `INVALID_SEMANTIC_EVENT_FOLLOW_POLICY`
+- `INVALID_SEMANTIC_EVENT_SAME_TIME_ORDER`
+- `UNSUPPORTED_SEMANTIC_EVENT_KIND`
+- `SEMANTIC_EVENT_PAYLOAD_KIND_MISMATCH`
+- `UNKNOWN_VFX_CUE_ID`
+
+See [RFC-0014](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md) and
+[ADR-0015](adr/ADR-0015-engine-neutral-character-semantic-events.md).
+TASK-014A defines contracts, validation, and evaluation only. No Cocos VFX
+runtime exists yet and no visual effect was rendered.
+
 ## Deliberate limitations
 
 - Referenced image and JSON files are not opened or checked for existence in TASK-001.
 - Rig animation clips are a separate TASK-005 contract documented in
   `docs/rig-animation.md`; Character Rig retains only stable target bindings.
+- Gameplay-triggered semantic-event injection, engine adapters, resource
+  resolution, audio/gameplay execution, and networking are not implemented in
+  TASK-014A.
 - No Cocos-specific UUID, `Node`, `Sprite`, prefab, scene, or component data is allowed in these schemas.
 - Mesh deformation, IK, Spine, and DragonBones remain outside the MVP contract.
