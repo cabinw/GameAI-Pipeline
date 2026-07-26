@@ -1,15 +1,21 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
 import {
+  cpSync,
+  mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   writeFileSync,
 } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
+import { atomicWriteFile } from "../scripts/atomic-write.mjs";
 import {
   CocosSceneMetadataError,
   compressCocosUuid,
@@ -48,6 +54,35 @@ const rejectedSyntheticIds = [
   "a65416f7-8091-42a3-d456-789abcdef012",
   "d98749fa-b3c4-45d6-a789-abcdef012345",
 ];
+const execFileAsync = promisify(execFile);
+
+function createIsolatedAssetsRoot() {
+  const root = mkdtempSync(path.join(tmpdir(), "gameai-cocos-scene-generate-"));
+  const relativeFiles = [
+    "one-handed-prop-reference.scene",
+    "one-handed-prop-reference.scene.meta",
+    "composable-full-loadout-reference.scene",
+    "composable-full-loadout-reference.scene.meta",
+    "gameai/one-handed-prop/one-handed-prop-demo.ts.meta",
+    "gameai/composable-loadout/composable-loadout-demo.ts.meta",
+  ];
+  for (const relativeFile of relativeFiles) {
+    const destination = path.join(root, relativeFile);
+    mkdirSync(path.dirname(destination), { recursive: true });
+    cpSync(path.join(assetsRoot, relativeFile), destination);
+  }
+  return root;
+}
+
+function generatedScene(root) {
+  return path.join(root, "composable-full-loadout-reference.scene");
+}
+
+function temporaryFiles(root) {
+  return readdirSync(root, { recursive: true })
+    .map((entry) => String(entry))
+    .filter((entry) => entry.endsWith(".tmp"));
+}
 
 test("all tracked character-pipeline scenes have resolvable Creator metadata", async () => {
   const result = await validateTrackedCocosScenes(assetsRoot);
@@ -77,21 +112,97 @@ test("TASK-013 component identity and node ownership resolve from tracked metada
   assert.equal(document[document[0].scene.__id__]._id, sceneMeta.uuid);
 });
 
-test("TASK-013 generator is idempotent and preserves Creator-owned metadata", () => {
-  const metadataFiles = [
+test("TASK-013 generator is isolated, idempotent, and preserves metadata", () => {
+  const isolatedAssets = createIsolatedAssetsRoot();
+  const isolatedMetadataFiles = [
+    "composable-full-loadout-reference.scene.meta",
+    "gameai/one-handed-prop/one-handed-prop-demo.ts.meta",
+    "gameai/composable-loadout/composable-loadout-demo.ts.meta",
+  ].map((relativeFile) => path.join(isolatedAssets, relativeFile));
+  const trackedFiles = [
+    sceneFile,
     sceneMetaFile,
     sourceScriptMetaFile,
     targetScriptMetaFile,
   ];
-  const beforeMetadata = metadataFiles.map((file) => readFileSync(file, "utf8"));
-  execFileSync(process.execPath, [generator]);
-  const firstScene = readFileSync(sceneFile, "utf8");
-  execFileSync(process.execPath, [generator]);
-  assert.equal(readFileSync(sceneFile, "utf8"), firstScene);
+  const beforeTracked = trackedFiles.map((file) => readFileSync(file));
+  const beforeMetadata = isolatedMetadataFiles.map((file) =>
+    readFileSync(file, "utf8"),
+  );
+  execFileSync(process.execPath, [
+    generator,
+    "--assets-root",
+    isolatedAssets,
+  ]);
+  const firstScene = readFileSync(generatedScene(isolatedAssets), "utf8");
+  execFileSync(process.execPath, [
+    generator,
+    "--assets-root",
+    isolatedAssets,
+  ]);
+  assert.equal(readFileSync(generatedScene(isolatedAssets), "utf8"), firstScene);
+  assert.equal(firstScene, readFileSync(sceneFile, "utf8"));
   assert.deepEqual(
-    metadataFiles.map((file) => readFileSync(file, "utf8")),
+    isolatedMetadataFiles.map((file) => readFileSync(file, "utf8")),
     beforeMetadata,
   );
+  assert.deepEqual(
+    trackedFiles.map((file) => readFileSync(file)),
+    beforeTracked,
+  );
+  assert.deepEqual(temporaryFiles(isolatedAssets), []);
+});
+
+test("isolated Scene generation and tracked audits remain race-free", async () => {
+  const isolatedAssets = createIsolatedAssetsRoot();
+  const expectedScene = readFileSync(sceneFile, "utf8");
+  const trackedSceneBefore = readFileSync(sceneFile);
+  for (let iteration = 0; iteration < 50; iteration += 1) {
+    const [, audit] = await Promise.all([
+      execFileAsync(process.execPath, [
+        generator,
+        "--assets-root",
+        isolatedAssets,
+      ]),
+      validateTrackedCocosScenes(isolatedAssets),
+    ]);
+    assert.equal(audit.sceneCount, 2);
+    assert.equal(readFileSync(generatedScene(isolatedAssets), "utf8"), expectedScene);
+    assert.deepEqual(temporaryFiles(isolatedAssets), []);
+  }
+  assert.deepEqual(readFileSync(sceneFile), trackedSceneBefore);
+});
+
+test("atomic Scene publication never exposes partial JSON", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "gameai-cocos-atomic-write-"));
+  const target = path.join(root, "publication.scene");
+  writeFileSync(target, `${JSON.stringify({ generation: -1 })}\n`);
+  for (let iteration = 0; iteration < 50; iteration += 1) {
+    const nextDocument = {
+      generation: iteration,
+      payload: "scene-data".repeat(16_384),
+    };
+    const [, observed] = await Promise.all([
+      atomicWriteFile(target, `${JSON.stringify(nextDocument)}\n`),
+      readFile(target, "utf8"),
+    ]);
+    assert.doesNotThrow(() => JSON.parse(observed));
+    assert.deepEqual(temporaryFiles(root), []);
+  }
+  assert.deepEqual(JSON.parse(readFileSync(target, "utf8")), {
+    generation: 49,
+    payload: "scene-data".repeat(16_384),
+  });
+});
+
+test("failed atomic Scene publication removes its temporary file", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "gameai-cocos-atomic-failure-"));
+  const target = path.join(root, "publication.scene");
+  mkdirSync(target);
+  await assert.rejects(
+    atomicWriteFile(target, `${JSON.stringify({ complete: true })}\n`),
+  );
+  assert.deepEqual(temporaryFiles(root), []);
 });
 
 test("TASK-013 generator and output reject the known synthetic identities", () => {
