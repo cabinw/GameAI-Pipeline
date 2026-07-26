@@ -27,6 +27,19 @@ semantic animation clip IDs and socket IDs from an engine-neutral Rig Layout.
 The evaluator advances normal forward time with `(previousTime, currentTime]`
 and deterministic ordering by time, order, and event ID.
 
+The public parser and evaluator factory share one fail-closed structural and
+semantic validation boundary. The factory requires an explicit initial track,
+so authored array order cannot select runtime state. One-shot events emit
+authored commands. Looping and persistent VFX create stable
+track/event/cycle-named instances with explicit start/stop commands; reset,
+track switching, and disposal expose deterministic cleanup. Stops precede
+starts at an equal absolute boundary. Advancement rejects non-finite
+accumulated time or more than 10,000 cycles/commands before state mutation.
+
+Gameplay windows are paired within one authored track. Open/close require a
+window ID, signals forbid one, and unmatched, duplicate, or unclosed windows
+fail validation.
+
 The delivery boundary remains:
 
 ```text
@@ -46,6 +59,8 @@ the boundary. It is not implemented by TASK-014A.
 - Rig sockets remain stable semantic bindings rather than Cocos node names.
 - Each engine owns resource lookup, effect instances, audio playback,
   gameplay execution, and runtime lifecycle.
+- Adapters receive explicit lifecycle commands rather than inferring stop or
+  cleanup behavior from authored starts.
 - Reverse playback, seeking, networking, and adapter delivery remain
   unsupported until separately designed.
 - No Cocos VFX runtime, Creator Scene, effect asset, audio asset, gameplay

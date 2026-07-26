@@ -31,9 +31,10 @@ TASK-014A completes the engine-neutral Character Semantic Events 1.0 and VFX
 cue-definition contract, stable validation, textual fixtures, and
 deterministic animation-timeline evaluator. It covers generic cue IDs,
 Rig Layout sockets, local transforms, layer roles, follow policies,
-one-shot/looping/persistent lifecycle compatibility, typed VFX/audio/gameplay
-payloads, skipped frames, loop crossings, Pause/Resume, Exact Reset, and clip
-switching.
+one-shot/looping/persistent lifecycle commands, typed VFX/audio/gameplay
+payloads, track-local gameplay-window pairing, skipped frames, bounded loop
+crossings, explicit initial-track selection, Pause/Resume, Exact Reset, and
+clip switching.
 
 TASK-014A is contracts and evaluation only. Gameplay-triggered injection,
 engine adapter delivery, Cocos VFX runtime, effect/audio assets, gameplay

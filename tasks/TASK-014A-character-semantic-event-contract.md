@@ -3,10 +3,11 @@
 - Status: Complete
 - Date: 2026-07-26
 - Branch: `feat/task-014a-semantic-event-contract`
-- Baseline: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Integration baseline: `e1abc595c7cfcb95cc372e8a5b13de1fd7f8d49a`
 - Release baseline: `v0.2.0`
-- Automated baseline: 349/349 tests
-- Expected budget: at most 30 files and 6,000 lines; zero binary/generated
+- Release baseline commit: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Automated baseline: 352/352 tests
+- Expected remediated budget: at most 45 files and 8,000 lines; zero binary/generated
   asset, Scene, `.meta`, runtime-evidence, or Cocos files
 
 ## Objective
@@ -43,6 +44,15 @@ synchronization, and gameplay-triggered injection.
 - [x] Pause/Resume, Exact Reset, clip switching, and replay follow RFC-0014.
 - [x] Time-zero and exact-duration policies are documented and tested.
 - [x] Non-finite/reverse deltas and arbitrary seek fail explicitly.
+- [x] Direct evaluator inputs share schema and semantic validation with the
+  parser and fail closed.
+- [x] Evaluator creation requires an explicit validated initial track.
+- [x] Accumulated-time overflow and cycle/command budget rejection occur
+  before evaluator state mutation.
+- [x] Looping/persistent VFX expose stable start/stop identities and
+  deterministic reset, switch, and disposal cleanup.
+- [x] Gameplay windows require valid IDs and reject unmatched, duplicate, or
+  unclosed track-local pairs; signals forbid window IDs.
 - [x] Valid fixtures contain footstep dust, hand swing trail, hit-active
   gameplay, and one audio cue.
 - [x] Negative textual fixtures cover duplicate event, unknown socket,
@@ -54,7 +64,9 @@ synchronization, and gameplay-triggered injection.
 
 - Added Character Semantic Events schema 1.0 and the engine-neutral
   `@gameai/character-semantic-events` package.
-- Added 11 focused tests; the complete repository gate passes 360/360 tests.
-- Final scope is 29 changed files and approximately 4,150 changed lines, with
-  zero binary/generated asset, Cocos, Scene, `.meta`, or evidence files.
+- Added 16 focused tests; working-copy and frozen tracked-files-only
+  verification each pass 368/368 tests after the infrastructure-fix rebase.
+- Final measured scope is 35 changed files, 3,258 insertions, and 6 deletions;
+  exact publication totals come from the final commit diff. There are zero
+  binary/generated asset, Cocos, Scene, `.meta`, or evidence files.
 - No Cocos VFX runtime exists and no visual effect was rendered.

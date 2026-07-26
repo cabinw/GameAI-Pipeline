@@ -8,10 +8,11 @@ time.
 - Status: Complete
 - Started: 2026-07-26
 - Branch: `feat/task-014a-semantic-event-contract`
-- Baseline `main`: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Baseline `main`: `e1abc595c7cfcb95cc372e8a5b13de1fd7f8d49a`
 - Release baseline: `v0.2.0`
-- Automated baseline: 349/349 tests
-- Declared PR budget: at most 30 changed files and 6,000 changed lines;
+- Automated baseline: 352/352 tests; final branch result: 368/368 tests
+- Declared remediated PR budget: at most 45 changed files and 8,000 changed
+  lines;
   textual fixtures only and zero generated binary, Scene, `.meta`, VFX,
   audio, or evidence files. This is below the mandatory split thresholds of
   100 files and 25,000 lines.
@@ -60,6 +61,15 @@ implementing any engine adapter or effect.
    effect exists.
 7. Run package tests and the complete `CI=true pnpm verify`, inspect scope and
    generated-output cleanliness, and record the final result.
+8. Remediate the public evaluator boundary so direct inputs receive the same
+   structural and semantic validation as parsed JSON, with explicit initial
+   track selection and fail-closed diagnostics.
+9. Bound forward advancement before state mutation and model engine-neutral
+   one-shot emission plus looping/persistent start and stop commands,
+   deterministic cleanup, and same-boundary stop-before-start ordering.
+10. Require and pair gameplay window identifiers within each track, forbid
+    window identifiers on signals, and cover each stable pairing diagnostic
+    with textual fixtures and tests.
 
 ### Done when
 
@@ -81,15 +91,23 @@ implementing any engine adapter or effect.
 - Semantic events and VFX cue definitions remain separate; VFX, audio, and
   gameplay payloads are discriminated and all published diagnostics have
   direct coverage.
-- Deterministic evaluation passes same-time ordering, skipped frames, one and
-  multiple loops, Pause/Resume, Exact Reset, clip switching, replay,
-  zero/duration boundaries, and floating-boundary regression tests.
-- Package verification passed 11/11 tests. Complete `CI=true pnpm verify`
-  passed 360/360 tests with accepted TASK-013/R1-R7 regression behavior
-  unchanged.
-- Final scope is 29 changed files and approximately 4,150 changed lines, below
-  both declared and mandatory split thresholds. There are no binary/generated
-  assets, Cocos files, Scenes, `.meta` files, or evidence media.
+- One public fail-closed boundary now applies canonical schema and
+  semantic/context validation to parsed JSON and direct evaluator inputs;
+  evaluator creation requires an explicit initial track.
+- Deterministic evaluation exposes authored `emit` plus lifecycle `start` and
+  `stop` commands, stable track/event/cycle instance IDs, stop-before-start
+  ordering, cleanup, overflow rejection, and 10,000-cycle/command bounds
+  without partial mutation.
+- Gameplay window IDs and track-local pairing are schema/semantic validated
+  with five specific stable diagnostics and textual negative fixtures.
+- Package verification passed 16/16 tests. Working-copy and frozen
+  tracked-files-only `CI=true pnpm verify` each passed 368/368 tests,
+  including the accepted metadata-race regression.
+- Final measured scope is 35 changed files, 3,258 insertions, and 6 deletions;
+  the exact publication totals are recorded from the final commit diff. This
+  remains below both declared and mandatory split thresholds. There are no
+  binary/generated assets, Cocos files, Scenes, `.meta` files, or evidence
+  media.
 - TASK-014A defines contracts, validation, and evaluation only. No Cocos VFX
   runtime exists and no visual effect was rendered; TASK-014B remains
   unstarted.

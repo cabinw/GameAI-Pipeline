@@ -145,15 +145,23 @@ semantic `animationId` and is validated against that clip's finite positive
 duration before an evaluator can be created.
 
 Normal forward evaluation uses `(previousTime, currentTime]` and orders events
-by `timeSeconds`, `order`, and `eventId`. Skipped frames and one or more loop
-crossings enumerate every crossed event. Pause emits nothing; Resume continues
-without duplication; Exact Reset emits nothing; and switching clips clears
-old-clip progress without emitting old-clip events.
+by `timeSeconds`, `order`, and `eventId`. Skipped frames and bounded loop
+crossings enumerate every crossed command. One-shot events emit once;
+looping/persistent VFX start stable track/event/cycle instances, with duration
+or cleanup stops. Pause emits nothing and preserves active instances; Resume
+continues without duplication. Exact Reset and clip switching emit no authored
+timeline event, but stop active instances before clearing progress.
 
 Initial Rest and the first open boundary at time zero emit nothing. On a loop
 wrap, a zero-time event fires once for the new cycle. An exact-duration event
 fires once for the ending cycle before that new-cycle zero event. Reverse
 playback and arbitrary seeking fail explicitly.
+
+Evaluator creation requires an explicit initial event-track ID. Direct values
+and parsed JSON share the same schema-plus-semantic validation boundary, so
+array order and parser bypasses cannot alter or weaken runtime selection.
+Advances exceeding 10,000 cycles/commands or producing non-finite accumulated
+or lifecycle-boundary time fail before state mutation.
 
 See [Character Contracts](character-contracts.md) and
 [RFC-0014](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md). This

@@ -24,6 +24,16 @@ The TASK-005 Rig Animation validator implements:
 >=1.0.0 <1.1.0
 ```
 
+The TASK-014A Character Semantic Events validator implements:
+
+```text
+>=1.0.0 <1.1.0
+```
+
+Its public parser and evaluator factory share the canonical schema check
+before semantic clip, Rig Layout, cue, gameplay-window, or initial-track
+validation. Canonical and package schema bytes remain identical.
+
 An animation additionally declares its compatible Rig Layout identity and
 version. The rig ID and implemented major/minor must match before animation
 normalization.

@@ -235,6 +235,24 @@ hints. They contain no Cocos, Unity, or Godot resource type.
 Validation receives declared semantic clips and a validated engine-neutral Rig
 Layout. Unknown clip IDs and socket IDs fail before evaluator construction.
 Socket bindings use Rig Layout `socketId`, never a Cocos node name.
+`parseCharacterSemanticEvents()` and
+`createCharacterSemanticEventEvaluator()` share one fail-closed structural and
+semantic validation path. The factory accepts an unknown direct value and
+requires an explicit `initialTrackId`; malformed input or an unknown initial
+track returns diagnostics instead of constructing partial evaluator state.
+
+One-shot events produce `emit` commands. Looping and persistent VFX produce
+`start` commands with stable `<trackId>:<eventId>:<cycle>` instance IDs.
+Looping duration crossings, Exact Reset, track switching, and `dispose()`
+produce deterministic `stop` commands. Lifecycle stops precede authored starts
+at the same absolute boundary. Advancement is bounded to 10,000 cycles and
+10,000 commands and rejects overflow or budget exhaustion before state
+mutation.
+
+Gameplay `window-open` and `window-close` payloads require `windowId`;
+`signal` forbids it. Opens and closes pair within one authored track in
+time/order/event-ID order. Unmatched close, duplicate open, and unclosed
+windows are invalid; windows never carry across a loop.
 
 Stable validation codes are exported by the package:
 
@@ -259,6 +277,21 @@ Stable validation codes are exported by the package:
 - `UNSUPPORTED_SEMANTIC_EVENT_KIND`
 - `SEMANTIC_EVENT_PAYLOAD_KIND_MISMATCH`
 - `UNKNOWN_VFX_CUE_ID`
+- `MISSING_GAMEPLAY_WINDOW_ID`
+- `UNEXPECTED_GAMEPLAY_WINDOW_ID`
+- `UNMATCHED_GAMEPLAY_WINDOW_CLOSE`
+- `DUPLICATE_GAMEPLAY_WINDOW_OPEN`
+- `UNCLOSED_GAMEPLAY_WINDOW`
+- `UNKNOWN_SEMANTIC_EVENT_INITIAL_TRACK_ID`
+
+Stable evaluator-operation codes are:
+
+- `INVALID_SEMANTIC_EVENT_DELTA`
+- `UNSUPPORTED_SEMANTIC_EVENT_REVERSE_PLAYBACK`
+- `UNSUPPORTED_SEMANTIC_EVENT_SEEK`
+- `UNKNOWN_SEMANTIC_EVENT_EVALUATOR_TRACK_ID`
+- `SEMANTIC_EVENT_ACCUMULATED_TIME_OVERFLOW`
+- `SEMANTIC_EVENT_ADVANCE_BUDGET_EXCEEDED`
 
 See [RFC-0014](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md) and
 [ADR-0015](adr/ADR-0015-engine-neutral-character-semantic-events.md).

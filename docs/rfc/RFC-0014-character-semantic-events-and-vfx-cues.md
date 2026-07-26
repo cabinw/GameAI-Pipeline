@@ -72,6 +72,9 @@ The canonical document is
 The document binds tracks to semantic clip IDs. Validation receives the
 selected animation clips and engine-neutral Rig Layout as context. Unknown
 clips and sockets fail before an evaluator can be created.
+Both parsed JSON and direct evaluator inputs use the same structural-schema
+plus semantic validation boundary. Evaluator creation also requires an
+explicit `initialTrackId`; track array order has no runtime meaning.
 
 ## Timeline and boundary policy
 
@@ -85,7 +88,9 @@ Events are ordered by clip-local `timeSeconds`, then authored `order`, then
 `eventId`. Multiple same-time events are preserved.
 
 - Initial Rest emits nothing.
-- Exact Reset emits nothing and returns progress to zero.
+- Exact Reset emits no authored timeline event, stops every active looping or
+  persistent instance in stable instance-ID order, and returns progress to
+  zero.
 - During the first cycle, an event at time zero does not fire because zero is
   the open side of `(0, currentTime]`.
 - At a loop wrap, time zero belongs to the new cycle and fires once.
@@ -94,14 +99,28 @@ Events are ordered by clip-local `timeSeconds`, then authored `order`, then
 - Skipped frames and large deltas enumerate every crossed cycle.
 - Pause advances no time and emits nothing.
 - Resume continues from the same boundary without duplication.
-- A clip change discards old-clip progress and emits no old-clip events.
+- A clip change stops every active old-track instance, discards old-clip
+  progress, and emits no old-track authored events.
 - Reset followed by replay may emit nonzero events again.
 
 Evaluator comparisons use a fixed boundary tolerance and monotonically stored
 absolute progress so floating-point representation at a previously crossed
 boundary cannot duplicate delivery.
 
-## Lifecycle compatibility
+## Lifecycle commands and compatibility
+
+One-shot events produce an `emit` command. Looping and persistent VFX events
+produce a `start` command with the stable instance ID
+`<trackId>:<eventId>:<cycle>`. A looping duration produces a `stop` command at
+the crossed absolute stop boundary. Persistent instances remain active until
+Exact Reset, track switching, or `dispose()` cleanup. Pause and Resume do not
+alter active instances.
+
+Commands order by absolute boundary first. A lifecycle `stop` orders before
+authored commands at the same boundary; authored exact-duration/ordinary
+events then order before the next cycle's time-zero events. Within an authored
+boundary, `order` and `eventId` remain the tie breakers. Cleanup commands order
+by stable instance ID.
 
 - `vfx` supports one-shot, looping, and persistent.
 - A looping VFX event requires a positive finite duration.
@@ -111,6 +130,24 @@ boundary cannot duplicate delivery.
   semantic event.
 
 These restrictions are contract compatibility, not engine limitations.
+
+## Gameplay window rules
+
+`window-open` and `window-close` require a non-empty `windowId`. `signal`
+forbids `windowId` and represents an instantaneous named semantic cue.
+Window pairing is track-local and evaluated in deterministic authored
+timeline order. A close must follow one open, an already-open ID cannot open
+again, and every open must close within the same authored track. Windows do
+not remain open across loop boundaries.
+
+## Advancement bounds
+
+Each `advance()` accepts at most 10,000 crossed cycles and at most 10,000
+authored/lifecycle commands. The evaluator rejects a larger finite crossing,
+an unsafe cycle index, or a non-finite accumulated/boundary/stop time before
+mutating progress or active instances. These bounds prevent unbounded
+enumeration while remaining far above ordinary skipped-frame and multi-loop
+playback.
 
 ## Unsupported behavior
 
