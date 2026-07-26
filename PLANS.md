@@ -1,8 +1,87 @@
 # Implementation Plans
 
 Use this file for multi-file or architectural work. Keep one active plan at a
-time. There is no active implementation plan after the release closeout
-recorded below.
+time.
+
+## Active plan: Cocos Scene Generation / Metadata Audit Race
+
+- Status: Complete
+- Started: 2026-07-26
+- Completed: 2026-07-26
+- Branch: `fix/cocos-scene-metadata-audit-race`
+- Baseline: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Declared budget: at most 8 changed files and 1,500 changed lines; zero
+  generated Scene, `.meta`, binary, evidence, schema, runtime, or TASK-014A
+  files.
+
+### Goal
+
+Remove the nondeterministic race between the legacy TASK-013 Scene-generation
+test and concurrent all-Scene metadata audits without serializing the test
+suite, weakening audits, or adding retry behavior.
+
+### Root cause
+
+`test/cocos-scene-metadata.test.mjs` runs
+`scripts/generate-composable-loadout-scene.mjs` twice while Node executes
+other test files concurrently. The generator uses `writeFile` to truncate and
+rewrite the tracked
+`assets/composable-full-loadout-reference.scene`. Concurrent
+`validateTrackedCocosScenes` calls in TASK-013R7 enumerate and parse that same
+shared Scene, so they can observe incomplete JSON. The canonical V2 Scene is
+not the writer; its audit fails because the audit intentionally covers every
+tracked Scene.
+
+### Boundaries
+
+- Generate legacy idempotence-test output below an isolated temporary assets
+  root and leave the tracked canonical and legacy Scenes immutable during
+  tests.
+- Add a narrow same-directory atomic-write helper for the production legacy
+  Scene generator.
+- Preserve byte-identical generated Scene output and Creator-owned `.meta`
+  files.
+- Add focused concurrent stress, deterministic-byte, tracked-immutability,
+  temporary-file closure, and failure-cleanup tests.
+- Do not change Cocos runtime behavior, Scenes, metadata, TASK-014A,
+  TASK-014B, test concurrency, timeouts, or parse/retry policy.
+
+### Execution
+
+1. Record the failure topology and protected TASK-014A fingerprint.
+2. Parameterize the legacy Scene generator with an optional isolated assets
+   root and replace its direct write with an atomic same-directory write.
+3. Move the legacy idempotence test to a complete temporary fixture.
+4. Add at least 50 concurrent writer/reader stress iterations plus cleanup and
+   deterministic-output assertions.
+5. Run focused tests, three complete working-copy verification runs, and
+   three complete tracked-only verification runs.
+6. Confirm generated-output closure, clean tree, text-only scope, protected
+   refs, and exact TASK-014A fingerprint preservation.
+7. Commit, push, and open one Draft PR without merging.
+
+### Done when
+
+- Metadata audits cannot observe partially serialized JSON.
+- Generator tests do not mutate tracked Scenes or `.meta` files.
+- Atomic write success and failure leave no temporary files.
+- Generated Scene bytes remain identical to the tracked accepted output.
+- Every required full verification run passes with the actual baseline-plus-
+  regression test total and the worktree remains clean.
+
+### Closeout result
+
+- The legacy generator test now uses an isolated complete asset fixture; no
+  test-time process writes a tracked Scene or `.meta` file.
+- Scene publication writes, flushes, and closes a unique same-directory
+  temporary file before atomic replacement, with failure cleanup covered.
+- The focused regression passed 50 shared isolated Scene writer/metadata-
+  reader iterations, plus 50 atomic writer/reader iterations.
+- Three working-copy and three frozen-install tracked-files-only verification
+  runs each passed 352/352 tests (349 baseline tests plus three net regression
+  tests).
+- Generated output remained closed and deterministic, with zero Scene,
+  `.meta`, binary, MP4, runtime, TASK-014A, or TASK-014B changes.
 
 ## Completed plan: RELEASE-0.2.0 Character Loadout Baseline Closeout
 

@@ -1,14 +1,25 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { atomicWriteFile } from "./atomic-write.mjs";
 import {
   compressCocosUuid,
   readCocosMeta,
 } from "./cocos-scene-metadata.mjs";
 
 const extensionRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const assets = path.resolve(extensionRoot, "../..", "assets");
+const defaultAssets = path.resolve(extensionRoot, "../..", "assets");
+const args = process.argv.slice(2);
+if (
+  args.length !== 0 &&
+  (args.length !== 2 || args[0] !== "--assets-root" || !args[1])
+) {
+  throw new Error(
+    "TASK_013_GENERATOR_ARGUMENTS: expected no arguments or --assets-root <path>",
+  );
+}
+const assets = args.length === 0 ? defaultAssets : path.resolve(args[1]);
 const sourceScene = path.join(assets, "one-handed-prop-reference.scene");
 const outputScene = path.join(assets, "composable-full-loadout-reference.scene");
 const sourceScriptMeta = path.join(
@@ -93,4 +104,4 @@ if (
   throw new Error("TASK_013_OUTPUT_COMPONENT_IDENTITY_INVALID");
 }
 
-await writeFile(outputScene, `${JSON.stringify(document, null, 2)}\n`);
+await atomicWriteFile(outputScene, `${JSON.stringify(document, null, 2)}\n`);
