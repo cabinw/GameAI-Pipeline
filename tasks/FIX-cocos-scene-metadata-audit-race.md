@@ -1,9 +1,12 @@
 # FIX: Isolate Cocos Scene Generation from Metadata Audits
 
-- Status: Complete
+- Status: Accepted
 - Date: 2026-07-26
+- Accepted: 2026-07-26
 - Branch: `fix/cocos-scene-metadata-audit-race`
 - Baseline: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Accepted implementation:
+  `620526fdb0d0b45561df5ae6a3b0bdf1a6928e78`
 - Expected budget: at most 8 files and 1,500 lines
 
 ## Problem
@@ -31,3 +34,12 @@ truncate-to-complete interval, producing intermittent
 No runtime behavior, serialized Scene content, metadata identity, global test
 serialization, timeout increase, retry, sleep, ignored parse error, audit
 exclusion, TASK-014A change, or TASK-014B work.
+
+## Acceptance record
+
+- External code review: PASS.
+- Working-copy verification: three consecutive 352/352 passes.
+- Frozen-install tracked-files-only verification: three consecutive 352/352
+  passes.
+- GitHub Actions verification: PASS.
+- No TASK-014A work was modified; TASK-014A remains uncommitted.

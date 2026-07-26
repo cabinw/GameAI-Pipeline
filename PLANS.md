@@ -3,13 +3,16 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: Cocos Scene Generation / Metadata Audit Race
+## Completed plan: Cocos Scene Generation / Metadata Audit Race
 
-- Status: Complete
+- Status: Accepted
 - Started: 2026-07-26
 - Completed: 2026-07-26
+- Accepted: 2026-07-26
 - Branch: `fix/cocos-scene-metadata-audit-race`
 - Baseline: `f3ff419522a4d65305b7a20a88a40b26c7084903`
+- Accepted implementation:
+  `620526fdb0d0b45561df5ae6a3b0bdf1a6928e78`
 - Declared budget: at most 8 changed files and 1,500 changed lines; zero
   generated Scene, `.meta`, binary, evidence, schema, runtime, or TASK-014A
   files.
@@ -71,6 +74,7 @@ tracked Scene.
 
 ### Closeout result
 
+- External code review: PASS.
 - The legacy generator test now uses an isolated complete asset fixture; no
   test-time process writes a tracked Scene or `.meta` file.
 - Scene publication writes, flushes, and closes a unique same-directory
@@ -80,8 +84,10 @@ tracked Scene.
 - Three working-copy and three frozen-install tracked-files-only verification
   runs each passed 352/352 tests (349 baseline tests plus three net regression
   tests).
+- GitHub Actions verification passed on the accepted implementation.
 - Generated output remained closed and deterministic, with zero Scene,
   `.meta`, binary, MP4, runtime, TASK-014A, or TASK-014B changes.
+- The protected uncommitted TASK-014A worktree was not modified.
 
 ## Completed plan: RELEASE-0.2.0 Character Loadout Baseline Closeout
 
