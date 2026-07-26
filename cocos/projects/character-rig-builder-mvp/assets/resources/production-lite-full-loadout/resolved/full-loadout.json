@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
   "loadoutId": "production-lite-full-loadout",
-  "stateId": "full-loadout",
+  "stateId": "garment-and-accessories-with-left-hand-prop",
   "resolvedStateIds": [
-    "full-loadout"
+    "garment-and-accessories-with-left-hand-prop"
   ],
   "attachments": [
     {

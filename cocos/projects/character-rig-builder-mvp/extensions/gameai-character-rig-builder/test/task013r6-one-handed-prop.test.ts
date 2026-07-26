@@ -7,7 +7,9 @@ import test from "node:test";
 import {
   composeAttachmentWorldTransform,
   multiplyAttachmentTransforms,
+  resolveCharacterLoadout,
   type AttachmentLayout,
+  type CharacterLoadoutContract,
   type RigLayout,
 } from "@gameai/character-contracts";
 import {
@@ -59,6 +61,7 @@ import {
 import {
   validatePropSpatialMeasurement,
 } from "../source/task013r6/prop-spatial";
+import { PropRuntimeReadiness } from "../source/task013r6/runtime-readiness";
 
 const extensionRoot = path.resolve(__dirname, "../..");
 const repositoryRoot = path.resolve(extensionRoot, "../../../../..");
@@ -75,6 +78,78 @@ const propFixtureRoot = path.join(
   repositoryRoot,
   "examples/production-lite-one-handed-prop",
 );
+const fullLoadoutFixtureRoot = path.join(
+  repositoryRoot,
+  "examples/production-lite-full-loadout",
+);
+
+test("TASK-013R7 input remains unavailable throughout loading and terminal failure", () => {
+  const readiness = new PropRuntimeReadiness();
+  const generation = readiness.begin();
+  assert.equal(readiness.canDispatch(generation), false);
+  assert.equal(readiness.snapshot().activeInputHandlerCount, 0);
+  readiness.fail(generation);
+  assert.equal(readiness.canDispatch(generation), false);
+  assert.equal(readiness.snapshot().activeInputHandlerCount, 0);
+});
+
+test("TASK-013R7 resource failure reaches one explicit terminal failure", async () => {
+  const manifest = createPropResourceManifest((await fixtureInputs()).plan);
+  const coordinator = new HarnessResourceCoordinator(manifest);
+  for (const entry of manifest) coordinator.request(entry.logicalId);
+  coordinator.reject(manifest[0]!.logicalId);
+  coordinator.rejectPending();
+  const snapshot = coordinator.snapshot();
+  assert.equal(snapshot.terminal, "failed");
+  assert.equal(snapshot.requested, 35);
+  assert.equal(snapshot.loaded, 0);
+  assert.equal(snapshot.failed, 35);
+  assert.equal(snapshot.duplicateRequests, 0);
+});
+
+test("TASK-013R7 activates exactly one handler only after complete readiness", () => {
+  const readiness = new PropRuntimeReadiness();
+  const generation = readiness.begin();
+  readiness.resourcesPassed(generation);
+  assert.equal(readiness.canDispatch(generation), false);
+  readiness.nodesBuilt(generation);
+  readiness.resetComplete(generation, true);
+  readiness.lifecycleReady(generation);
+  assert.equal(readiness.canDispatch(generation), false);
+  readiness.activateInput(generation);
+  assert.equal(readiness.canDispatch(generation), true);
+  assert.equal(readiness.snapshot().activeInputHandlerCount, 1);
+  assert.throws(
+    () => readiness.activateInput(generation),
+    /TASK_013R7_DUPLICATE_INPUT_HANDLER/u,
+  );
+});
+
+test("TASK-013R7 rebuild, disable, and destroy invalidate old handlers and generations", () => {
+  const readiness = new PropRuntimeReadiness();
+  const first = readiness.begin();
+  readiness.resourcesPassed(first);
+  readiness.nodesBuilt(first);
+  readiness.resetComplete(first, true);
+  readiness.lifecycleReady(first);
+  readiness.activateInput(first);
+  readiness.teardown();
+  assert.equal(readiness.canDispatch(first), false);
+  assert.equal(readiness.snapshot().activeInputHandlerCount, 0);
+
+  const second = readiness.begin();
+  assert.notEqual(second, first);
+  assert.equal(readiness.canDispatch(second), false);
+  readiness.resourcesPassed(second);
+  readiness.nodesBuilt(second);
+  readiness.resetComplete(second, true);
+  readiness.lifecycleReady(second);
+  readiness.activateInput(second);
+  assert.equal(readiness.snapshot().activeInputHandlerCount, 1);
+  readiness.teardown(true);
+  assert.equal(readiness.snapshot().activeInputHandlerCount, 0);
+  assert.equal(readiness.canDispatch(second), false);
+});
 
 const garmentStateDefinitions: readonly GarmentStateDefinition[] =
   Object.freeze([
@@ -138,6 +213,65 @@ interface FixtureInputs {
   readonly propLayout: AttachmentLayout;
   readonly clips: readonly RigAnimation[];
   readonly plan: PropBridgePlan;
+  readonly resolvedLoadoutStates: Parameters<
+    typeof buildPropBridgePlan
+  >[5];
+}
+
+async function engineNeutralLoadoutStates(
+  rigLayout: RigLayout,
+): Promise<Parameters<typeof buildPropBridgePlan>[5]> {
+  const serialized = JSON.parse(
+    await readFile(
+      path.join(fullLoadoutFixtureRoot, "loadout-contract.json"),
+      "utf8",
+    ),
+  );
+  const contract: CharacterLoadoutContract = {
+    ...serialized,
+    families: await Promise.all(
+      serialized.families.map(async (family: any) => ({
+        familyId: family.familyId,
+        attachmentLayout: JSON.parse(
+          await readFile(
+            path.join(
+              fullLoadoutFixtureRoot,
+              family.attachmentLayoutFile,
+            ),
+            "utf8",
+          ),
+        ),
+      })),
+    ),
+  };
+  return contract.states.map((state) => {
+    const resolved = resolveCharacterLoadout(
+      rigLayout,
+      contract,
+      state.stateId,
+    );
+    const garment = state.enabledFamilyIds.includes("garment");
+    const accessories = state.enabledFamilyIds.includes("accessories");
+    const garmentStateId = garment && accessories
+      ? GARMENT_COMBINED_STATE_ID
+      : garment
+        ? GARMENT_ONLY_STATE_ID
+        : accessories
+          ? GARMENT_ACCESSORIES_ONLY_STATE_ID
+          : GARMENT_BASE_ONLY_STATE_ID;
+    const propStateId =
+      (state.propStateId ?? PROP_NO_PROP_STATE_ID) as
+        Parameters<typeof buildPropBridgePlan>[5][number]["propStateId"];
+    return {
+      stateId: state.stateId,
+      garmentStateId,
+      propStateId,
+      hudLabel: state.stateId,
+      enabledAttachmentIds: resolved.enabledAttachments.map(
+        (attachment) => attachment.attachmentId,
+      ),
+    } satisfies Parameters<typeof buildPropBridgePlan>[5][number];
+  });
 }
 
 async function fixtureInputs(): Promise<FixtureInputs> {
@@ -224,14 +358,23 @@ async function fixtureInputs(): Promise<FixtureInputs> {
     baseDimensions,
     garmentDimensions,
   );
+  const resolvedLoadoutStates = await engineNeutralLoadoutStates(rigLayout);
   const plan = buildPropBridgePlan(
     garment,
     rigLayout,
     propLayout,
     propDimensions,
     "production-lite-one-handed-prop",
+    resolvedLoadoutStates,
   );
-  return { rigLayout, garmentLayout, propLayout, clips, plan };
+  return {
+    rigLayout,
+    garmentLayout,
+    propLayout,
+    clips,
+    plan,
+    resolvedLoadoutStates,
+  };
 }
 
 test("TASK-013R6 resolves the deterministic 12-state garment/accessory/prop cross-product", async () => {
@@ -310,6 +453,7 @@ test("TASK-013R6 resolution is stable under reordered prop declarations", async 
       reordered,
       dimensions,
       "production-lite-one-handed-prop",
+      inputs.resolvedLoadoutStates,
     ),
     inputs.plan,
   );
@@ -333,6 +477,7 @@ test("TASK-013R6 rejects unknown prop state, hand socket, and duplicate prop IDs
         unknownState,
         dimensions,
         "production-lite-one-handed-prop",
+        inputs.resolvedLoadoutStates,
       ),
     /TASK_013R6_PROP_CONTRACT_INVALID|UNKNOWN_PROP_STATE/u,
   );
@@ -346,6 +491,7 @@ test("TASK-013R6 rejects unknown prop state, hand socket, and duplicate prop IDs
         unknownSocket,
         dimensions,
         "production-lite-one-handed-prop",
+        inputs.resolvedLoadoutStates,
       ),
     /TASK_013R6_PROP_CONTRACT_INVALID|UNKNOWN_ATTACHMENT_SOCKET/u,
   );
@@ -360,6 +506,7 @@ test("TASK-013R6 rejects unknown prop state, hand socket, and duplicate prop IDs
         duplicate,
         dimensions,
         "production-lite-one-handed-prop",
+        inputs.resolvedLoadoutStates,
       ),
     /TASK_013R6_PROP_CONTRACT_INVALID|DUPLICATE_ATTACHMENT_ID/u,
   );
@@ -376,6 +523,7 @@ test("TASK-013R6 rejects unknown prop state, hand socket, and duplicate prop IDs
         inputs.propLayout,
         missingDimensions,
         "production-lite-one-handed-prop",
+        inputs.resolvedLoadoutStates,
       ),
     /TASK_013R6_PROP_DIMENSIONS_MISSING/u,
   );
@@ -629,6 +777,7 @@ test("TASK-013R6 spatial guard includes prop grip, duplicates, sockets, seams, a
     frontBackRoleViolationCount: 0,
     unknownHandSocketCount: 0,
     duplicateActivePropCount: 0,
+    duplicateHandOverlayCount: 0,
     activePrimaryPropCount: 1,
     expectedPrimaryPropCount: 1,
   };
@@ -648,6 +797,14 @@ test("TASK-013R6 spatial guard includes prop grip, duplicates, sockets, seams, a
         propSocketToGripErrors: [0.51],
       }),
     /TASK_013R6_GRIP_TOLERANCE_EXCEEDED/u,
+  );
+  assert.throws(
+    () =>
+      validatePropSpatialMeasurement({
+        ...valid,
+        duplicateHandOverlayCount: 1,
+      }),
+    /TASK_013R6_PROP_RUNTIME_INVALID/u,
   );
   assert.throws(
     () =>

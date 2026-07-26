@@ -21,13 +21,53 @@
   ],
   "states": [
     {
-      "stateId": "base-only",
-      "enabledFamilyIds": []
+      "stateId": "base-only-with-no-prop",
+      "enabledFamilyIds": [
+        "prop"
+      ]
     },
     {
-      "stateId": "accessories-only",
+      "stateId": "base-only-with-left-hand-prop",
       "enabledFamilyIds": [
-        "accessories"
+        "prop"
+      ],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "base-only-with-right-hand-prop",
+      "enabledFamilyIds": [
+        "prop"
+      ],
+      "propStateId": "right-hand-prop"
+    },
+    {
+      "stateId": "garment-only-with-no-prop",
+      "enabledFamilyIds": [
+        "garment",
+        "prop"
+      ]
+    },
+    {
+      "stateId": "garment-only-with-left-hand-prop",
+      "enabledFamilyIds": [
+        "garment",
+        "prop"
+      ],
+      "propStateId": "left-hand-prop"
+    },
+    {
+      "stateId": "garment-only-with-right-hand-prop",
+      "enabledFamilyIds": [
+        "garment",
+        "prop"
+      ],
+      "propStateId": "right-hand-prop"
+    },
+    {
+      "stateId": "accessories-only-with-no-prop",
+      "enabledFamilyIds": [
+        "accessories",
+        "prop"
       ],
       "requiredAttachmentIds": [
         "cap-back",
@@ -36,52 +76,7 @@
       ]
     },
     {
-      "stateId": "garment-only",
-      "enabledFamilyIds": [
-        "garment"
-      ],
-      "requiredAttachmentIds": [
-        "jacket-back",
-        "jacket-front",
-        "collar-back",
-        "collar-front",
-        "jacket-zipper-trim",
-        "jacket-upper-sleeve-left",
-        "jacket-upper-sleeve-right",
-        "jacket-lower-sleeve-left",
-        "jacket-lower-sleeve-right",
-        "jacket-cuff-left",
-        "jacket-cuff-right"
-      ]
-    },
-    {
-      "stateId": "prop-only",
-      "enabledFamilyIds": [
-        "prop"
-      ],
-      "propStateId": "left-hand-prop",
-      "requiredAttachmentIds": [
-        "toolbox-left",
-        "hand-overlay-left"
-      ]
-    },
-    {
-      "stateId": "garment-accessories",
-      "enabledFamilyIds": [
-        "accessories",
-        "garment"
-      ]
-    },
-    {
-      "stateId": "garment-prop",
-      "enabledFamilyIds": [
-        "garment",
-        "prop"
-      ],
-      "propStateId": "left-hand-prop"
-    },
-    {
-      "stateId": "accessories-prop",
+      "stateId": "accessories-only-with-left-hand-prop",
       "enabledFamilyIds": [
         "accessories",
         "prop"
@@ -89,34 +84,15 @@
       "propStateId": "left-hand-prop"
     },
     {
-      "stateId": "full-loadout",
+      "stateId": "accessories-only-with-right-hand-prop",
       "enabledFamilyIds": [
         "accessories",
-        "garment",
         "prop"
       ],
-      "propStateId": "left-hand-prop",
-      "requiredAttachmentIds": [
-        "cap-back",
-        "cap-front",
-        "sunglasses",
-        "jacket-back",
-        "jacket-front",
-        "collar-back",
-        "collar-front",
-        "jacket-zipper-trim",
-        "jacket-upper-sleeve-left",
-        "jacket-upper-sleeve-right",
-        "jacket-lower-sleeve-left",
-        "jacket-lower-sleeve-right",
-        "jacket-cuff-left",
-        "jacket-cuff-right",
-        "toolbox-left",
-        "hand-overlay-left"
-      ]
+      "propStateId": "right-hand-prop"
     },
     {
-      "stateId": "full-loadout-no-prop",
+      "stateId": "garment-and-accessories-with-no-prop",
       "enabledFamilyIds": [
         "accessories",
         "garment",
@@ -124,7 +100,7 @@
       ]
     },
     {
-      "stateId": "full-loadout-left",
+      "stateId": "garment-and-accessories-with-left-hand-prop",
       "enabledFamilyIds": [
         "accessories",
         "garment",
@@ -133,7 +109,7 @@
       "propStateId": "left-hand-prop"
     },
     {
-      "stateId": "full-loadout-right",
+      "stateId": "garment-and-accessories-with-right-hand-prop",
       "enabledFamilyIds": [
         "accessories",
         "garment",

@@ -80,6 +80,7 @@ import {
   type PropSpatialMeasurement,
 } from "./prop-spatial";
 import { PropBridgeState } from "./prop-state";
+import { PropRuntimeReadiness } from "./runtime-readiness";
 import {
   applyGarmentState,
   buildGarmentRuntime,
@@ -169,6 +170,7 @@ interface SpatialRuntimeSnapshot {
   readonly duplicateActiveGarmentCount: number;
   readonly duplicateActiveAccessoryCount: number;
   readonly duplicateActivePropCount: number;
+  readonly duplicateHandOverlayCount: number;
   readonly unknownHandSocketCount: number;
   readonly duplicateResourceRequestCount: number;
   readonly duplicateInputHandlerCount: number;
@@ -182,6 +184,7 @@ interface SpatialRuntimeSnapshot {
 @ccclass("GameAITask013R6OneHandedPropIntegration")
 export class GameAITask013R6OneHandedPropIntegration extends Component {
   private readonly lifecycle = new HarnessLifecycle();
+  private readonly readiness = new PropRuntimeReadiness();
   private readonly semanticState = new PropBridgeState(
     PLAN.defaultGarmentStateId,
     PLAN.defaultPropStateId,
@@ -191,6 +194,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
   private playback: RigAnimationPlayback | null = null;
   private readonly spriteFrames = new Map<string, SpriteFrame>();
   private inputRegistered = false;
+  private runtimeGeneration = 0;
   private inputEventCount = 0;
   private lifecycleRebuildCount = 0;
   private maximumMarkerError = 0;
@@ -239,31 +243,46 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
 
   private beginRuntimeSetup(): void {
     const generation = this.lifecycle.begin();
-    this.registerInput();
+    this.runtimeGeneration = this.readiness.begin();
+    if (generation !== this.runtimeGeneration) {
+      throw new Error("TASK_013R7_LIFECYCLE_GENERATION_MISMATCH");
+    }
     this.spriteFrames.clear();
     this.coordinator = new HarnessResourceCoordinator(RESOURCE_MANIFEST);
     for (const entry of RESOURCE_MANIFEST) {
       this.coordinator.request(entry.logicalId);
+    }
+    for (const entry of RESOURCE_MANIFEST) {
       resources.load(entry.cocosPath, SpriteFrame, (error, asset) => {
         if (!this.lifecycle.accepts(generation)) return;
         if (error || asset === null) {
-          this.coordinator?.reject(entry.logicalId);
-          this.lifecycle.fail(generation);
-          throw new Error(
+          this.handleResourceFailure(
+            generation,
+            entry.logicalId,
             `TASK_013R6_RESOURCE_LOAD_FAILED: ${JSON.stringify({
               logicalId: entry.logicalId,
               cocosPath: entry.cocosPath,
               error: error?.message ?? "null SpriteFrame",
             })}`,
           );
+          return;
         }
         this.spriteFrames.set(entry.logicalId, asset);
         this.coordinator?.succeed(entry.logicalId);
         const snapshot = this.coordinator?.snapshot();
         if (snapshot?.terminal === "passed") {
+          this.readiness.resourcesPassed(generation);
           this.buildRuntime();
-          this.lifecycle.ready(generation);
+          this.readiness.nodesBuilt(generation);
           this.exactReset();
+          this.readiness.resetComplete(
+            generation,
+            this.playback !== null,
+          );
+          this.lifecycle.ready(generation);
+          this.readiness.lifecycleReady(generation);
+          this.registerInput(generation);
+          this.updateHud();
           const identity = this.runtimeDisplayIdentity();
           console.info(
             `${identity.diagnosticsId}_RUNTIME_READY ${JSON.stringify({
@@ -278,6 +297,26 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
         }
       });
     }
+  }
+
+  private handleResourceFailure(
+    generation: number,
+    logicalId: string,
+    diagnostic: string,
+  ): void {
+    this.unregisterInput();
+    this.coordinator?.reject(logicalId);
+    this.coordinator?.rejectPending();
+    this.runtime?.generatedRoot.removeFromParent();
+    this.runtime?.overlayRoot.removeFromParent();
+    this.runtime?.generatedRoot.destroy();
+    this.runtime?.overlayRoot.destroy();
+    this.runtime = null;
+    this.playback = null;
+    this.spriteFrames.clear();
+    this.readiness.fail(generation);
+    this.lifecycle.fail(generation);
+    console.error(diagnostic);
   }
 
   private buildRuntime(): void {
@@ -579,6 +618,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
         this.frontBackRoleViolationCount(runtime),
       unknownHandSocketCount: 0,
       duplicateActivePropCount: duplicatePropCounts.primaryProps,
+      duplicateHandOverlayCount: duplicatePropCounts.overlays,
       activePrimaryPropCount: this.activePropCounts.primaryProps,
       expectedPrimaryPropCount,
     };
@@ -631,10 +671,14 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       duplicateActiveGarmentCount: duplicateCounts.garment,
       duplicateActiveAccessoryCount: duplicateCounts.accessories,
       duplicateActivePropCount: duplicatePropCounts.primaryProps,
+      duplicateHandOverlayCount: duplicatePropCounts.overlays,
       unknownHandSocketCount: 0,
       duplicateResourceRequestCount:
         this.coordinator?.snapshot().duplicateRequests ?? 0,
-      duplicateInputHandlerCount: this.inputRegistered ? 0 : 1,
+      duplicateInputHandlerCount: Math.max(
+        0,
+        this.readiness.snapshot().activeInputHandlerCount - 1,
+      ),
       nonFinitePositionCount: 0,
       debugOutsideCharacterCount: this.debugOutsideViewportCount(
         runtime.overlayRoot,
@@ -1058,12 +1102,13 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     return violations;
   }
 
-  private registerInput(): void {
+  private registerInput(generation: number): void {
     if (this.inputRegistered) {
       throw new Error("TASK_013R6_DUPLICATE_INPUT_HANDLER");
     }
     input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
     this.inputRegistered = true;
+    this.readiness.activateInput(generation);
   }
 
   private unregisterInput(): void {
@@ -1073,6 +1118,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
   }
 
   private onKeyDown(event: EventKeyboard): void {
+    if (!this.readiness.canDispatch(this.runtimeGeneration)) return;
     const binding = BINDING_BY_KEY.get(event.keyCode);
     if (binding === undefined) return;
     this.inputEventCount += 1;
@@ -1176,7 +1222,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       `MAX MARKER ${this.maximumMarkerError.toFixed(3)} px · SKELETON ${this.maximumSkeletonError.toFixed(3)} px · ACCESSORY SOCKET ${this.maximumAccessorySocketError.toFixed(3)} px`,
       `MAX GARMENT SEAM ${this.maximumGarmentSeamError.toFixed(3)} px · PROP GRIP ${this.maximumPropGripError.toFixed(3)} px · LIMIT ${HARNESS_SPATIAL_TOLERANCE_PX.toFixed(1)} px`,
       `SORTING ${this.lastSpatial?.sortingViolationCount ?? 0} · FRONT/BACK ${this.lastSpatial?.frontBackRoleViolationCount ?? 0} · UNKNOWN SLOTS ${this.lastSpatial?.unknownSlotCount ?? 0}`,
-      `DUP GARMENT ${this.lastSpatial?.duplicateActiveGarmentCount ?? 0} · DUP ACCESSORY ${this.lastSpatial?.duplicateActiveAccessoryCount ?? 0} · DUP PROP ${this.lastSpatial?.duplicateActivePropCount ?? 0}`,
+      `DUP GARMENT ${this.lastSpatial?.duplicateActiveGarmentCount ?? 0} · DUP ACCESSORY ${this.lastSpatial?.duplicateActiveAccessoryCount ?? 0} · DUP PROP ${this.lastSpatial?.duplicateActivePropCount ?? 0} · DUP OVERLAY ${this.lastSpatial?.duplicateHandOverlayCount ?? 0}`,
       `DUP INPUT ${this.lastSpatial?.duplicateInputHandlerCount ?? 0} · DUP RESOURCE ${this.lastSpatial?.duplicateResourceRequestCount ?? 0} · NON-FINITE ${this.lastSpatial?.nonFinitePositionCount ?? 0} · OUTSIDE ${this.lastSpatial?.debugOutsideCharacterCount ?? 0}`,
       `CONTROLS ${runtimeHelp}`,
       `PROP STATES ${stateHelp}`,
@@ -1194,6 +1240,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.playback = null;
     this.coordinator = null;
     this.spriteFrames.clear();
+    this.readiness.teardown(dispose);
     this.lifecycle.teardown(dispose);
   }
 }

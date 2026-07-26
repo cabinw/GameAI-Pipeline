@@ -1,6 +1,200 @@
 // Generated from tracked engine-neutral rig, animation, garment, accessory, prop, socket, and grip contracts. Do not hand-edit.
 import type { PropBridgePlan } from "./prop-bridge-runtime-contract";
 
+export const PROP_BRIDGE_PLAN_PROVENANCE = {
+  "generatorVersion": "2.0.0",
+  "inputs": [
+    {
+      "path": "cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/generate-task013r6-runtime.mjs",
+      "sha256": "d4992a3673526fd2d2dd771875319256d7a39133110f90000fc00087126edaea"
+    },
+    {
+      "path": "examples/production-lite-character/animations/arm-wave.json",
+      "sha256": "8c51eb4dc44f9bee46e14e9cb5770a99aef347210dea7d5e5d3df7e5497e5a3c"
+    },
+    {
+      "path": "examples/production-lite-character/animations/articulation-stress.json",
+      "sha256": "a9f8d0ce4c165b41d94a98b791335dc04061b7aed61a17b3e11a2c558ca55cce"
+    },
+    {
+      "path": "examples/production-lite-character/animations/rest-idle.json",
+      "sha256": "40a6ebdab3c0f4b277d0115123adb8f150c88844017dadd6e7691d9f85221b6a"
+    },
+    {
+      "path": "examples/production-lite-character/parts/hair-back.png",
+      "sha256": "f7de0ccc71b48ef9a5fff083f6fd4b8f53c51c2c0e3f3a12f2361c5a1acd6359"
+    },
+    {
+      "path": "examples/production-lite-character/parts/hair-front.png",
+      "sha256": "05c48b496b2840f14311d70ea074a81f15edf332d7d554e94ec9e24b7fd9a2e7"
+    },
+    {
+      "path": "examples/production-lite-character/parts/hand-left.png",
+      "sha256": "4099eed195a5b9330946a9053c9b7c02f0eb8ca25f81d6e071c0e1c3bf9948b2"
+    },
+    {
+      "path": "examples/production-lite-character/parts/hand-right.png",
+      "sha256": "7987531c7aa03bead72162e18c4f9bbd540178ac3e58a6fa195d0dc560630666"
+    },
+    {
+      "path": "examples/production-lite-character/parts/head.png",
+      "sha256": "d0ce767dd7127f42fadea116dffdc8ac259ea98e0aaf3c4925677384d90193ff"
+    },
+    {
+      "path": "examples/production-lite-character/parts/lower-arm-left.png",
+      "sha256": "c653df9cd9d5e9180c5a1e5f5deca399ce4053642ce6d97c2ff0a3634e1e63a1"
+    },
+    {
+      "path": "examples/production-lite-character/parts/lower-arm-right.png",
+      "sha256": "3ea266f8dc44d01db2c0484832d9e07de9d48658537e388b12aa16545e45c328"
+    },
+    {
+      "path": "examples/production-lite-character/parts/pelvis.png",
+      "sha256": "760f2358e9511d163aa6fd4884132a06bbc4414e70762da489dce36b92e16b8b"
+    },
+    {
+      "path": "examples/production-lite-character/parts/shin-left.png",
+      "sha256": "ad7bb7069ba6f11643148f339740d7c1b9301d699d139e550d08fbaf563156ec"
+    },
+    {
+      "path": "examples/production-lite-character/parts/shin-right.png",
+      "sha256": "3e518bcd7c662a62f0a237fbe3a1017c5785ebb5aa8832939bb8f24e9b18ca3f"
+    },
+    {
+      "path": "examples/production-lite-character/parts/shoe-left.png",
+      "sha256": "4e5383055be3579a8b7893dca28b1837fe81c5800beb21c4c4e6ef670c2b76d9"
+    },
+    {
+      "path": "examples/production-lite-character/parts/shoe-right.png",
+      "sha256": "d777945245d4041ed0d9b236ed34fe75f801b4f6c664c721c09b3473dc750f9c"
+    },
+    {
+      "path": "examples/production-lite-character/parts/thigh-left.png",
+      "sha256": "800ce912eec5a713ca0295e0e1a87ce2d81d5dbd72ec2650b680a060fa5b12cc"
+    },
+    {
+      "path": "examples/production-lite-character/parts/thigh-right.png",
+      "sha256": "f9c9db9a11e2c418d1c182665588f924664439cfeff92f41f1fa0f2b09684874"
+    },
+    {
+      "path": "examples/production-lite-character/parts/torso.png",
+      "sha256": "2f04eeaba24c4b3e95ddfa7b1dc8c0324ec79e4533bfe901efb34e6f69067a00"
+    },
+    {
+      "path": "examples/production-lite-character/parts/upper-arm-left.png",
+      "sha256": "adf0f120d708629da274d2f4d0c0eb1275fc96df91c47fc9d24eff635061df74"
+    },
+    {
+      "path": "examples/production-lite-character/parts/upper-arm-right.png",
+      "sha256": "b23119dfba940d8ab8144228400dfc9cf414f1cd936a8073f1c08cc1de2fea39"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/families/accessories.attachment-layout.json",
+      "sha256": "fb657d8c0ad25585753b61b0a7126a958f5a86d96ff4f48d54b7fde279bfb223"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/families/garment.attachment-layout.json",
+      "sha256": "54a53ed15a409d234f6991df2aa6e01e02794aabef3e8c4d62c51c16668447a3"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/families/prop.attachment-layout.json",
+      "sha256": "f36c89bd3f4668f8eaeb15e658f477ff018dcf256763b8301abdc93d0e7fc5f5"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/loadout-contract.json",
+      "sha256": "11ed463c30de21bfcf7a6d4646a08828f2c870021637a5e9ab75ad4df9d8f2e4"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachment-layout.json",
+      "sha256": "01652698864dee5222c98772d0847594c9aedb99c58d8822854b335c3f2787b3"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/cap-back.png",
+      "sha256": "6d0df35cbd2cb831ec6df7e5489143eb6c25b0c041e91bed9575d857045b97da"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/cap-front.png",
+      "sha256": "2d777db75260530251cf9550a31621324303d2adeec2c1ffc07ec6b9da5d4d3d"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/collar-back.png",
+      "sha256": "c14a64da679105201502f17200b5b8f38cdc6f8dde1650567fca633070dbd28c"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/collar-front.png",
+      "sha256": "5e9a052565fd3c351eb26ab759f515c317bb4d8fe0c092f2ad1cd09531e54994"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-back.png",
+      "sha256": "91f3b0744e28729cb7d4e8d017087bfa6627624d0b377c433140295560a703c9"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-cuff-left.png",
+      "sha256": "5d7d9101f0f29de3e8d3e911d4b7f8e827263c01fd800964277bedebcb78c5d8"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-cuff-right.png",
+      "sha256": "d8c14f311b5c5f5af23e341ffa0180a337fb7ff69b5efd51f02e3dec9d98a9b4"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-front.png",
+      "sha256": "199c2cb533efbeae97cdea74f22b66391f0514881f93b30633b06ba589ac643b"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-lower-sleeve-left.png",
+      "sha256": "df199de90dc7b61470266a557c1c027d14a28ad83fdba85bea5cfeb01278d059"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-lower-sleeve-right.png",
+      "sha256": "f465dda821046bb6344448316b32479cb740565ad1a05f08c1c43a43cbf6baee"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-upper-sleeve-left.png",
+      "sha256": "8c1c477750807bd9b10e6c89c79374468663c6894f0586410d6464fa99c8c03e"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-upper-sleeve-right.png",
+      "sha256": "f47d19d543c7f86173869aa159f82e655230083fceb399b99bf80b174d6fe3da"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-zipper-trim.png",
+      "sha256": "4d482fc4be4ffd0ced7a76de86205e7557da4fa08d47571eb85eff48713d8348"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/sunglasses.png",
+      "sha256": "eb33f845459586f5ec0652c1194138795e7b9ca37becc869a618e1216521e80d"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/animations/prop-swing.json",
+      "sha256": "eaa1670f6354624093a9543c9548b7b058f660de77e88971bebd53ae14c29600"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachment-layout.json",
+      "sha256": "e0b743c9751df22873626ae7850dac28cb633e93d3af985bc948ccdb206cd420"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/hand-overlay-left.png",
+      "sha256": "85d116fb7cb1e31abe3fd06335f959a444f1f6fae2fbdf110328f42724ce4604"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/hand-overlay-right.png",
+      "sha256": "85d116fb7cb1e31abe3fd06335f959a444f1f6fae2fbdf110328f42724ce4604"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/toolbox-left.png",
+      "sha256": "b8163f9ba7241ecf101df4b21ebd27bb30df79fe08841700d646387ea727eff4"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/toolbox-right.png",
+      "sha256": "b8163f9ba7241ecf101df4b21ebd27bb30df79fe08841700d646387ea727eff4"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/rig-layout.json",
+      "sha256": "cf94408e91f7ecd1553afe107f4314efb91291022ad42cc348cb1961a6e9b66d"
+    }
+  ]
+} as const;
+
 export const PROP_BRIDGE_PLAN = {
   "planVersion": "1.0.0",
   "rigId": "production-lite-character-layout",
@@ -2297,104 +2491,18 @@ export const PROP_BRIDGE_PLAN = {
   },
   "states": [
     {
-      "stateId": "base-only-with-no-prop",
-      "garmentStateId": "base-only",
-      "propStateId": "no-prop",
-      "hudLabel": "Base Only / No Prop",
-      "enabledGarmentAttachmentIds": [],
-      "enabledPropAttachmentIds": [],
-      "activePrimaryPropCount": 0
-    },
-    {
-      "stateId": "base-only-with-left-hand-prop",
-      "garmentStateId": "base-only",
+      "stateId": "accessories-only-with-left-hand-prop",
+      "garmentStateId": "accessories-only",
       "propStateId": "left-hand-prop",
-      "hudLabel": "Base Only / Left Prop",
-      "enabledGarmentAttachmentIds": [],
-      "enabledPropAttachmentIds": [
-        "hand-overlay-left",
-        "toolbox-left"
-      ],
-      "activePrimaryPropCount": 1
-    },
-    {
-      "stateId": "base-only-with-right-hand-prop",
-      "garmentStateId": "base-only",
-      "propStateId": "right-hand-prop",
-      "hudLabel": "Base Only / Right Prop",
-      "enabledGarmentAttachmentIds": [],
-      "enabledPropAttachmentIds": [
-        "hand-overlay-right",
-        "toolbox-right"
-      ],
-      "activePrimaryPropCount": 1
-    },
-    {
-      "stateId": "garment-only-with-no-prop",
-      "garmentStateId": "garment-only",
-      "propStateId": "no-prop",
-      "hudLabel": "Garment Only / No Prop",
+      "hudLabel": "Accessories Only / Left Prop",
       "enabledGarmentAttachmentIds": [
-        "collar-back",
-        "collar-front",
-        "jacket-back",
-        "jacket-cuff-left",
-        "jacket-cuff-right",
-        "jacket-front",
-        "jacket-lower-sleeve-left",
-        "jacket-lower-sleeve-right",
-        "jacket-upper-sleeve-left",
-        "jacket-upper-sleeve-right",
-        "jacket-zipper-trim"
-      ],
-      "enabledPropAttachmentIds": [],
-      "activePrimaryPropCount": 0
-    },
-    {
-      "stateId": "garment-only-with-left-hand-prop",
-      "garmentStateId": "garment-only",
-      "propStateId": "left-hand-prop",
-      "hudLabel": "Garment Only / Left Prop",
-      "enabledGarmentAttachmentIds": [
-        "collar-back",
-        "collar-front",
-        "jacket-back",
-        "jacket-cuff-left",
-        "jacket-cuff-right",
-        "jacket-front",
-        "jacket-lower-sleeve-left",
-        "jacket-lower-sleeve-right",
-        "jacket-upper-sleeve-left",
-        "jacket-upper-sleeve-right",
-        "jacket-zipper-trim"
+        "cap-back",
+        "cap-front",
+        "sunglasses"
       ],
       "enabledPropAttachmentIds": [
         "hand-overlay-left",
         "toolbox-left"
-      ],
-      "activePrimaryPropCount": 1
-    },
-    {
-      "stateId": "garment-only-with-right-hand-prop",
-      "garmentStateId": "garment-only",
-      "propStateId": "right-hand-prop",
-      "hudLabel": "Garment Only / Right Prop",
-      "enabledGarmentAttachmentIds": [
-        "collar-back",
-        "collar-front",
-        "jacket-back",
-        "jacket-cuff-left",
-        "jacket-cuff-right",
-        "jacket-front",
-        "jacket-lower-sleeve-left",
-        "jacket-lower-sleeve-right",
-        "jacket-upper-sleeve-left",
-        "jacket-upper-sleeve-right",
-        "jacket-zipper-trim"
-      ],
-      "enabledPropAttachmentIds": [
-        "hand-overlay-right",
-        "toolbox-right"
       ],
       "activePrimaryPropCount": 1
     },
@@ -2410,22 +2518,6 @@ export const PROP_BRIDGE_PLAN = {
       ],
       "enabledPropAttachmentIds": [],
       "activePrimaryPropCount": 0
-    },
-    {
-      "stateId": "accessories-only-with-left-hand-prop",
-      "garmentStateId": "accessories-only",
-      "propStateId": "left-hand-prop",
-      "hudLabel": "Accessories Only / Left Prop",
-      "enabledGarmentAttachmentIds": [
-        "cap-back",
-        "cap-front",
-        "sunglasses"
-      ],
-      "enabledPropAttachmentIds": [
-        "hand-overlay-left",
-        "toolbox-left"
-      ],
-      "activePrimaryPropCount": 1
     },
     {
       "stateId": "accessories-only-with-right-hand-prop",
@@ -2444,28 +2536,37 @@ export const PROP_BRIDGE_PLAN = {
       "activePrimaryPropCount": 1
     },
     {
-      "stateId": "garment-and-accessories-with-no-prop",
-      "garmentStateId": "garment-and-accessories",
-      "propStateId": "no-prop",
-      "hudLabel": "Garment + Accessories / No Prop",
-      "enabledGarmentAttachmentIds": [
-        "cap-back",
-        "cap-front",
-        "collar-back",
-        "collar-front",
-        "jacket-back",
-        "jacket-cuff-left",
-        "jacket-cuff-right",
-        "jacket-front",
-        "jacket-lower-sleeve-left",
-        "jacket-lower-sleeve-right",
-        "jacket-upper-sleeve-left",
-        "jacket-upper-sleeve-right",
-        "jacket-zipper-trim",
-        "sunglasses"
+      "stateId": "base-only-with-left-hand-prop",
+      "garmentStateId": "base-only",
+      "propStateId": "left-hand-prop",
+      "hudLabel": "Base Only / Left Prop",
+      "enabledGarmentAttachmentIds": [],
+      "enabledPropAttachmentIds": [
+        "hand-overlay-left",
+        "toolbox-left"
       ],
+      "activePrimaryPropCount": 1
+    },
+    {
+      "stateId": "base-only-with-no-prop",
+      "garmentStateId": "base-only",
+      "propStateId": "no-prop",
+      "hudLabel": "Base Only / No Prop",
+      "enabledGarmentAttachmentIds": [],
       "enabledPropAttachmentIds": [],
       "activePrimaryPropCount": 0
+    },
+    {
+      "stateId": "base-only-with-right-hand-prop",
+      "garmentStateId": "base-only",
+      "propStateId": "right-hand-prop",
+      "hudLabel": "Base Only / Right Prop",
+      "enabledGarmentAttachmentIds": [],
+      "enabledPropAttachmentIds": [
+        "hand-overlay-right",
+        "toolbox-right"
+      ],
+      "activePrimaryPropCount": 1
     },
     {
       "stateId": "garment-and-accessories-with-left-hand-prop",
@@ -2495,6 +2596,30 @@ export const PROP_BRIDGE_PLAN = {
       "activePrimaryPropCount": 1
     },
     {
+      "stateId": "garment-and-accessories-with-no-prop",
+      "garmentStateId": "garment-and-accessories",
+      "propStateId": "no-prop",
+      "hudLabel": "Garment + Accessories / No Prop",
+      "enabledGarmentAttachmentIds": [
+        "cap-back",
+        "cap-front",
+        "collar-back",
+        "collar-front",
+        "jacket-back",
+        "jacket-cuff-left",
+        "jacket-cuff-right",
+        "jacket-front",
+        "jacket-lower-sleeve-left",
+        "jacket-lower-sleeve-right",
+        "jacket-upper-sleeve-left",
+        "jacket-upper-sleeve-right",
+        "jacket-zipper-trim",
+        "sunglasses"
+      ],
+      "enabledPropAttachmentIds": [],
+      "activePrimaryPropCount": 0
+    },
+    {
       "stateId": "garment-and-accessories-with-right-hand-prop",
       "garmentStateId": "garment-and-accessories",
       "propStateId": "right-hand-prop",
@@ -2514,6 +2639,75 @@ export const PROP_BRIDGE_PLAN = {
         "jacket-upper-sleeve-right",
         "jacket-zipper-trim",
         "sunglasses"
+      ],
+      "enabledPropAttachmentIds": [
+        "hand-overlay-right",
+        "toolbox-right"
+      ],
+      "activePrimaryPropCount": 1
+    },
+    {
+      "stateId": "garment-only-with-left-hand-prop",
+      "garmentStateId": "garment-only",
+      "propStateId": "left-hand-prop",
+      "hudLabel": "Garment Only / Left Prop",
+      "enabledGarmentAttachmentIds": [
+        "collar-back",
+        "collar-front",
+        "jacket-back",
+        "jacket-cuff-left",
+        "jacket-cuff-right",
+        "jacket-front",
+        "jacket-lower-sleeve-left",
+        "jacket-lower-sleeve-right",
+        "jacket-upper-sleeve-left",
+        "jacket-upper-sleeve-right",
+        "jacket-zipper-trim"
+      ],
+      "enabledPropAttachmentIds": [
+        "hand-overlay-left",
+        "toolbox-left"
+      ],
+      "activePrimaryPropCount": 1
+    },
+    {
+      "stateId": "garment-only-with-no-prop",
+      "garmentStateId": "garment-only",
+      "propStateId": "no-prop",
+      "hudLabel": "Garment Only / No Prop",
+      "enabledGarmentAttachmentIds": [
+        "collar-back",
+        "collar-front",
+        "jacket-back",
+        "jacket-cuff-left",
+        "jacket-cuff-right",
+        "jacket-front",
+        "jacket-lower-sleeve-left",
+        "jacket-lower-sleeve-right",
+        "jacket-upper-sleeve-left",
+        "jacket-upper-sleeve-right",
+        "jacket-zipper-trim"
+      ],
+      "enabledPropAttachmentIds": [],
+      "activePrimaryPropCount": 0
+    },
+    {
+      "stateId": "garment-only-with-right-hand-prop",
+      "garmentStateId": "garment-only",
+      "propStateId": "right-hand-prop",
+      "hudLabel": "Garment Only / Right Prop",
+      "enabledGarmentAttachmentIds": [
+        "collar-back",
+        "collar-front",
+        "jacket-back",
+        "jacket-cuff-left",
+        "jacket-cuff-right",
+        "jacket-front",
+        "jacket-lower-sleeve-left",
+        "jacket-lower-sleeve-right",
+        "jacket-upper-sleeve-left",
+        "jacket-upper-sleeve-right",
+        "jacket-zipper-trim"
       ],
       "enabledPropAttachmentIds": [
         "hand-overlay-right",

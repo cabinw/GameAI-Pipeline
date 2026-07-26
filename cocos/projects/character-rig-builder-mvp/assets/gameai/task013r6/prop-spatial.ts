@@ -12,6 +12,7 @@ export interface PropSpatialMeasurement
   readonly propSocketToGripErrors: readonly number[];
   readonly unknownHandSocketCount: number;
   readonly duplicateActivePropCount: number;
+  readonly duplicateHandOverlayCount: number;
   readonly activePrimaryPropCount: number;
   readonly expectedPrimaryPropCount: number;
 }
@@ -40,6 +41,7 @@ export function validatePropSpatialMeasurement(
   if (
     measurement.unknownHandSocketCount !== 0 ||
     measurement.duplicateActivePropCount !== 0 ||
+    measurement.duplicateHandOverlayCount !== 0 ||
     measurement.activePrimaryPropCount !==
       measurement.expectedPrimaryPropCount
   ) {

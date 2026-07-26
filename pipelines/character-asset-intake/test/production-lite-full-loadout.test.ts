@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
@@ -24,9 +24,12 @@ const source = JSON.parse(
     "utf8",
   ),
 ) as {
-  exactRestStateIds: string[];
+  exactRestPresets: Array<{ outputId: string; stateId: string }>;
   requiredSemanticClipIds: string[];
 };
+const generatedLayout = JSON.parse(
+  readFileSync(path.join(fixtureRoot, "attachment-layout.json"), "utf8"),
+) as { attachments: Array<{ file: string }> };
 const digest = async (file: string) =>
   createHash("sha256").update(await readFile(file)).digest("hex");
 
@@ -44,7 +47,7 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
     ...["rest", "walk", "wave", "prop-swing", "integration-stress"].map(
       (clip) => `animations/${clip}.json`,
     ),
-    ...source.exactRestStateIds.flatMap((stateId) => [
+    ...source.exactRestPresets.flatMap(({ outputId: stateId }) => [
       `reference/${stateId}.png`,
       `reference/${stateId}-reconstructed.png`,
       `reference/${stateId}-diff.png`,
@@ -88,11 +91,35 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
       `Cocos mirror ${file}`,
     );
   }
+  const generatedFiles = [
+    ...files,
+    ...generatedLayout.attachments.map((attachment) => attachment.file),
+  ].sort();
+  const recursiveFiles = async (root: string): Promise<string[]> => {
+    const entries = await readdir(root, { recursive: true });
+    const result: string[] = [];
+    for (const entry of entries.map(String)) {
+      if ((await stat(path.join(root, entry))).isFile()) result.push(entry);
+    }
+    return result;
+  };
+  const fixtureFiles = (await recursiveFiles(fixtureRoot))
+    .filter(
+      (file) =>
+        file !== "README.md" &&
+        file !== "source/full-loadout-source.json",
+    )
+    .sort();
+  assert.deepEqual(fixtureFiles, generatedFiles);
+  const cocosFiles = (await recursiveFiles(cocosRoot))
+    .filter((file) => !file.endsWith(".meta"))
+    .sort();
+  assert.deepEqual(cocosFiles, generatedFiles);
 });
 
 test("all eight authored Rest reports are exact zero-difference", async () => {
-  assert.equal(source.exactRestStateIds.length, 8);
-  for (const stateId of source.exactRestStateIds) {
+  assert.equal(source.exactRestPresets.length, 8);
+  for (const { outputId: stateId } of source.exactRestPresets) {
     const report = JSON.parse(
       await readFile(
         path.join(fixtureRoot, `reference/${stateId}-report.json`),

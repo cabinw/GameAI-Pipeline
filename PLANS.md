@@ -2,6 +2,103 @@
 
 Use this file for active multi-file or architectural work. Keep one active plan at a time.
 
+## Active plan: TASK-013R7 Pre-Merge Remediation
+
+- Status: Remediation complete; replacement evidence pending external review
+- Started: 2026-07-26
+- Branch: `recovery/task-013r7-full-loadout-release-candidate`
+- Draft PR: `#9`
+- Baseline R7 acceptance commit:
+  `c4d8f3258308ed0b1bbb570e9a264cfe0ae4d6e9`
+- Protected `main`: `317fd451c6a808cd41788e7ce8e0916701992642`
+- Frozen TASK-013 feature:
+  `5170185fdca666300c4d61488f17e15aa18656be`
+- Protected evidence: `evidence/task-013` at
+  `32a4074a3b488ca5a13ebcf9908f0f0ff24085b9`
+- Protected archive: `archive/old-task-007-cross-engine` at
+  `ed0923b466e457da7ce9932e0daf6644aa29df39`
+
+### Goal
+
+Resolve the focused pre-merge findings in Draft PR #9 without changing the
+accepted visual design or user-facing loadout behavior. Make the
+engine-neutral 12-state contract authoritative, gate runtime input on terminal
+readiness, harden semantic validation, replace tautological accessory
+measurement, close generated-output sets, isolate legacy generation, and
+publish replacement live Creator evidence from the final appended feature
+SHA.
+
+### Boundaries
+
+- Append focused commits only; do not rewrite accepted or protected history.
+- Keep PR #9 Draft and do not merge it.
+- Preserve the canonical V2 Scene, accepted R1-R6 harnesses, historical
+  monolith, generated mirrors, loadout appearance, controls, reset defaults,
+  resource count, sorting, and semantic clips.
+- Do not add TASK-014, automatic fitting, IK, physics, mesh/cloth behavior,
+  animation blending, root motion, two-handed props, Red Cap reconstruction,
+  or cross-engine adapters.
+
+### Execution
+
+1. Audit every PR #9 file and record a focused remediation task before code
+   changes.
+2. Extend the engine-neutral loadout resolver with stable duplicate,
+   reference, exclusivity, and prop-state diagnostics; define and resolve the
+   complete canonical 12-state matrix from the tracked source contract.
+3. Derive the R6-compatible Cocos plan from those resolved canonical states
+   and preserve exact parity through deterministic tests.
+4. Register runtime input only after manifest PASS, node construction,
+   playback creation, exact Reset, and lifecycle READY; failure and teardown
+   leave zero handlers and no partial runtime.
+5. Measure accessory socket and attachment-anchor world positions
+   independently, validate duplicate primary/overlay nodes, and state the
+   AABB seam boundary accurately.
+6. Correct the canonical adapter ID, README entry points, ADR/acceptance
+   wording, and isolate monolith generation behind an explicit legacy
+   provenance command.
+7. Enforce exact generated file sets and transitive provenance, add
+   post-verify clean-tree CI closure, and publish a retention report without
+   deleting accepted files.
+8. Pass working-copy and tracked-files-only verification, exact-output
+   closure, clean-tree checks, the uninterrupted Creator 3.8.8 gate, local
+   media validation, temporary evidence publication, uploaded-copy identity,
+   and full decode.
+9. Append and push focused commits, update Draft PR #9 in place, keep it
+   Draft, and stop.
+
+### Remediation result
+
+- Working-copy verification: 349 tests passed, 0 failed.
+- Creator 3.8.8 clean-open, R6 Scene switch, canonical Scene reopen, and
+  second runtime initialization: PASS.
+- Canonical runtime: 35/35 resources, all 12 states, four semantic clips,
+  Pause/Resume, spatial Debug, Transform Stress, two lifecycle rebuilds,
+  post-rebuild switching, and Exact Reset: PASS.
+- Runtime guards: all spatial, duplicate, sorting, role, finite-coordinate,
+  and viewport counters remained 0; Creator and Preview consoles were clean.
+- The feature branch is frozen after the focused remediation commit while
+  replacement live evidence is published separately on
+  `evidence/task-013r7-pr-remediation`.
+
+### Done when
+
+- Input handlers are 0 while loading/failed/disabled/destroyed/rebuilding and
+  exactly 1 only after full runtime readiness.
+- One engine-neutral contract owns exactly 12 unique canonical states and the
+  derived Cocos plan remains behaviorally equal to accepted R6.
+- Every requested invalid semantic mutation fails with a stable code before
+  any lossy `Map` construction or fallback.
+- Accessory socket drift is measured from independent expected/actual world
+  quantities and a perturbed fixture produces a non-zero failure.
+- Canonical adapter ID is
+  `composable-character-loadout-reference-v2`; legacy generation is explicit,
+  non-canonical, and tested as unselectable by the canonical facade/Scene.
+- Generators reject stale/unexpected outputs, tracked-only regeneration is
+  deterministic, and post-verify tracked state is clean.
+- Both automated modes, Creator gate, spatial/duplicate guards, and
+  replacement evidence upload verification pass from the final feature SHA.
+
 ## Accepted plan: TASK-013R7 Recovered Full-Loadout Release Candidate
 
 - Status: Accepted after external visual review

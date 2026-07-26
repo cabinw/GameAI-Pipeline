@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
   "loadoutId": "production-lite-full-loadout",
-  "stateId": "accessories-prop",
+  "stateId": "accessories-only-with-left-hand-prop",
   "resolvedStateIds": [
-    "accessories-prop"
+    "accessories-only-with-left-hand-prop"
   ],
   "attachments": [
     {

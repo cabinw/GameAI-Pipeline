@@ -3,16 +3,163 @@
   "taskId": "TASK-013",
   "source": "source/full-loadout-source.json",
   "generator": "pipelines/character-asset-intake/scripts/generate-production-lite-full-loadout.mjs",
-  "sourceDigest": "a8a1acb3ee9c3bcbf0066951a83292b3f5447c0546fe5a54bb5269d99a00a1b8",
-  "exactRestStateIds": [
-    "base-only",
-    "accessories-only",
-    "garment-only",
-    "prop-only",
-    "garment-accessories",
-    "garment-prop",
-    "accessories-prop",
-    "full-loadout"
+  "generatorVersion": "2.0.0",
+  "sourceDigest": "eb7422fc688d80ba36ecbe9496e304f535ca7ec177be5888c57f83b94901953b",
+  "exactRestPresets": [
+    {
+      "outputId": "base-only",
+      "stateId": "base-only-with-no-prop"
+    },
+    {
+      "outputId": "accessories-only",
+      "stateId": "accessories-only-with-no-prop"
+    },
+    {
+      "outputId": "garment-only",
+      "stateId": "garment-only-with-no-prop"
+    },
+    {
+      "outputId": "prop-only",
+      "stateId": "base-only-with-left-hand-prop"
+    },
+    {
+      "outputId": "garment-accessories",
+      "stateId": "garment-and-accessories-with-no-prop"
+    },
+    {
+      "outputId": "garment-prop",
+      "stateId": "garment-only-with-left-hand-prop"
+    },
+    {
+      "outputId": "accessories-prop",
+      "stateId": "accessories-only-with-left-hand-prop"
+    },
+    {
+      "outputId": "full-loadout",
+      "stateId": "garment-and-accessories-with-left-hand-prop"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "examples/production-lite-character/animations/arm-wave.json",
+      "sha256": "8c51eb4dc44f9bee46e14e9cb5770a99aef347210dea7d5e5d3df7e5497e5a3c"
+    },
+    {
+      "path": "examples/production-lite-character/animations/rest-idle.json",
+      "sha256": "40a6ebdab3c0f4b277d0115123adb8f150c88844017dadd6e7691d9f85221b6a"
+    },
+    {
+      "path": "examples/production-lite-character/source/character-source.json",
+      "sha256": "e94e729ba15bf0d3fd24163cefba83fa31883153fdf06fe73c58f0816234b9a9"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/source/full-loadout-source.json",
+      "sha256": "eb7422fc688d80ba36ecbe9496e304f535ca7ec177be5888c57f83b94901953b"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/animations/garment-stress.json",
+      "sha256": "4265ca5d796fe41e2a5be7eea2c8a21115560ec5e9073f4e3c6d52321d8482fa"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachment-layout.json",
+      "sha256": "01652698864dee5222c98772d0847594c9aedb99c58d8822854b335c3f2787b3"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/cap-back.png",
+      "sha256": "6d0df35cbd2cb831ec6df7e5489143eb6c25b0c041e91bed9575d857045b97da"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/cap-front.png",
+      "sha256": "2d777db75260530251cf9550a31621324303d2adeec2c1ffc07ec6b9da5d4d3d"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/collar-back.png",
+      "sha256": "c14a64da679105201502f17200b5b8f38cdc6f8dde1650567fca633070dbd28c"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/collar-front.png",
+      "sha256": "5e9a052565fd3c351eb26ab759f515c317bb4d8fe0c092f2ad1cd09531e54994"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-back.png",
+      "sha256": "91f3b0744e28729cb7d4e8d017087bfa6627624d0b377c433140295560a703c9"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-cuff-left.png",
+      "sha256": "5d7d9101f0f29de3e8d3e911d4b7f8e827263c01fd800964277bedebcb78c5d8"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-cuff-right.png",
+      "sha256": "d8c14f311b5c5f5af23e341ffa0180a337fb7ff69b5efd51f02e3dec9d98a9b4"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-front.png",
+      "sha256": "199c2cb533efbeae97cdea74f22b66391f0514881f93b30633b06ba589ac643b"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-lower-sleeve-left.png",
+      "sha256": "df199de90dc7b61470266a557c1c027d14a28ad83fdba85bea5cfeb01278d059"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-lower-sleeve-right.png",
+      "sha256": "f465dda821046bb6344448316b32479cb740565ad1a05f08c1c43a43cbf6baee"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-upper-sleeve-left.png",
+      "sha256": "8c1c477750807bd9b10e6c89c79374468663c6894f0586410d6464fa99c8c03e"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-upper-sleeve-right.png",
+      "sha256": "f47d19d543c7f86173869aa159f82e655230083fceb399b99bf80b174d6fe3da"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/jacket-zipper-trim.png",
+      "sha256": "4d482fc4be4ffd0ced7a76de86205e7557da4fa08d47571eb85eff48713d8348"
+    },
+    {
+      "path": "examples/production-lite-garment-layering/attachments/sunglasses.png",
+      "sha256": "eb33f845459586f5ec0652c1194138795e7b9ca37becc869a618e1216521e80d"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/animations/prop-stress.json",
+      "sha256": "4284107ed7c6ef0f780b96d78a97a2b06f2416fb8239c6f2f61e157f6242090e"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/animations/prop-swing.json",
+      "sha256": "eaa1670f6354624093a9543c9548b7b058f660de77e88971bebd53ae14c29600"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/animations/prop-walk.json",
+      "sha256": "ccfa891f88eb0fdd4ee2670ca57e8071ce1e7746d20ee133569b0a760718aa83"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachment-layout.json",
+      "sha256": "e0b743c9751df22873626ae7850dac28cb633e93d3af985bc948ccdb206cd420"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/hand-overlay-left.png",
+      "sha256": "85d116fb7cb1e31abe3fd06335f959a444f1f6fae2fbdf110328f42724ce4604"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/hand-overlay-right.png",
+      "sha256": "85d116fb7cb1e31abe3fd06335f959a444f1f6fae2fbdf110328f42724ce4604"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/toolbox-left.png",
+      "sha256": "b8163f9ba7241ecf101df4b21ebd27bb30df79fe08841700d646387ea727eff4"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/attachments/toolbox-right.png",
+      "sha256": "b8163f9ba7241ecf101df4b21ebd27bb30df79fe08841700d646387ea727eff4"
+    },
+    {
+      "path": "examples/production-lite-one-handed-prop/rig-layout.json",
+      "sha256": "cf94408e91f7ecd1553afe107f4314efb91291022ad42cc348cb1961a6e9b66d"
+    },
+    {
+      "path": "pipelines/character-asset-intake/scripts/generate-production-lite-full-loadout.mjs",
+      "sha256": "e3ded341b516b22602c87bee83fb95e87efa45050984b395555418270460cf47"
+    }
   ],
   "tolerances": {
     "rgbaMismatchPixels": 0,

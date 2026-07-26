@@ -76,7 +76,7 @@ const plan = buildCocosComposableCharacterLoadoutPlan(
   baseDimensions,
   attachmentDimensions,
   "production-lite-full-loadout",
-  source.exactRestStateIds,
+  source.exactRestPresets.map((preset) => preset.outputId),
 );
 const resourceManifest = deriveComposableLoadoutResourceManifest(plan);
 const exists = async (file) => {

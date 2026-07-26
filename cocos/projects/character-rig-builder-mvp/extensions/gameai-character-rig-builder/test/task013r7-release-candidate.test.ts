@@ -3,9 +3,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
-import type {
-  AttachmentLayout,
-  RigLayout,
+import {
+  resolveCharacterLoadout,
+  type AttachmentLayout,
+  type CharacterLoadoutContract,
+  type RigLayout,
 } from "@gameai/character-contracts";
 import type {
   RigAnimation,
@@ -45,6 +47,7 @@ import {
 } from "../source/task013r6/prop-resource-manifest";
 import {
   PROP_REQUIRED_STATE_IDS,
+  PROP_NO_PROP_STATE_ID,
   validatePropBridgePlan,
 } from "../source/task013r6/prop-bridge-runtime-contract";
 import {
@@ -66,6 +69,10 @@ const garmentFixtureRoot = path.join(
 const propFixtureRoot = path.join(
   repositoryRoot,
   "examples/production-lite-one-handed-prop",
+);
+const fullLoadoutFixtureRoot = path.join(
+  repositoryRoot,
+  "examples/production-lite-full-loadout",
 );
 
 const garmentStates: readonly GarmentStateDefinition[] = Object.freeze([
@@ -196,12 +203,60 @@ async function acceptedR6Plan() {
     baseDimensions,
     garmentDimensions,
   );
+  const serialized = JSON.parse(
+    await readFile(
+      path.join(fullLoadoutFixtureRoot, "loadout-contract.json"),
+      "utf8",
+    ),
+  );
+  const loadoutContract: CharacterLoadoutContract = {
+    ...serialized,
+    families: await Promise.all(
+      serialized.families.map(async (family: any) => ({
+        familyId: family.familyId,
+        attachmentLayout: JSON.parse(
+          await readFile(
+            path.join(
+              fullLoadoutFixtureRoot,
+              family.attachmentLayoutFile,
+            ),
+            "utf8",
+          ),
+        ),
+      })),
+    ),
+  };
+  const resolvedLoadoutStates = loadoutContract.states.map((state) => {
+    const garmentEnabled = state.enabledFamilyIds.includes("garment");
+    const accessoriesEnabled =
+      state.enabledFamilyIds.includes("accessories");
+    const garmentStateId = garmentEnabled && accessoriesEnabled
+      ? GARMENT_COMBINED_STATE_ID
+      : garmentEnabled
+        ? GARMENT_ONLY_STATE_ID
+        : accessoriesEnabled
+          ? GARMENT_ACCESSORIES_ONLY_STATE_ID
+          : GARMENT_BASE_ONLY_STATE_ID;
+    return {
+      stateId: state.stateId,
+      garmentStateId,
+      propStateId: (state.propStateId ?? PROP_NO_PROP_STATE_ID) as
+        Parameters<typeof buildPropBridgePlan>[5][number]["propStateId"],
+      hudLabel: state.stateId,
+      enabledAttachmentIds: resolveCharacterLoadout(
+        rigLayout,
+        loadoutContract,
+        state.stateId,
+      ).enabledAttachments.map((attachment) => attachment.attachmentId),
+    } satisfies Parameters<typeof buildPropBridgePlan>[5][number];
+  });
   return buildPropBridgePlan(
     garment,
     rigLayout,
     propLayout,
     propDimensions,
     "production-lite-one-handed-prop",
+    resolvedLoadoutStates,
   );
 }
 
@@ -271,8 +326,9 @@ test("TASK-013R7 canonical and R6 state membership and resolved order are identi
     })),
   );
   assert.deepEqual(
-    [...new Set(canonical.plan.states.map((state) => state.propStateId))],
-    PROP_REQUIRED_STATE_IDS,
+    [...new Set(canonical.plan.states.map((state) => state.propStateId))]
+      .sort(),
+    [...PROP_REQUIRED_STATE_IDS].sort(),
   );
   assert.deepEqual(
     canonical.plan.garment.baseSortingOrders,

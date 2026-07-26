@@ -133,18 +133,25 @@ test("generic Cocos adapter consumes one resolved loadout result for every state
   const plan = composablePlan;
   assert.equal(plan.planVersion, "1.0.0");
   assert.equal(Object.keys(plan.reconstructionStatus).length, 8);
-  assert.equal(plan.states["base-only"]!.enabledAttachmentIds.length, 0);
-  assert.equal(plan.states["full-loadout"]!.enabledAttachmentIds.length, 16);
   assert.equal(
-    plan.states["full-loadout-right"]!.enabledAttachmentIds.includes(
+    plan.states["base-only-with-no-prop"]!.enabledAttachmentIds.length,
+    0,
+  );
+  assert.equal(
+    plan.states["garment-and-accessories-with-left-hand-prop"]!
+      .enabledAttachmentIds.length,
+    16,
+  );
+  assert.equal(
+    plan.states["garment-and-accessories-with-right-hand-prop"]!
+      .enabledAttachmentIds.includes(
       "toolbox-right",
     ),
     true,
   );
   assert.equal(
-    plan.states["full-loadout-no-prop"]!.enabledAttachmentIds.some((id) =>
-      id.startsWith("toolbox"),
-    ),
+    plan.states["garment-and-accessories-with-no-prop"]!
+      .enabledAttachmentIds.some((id) => id.startsWith("toolbox")),
     false,
   );
   assert.deepEqual(

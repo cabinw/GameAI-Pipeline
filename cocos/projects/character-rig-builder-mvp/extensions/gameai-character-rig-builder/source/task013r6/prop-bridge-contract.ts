@@ -34,6 +34,14 @@ interface AssetDimensions {
   readonly height: number;
 }
 
+export interface ResolvedLoadoutStateInput {
+  readonly stateId: string;
+  readonly garmentStateId: GarmentBridgePlan["states"][number]["stateId"];
+  readonly propStateId: PropStateId;
+  readonly hudLabel: string;
+  readonly enabledAttachmentIds: readonly string[];
+}
+
 const PROP_STATE_OVERRIDES: Readonly<
   Record<PropStateId, Readonly<Record<string, boolean>>>
 > = Object.freeze({
@@ -70,6 +78,7 @@ export function buildPropBridgePlan(
   propAttachmentInput: unknown,
   propDimensions: Readonly<Record<string, AssetDimensions>>,
   resourceRoot: string,
+  resolvedLoadoutStates: readonly ResolvedLoadoutStateInput[],
 ): PropBridgePlan {
   const garmentValidation = validateGarmentBridgePlan(garmentInput);
   if (
@@ -329,8 +338,27 @@ export function buildPropBridgePlan(
   }
 
   const states = Object.freeze(
-    garment.states.flatMap((garmentState) =>
-      PROP_REQUIRED_STATE_IDS.map((propStateId) => {
+    [...resolvedLoadoutStates]
+      .sort((left, right) => left.stateId.localeCompare(right.stateId))
+      .map((resolvedState) => {
+        const garmentState = garment.states.find(
+          (candidate) =>
+            candidate.stateId === resolvedState.garmentStateId,
+        );
+        if (
+          garmentState === undefined ||
+          !PROP_REQUIRED_STATE_IDS.includes(resolvedState.propStateId) ||
+          resolvedState.stateId !==
+            propLoadoutStateId(
+              resolvedState.garmentStateId,
+              resolvedState.propStateId,
+            )
+        ) {
+          throw new Error(
+            `TASK_013R7_ENGINE_NEUTRAL_LOADOUT_STATE_INVALID: ${resolvedState.stateId}`,
+          );
+        }
+        const propStateId = resolvedState.propStateId;
         const enabledPropAttachmentIds = attachments
           .filter(
             (attachment) =>
@@ -349,14 +377,27 @@ export function buildPropBridgePlan(
             : propStateId === PROP_LEFT_HAND_STATE_ID
               ? "Left Prop"
               : "Right Prop";
+        const expectedEnabledIds = [
+          ...garmentState.enabledAttachmentIds,
+          ...enabledPropAttachmentIds,
+        ].sort();
+        if (
+          JSON.stringify([...resolvedState.enabledAttachmentIds].sort()) !==
+          JSON.stringify(expectedEnabledIds)
+        ) {
+          throw new Error(
+            `TASK_013R7_ENGINE_NEUTRAL_LOADOUT_PARITY_MISMATCH: ${resolvedState.stateId}`,
+          );
+        }
         return Object.freeze({
-          stateId: propLoadoutStateId(
-            garmentState.stateId,
-            propStateId,
-          ),
-          garmentStateId: garmentState.stateId,
+          stateId: resolvedState.stateId as ReturnType<
+            typeof propLoadoutStateId
+          >,
+          garmentStateId: resolvedState.garmentStateId,
           propStateId,
-          hudLabel: `${garmentState.hudLabel} / ${propLabel}`,
+          hudLabel:
+            resolvedState.hudLabel ||
+            `${garmentState.hudLabel} / ${propLabel}`,
           enabledGarmentAttachmentIds:
             garmentState.enabledAttachmentIds,
           enabledPropAttachmentIds: Object.freeze(
@@ -365,7 +406,6 @@ export function buildPropBridgePlan(
           activePrimaryPropCount,
         });
       }),
-    ),
   );
 
   const plan: PropBridgePlan = Object.freeze({

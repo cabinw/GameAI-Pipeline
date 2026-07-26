@@ -22,61 +22,73 @@
   ],
   "states": [
     {
-      "stateId": "base-only",
-      "enabledFamilyIds": []
+      "stateId": "base-only-with-no-prop",
+      "enabledFamilyIds": ["prop"]
     },
     {
-      "stateId": "accessories-only",
-      "enabledFamilyIds": ["accessories"],
-      "requiredAttachmentIds": ["cap-back", "cap-front", "sunglasses"]
-    },
-    {
-      "stateId": "garment-only",
-      "enabledFamilyIds": ["garment"],
-      "requiredAttachmentIds": ["jacket-back", "jacket-front", "collar-back", "collar-front", "jacket-zipper-trim", "jacket-upper-sleeve-left", "jacket-upper-sleeve-right", "jacket-lower-sleeve-left", "jacket-lower-sleeve-right", "jacket-cuff-left", "jacket-cuff-right"]
-    },
-    {
-      "stateId": "prop-only",
+      "stateId": "base-only-with-left-hand-prop",
       "enabledFamilyIds": ["prop"],
-      "propStateId": "left-hand-prop",
-      "requiredAttachmentIds": ["toolbox-left", "hand-overlay-left"]
+      "propStateId": "left-hand-prop"
     },
     {
-      "stateId": "garment-accessories",
-      "enabledFamilyIds": ["accessories", "garment"]
+      "stateId": "base-only-with-right-hand-prop",
+      "enabledFamilyIds": ["prop"],
+      "propStateId": "right-hand-prop"
     },
     {
-      "stateId": "garment-prop",
+      "stateId": "garment-only-with-no-prop",
+      "enabledFamilyIds": ["garment", "prop"]
+    },
+    {
+      "stateId": "garment-only-with-left-hand-prop",
       "enabledFamilyIds": ["garment", "prop"],
       "propStateId": "left-hand-prop"
     },
     {
-      "stateId": "accessories-prop",
+      "stateId": "garment-only-with-right-hand-prop",
+      "enabledFamilyIds": ["garment", "prop"],
+      "propStateId": "right-hand-prop"
+    },
+    {
+      "stateId": "accessories-only-with-no-prop",
+      "enabledFamilyIds": ["accessories", "prop"],
+      "requiredAttachmentIds": ["cap-back", "cap-front", "sunglasses"]
+    },
+    {
+      "stateId": "accessories-only-with-left-hand-prop",
       "enabledFamilyIds": ["accessories", "prop"],
       "propStateId": "left-hand-prop"
     },
     {
-      "stateId": "full-loadout",
-      "enabledFamilyIds": ["accessories", "garment", "prop"],
-      "propStateId": "left-hand-prop",
-      "requiredAttachmentIds": ["cap-back", "cap-front", "sunglasses", "jacket-back", "jacket-front", "collar-back", "collar-front", "jacket-zipper-trim", "jacket-upper-sleeve-left", "jacket-upper-sleeve-right", "jacket-lower-sleeve-left", "jacket-lower-sleeve-right", "jacket-cuff-left", "jacket-cuff-right", "toolbox-left", "hand-overlay-left"]
+      "stateId": "accessories-only-with-right-hand-prop",
+      "enabledFamilyIds": ["accessories", "prop"],
+      "propStateId": "right-hand-prop"
     },
     {
-      "stateId": "full-loadout-no-prop",
+      "stateId": "garment-and-accessories-with-no-prop",
       "enabledFamilyIds": ["accessories", "garment", "prop"]
     },
     {
-      "stateId": "full-loadout-left",
+      "stateId": "garment-and-accessories-with-left-hand-prop",
       "enabledFamilyIds": ["accessories", "garment", "prop"],
       "propStateId": "left-hand-prop"
     },
     {
-      "stateId": "full-loadout-right",
+      "stateId": "garment-and-accessories-with-right-hand-prop",
       "enabledFamilyIds": ["accessories", "garment", "prop"],
       "propStateId": "right-hand-prop"
     }
   ],
-  "exactRestStateIds": ["base-only", "accessories-only", "garment-only", "prop-only", "garment-accessories", "garment-prop", "accessories-prop", "full-loadout"],
+  "exactRestPresets": [
+    { "outputId": "base-only", "stateId": "base-only-with-no-prop" },
+    { "outputId": "accessories-only", "stateId": "accessories-only-with-no-prop" },
+    { "outputId": "garment-only", "stateId": "garment-only-with-no-prop" },
+    { "outputId": "prop-only", "stateId": "base-only-with-left-hand-prop" },
+    { "outputId": "garment-accessories", "stateId": "garment-and-accessories-with-no-prop" },
+    { "outputId": "garment-prop", "stateId": "garment-only-with-left-hand-prop" },
+    { "outputId": "accessories-prop", "stateId": "accessories-only-with-left-hand-prop" },
+    { "outputId": "full-loadout", "stateId": "garment-and-accessories-with-left-hand-prop" }
+  ],
   "exclusiveGroups": [
     {
       "groupId": "active-prop",

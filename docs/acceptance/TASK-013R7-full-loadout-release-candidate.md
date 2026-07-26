@@ -20,7 +20,7 @@ reference.
 - Canonical component:
   `GameAIComposableCharacterLoadoutReferenceV2`
 - Canonical adapter ID:
-  `gameai-composable-character-loadout-reference-v2`
+  `composable-character-loadout-reference-v2`
 - Canonical display title:
   `GAMEAI · COMPOSABLE CHARACTER LOADOUT V2`
 - Accepted implementation source: TASK-013R6 generic one-handed prop
@@ -134,6 +134,7 @@ release-candidate gate; external visual acceptance is **PASS**.
 - Duplicate garment nodes: 0
 - Duplicate accessory nodes: 0
 - Duplicate prop nodes: 0
+- Duplicate hand-overlay nodes: 0
 - Duplicate input handlers: 0
 - Duplicate resource requests: 0
 - Production/debug/HUD sorting violations: 0
@@ -145,6 +146,10 @@ Measurements use current Creator runtime world positions and the accepted
 world-to-`DebugOverlayRoot` projection. There is no Canvas compensation,
 character-specific offset, item-name dispatch, implicit mirroring, inverse
 grip solving, or fixed Skeleton geometry.
+
+Garment seam checks use axis-aligned world-space bounding boxes (AABBs)
+derived from the transformed authored seam regions. They prove the declared
+minimum AABB overlap, not oriented-polygon intersection or cloth correctness.
 
 ## Evidence status
 
@@ -185,6 +190,43 @@ The original
 `task-013r7-recovered-full-loadout-release-candidate.mp4` remains recorded in
 the reviewed evidence manifest with status
 `superseded-canonical-hud-identity-mismatch`.
+
+## Draft PR #9 pre-merge remediation
+
+The focused remediation leaves the accepted visual design, controls, state
+membership, resource count, animation IDs, sorting, and Reset defaults
+unchanged while hardening the pre-merge boundaries:
+
+- input registration occurs only after terminal manifest PASS, runtime node
+  construction, playback creation, exact Reset, and lifecycle READY;
+- failure, disable, destroy, and rebuild transitions expose zero stale input
+  handlers;
+- the engine-neutral contract owns the complete unique 12-state matrix and
+  the Cocos plan is a tested derived representation;
+- merged duplicate IDs, unknown members and prop states, invalid/conflicting
+  exclusive groups, and incompatible rig references fail with stable
+  diagnostics before lookup-map construction;
+- accessory drift compares the evaluated slot world position with the
+  independently resolved attachment-anchor world position;
+- duplicate primary prop and hand-overlay nodes are both guarded;
+- default generation excludes the superseded monolith, which remains
+  available only through the explicit legacy/provenance command;
+- affected generators reject missing, stale, or unexpected generated files
+  and record transitive provenance.
+
+The uninterrupted Creator 3.8.8 remediation gate passed with 35/35 resources,
+all 12 states, Rest, Wave, Prop Swing, Integration Stress, Pause/Resume,
+spatial Debug, Transform Stress, two lifecycle rebuilds, post-rebuild
+switching, and Exact Reset. Creator and Preview consoles were clean. Maximum
+joint, Skeleton, accessory socket, garment seam, and prop grip errors were
+`0.000 px`; duplicate, sorting, role, non-finite, unknown-member, and viewport
+violation counts were 0.
+
+Replacement live evidence is published separately on
+`evidence/task-013r7-pr-remediation` with review status
+`pending-external-visual-review`. This does not change the earlier accepted
+and superseded evidence history recorded above, and does not finalize or merge
+Draft PR #9.
 
 ## Limits
 

@@ -14,10 +14,21 @@ export type CharacterLoadoutErrorCode =
   | "UNSUPPORTED_LOADOUT_SCHEMA_VERSION"
   | "DUPLICATE_ATTACHMENT_FAMILY_ID"
   | "DUPLICATE_ATTACHMENT_ID_ACROSS_FAMILIES"
+  | "DUPLICATE_ATTACHMENT_SLOT_ID_ACROSS_FAMILIES"
+  | "DUPLICATE_WEARABLE_SET_ID_ACROSS_FAMILIES"
+  | "DUPLICATE_PROP_STATE_ID_ACROSS_FAMILIES"
+  | "DUPLICATE_ATTACHMENT_SEAM_ID_ACROSS_FAMILIES"
   | "DUPLICATE_LOADOUT_STATE_ID"
+  | "DUPLICATE_EXCLUSIVE_GROUP_ID"
   | "UNKNOWN_LOADOUT_STATE"
   | "UNKNOWN_LOADOUT_FAMILY"
   | "UNKNOWN_LOADOUT_DEPENDENCY"
+  | "UNKNOWN_LOADOUT_PROP_STATE"
+  | "UNKNOWN_ATTACHMENT_SLOT_MEMBER"
+  | "UNKNOWN_WEARABLE_SET_MEMBER"
+  | "UNKNOWN_EXCLUSIVE_GROUP_MEMBER"
+  | "INVALID_EXCLUSIVE_GROUP_DECLARATION"
+  | "CONFLICTING_EXCLUSIVE_GROUP_DECLARATION"
   | "CYCLIC_STATE_DEPENDENCY"
   | "CONTRADICTORY_STATE_DEPENDENCY"
   | "CONFLICTING_EXCLUSIVE_SLOT_OCCUPANTS"
@@ -189,6 +200,51 @@ function mergeLayouts(
       familyByAttachmentId.set(attachment.attachmentId, family.familyId);
     }
   }
+  const mergedDuplicateChecks = [
+    [
+      slots.map((slot) => slot.slotId),
+      "DUPLICATE_ATTACHMENT_SLOT_ID_ACROSS_FAMILIES",
+    ],
+    [
+      wearableSets.map((set) => set.wearableSetId),
+      "DUPLICATE_WEARABLE_SET_ID_ACROSS_FAMILIES",
+    ],
+    [
+      propStates.map((state) => state.propStateId),
+      "DUPLICATE_PROP_STATE_ID_ACROSS_FAMILIES",
+    ],
+    [
+      seams.map((seam) => seam.seamId),
+      "DUPLICATE_ATTACHMENT_SEAM_ID_ACROSS_FAMILIES",
+    ],
+  ] as const;
+  for (const [values, code] of mergedDuplicateChecks) {
+    const duplicateId = duplicates(values)[0];
+    if (duplicateId !== undefined) {
+      throw new CharacterLoadoutError(code, duplicateId);
+    }
+  }
+  const slotIds = new Set(slots.map((slot) => slot.slotId));
+  const wearableSetIds = new Set(
+    wearableSets.map((set) => set.wearableSetId),
+  );
+  for (const attachment of attachments) {
+    if (!slotIds.has(attachment.slotId)) {
+      throw new CharacterLoadoutError(
+        "UNKNOWN_ATTACHMENT_SLOT_MEMBER",
+        `${attachment.attachmentId}:${attachment.slotId}`,
+      );
+    }
+    if (
+      attachment.wearableSetId !== undefined &&
+      !wearableSetIds.has(attachment.wearableSetId)
+    ) {
+      throw new CharacterLoadoutError(
+        "UNKNOWN_WEARABLE_SET_MEMBER",
+        `${attachment.attachmentId}:${attachment.wearableSetId}`,
+      );
+    }
+  }
   const duplicateDrawOrder = duplicates(
     attachments.map((attachment) => String(attachment.drawOrder)),
   )[0];
@@ -306,6 +362,17 @@ export function resolveCharacterLoadout(
     }
   }
   const merged = mergeLayouts(contract);
+  if (
+    propStateId !== undefined &&
+    !(merged.layout.propStates ?? []).some(
+      (state) => state.propStateId === propStateId,
+    )
+  ) {
+    throw new CharacterLoadoutError(
+      "UNKNOWN_LOADOUT_PROP_STATE",
+      propStateId,
+    );
+  }
   const propStateOverrides = Object.fromEntries(
     (merged.layout.propStates ?? []).map((state) => [
       state.propStateId,
@@ -339,7 +406,51 @@ export function resolveCharacterLoadout(
       );
     }
   }
-  for (const group of contract.exclusiveGroups ?? []) {
+  const exclusiveGroups = contract.exclusiveGroups ?? [];
+  const duplicateGroupId = duplicates(
+    exclusiveGroups.map((group) => group.groupId),
+  )[0];
+  if (duplicateGroupId !== undefined) {
+    throw new CharacterLoadoutError(
+      "DUPLICATE_EXCLUSIVE_GROUP_ID",
+      duplicateGroupId,
+    );
+  }
+  const exclusiveOwner = new Map<string, string>();
+  const allAttachmentIds = new Set(
+    merged.layout.attachments.map((attachment) => attachment.attachmentId),
+  );
+  for (const group of exclusiveGroups) {
+    if (
+      group.attachmentIds.length === 0 ||
+      !Number.isInteger(group.maximumEnabled) ||
+      group.maximumEnabled < 0 ||
+      group.maximumEnabled > group.attachmentIds.length ||
+      duplicates(group.attachmentIds).length > 0
+    ) {
+      throw new CharacterLoadoutError(
+        "INVALID_EXCLUSIVE_GROUP_DECLARATION",
+        group.groupId,
+      );
+    }
+    for (const attachmentId of group.attachmentIds) {
+      if (!allAttachmentIds.has(attachmentId)) {
+        throw new CharacterLoadoutError(
+          "UNKNOWN_EXCLUSIVE_GROUP_MEMBER",
+          `${group.groupId}:${attachmentId}`,
+        );
+      }
+      const owner = exclusiveOwner.get(attachmentId);
+      if (owner !== undefined && owner !== group.groupId) {
+        throw new CharacterLoadoutError(
+          "CONFLICTING_EXCLUSIVE_GROUP_DECLARATION",
+          `${attachmentId}:${owner}:${group.groupId}`,
+        );
+      }
+      exclusiveOwner.set(attachmentId, group.groupId);
+    }
+  }
+  for (const group of exclusiveGroups) {
     const occupants = group.attachmentIds.filter((id) => enabledIds.has(id));
     if (occupants.length > group.maximumEnabled) {
       throw new CharacterLoadoutError(

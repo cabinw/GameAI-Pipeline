@@ -95,3 +95,23 @@ the accepted R6 Scene. Any difference stops publication.
   supported adapter.
 - Parity tests intentionally make R6 behavior changes explicit rather than
   allowing silent canonical drift.
+The tracked engine-neutral full-loadout contract is the sole authority for
+the canonical 12-state matrix. `framework/character-contracts` validates and
+resolves each state; generation derives the R6-compatible Cocos plan from
+that resolved membership and fails on parity drift. The Cocos adapter must
+not independently construct the 4×3 cross-product.
+
+Semantic input registration occurs only after the manifest passes, runtime
+nodes and playback exist, Exact Reset completes, and the lifecycle reaches
+ready. Failure, rebuild, disable, and destroy invalidate the generation and
+leave zero active handlers.
+
+The superseded TASK-013 monolith stays available for provenance, but its
+generators are excluded from the default build and exposed only through an
+explicit legacy verification command.
+
+Runtime semantic validation is mandatory even without a full parser/schema
+revision. A future schema/parser revision may encode the merged-loadout and
+exclusive-group constraints structurally; that work is deferred because this
+remediation preserves schema `1.0.0` and enforces the same conditions with
+stable runtime error codes.

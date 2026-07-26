@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   composeAttachmentWorldTransform,
+  measureAttachmentSocketToAnchorError,
   parseAttachmentLayout,
   resolveCharacterLoadout,
   validateSemanticClipIds,
@@ -61,7 +62,7 @@ const familySlotIds = new Map(
 );
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
-for (const stateId of source.exactRestStateIds) {
+for (const { outputId, stateId } of source.exactRestPresets) {
   const state = stateById.get(stateId);
   const enabledFamilies = new Set(state.enabledFamilyIds);
   const slotOverrides = Object.fromEntries(
@@ -81,7 +82,7 @@ for (const stateId of source.exactRestStateIds) {
     rigLayout,
     parsedCombined.value,
     slotOverrides,
-    await readFile(path.join(fixtureRoot, `reference/${stateId}.png`)),
+    await readFile(path.join(fixtureRoot, `reference/${outputId}.png`)),
     undefined,
     {},
     propStateOverrides,
@@ -93,7 +94,7 @@ for (const stateId of source.exactRestStateIds) {
     result.metrics.seamMismatchPixels !== 0 ||
     result.metrics.boundsExpansionPixels !== 0
   ) {
-    throw new Error(`EXACT_RECONSTRUCTION_FAILED:${stateId}`);
+    throw new Error(`EXACT_RECONSTRUCTION_FAILED:${outputId}:${stateId}`);
   }
 }
 
@@ -124,7 +125,11 @@ const hierarchy = rigLayout.parts.map((part) => ({
   parentId: part.parentId,
   restPose: part.restPose,
 }));
-const resolved = resolveCharacterLoadout(rigLayout, contract, "full-loadout");
+const resolved = resolveCharacterLoadout(
+  rigLayout,
+  contract,
+  "garment-and-accessories-with-left-hand-prop",
+);
 const attachmentById = new Map(
   resolved.enabledAttachments.map((attachment) => [
     attachment.attachmentId,
@@ -281,19 +286,9 @@ for (const clip of parsedClips) {
         attachment.parentPartId === "head"
       ) {
         const parent = pose.joints[attachment.parentPartId].worldTransform;
-        const expected = composeAttachmentWorldTransform(
-          parent,
-          attachment.slotTransform,
-          attachment.attachmentTransform,
-        );
-        const actual = composeAttachmentWorldTransform(
-          parent,
-          attachment.slotTransform,
-          attachment.attachmentTransform,
-        );
         maximumAccessorySocketError = Math.max(
           maximumAccessorySocketError,
-          Math.hypot(expected.tx - actual.tx, expected.ty - actual.ty),
+          measureAttachmentSocketToAnchorError(parent, attachment),
         );
       }
     }

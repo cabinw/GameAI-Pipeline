@@ -2,6 +2,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { assertExactFlatFileSet } from "./generated-output-closure.mjs";
+
 const extensionRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -29,3 +31,12 @@ await writeFile(
   runtimeFile,
   `// Generated from the tested canonical loadout adapter boundary. Do not hand-edit.\n${creatorSource}`,
 );
+
+const expectedRuntimeFiles = [
+  "canonical-loadout-adapter.ts",
+  "composable-character-loadout-reference-v2.ts",
+];
+await assertExactFlatFileSet(runtimeRoot, expectedRuntimeFiles, {
+  include: (file) => file.endsWith(".ts"),
+  diagnostic: "TASK_013R7_CANONICAL_GENERATED_OUTPUT_CLOSURE_FAILED",
+});

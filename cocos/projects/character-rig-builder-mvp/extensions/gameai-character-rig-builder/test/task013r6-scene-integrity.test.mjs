@@ -85,6 +85,7 @@ test("TASK-013R6 every runtime module has Creator-owned imported metadata", asyn
     "prop-runtime-builder.ts",
     "prop-spatial.ts",
     "prop-state.ts",
+    "runtime-readiness.ts",
     "task013r6-one-handed-prop-integration.ts",
   ]) {
     const meta = await json(

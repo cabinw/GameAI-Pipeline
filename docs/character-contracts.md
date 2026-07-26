@@ -192,6 +192,23 @@ contradictory dependencies, missing required state attachments, invalid
 global draw order, missing/duplicate semantic animation IDs, and loadout
 schema/rig incompatibility.
 
+Merged-loadout validation uses stable `CharacterLoadoutError.code` values:
+`DUPLICATE_ATTACHMENT_SLOT_ID_ACROSS_FAMILIES`,
+`DUPLICATE_WEARABLE_SET_ID_ACROSS_FAMILIES`,
+`DUPLICATE_PROP_STATE_ID_ACROSS_FAMILIES`,
+`DUPLICATE_ATTACHMENT_SEAM_ID_ACROSS_FAMILIES`,
+`DUPLICATE_EXCLUSIVE_GROUP_ID`, `UNKNOWN_LOADOUT_PROP_STATE`,
+`UNKNOWN_ATTACHMENT_SLOT_MEMBER`, `UNKNOWN_WEARABLE_SET_MEMBER`,
+`UNKNOWN_EXCLUSIVE_GROUP_MEMBER`, `INVALID_EXCLUSIVE_GROUP_DECLARATION`, and
+`CONFLICTING_EXCLUSIVE_GROUP_DECLARATION`. These checks run before lookup-map
+construction, so duplicate declarations cannot silently overwrite one
+another and an unknown prop state can never mean “no prop.”
+
+The current loadout document is semantically validated through the typed
+runtime contract rather than a dedicated full JSON Schema/parser. Adding that
+structural parser is deferred to a separately versioned schema task; this
+does not defer or weaken the runtime rejection rules above.
+
 This is a resolver contract, not a Cocos contract. Engine adapters receive
 only resolved state/layer data and resource metadata.
 

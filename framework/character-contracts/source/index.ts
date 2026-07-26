@@ -15,6 +15,7 @@ export {
 } from "./schema-loader";
 export {
   composeAttachmentWorldTransform,
+  measureAttachmentSocketToAnchorError,
   multiplyAttachmentTransforms,
   resolveAttachmentLayout,
 } from "./attachment-resolver";

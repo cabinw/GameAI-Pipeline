@@ -119,6 +119,17 @@ export class HarnessResourceCoordinator {
     this.failed += 1;
   }
 
+  rejectPending(): void {
+    for (const logicalId of this.expectedIds) {
+      if (this.completed.has(logicalId)) continue;
+      if (!this.requested.has(logicalId)) {
+        this.requested.add(logicalId);
+      }
+      this.completed.add(logicalId);
+      this.failed += 1;
+    }
+  }
+
   snapshot(): HarnessResourceSnapshot {
     const terminal =
       this.completed.size !== this.expectedIds.size

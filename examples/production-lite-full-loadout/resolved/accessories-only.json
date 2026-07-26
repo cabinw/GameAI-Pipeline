@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
   "loadoutId": "production-lite-full-loadout",
-  "stateId": "accessories-only",
+  "stateId": "accessories-only-with-no-prop",
   "resolvedStateIds": [
-    "accessories-only"
+    "accessories-only-with-no-prop"
   ],
   "attachments": [
     {

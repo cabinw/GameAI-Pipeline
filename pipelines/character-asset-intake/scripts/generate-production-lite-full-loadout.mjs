@@ -29,6 +29,8 @@ const cocosRoot = path.join(
   "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-full-loadout",
 );
 const outputRoots = [fixtureRoot, cocosRoot];
+const generatorFile = fileURLToPath(import.meta.url);
+const generatorVersion = "2.0.0";
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
 const loadedSources = new Map();
@@ -262,8 +264,10 @@ const familySlotIds = new Map(
   ]),
 );
 const reports = {};
-for (const stateId of source.exactRestStateIds) {
+for (const preset of source.exactRestPresets) {
+  const { outputId, stateId } = preset;
   const state = source.states.find((candidate) => candidate.stateId === stateId);
+  if (state === undefined) throw new Error(`EXACT_REST_STATE_MISSING:${stateId}`);
   const resolved = resolveCharacterLoadout(rigLayout, contract, stateId);
   const enabledFamilies = new Set(state.enabledFamilyIds);
   const slotOverrides = Object.fromEntries(
@@ -307,20 +311,20 @@ for (const stateId of source.exactRestStateIds) {
   if (exact.metrics.status !== "passed") {
     throw new Error(`${stateId}:${JSON.stringify(exact.metrics)}`);
   }
-  reports[stateId] = exact.metrics;
+  reports[outputId] = exact.metrics;
   for (const root of outputRoots) {
-    await writeFile(path.join(root, `reference/${stateId}.png`), authored.reconstructed);
+    await writeFile(path.join(root, `reference/${outputId}.png`), authored.reconstructed);
     await writeFile(
-      path.join(root, `reference/${stateId}-reconstructed.png`),
+      path.join(root, `reference/${outputId}-reconstructed.png`),
       exact.reconstructed,
     );
-    await writeFile(path.join(root, `reference/${stateId}-diff.png`), exact.comparison);
+    await writeFile(path.join(root, `reference/${outputId}-diff.png`), exact.comparison);
     await writeFile(
-      path.join(root, `reference/${stateId}-report.json`),
+      path.join(root, `reference/${outputId}-report.json`),
       json(exact.metrics),
     );
     await writeFile(
-      path.join(root, `resolved/${stateId}.json`),
+      path.join(root, `resolved/${outputId}.json`),
       json(resolved),
     );
   }
@@ -332,10 +336,45 @@ const provenance = {
   source: "source/full-loadout-source.json",
   generator:
     "pipelines/character-asset-intake/scripts/generate-production-lite-full-loadout.mjs",
+  generatorVersion,
   sourceDigest: createHash("sha256")
     .update(await readFile(sourceFile))
     .digest("hex"),
-  exactRestStateIds: source.exactRestStateIds,
+  exactRestPresets: source.exactRestPresets,
+  inputs: await Promise.all(
+    [
+      generatorFile,
+      sourceFile,
+      path.resolve(sourceDirectory, source.rigSource),
+      ...loadedSources.keys(),
+      path.join(baseRoot, "source/character-source.json"),
+      ...animationSources.map(([, relativeSource]) =>
+        path.join(repositoryRoot, "examples", relativeSource),
+      ),
+      path.join(
+        repositoryRoot,
+        "examples/production-lite-garment-layering/animations/garment-stress.json",
+      ),
+      path.join(
+        repositoryRoot,
+        "examples/production-lite-one-handed-prop/animations/prop-stress.json",
+      ),
+      ...parsedCombined.value.attachments.map((attachment) =>
+        path.join(
+          attachmentOrigin.get(attachment.attachmentId),
+          attachment.file,
+        ),
+      ),
+    ]
+      .filter((file, index, files) => files.indexOf(file) === index)
+      .sort()
+      .map(async (file) => ({
+        path: path.relative(repositoryRoot, file).replaceAll(path.sep, "/"),
+        sha256: createHash("sha256")
+          .update(await readFile(file))
+          .digest("hex"),
+      })),
+  ),
   tolerances: {
     rgbaMismatchPixels: 0,
     alphaMismatchPixels: 0,

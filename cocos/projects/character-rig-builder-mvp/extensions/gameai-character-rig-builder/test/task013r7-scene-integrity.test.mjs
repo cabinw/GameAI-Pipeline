@@ -108,6 +108,24 @@ test("TASK-013R7 canonical facade wraps accepted R6 and never imports the supers
   );
 });
 
+test("TASK-013R7 default build excludes the superseded monolith generators", async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(extensionRoot, "package.json"), "utf8"),
+  );
+  assert.doesNotMatch(
+    packageJson.scripts.build,
+    /generate-composable-loadout-(?:cocos-data|scene)/u,
+  );
+  assert.match(
+    packageJson.scripts["legacy:verify-task013-provenance"],
+    /generate-composable-loadout-cocos-data/u,
+  );
+  assert.match(
+    packageJson.scripts["legacy:verify-task013-provenance"],
+    /generate-composable-loadout-scene/u,
+  );
+});
+
 test("TASK-013R7 canonical runtime injects production identity while accepted R6 retains its identity", async () => {
   const [canonicalSource, acceptedR6Source] = await Promise.all([
     readFile(scriptFile, "utf8"),

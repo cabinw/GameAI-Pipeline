@@ -1,18 +1,18 @@
+import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import sharp from "sharp";
+import { resolveCharacterLoadout } from "@gameai/character-contracts";
 
 import { buildCocosProductionLiteCharacterPlan } from "../dist/production-lite-character-adapter.js";
 import { buildGarmentBridgePlan } from "../dist/task013r5/garment-bridge-contract.js";
-import {
-  GARMENT_ACCESSORIES_ONLY_STATE_ID,
-  GARMENT_BASE_ONLY_STATE_ID,
-  GARMENT_COMBINED_STATE_ID,
-  GARMENT_ONLY_STATE_ID,
-} from "../dist/task013r5/garment-bridge-runtime-contract.js";
 import { buildPropBridgePlan } from "../dist/task013r6/prop-bridge-contract.js";
+import {
+  PROP_NO_PROP_STATE_ID,
+} from "../dist/task013r6/prop-bridge-runtime-contract.js";
+import { assertExactFlatFileSet } from "./generated-output-closure.mjs";
 
 const extensionRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -36,10 +36,15 @@ const propFixtureRoot = path.join(
   repositoryRoot,
   "examples/production-lite-one-handed-prop",
 );
+const fullLoadoutFixtureRoot = path.join(
+  repositoryRoot,
+  "examples/production-lite-full-loadout",
+);
 const modules = [
   "prop-bridge-runtime-contract.ts",
   "prop-input-registry.ts",
   "prop-resource-manifest.ts",
+  "runtime-readiness.ts",
   "prop-spatial.ts",
   "prop-state.ts",
 ];
@@ -132,60 +137,91 @@ const basePlan = buildCocosProductionLiteCharacterPlan(
   clips,
   baseDimensions,
 );
-const stateDefinitions = Object.freeze([
-  Object.freeze({
-    stateId: GARMENT_BASE_ONLY_STATE_ID,
-    hudLabel: "Base Only",
-    garmentEnabled: false,
-    accessoriesEnabled: false,
-    slotEnabled: Object.freeze({
-      headwear: false,
-      "face-accessory": false,
+const serializedLoadout = JSON.parse(
+  await readFile(
+    path.join(fullLoadoutFixtureRoot, "loadout-contract.json"),
+    "utf8",
+  ),
+);
+const engineNeutralContract = {
+  ...serializedLoadout,
+  families: await Promise.all(
+    serializedLoadout.families.map(async (family) => ({
+      familyId: family.familyId,
+      attachmentLayout: JSON.parse(
+        await readFile(
+          path.join(
+            fullLoadoutFixtureRoot,
+            family.attachmentLayoutFile,
+          ),
+          "utf8",
+        ),
+      ),
+    })),
+  ),
+};
+const garmentStateId = (enabledFamilyIds) => {
+  const garment = enabledFamilyIds.includes("garment");
+  const accessories = enabledFamilyIds.includes("accessories");
+  if (garment && accessories) return "garment-and-accessories";
+  if (garment) return "garment-only";
+  if (accessories) return "accessories-only";
+  return "base-only";
+};
+const garmentHudLabel = Object.freeze({
+  "base-only": "Base Only",
+  "garment-only": "Garment Only",
+  "accessories-only": "Accessories Only",
+  "garment-and-accessories": "Garment + Accessories",
+});
+const resolvedLoadoutStates = engineNeutralContract.states.map((state) => {
+  const resolved = resolveCharacterLoadout(
+    rigLayout,
+    engineNeutralContract,
+    state.stateId,
+  );
+  const garmentState = garmentStateId(state.enabledFamilyIds);
+  const propStateId = state.propStateId ?? PROP_NO_PROP_STATE_ID;
+  const propLabel =
+    propStateId === "no-prop"
+      ? "No Prop"
+      : propStateId === "left-hand-prop"
+        ? "Left Prop"
+        : "Right Prop";
+  return Object.freeze({
+    stateId: state.stateId,
+    garmentStateId: garmentState,
+    propStateId,
+    hudLabel: `${garmentHudLabel[garmentState]} / ${propLabel}`,
+    enabledAttachmentIds: Object.freeze(
+      resolved.enabledAttachments
+        .map((attachment) => attachment.attachmentId)
+        .sort(),
+    ),
+  });
+});
+const stateDefinitions = Object.freeze(
+  resolvedLoadoutStates
+    .filter((state) => state.propStateId === PROP_NO_PROP_STATE_ID)
+    .map((state) => {
+      const garmentEnabled = state.garmentStateId.includes("garment");
+      const accessoriesEnabled =
+        state.garmentStateId.includes("accessories");
+      return Object.freeze({
+        stateId: state.garmentStateId,
+        hudLabel: garmentHudLabel[state.garmentStateId],
+        garmentEnabled,
+        accessoriesEnabled,
+        slotEnabled: Object.freeze({
+          headwear: accessoriesEnabled,
+          "face-accessory": accessoriesEnabled,
+        }),
+        wearableSetEnabled: Object.freeze({
+          "casual-jacket": garmentEnabled,
+        }),
+      });
     }),
-    wearableSetEnabled: Object.freeze({
-      "casual-jacket": false,
-    }),
-  }),
-  Object.freeze({
-    stateId: GARMENT_ONLY_STATE_ID,
-    hudLabel: "Garment Only",
-    garmentEnabled: true,
-    accessoriesEnabled: false,
-    slotEnabled: Object.freeze({
-      headwear: false,
-      "face-accessory": false,
-    }),
-    wearableSetEnabled: Object.freeze({
-      "casual-jacket": true,
-    }),
-  }),
-  Object.freeze({
-    stateId: GARMENT_ACCESSORIES_ONLY_STATE_ID,
-    hudLabel: "Accessories Only",
-    garmentEnabled: false,
-    accessoriesEnabled: true,
-    slotEnabled: Object.freeze({
-      headwear: true,
-      "face-accessory": true,
-    }),
-    wearableSetEnabled: Object.freeze({
-      "casual-jacket": false,
-    }),
-  }),
-  Object.freeze({
-    stateId: GARMENT_COMBINED_STATE_ID,
-    hudLabel: "Garment + Accessories",
-    garmentEnabled: true,
-    accessoriesEnabled: true,
-    slotEnabled: Object.freeze({
-      headwear: true,
-      "face-accessory": true,
-    }),
-    wearableSetEnabled: Object.freeze({
-      "casual-jacket": true,
-    }),
-  }),
-]);
+);
 const garmentPlan = buildGarmentBridgePlan(
   basePlan,
   rigLayout,
@@ -200,14 +236,62 @@ const plan = buildPropBridgePlan(
   propLayout,
   propDimensions,
   "production-lite-one-handed-prop",
+  resolvedLoadoutStates,
 );
+const provenanceInputFiles = [
+  fileURLToPath(import.meta.url),
+  path.join(propFixtureRoot, "rig-layout.json"),
+  path.join(garmentFixtureRoot, "attachment-layout.json"),
+  path.join(propFixtureRoot, "attachment-layout.json"),
+  path.join(fullLoadoutFixtureRoot, "loadout-contract.json"),
+  ...serializedLoadout.families.map((family) =>
+    path.join(fullLoadoutFixtureRoot, family.attachmentLayoutFile),
+  ),
+  ...["rest-idle", "arm-wave", "articulation-stress"].map((name) =>
+    path.join(baseFixtureRoot, `animations/${name}.json`),
+  ),
+  path.join(propFixtureRoot, "animations/prop-swing.json"),
+  ...rigLayout.parts.map((part) =>
+    path.join(baseFixtureRoot, part.file),
+  ),
+  ...garmentLayout.attachments.map((attachment) =>
+    path.join(garmentFixtureRoot, attachment.file),
+  ),
+  ...propLayout.attachments.map((attachment) =>
+    path.join(propFixtureRoot, attachment.file),
+  ),
+];
+const provenance = {
+  generatorVersion: "2.0.0",
+  inputs: await Promise.all(
+    [...new Set(provenanceInputFiles)].sort().map(async (file) => ({
+      path: path.relative(repositoryRoot, file).replaceAll(path.sep, "/"),
+      sha256: createHash("sha256")
+        .update(await readFile(file))
+        .digest("hex"),
+    })),
+  ),
+};
 await writeFile(
   path.join(runtimeRoot, "prop-bridge-plan-data.ts"),
   [
     "// Generated from tracked engine-neutral rig, animation, garment, accessory, prop, socket, and grip contracts. Do not hand-edit.",
     'import type { PropBridgePlan } from "./prop-bridge-runtime-contract";',
     "",
+    `export const PROP_BRIDGE_PLAN_PROVENANCE = ${JSON.stringify(provenance, null, 2)} as const;`,
+    "",
     `export const PROP_BRIDGE_PLAN = ${JSON.stringify(plan, null, 2)} as unknown as PropBridgePlan;`,
     "",
   ].join("\n"),
 );
+
+const expectedRuntimeFiles = [
+  ...modules,
+  "prop-bridge-plan-data.ts",
+  "prop-runtime-builder.ts",
+  "task013r6-one-handed-prop-integration.ts",
+].sort();
+await assertExactFlatFileSet(runtimeRoot, expectedRuntimeFiles, {
+  include: (file) => file.endsWith(".ts"),
+  diagnostic: "TASK_013R7_R6_GENERATED_OUTPUT_CLOSURE_FAILED",
+});
