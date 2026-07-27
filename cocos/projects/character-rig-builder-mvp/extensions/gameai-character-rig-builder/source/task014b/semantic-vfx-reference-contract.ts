@@ -131,8 +131,8 @@ export const TASK014B_SEMANTIC_EVENT_CONTEXT: SemanticEventValidationContext =
           parentPartId: "foot-right",
         }),
         Object.freeze({
-          socketId: "hand-left-trail",
-          parentPartId: "hand-left",
+          socketId: "hand-right-trail",
+          parentPartId: "hand-right",
         }),
         Object.freeze({
           socketId: "torso-aura",
@@ -159,7 +159,7 @@ export const TASK014B_SEMANTIC_EVENT_CONTRACT: CharacterSemanticEventContract =
       Object.freeze({
         cueId: "hand-swing-trail",
         effectKind: "trail",
-        visualIntent: "Procedural trail following the animated left hand.",
+        visualIntent: "Procedural trail following the animated right hand.",
         defaultDurationSeconds: 0.75,
       }),
       Object.freeze({
@@ -258,7 +258,7 @@ export const TASK014B_SEMANTIC_EVENT_CONTRACT: CharacterSemanticEventContract =
             timeSeconds: 0.25,
             eventKind: "vfx",
             semanticCueId: "hand-swing-trail",
-            socketId: "hand-left-trail",
+            socketId: "hand-right-trail",
             localTransform: identityTransform,
             layerRole: "in-front-of-character",
             followPolicy: { position: true, rotation: true, scale: true },

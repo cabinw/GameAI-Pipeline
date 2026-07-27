@@ -5,7 +5,7 @@ time.
 
 ## Active plan: TASK-014B Minimal Cocos Semantic VFX Adapter
 
-- Status: Implementation gate passed; pending external visual review
+- Status: Final closure verified; replacement evidence pending external visual review
 - Started: 2026-07-26
 - Branch: `feat/task-014b-cocos-semantic-vfx-adapter`
 - Baseline `main`: `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
@@ -93,9 +93,9 @@ behavior through a Cocos-only adapter and cue-renderer registry.
 
 ### Implementation result
 
-- Focused TASK-014B tests pass 21/21; complete extension tests pass 215/215;
+- Focused TASK-014B tests pass 22/22; complete extension tests pass 216/216;
   semantic-event package tests pass 24/24.
-- Working-copy and frozen tracked-files-only verification both pass 372/372.
+- Working-copy and frozen tracked-files-only verification both pass 373/373.
 - Creator 3.8.8 cold-open identity, R1/TASK-014B switching, Web Preview,
   console, transform-stress, VFX, Pause/Resume, track switch, two rebuilds,
   and Exact Reset gates pass in one run.
@@ -118,8 +118,36 @@ behavior through a Cocos-only adapter and cue-renderer registry.
   The Creator-owned Scene and `.meta` hashes remain byte-identical to the
   frozen preflight values.
 - No TASK-014C, feature-branch MP4/audio, or new engine-neutral Transform
-  Stress control was added. Evidence publication remains the final step
-  before external visual review.
+  Stress control was added.
+
+### Final closure result
+
+- The original evidence failed external visual review because its recording
+  framing placed the character against the right/bottom boundary, clipped
+  the aura and shortcut help, made Dust and Trail unreliable to identify,
+  and left a highlighted pointer close enough to the Trail to be ambiguous.
+- The acceptance layout now has explicit Normal/Stress visual contracts for
+  the character, sockets, HUD glyphs, renderer geometry, safe viewport, and
+  minimum effect ROI deltas. Runtime diagnostics fail closed on non-finite
+  geometry or any viewport overflow.
+- The HUD uses three deterministic help lines. Dust uses high-contrast orange
+  filled/stroked geometry, Trail uses a green/white two-pass curve on the
+  animated right hand, and Aura uses a smaller high-contrast complete
+  double ring.
+- Rebuild now detaches the old runtime root synchronously and preserves its
+  one registered input handler. This rejects the live two-rebuild duplicate
+  root/input failure while retaining symmetric final teardown.
+- Creator 3.8.8 clean import, R1 → TASK-014B → R1 → TASK-014B, second open,
+  resources, Rest, all three effects in Normal and Stress, Aura six loops,
+  Pause/Resume, two rebuilds, post-rebuild effects, Exact Reset, and final
+  clean hold pass with zero relevant Creator or Preview console output.
+- The replacement recording is a real 82-second Web Preview capture at
+  H.264 High, 1280×720, 30 fps, yuv420p. Local full decode, two-second
+  contact-sheet review, effect/rebuild/reset high-frequency review, and ROI
+  pixel-diff review pass with the pointer outside the Canvas.
+- The original evidence remains preserved and is classified
+  `failed-external-visual-framing-and-hud-coverage`; the appended replacement
+  is classified `pending-external-visual-review`.
 
 ## Completed plan: TASK-014A1 Persistent Lifecycle Coalescing
 

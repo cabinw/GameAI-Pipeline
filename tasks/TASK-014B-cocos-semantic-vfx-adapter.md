@@ -1,6 +1,6 @@
 # TASK-014B: Minimal Cocos Semantic VFX Adapter
 
-- Status: Implementation complete; pending external visual review
+- Status: Final closure verified; replacement evidence pending external visual review
 - Date: 2026-07-26
 - Branch: `feat/task-014b-cocos-semantic-vfx-adapter`
 - Baseline: `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
@@ -65,11 +65,12 @@ Character Semantic Events contract
 - [x] Creator 3.8.8 passes clean import/open, Scene switch/reopen, second
   initialization, clean Creator/Web consoles, all visual/socket/lifecycle
   controls, transform stress, final Debug OFF, and zero leaks.
-- [ ] Feature branch is committed and pushed only after all automated and
+- [x] Feature branch is committed and pushed only after all automated and
   Creator gates pass; no TASK-014B PR is created.
-- [ ] `evidence/task-014b` contains only verified `manifest.json` and one real
-  Web Preview H.264 High 1280×720 30 fps yuv420p video whose local/downloaded
-  SHA-256 and full FFmpeg decode match.
+- [x] `evidence/task-014b` preserves the original failed-framing video and
+  appends one real replacement Web Preview H.264 High 1280×720 30 fps
+  yuv420p video whose local/downloaded SHA-256, frame count, metadata, and
+  full FFmpeg decode match.
 - [x] TASK-014C, real audio/gameplay execution, Unity/Godot changes, Windows
   claims, and Red Cap reconstruction remain absent.
 
@@ -90,11 +91,11 @@ merge a TASK-014B PR.
 - Rebuild preserves the current stress state, creates exactly one stress root,
   and retains exactly one input handler. Two live rebuilds reached
   `SETUP 3 / TEARDOWN 2 / REBUILDS 2 / INPUT 1`.
-- Focused TASK-014B tests: 21/21 PASS.
-- Complete extension tests: 215/215 PASS.
+- Focused TASK-014B tests: 22/22 PASS.
+- Complete extension tests: 216/216 PASS.
 - Semantic-event package tests: 24/24 PASS.
-- Working-copy verification: 372/372 PASS.
-- Frozen tracked-files-only verification: 372/372 PASS.
+- Working-copy verification: 373/373 PASS.
+- Frozen tracked-files-only verification: 373/373 PASS.
 - Extension TypeScript, Cocos clean-CI typecheck, generated-output closure,
   schema byte identity, metadata-race regression, and `git diff --check`:
   PASS.
@@ -121,5 +122,26 @@ merge a TASK-014B PR.
   `abea453c7cfa2648c18944d56e42dd43f298cc5c49c59898c267856eb14369c3`
   and
   `fb150603bfb20a5f2645ef0fb56231e41dd6662e0b73bf313d83743c9d1ecd52`.
-- Feature publication and evidence publication remain pending. No TASK-014B
-  PR exists.
+- The final closure repairs all audited visual evidence defects without
+  changing the Scene, `.meta`, engine-neutral contract, or evaluator:
+  Normal/Stress placement and safe viewport are explicit; HUD help is split
+  across three complete lines; Dust is high-contrast orange; Trail is a
+  green/white two-pass curve attached to the animated right hand; Aura is a
+  complete high-contrast double ring.
+- Deterministic guards reject the previous unsafe layout, single-line clipped
+  HUD, invisible Trail geometry, non-finite transforms, character/socket/
+  effect/HUD overflow, insufficient effect ROI deltas, missing stopped-state
+  ROI cleanup, and duplicate/stale post-rebuild geometry.
+- The live second-rebuild duplicate-root defect was fixed by synchronously
+  detaching the old generated root and preserving the one registered input
+  handler across rebuild. Two rebuilds finish with one root, one input,
+  zero stale geometry, and zero leaks.
+- External recording self-review passes: character, HUD, Dust, Trail, and
+  Aura are directly visible; Aura remains one instance across six loops and
+  Pause/Resume; Normal/Stress and post-rebuild sequences remain in bounds;
+  Exact Reset leaves a clean frame; the pointer remains outside the Canvas.
+- The original evidence is retained as
+  `failed-external-visual-framing-and-hud-coverage`. Its replacement is an
+  82-second H.264 High 1280×720 30 fps yuv420p capture marked
+  `pending-external-visual-review`.
+- No TASK-014B PR exists.

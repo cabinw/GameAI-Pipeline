@@ -52,10 +52,13 @@ import {
 } from "./semantic-vfx-diagnostics";
 import {
   assertNeverSemanticVfxAction,
-  formatSemanticVfxInputHelp,
+  formatSemanticVfxInputHelpLines,
   nextTask014BTransformStressState,
   SEMANTIC_VFX_INPUT_REGISTRY,
+  TASK014B_VISUAL_ACCEPTANCE,
+  task014bViewportOverflowPx,
   task014bTransformStressPose,
+  transformTask014BAabb,
   type SemanticVfxAction,
 } from "./semantic-vfx-input-registry";
 import {
@@ -119,6 +122,7 @@ class CocosSemanticVfxHost implements SemanticVfxHost {
   maximumProjectionError = 0;
   maximumEffectPositionError = 0;
   maximumEffectRotationErrorDegrees = 0;
+  maximumViewportOverflowPx = 0;
   rendererComponentConflictCount = 0;
 
   constructor(
@@ -238,40 +242,77 @@ class CocosSemanticVfxHost implements SemanticVfxHost {
     graphics.clear();
     switch (request.rendererKind) {
       case "footstep-dust": {
-        const radius = 10 + update.normalizedAge * 34;
-        const alpha = Math.round(220 * (1 - update.normalizedAge));
-        graphics.fillColor = new Color(203, 213, 225, alpha);
-        graphics.circle(-12, 0, radius * 0.55);
-        graphics.circle(12, 2, radius * 0.7);
+        const radius = 16 + update.normalizedAge * 38;
+        const alpha = Math.round(255 * (1 - update.normalizedAge));
+        graphics.fillColor = new Color(251, 146, 60, alpha);
+        graphics.circle(-18, 16, radius * 0.62);
+        graphics.circle(14, 20, radius * 0.78);
+        graphics.circle(0, 30, radius * 0.48);
         graphics.fill();
+        graphics.strokeColor = new Color(255, 237, 213, alpha);
+        graphics.lineWidth = 4;
+        graphics.circle(-18, 16, radius * 0.62);
+        graphics.circle(14, 20, radius * 0.78);
+        graphics.stroke();
         break;
       }
       case "hand-trail": {
-        const pulse = 4 + Math.sin(update.elapsedSeconds * 18) * 2;
-        graphics.strokeColor = new Color(34, 211, 238, 220);
-        graphics.lineWidth = 10;
-        graphics.moveTo(-58, -10);
-        graphics.bezierCurveTo(-38, 25, -16, -22, 0, 0);
+        const pulse = 7 + Math.sin(update.elapsedSeconds * 18) * 2;
+        graphics.strokeColor = new Color(52, 211, 153, 245);
+        graphics.lineWidth = 16;
+        graphics.moveTo(-64, -14);
+        graphics.bezierCurveTo(-44, 30, -18, -26, 0, 0);
         graphics.stroke();
-        graphics.fillColor = new Color(103, 232, 249, 235);
+        graphics.strokeColor = new Color(236, 253, 245, 235);
+        graphics.lineWidth = 4;
+        graphics.moveTo(-62, -14);
+        graphics.bezierCurveTo(-42, 28, -18, -24, 0, 0);
+        graphics.stroke();
+        graphics.fillColor = new Color(110, 231, 183, 255);
         graphics.circle(0, 0, pulse);
         graphics.fill();
         break;
       }
       case "persistent-aura": {
-        const radius = 74 + Math.sin(update.elapsedSeconds * 4) * 6;
-        graphics.strokeColor = new Color(192, 132, 252, 190);
-        graphics.lineWidth = 6;
+        const radius = 62 + Math.sin(update.elapsedSeconds * 4) * 5;
+        graphics.strokeColor = new Color(192, 132, 252, 225);
+        graphics.lineWidth = 8;
         graphics.circle(0, 0, radius);
         graphics.stroke();
-        graphics.strokeColor = new Color(244, 114, 182, 110);
-        graphics.lineWidth = 3;
-        graphics.circle(0, 0, radius - 12);
+        graphics.strokeColor = new Color(244, 114, 182, 180);
+        graphics.lineWidth = 4;
+        graphics.circle(0, 0, radius - 13);
         graphics.stroke();
         break;
       }
       default:
         assertNeverSemanticVfxRendererKind(request.rendererKind);
+    }
+    const viewportBounds = transformTask014BAabb(
+      {
+        position: {
+          x: update.pose.position.x,
+          y: update.pose.position.y,
+        },
+        rotationDegrees: node.eulerAngles.z,
+        scale: {
+          x: update.pose.scale.x,
+          y: update.pose.scale.y,
+        },
+      },
+      TASK014B_VISUAL_ACCEPTANCE.rendererLocalBounds[
+        request.rendererKind
+      ],
+    );
+    const overflow = task014bViewportOverflowPx(viewportBounds);
+    this.maximumViewportOverflowPx = Math.max(
+      this.maximumViewportOverflowPx,
+      overflow,
+    );
+    if (overflow > 0) {
+      throw new Error(
+        `TASK_014B_VFX_VIEWPORT_OVERFLOW: ${request.rendererId} ${overflow.toFixed(4)}px`,
+      );
     }
     if (this.debugVisible) {
       graphics.strokeColor = new Color(34, 211, 238, 180);
@@ -406,7 +447,7 @@ export class GameAITask014BSemanticVfxReference extends Component {
 
   private beginSetup(preserveTransformStress: boolean): void {
     const generation = this.lifecycle.begin();
-    this.registerInput();
+    if (!this.inputRegistered) this.registerInput();
     this.coordinator = new HarnessResourceCoordinator(RESOURCE_MANIFEST);
     for (const resource of RESOURCE_MANIFEST) {
       this.coordinator.request(resource.logicalId);
@@ -494,7 +535,7 @@ export class GameAITask014BSemanticVfxReference extends Component {
     }
     this.createSocket("foot-left-contact", jointNodes.get("foot-left")!);
     this.createSocket("foot-right-contact", jointNodes.get("foot-right")!);
-    this.createSocket("hand-left-trail", jointNodes.get("hand-left")!);
+    this.createSocket("hand-right-trail", jointNodes.get("hand-right")!);
     this.createSocket("torso-aura", jointNodes.get("torso")!);
 
     const overlay = this.makeNode("TASK014BOverlay", root);
@@ -679,7 +720,11 @@ export class GameAITask014BSemanticVfxReference extends Component {
   ): void {
     if (this.evaluator !== null) this.dispatch(this.evaluator.dispose());
     this.adapter?.cleanup(reason);
-    this.generatedRoot?.destroy();
+    const generatedRoot = this.generatedRoot;
+    if (generatedRoot !== null) {
+      generatedRoot.setParent(null);
+      generatedRoot.destroy();
+    }
     this.generatedRoot = null;
     this.transformStressRoot = null;
     this.overlayRoot = null;
@@ -690,7 +735,7 @@ export class GameAITask014BSemanticVfxReference extends Component {
     this.animation = null;
     this.joints.clear();
     this.sockets.clear();
-    this.unregisterInput();
+    if (reason !== "rebuild") this.unregisterInput();
     this.lifecycle.teardown(dispose);
   }
 
@@ -811,6 +856,8 @@ export class GameAITask014BSemanticVfxReference extends Component {
         this.host?.maximumEffectPositionError ?? 0,
       maximumEffectRotationErrorDegrees:
         this.host?.maximumEffectRotationErrorDegrees ?? 0,
+      maximumViewportOverflowPx:
+        this.host?.maximumViewportOverflowPx ?? 0,
       rendererComponentConflictCount:
         this.host?.rendererComponentConflictCount ?? 0,
       rendererComponents:
@@ -833,6 +880,7 @@ export class GameAITask014BSemanticVfxReference extends Component {
       lifecycle.phase === "ready" &&
       resources?.terminal === "passed" &&
       adapter?.leakedInstanceCount === 0 &&
+      (this.host?.maximumViewportOverflowPx ?? 0) === 0 &&
       this.runtimeFailure.length === 0;
     this.hud.string = [
       `TASK-014B · Cocos Semantic VFX Adapter · ${pass ? "PASS" : "FAIL"}`,
@@ -841,11 +889,12 @@ export class GameAITask014BSemanticVfxReference extends Component {
       `ACTIVE ${adapter?.activeInstanceIds.join(",") || "none"} (${(adapter?.activeInstanceIds.length ?? 0) + (adapter?.activeOneShotCount ?? 0)}) · audio/gameplay ${adapter?.audioCount ?? 0}/${adapter?.gameplayCount ?? 0}`,
       `RESOURCES ${resources?.loaded ?? 0}/${resources?.expected ?? RESOURCE_MANIFEST.length} · projection ${(this.host?.maximumProjectionError ?? 0).toFixed(4)}px`,
       `VFX position/rotation error ${(this.host?.maximumEffectPositionError ?? 0).toFixed(4)}px/${(this.host?.maximumEffectRotationErrorDegrees ?? 0).toFixed(4)}deg · components ${rendererComponents.map(({ uiRendererCount, sorting2DCount }) => `${uiRendererCount}/${sorting2DCount}`).join(",") || "none"} · conflicts ${this.host?.rendererComponentConflictCount ?? 0}`,
+      `VIEWPORT overflow ${(this.host?.maximumViewportOverflowPx ?? 0).toFixed(4)}px · finite ${this.runtimeFailure.includes("NON_FINITE") ? "FAIL" : "PASS"}`,
       `duplicate starts ${adapter?.duplicateStartCount ?? 0} · unknown stops ${adapter?.unknownStopCount ?? 0} · leaked ${adapter?.leakedInstanceCount ?? 0}`,
       `LIFECYCLE setup/teardown/rebuild ${lifecycle.setupCount}/${lifecycle.teardownCount}/${this.rebuildCount} · input ${this.inputRegistered ? 1 : 0}`,
       `STRESS ${this.transformStressEnabled ? "ON" : "OFF"} · root ${stressPose.position.x}/${stressPose.position.y} · rotation ${stressPose.rotationDegrees}deg · scale ${stressPose.scale.x}/${stressPose.scale.y}`,
       `DEBUG J:${this.debugJoints ? "ON" : "OFF"} V:${this.debugVfx ? "ON" : "OFF"} K:${this.debugSkeleton ? "ON" : "OFF"} Y:${this.debugLinks ? "ON" : "OFF"}`,
-      formatSemanticVfxInputHelp(),
+      ...formatSemanticVfxInputHelpLines(),
       this.runtimeFailure,
     ].join("\n");
   }

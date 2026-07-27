@@ -23,6 +23,13 @@ export interface Task014BPoint2D {
   readonly y: number;
 }
 
+export interface Task014BAabb {
+  readonly minX: number;
+  readonly minY: number;
+  readonly maxX: number;
+  readonly maxY: number;
+}
+
 function transform2D(
   x: number,
   y: number,
@@ -85,6 +92,89 @@ export function composeTask014BTransformPoint(
   return transformTask014BPoint(
     outer,
     transformTask014BPoint(inner, point),
+  );
+}
+
+function aabb(
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+): Task014BAabb {
+  if (
+    [minX, minY, maxX, maxY].some((value) => !Number.isFinite(value)) ||
+    minX > maxX ||
+    minY > maxY
+  ) {
+    throw new Error("TASK_014B_VISUAL_AABB_INVALID");
+  }
+  return Object.freeze({ minX, minY, maxX, maxY });
+}
+
+export const TASK014B_VISUAL_ACCEPTANCE = Object.freeze({
+  viewport: aabb(-640, -360, 640, 360),
+  safeInsetPx: 8,
+  authoredRig: transform2D(100, 60, 0, 1.35, 1.35),
+  characterLocalBounds: aabb(-130, -265, 130, 40),
+  hudBounds: aabb(-620, 75, 620, 345),
+  maximumHelpLineCharacters: 110,
+  rendererLocalBounds: Object.freeze({
+    "footstep-dust": aabb(-52, -24, 52, 64),
+    "hand-trail": aabb(-72, -38, 18, 38),
+    "persistent-aura": aabb(-72, -72, 72, 72),
+  }),
+  minimumRoiPixelDelta: Object.freeze({
+    "footstep-dust": 300,
+    "hand-trail": 500,
+    "persistent-aura": 700,
+  }),
+});
+
+export function transformTask014BAabb(
+  transform: Task014BTransform2D,
+  bounds: Task014BAabb,
+): Task014BAabb {
+  const corners = [
+    { x: bounds.minX, y: bounds.minY },
+    { x: bounds.minX, y: bounds.maxY },
+    { x: bounds.maxX, y: bounds.minY },
+    { x: bounds.maxX, y: bounds.maxY },
+  ].map((point) => transformTask014BPoint(transform, point));
+  return aabb(
+    Math.min(...corners.map((point) => point.x)),
+    Math.min(...corners.map((point) => point.y)),
+    Math.max(...corners.map((point) => point.x)),
+    Math.max(...corners.map((point) => point.y)),
+  );
+}
+
+export function composeTask014BTransformAabb(
+  outer: Task014BTransform2D,
+  inner: Task014BTransform2D,
+  bounds: Task014BAabb,
+): Task014BAabb {
+  const corners = [
+    { x: bounds.minX, y: bounds.minY },
+    { x: bounds.minX, y: bounds.maxY },
+    { x: bounds.maxX, y: bounds.minY },
+    { x: bounds.maxX, y: bounds.maxY },
+  ].map((point) => composeTask014BTransformPoint(outer, inner, point));
+  return aabb(
+    Math.min(...corners.map((point) => point.x)),
+    Math.min(...corners.map((point) => point.y)),
+    Math.max(...corners.map((point) => point.x)),
+    Math.max(...corners.map((point) => point.y)),
+  );
+}
+
+export function task014bViewportOverflowPx(bounds: Task014BAabb): number {
+  const { viewport, safeInsetPx } = TASK014B_VISUAL_ACCEPTANCE;
+  return Math.max(
+    0,
+    viewport.minX + safeInsetPx - bounds.minX,
+    viewport.minY + safeInsetPx - bounds.minY,
+    bounds.maxX - (viewport.maxX - safeInsetPx),
+    bounds.maxY - (viewport.maxY - safeInsetPx),
   );
 }
 
@@ -254,4 +344,28 @@ export function formatSemanticVfxInputHelp(): string {
   return SEMANTIC_VFX_INPUT_REGISTRY.map(
     (binding) => `${binding.displayedKey} ${binding.hudLabel}`,
   ).join(" · ");
+}
+
+export function formatSemanticVfxInputHelpLines(): readonly string[] {
+  const groups = [
+    ["TRACKS", SEMANTIC_VFX_INPUT_REGISTRY.slice(0, 4)],
+    ["CONTROLS", SEMANTIC_VFX_INPUT_REGISTRY.slice(4, 9)],
+    ["DEBUG", SEMANTIC_VFX_INPUT_REGISTRY.slice(9)],
+  ] as const;
+  const lines = groups.map(
+    ([label, bindings]) =>
+      `${label} ${bindings
+        .map((binding) => `${binding.displayedKey} ${binding.hudLabel}`)
+        .join(" · ")}`,
+  );
+  if (
+    lines.some(
+      (line) =>
+        line.length >
+        TASK014B_VISUAL_ACCEPTANCE.maximumHelpLineCharacters,
+    )
+  ) {
+    throw new Error("TASK_014B_HUD_HELP_OVERFLOW");
+  }
+  return Object.freeze(lines);
 }

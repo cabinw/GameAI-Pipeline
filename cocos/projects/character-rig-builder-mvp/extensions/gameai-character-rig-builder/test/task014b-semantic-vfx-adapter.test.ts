@@ -28,11 +28,16 @@ import {
 } from "../source/task014b/semantic-vfx-diagnostics";
 import {
   TASK014B_TRANSFORM_STRESS,
+  TASK014B_VISUAL_ACCEPTANCE,
   SEMANTIC_VFX_INPUT_REGISTRY,
+  composeTask014BTransformAabb,
   composeTask014BTransformPoint,
   formatSemanticVfxInputHelp,
+  formatSemanticVfxInputHelpLines,
   nextTask014BTransformStressState,
+  task014bViewportOverflowPx,
   task014bTransformStressPose,
+  transformTask014BAabb,
   validateSemanticVfxInputRegistry,
 } from "../source/task014b/semantic-vfx-input-registry";
 import {
@@ -457,12 +462,14 @@ test("TASK-014B runtime creates concrete renderers before Sorting2D", async () =
   ]) {
     assert.ok(runtime.indexOf(drawCommand) > graphicsCreation, drawCommand);
   }
-  assert.ok(runtime.indexOf("graphics.circle(-12") > graphicsCreation);
+  assert.ok(runtime.indexOf("graphics.circle(-18") > graphicsCreation);
   assert.ok(runtime.indexOf("graphics.bezierCurveTo") > graphicsCreation);
   assert.ok(
     runtime.indexOf("graphics.circle(0, 0, radius)") >
       graphicsCreation,
   );
+  assert.match(runtime, /TASK_014B_VFX_VIEWPORT_OVERFLOW/u);
+  assert.match(runtime, /\.\.\.formatSemanticVfxInputHelpLines\(\)/u);
 });
 
 test("typed stop removes the matching hand-trail renderer instance", () => {
@@ -796,6 +803,108 @@ test("Transform Stress state, finite nested composition, and fail-closed transit
   assert.equal(enabled, beforeUnknown);
 });
 
+test("visual acceptance bounds keep Normal, Stress, HUD, and effect ROIs inside the design viewport", () => {
+  const normalCharacter = composeTask014BTransformAabb(
+    TASK014B_TRANSFORM_STRESS.off,
+    TASK014B_VISUAL_ACCEPTANCE.authoredRig,
+    TASK014B_VISUAL_ACCEPTANCE.characterLocalBounds,
+  );
+  const stressedCharacter = composeTask014BTransformAabb(
+    TASK014B_TRANSFORM_STRESS.on,
+    TASK014B_VISUAL_ACCEPTANCE.authoredRig,
+    TASK014B_VISUAL_ACCEPTANCE.characterLocalBounds,
+  );
+  assert.equal(task014bViewportOverflowPx(normalCharacter), 0);
+  assert.equal(task014bViewportOverflowPx(stressedCharacter), 0);
+  assert.equal(
+    task014bViewportOverflowPx(TASK014B_VISUAL_ACCEPTANCE.hudBounds),
+    0,
+  );
+
+  const helpLines = formatSemanticVfxInputHelpLines();
+  assert.equal(helpLines.length, 3);
+  assert.ok(
+    helpLines.every(
+      (line) =>
+        line.length <=
+        TASK014B_VISUAL_ACCEPTANCE.maximumHelpLineCharacters,
+    ),
+  );
+  for (const binding of SEMANTIC_VFX_INPUT_REGISTRY) {
+    assert.equal(
+      helpLines.filter((line) =>
+        line.includes(`${binding.displayedKey} ${binding.hudLabel}`),
+      ).length,
+      1,
+      binding.semanticActionId,
+    );
+  }
+
+  const rendererSamples = {
+    "footstep-dust": {
+      position: { x: 86, y: -286 },
+      rotationDegrees: 0,
+      scale: { x: 1, y: 1 },
+    },
+    "hand-trail": {
+      position: { x: 220, y: 30 },
+      rotationDegrees: 100,
+      scale: { x: 1.35, y: 1.35 },
+    },
+    "persistent-aura": {
+      position: { x: 100, y: -91 },
+      rotationDegrees: 0,
+      scale: { x: 1.35, y: 1.35 },
+    },
+  } as const;
+  for (const rendererKind of Object.keys(
+    TASK014B_VISUAL_ACCEPTANCE.rendererLocalBounds,
+  ) as Array<
+    keyof typeof TASK014B_VISUAL_ACCEPTANCE.rendererLocalBounds
+  >) {
+    const transformed = transformTask014BAabb(
+      rendererSamples[rendererKind],
+      TASK014B_VISUAL_ACCEPTANCE.rendererLocalBounds[rendererKind],
+    );
+    assert.equal(task014bViewportOverflowPx(transformed), 0);
+    assert.ok(
+      TASK014B_VISUAL_ACCEPTANCE.minimumRoiPixelDelta[
+        rendererKind
+      ] > 0,
+    );
+    assert.ok(
+      [
+        transformed.minX,
+        transformed.minY,
+        transformed.maxX,
+        transformed.maxY,
+      ].every(Number.isFinite),
+    );
+  }
+
+  assert.ok(
+    task014bViewportOverflowPx({
+      minX: 500,
+      minY: -420,
+      maxX: 760,
+      maxY: -50,
+    }) > 0,
+    "the rejected right-bottom evidence framing must fail",
+  );
+  assert.throws(
+    () =>
+      transformTask014BAabb(
+        {
+          position: { x: Number.NaN, y: 0 },
+          rotationDegrees: 0,
+          scale: { x: 1, y: 1 },
+        },
+        TASK014B_VISUAL_ACCEPTANCE.characterLocalBounds,
+      ),
+    /TASK_014B_VISUAL_AABB_INVALID/u,
+  );
+});
+
 test("stressed socket world pose is shared by dust, trail, and Aura without lifecycle duplication", () => {
   const baselineRig = {
     position: { x: 100, y: 60 },
@@ -838,7 +947,7 @@ test("stressed socket world pose is shared by dust, trail, and Aura without life
     },
     {
       trackId: "wave-semantic-events",
-      socketId: "hand-left-trail",
+      socketId: "hand-right-trail",
       seconds: 0.26,
       rendererId:
         "instance:wave-semantic-events:wave-hand-trail:0",
@@ -903,11 +1012,23 @@ test("Creator runtime applies one nested Stress root, preserves rebuild state, a
   );
   assert.match(
     runtime,
+    /private beginSetup\(preserveTransformStress: boolean\): void \{[\s\S]*if \(!this\.inputRegistered\) this\.registerInput\(\);/u,
+  );
+  assert.match(
+    runtime,
     /private exactReset\(preserveTransformStress = false\): void \{[\s\S]*if \(!preserveTransformStress\) \{[\s\S]*this\.transformStressEnabled = false;[\s\S]*\}[\s\S]*this\.applyTransformStress\(\);[\s\S]*this\.debugJoints = false;/u,
   );
   assert.match(
     runtime,
     /this\.generatedRoot = null;\s*this\.transformStressRoot = null;/u,
+  );
+  assert.match(
+    runtime,
+    /const generatedRoot = this\.generatedRoot;[\s\S]*generatedRoot\.setParent\(null\);[\s\S]*generatedRoot\.destroy\(\);[\s\S]*this\.generatedRoot = null;/u,
+  );
+  assert.match(
+    runtime,
+    /if \(reason !== "rebuild"\) this\.unregisterInput\(\);[\s\S]*this\.lifecycle\.teardown\(dispose\);/u,
   );
   assert.match(
     runtime,
@@ -1017,7 +1138,7 @@ test("one-shot captures disabled follow axes while trail and aura follow runtime
   assert.deepEqual(oneShotHost.updates.get(dustId)!.pose, spawned.pose);
 
   for (const [trackId, socketId] of [
-    ["wave-semantic-events", "hand-left-trail"],
+    ["wave-semantic-events", "hand-right-trail"],
     ["aura-semantic-events", "torso-aura"],
   ] as const) {
     const host = new FakeHost();
