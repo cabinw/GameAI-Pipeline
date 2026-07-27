@@ -3567,12 +3567,17 @@ Establish and prove the minimum reproducible development environment required be
 - The pnpm workspace, frozen lockfile, Cocos 3.8.8 fixture extension, four tests, and CI workflow are implemented.
 - Creator loaded the fixture extension main process and Scene process. The remaining live panel click is explicitly blocked by concurrent-instance accessibility targeting and has exact reproduction steps in `docs/environment.md`.
 - ADR-0003 records the external production-game consumer topology.
-# Implemented plan: TASK-014C Canonical Full-Loadout Semantic VFX Integration
+# Accepted plan: TASK-014C Canonical Full-Loadout Semantic VFX Integration
 
-- Status: Pending External Visual Review
+- Status: Accepted
 - Started: 2026-07-27
+- Accepted: 2026-07-28
 - Branch: `feat/task-014c-canonical-loadout-semantic-vfx`
 - Baseline: `48316aa2603f9235ebafc83c726b7f0bff822348`
+- Reviewed feature:
+  `3c734174c04f823b21b0fd6ab8b9c3e3f121fc38`
+- Final evidence:
+  `75b844b14d250d7b10df915275d242ab5128aa59`
 - Expected budget: at most 70 changed files and 12,000 changed lines,
   including one Creator-owned Scene/`.meta` pair; zero feature-branch MP4 or
   audio files
@@ -3694,3 +3699,28 @@ reference mutation.
   self-review passes, and its uploaded copy is byte-identical.
 - Feature implementation and temporary evidence are pushed, no MP4 is
   tracked on the feature branch, and no PR exists.
+
+## Acceptance result
+
+- External visual review: PASS.
+- The complete 65-second core video passed canonical 12-state traversal,
+  no/left/right prop behavior, Footstep Dust, Wave Trail, Prop Swing Trail,
+  persistent Aura across six loops, Pause/Resume, loadout and prop switching,
+  Transform Stress, two Lifecycle Rebuilds, and effects after rebuild.
+- Core video:
+  `task-014c-canonical-loadout-semantic-vfx.mp4`, SHA-256
+  `6952013fe22c9c04dcc1d2fce1731434511617015c640d7f92a336006a00df01`.
+- The supplemental tail passed Aura-before-Reset, Exact Reset, canonical
+  no-prop Rest at stopped time zero, debug/stress OFF, zero evaluator,
+  adapter, visible-VFX, leak, stale-target, viewport, and finite-value
+  violations, plus approximately nine seconds of unchanged clean hold.
+- Supplemental video: `task-014c-acceptance-tail.mp4`, SHA-256
+  `ffddbec09ff087baf82be80c0c2ae48e711f6a26a24276ef510a4e88262cf601`.
+- The stable final state remained one runtime root, one input handler, and
+  `SETUP 7 / TEARDOWN 6 / REBUILDS 6`. HUD `ROOTS 0 / INPUT 0` are the
+  duplicate-root and excess-handler counters.
+- A pointer remains in unused blank space in the supplemental tail and
+  obscures no HUD, character, or VFX region.
+- Procedural Dust, Trail, and Aura remain placeholder art. Audio/gameplay
+  execution, Red Cap, Unity, Godot, Windows, and TASK-014D remain out of
+  scope.

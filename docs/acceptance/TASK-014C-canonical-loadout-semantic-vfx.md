@@ -5,7 +5,12 @@
 Implementation acceptance gate: **PASS**.
 Creator 3.8.8 live gate: **PASS**.
 Evidence self-review: **PASS**.
-External visual review: **PENDING**.
+External visual review: **PASS**.
+
+Reviewed feature SHA:
+`3c734174c04f823b21b0fd6ab8b9c3e3f121fc38`.
+Final evidence manifest commit:
+`75b844b14d250d7b10df915275d242ab5128aa59`.
 
 TASK-014C composes the accepted engine-neutral Character Semantic Events
 evaluator, canonical V2 loadout resolver and pose, semantic target resolver,
@@ -89,17 +94,41 @@ these tracked bytes.
 
 ## Evidence handoff
 
-- Review status: `pending-external-visual-review`.
-- Video: `task-014c-canonical-loadout-semantic-vfx.mp4`.
-- SHA-256:
-  `6952013fe22c9c04dcc1d2fce1731434511617015c640d7f92a336006a00df01`
-- Format: H.264 High, yuv420p, 1280×720, 30 fps.
-- Duration / frames: 65.000 seconds / 1,950.
-- Full FFmpeg decode: PASS.
-- Pointer/browser/editor obstruction: none in the published Canvas capture.
-- Self-review: complete storyboard and final clean state PASS.
+- Review status: `passed-external-visual-review`.
+- The complete core video was externally inspected and passed canonical
+  12-state loadout traversal, no/left/right prop behavior, Footstep Dust,
+  Wave Trail, Prop Swing Trail, persistent Aura across six loops,
+  Pause/Resume, loadout and prop switching, Transform Stress, two Lifecycle
+  Rebuilds, and effects after rebuild.
+- Core video: `task-014c-canonical-loadout-semantic-vfx.mp4`.
+- Core SHA-256:
+  `6952013fe22c9c04dcc1d2fce1731434511617015c640d7f92a336006a00df01`.
+- Core format: H.264 High, yuv420p, 1280×720, 30 fps, 65.000 seconds,
+  1,950 frames; complete FFmpeg decode PASS.
+- The supplemental tail was externally inspected and passed Aura-before-
+  Reset, Exact Reset at approximately three seconds, canonical default
+  garment-and-accessories-with-no-prop, authored Rest,
+  `production-lite-rest-idle`, `canonical-rest-events`, stopped time zero,
+  Transform Stress/VFX Debug/Target Debug OFF, zero evaluator/adapter/visible
+  VFX, zero duplicate starts/unknown stops/leaks/stale targets, zero viewport
+  overflow/non-finite coordinates, and approximately nine seconds of
+  unchanged clean hold with no residual renderer or debug geometry.
+- Supplemental video: `task-014c-acceptance-tail.mp4`.
+- Supplemental SHA-256:
+  `ffddbec09ff087baf82be80c0c2ae48e711f6a26a24276ef510a4e88262cf601`.
+- Supplemental format: H.264 High, yuv420p, 1280×720, 30 fps, 12.000 seconds,
+  360 frames; uploaded-copy byte, SHA, metadata, frame-count, and complete
+  decode verification PASS.
+- Final clean state: one runtime root, one input handler,
+  `SETUP 7 / TEARDOWN 6 / REBUILDS 6`. HUD `ROOTS 0 / INPUT 0` are the
+  duplicate-root and excess-handler counters and therefore confirm those
+  expected single instances.
+- The core recording has no pointer/browser/editor obstruction. The
+  supplemental tail retains a pointer in unused blank space; it obscures no
+  HUD, character, or VFX region.
 
-Only the evidence manifest and MP4 belong on `evidence/task-014c`; the feature
-branch tracks zero MP4 files. Procedural placeholder VFX are intentionally not
-final art. Audio/gameplay execution, TASK-014D, Red Cap, Unity, Godot, and
-Windows support remain out of scope.
+Only the evidence manifest and two MP4 files belonged on the temporary
+`evidence/task-014c` branch; the feature branch tracks zero MP4 files.
+Procedural Dust, Trail, and Aura remain placeholder art. Audio/gameplay
+execution, TASK-014D, Red Cap, Unity, Godot, and Windows support remain out of
+scope.
