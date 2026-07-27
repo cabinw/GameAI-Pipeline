@@ -1,10 +1,7 @@
 import {
-  SemanticEventErrorCode,
   SemanticEventEvaluationError,
   SemanticEventEvaluationErrorCode,
-  type SemanticEventResult,
-} from "./diagnostics";
-import { validateCharacterSemanticEventInput } from "./parser";
+} from "./diagnostics.js";
 import type {
   CharacterSemanticEvent,
   CharacterSemanticEventContract,
@@ -16,7 +13,7 @@ import type {
   SemanticEventValidationContext,
   StartedSemanticEvent,
   StoppedSemanticEvent,
-} from "./types";
+} from "./types.js";
 
 const BOUNDARY_EPSILON = 1e-9;
 
@@ -460,36 +457,21 @@ export class CharacterSemanticEventEvaluator {
 
 const evaluatorValidationToken = Symbol("validated-semantic-events");
 
-export function createCharacterSemanticEventEvaluator(
-  contract: unknown,
-  context: unknown,
+export function createPrevalidatedCharacterSemanticEventEvaluator(
+  contract: CharacterSemanticEventContract,
+  context: SemanticEventValidationContext,
   initialTrackId: string,
-): SemanticEventResult<CharacterSemanticEventEvaluator> {
-  const validated = validateCharacterSemanticEventInput(contract, context);
-  if (!validated.ok) return validated;
-  const initialTrack = validated.value.tracks.find(
-    (track) => track.trackId === initialTrackId,
-  );
-  if (initialTrack === undefined) {
-    return {
-      ok: false,
-      errors: [
-        {
-          code: SemanticEventErrorCode.UNKNOWN_INITIAL_TRACK_ID,
-          path: "/initialTrackId",
-          message: `Unknown initial semantic-event track ${String(initialTrackId)}.`,
-        },
-      ],
-    };
+): CharacterSemanticEventEvaluator {
+  if (!contract.tracks.some((track) => track.trackId === initialTrackId)) {
+    throw new SemanticEventEvaluationError(
+      SemanticEventEvaluationErrorCode.UNKNOWN_TRACK_ID,
+      `Unknown prevalidated semantic-event track ${initialTrackId}.`,
+    );
   }
-  return {
-    ok: true,
-    value: new CharacterSemanticEventEvaluator(
-      validated.value,
-      context as SemanticEventValidationContext,
-      initialTrack.trackId,
-      evaluatorValidationToken,
-    ),
-    errors: [],
-  };
+  return new CharacterSemanticEventEvaluator(
+    contract,
+    context,
+    initialTrackId,
+    evaluatorValidationToken,
+  );
 }

@@ -7,6 +7,7 @@
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
+    "@gameai/character-semantic-events": "workspace:*",
     "@gameai/rig-animation": "workspace:*"
   },
   "devDependencies": {

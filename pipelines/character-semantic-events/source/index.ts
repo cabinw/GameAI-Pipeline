@@ -12,8 +12,8 @@ export {
   CharacterSemanticEventEvaluator,
   MAX_SEMANTIC_EVENT_COMMANDS_PER_ADVANCE,
   MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE,
-  createCharacterSemanticEventEvaluator,
 } from "./evaluator";
+export { createCharacterSemanticEventEvaluator } from "./factory";
 export {
   characterSemanticEventsSchema,
   parseCharacterSemanticEvents,

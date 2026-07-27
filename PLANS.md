@@ -3,6 +3,124 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Active plan: TASK-014B Minimal Cocos Semantic VFX Adapter
+
+- Status: Implementation gate passed; pending external visual review
+- Started: 2026-07-26
+- Branch: `feat/task-014b-cocos-semantic-vfx-adapter`
+- Baseline `main`: `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
+- Automated baseline: 368/368 tests
+- Declared feature budget: at most 70 changed files and 12,000 changed lines,
+  including one Creator-owned Scene/`.meta` pair and deterministic generated
+  runtime mirrors; no feature-branch video or audio file. This remains below
+  the mandatory split thresholds of 100 files and 25,000 lines.
+
+### Goal
+
+Prove that Character Semantic Events 1.0 `emit`, `start`, and `stop` commands
+can drive deterministic visible Cocos Creator 3.8.8 effects at real sockets
+on an independent minimal stickman/base-rig reference. Preserve the
+engine-neutral contract and evaluator unchanged while exercising one-shot,
+looping, persistent, follow-policy, cleanup, projection, and lifecycle
+behavior through a Cocos-only adapter and cue-renderer registry.
+
+### Boundaries
+
+- Keep every Cocos import and resource/runtime concept under the Cocos
+  project/extension boundary. Do not change semantic-event schemas, public
+  engine-neutral types, evaluator, framework resolver, or textual source
+  contract semantics.
+- Use a new Creator-owned independent Scene, never the superseded TASK-013
+  monolith or full composable-loadout character as the first VFX consumer.
+- Use deterministic procedural Cocos visuals for footstep dust, hand trail,
+  and persistent aura; do not add real audio playback or gameplay execution.
+- Reuse accepted readiness, generation-token, symmetric teardown,
+  single-input-handler, frozen-manifest, global-sort, projection, and runtime
+  assertion boundaries from TASK-013R1–R7.
+- Complete the authorized Transform Stress control in the same feature:
+  `X` is the unique registry-owned key because `T` already owns track
+  switching; a single outer `TransformStressRoot` applies deterministic
+  translation, non-uniform scale, and rotation around the unchanged authored
+  rig/socket hierarchy. Rebuild preserves the current stress state and Exact
+  Reset restores Stress OFF plus the baseline transform.
+- Keep evidence video and manifest on `evidence/task-014b`; local capture
+  originals remain ignored and untracked. Do not create a TASK-014B PR.
+- Do not start TASK-014C, Unity/Godot adapters, Windows validation, Red Cap
+  reconstruction, or production audio/gameplay behavior.
+
+### Execution
+
+1. Inspect the accepted minimal Creator lifecycle, Scene identity, generated
+   runtime, projection, sorting, manifest, and test patterns.
+2. Add a typed Cocos adapter core that exhaustively consumes semantic
+   commands, resolves cue/socket registries, applies transform/follow axes,
+   owns active instances, rejects duplicate/unknown operations, and performs
+   failure-safe cleanup.
+3. Add deterministic reference data and procedural renderer plans for
+   one-shot footstep dust, looping hand trail, and persistent aura.
+4. Add one Creator-owned Scene/runtime with one typed semantic-input registry,
+   complete HUD, real socket projection, debug overlays, lifecycle rebuild,
+   and symmetric teardown.
+5. Add direct adapter tests for all required dispatch, diagnostics, cleanup,
+   ordering, transform/follow, sort, manifest, Scene/meta, portability, and
+   generated-closure requirements.
+6. Synchronize architecture, Cocos adapter, acceptance, compatibility, and
+   roadmap documentation.
+7. Run direct tests, working-copy and frozen tracked-files-only full
+   verification, generated closure, scope/media audits, and require a clean
+   feature tree after commit.
+8. Complete the Creator 3.8.8 clean-open/reopen, visual, console, spatial,
+   lifecycle, control, and zero-leak gate. Stop on any real defect.
+9. Commit and push only the feature branch after every automated and Creator
+   gate passes; create no PR.
+10. Capture one real 1280×720/30 fps H.264 High/yuv420p Web Preview video,
+    verify local and downloaded bytes/decode, publish it plus `manifest.json`
+    on `evidence/task-014b`, and stop for external visual review.
+
+### Done when
+
+- All required adapter diagnostics and 23 automated behavior/closure checks
+  pass without Cocos leakage into engine-neutral packages.
+- Creator clean open/reopen and second initialization are console-clean;
+  effects visibly align with real sockets and satisfy authored lifecycle and
+  follow policy.
+- Exact Reset ends at authored Rest, STOPPED, 0.00 seconds, zero active VFX;
+  rebuild leaves one runtime tree/input handler and zero leaked instances.
+- Working-copy and frozen tracked-files-only verification pass, feature
+  branch tracks zero MP4 files, and generated output is byte deterministic.
+- The feature branch is pushed without a PR, verified evidence is published
+  separately, and work stops for external visual review.
+
+### Implementation result
+
+- Focused TASK-014B tests pass 21/21; complete extension tests pass 215/215;
+  semantic-event package tests pass 24/24.
+- Working-copy and frozen tracked-files-only verification both pass 372/372.
+- Creator 3.8.8 cold-open identity, R1/TASK-014B switching, Web Preview,
+  console, transform-stress, VFX, Pause/Resume, track switch, two rebuilds,
+  and Exact Reset gates pass in one run.
+- `X` is the unique registry-owned Transform Stress key. Stress applies
+  translation `(84, -48)`, rotation `17deg`, and scale `(1.18, 0.82)` on one
+  outer root while the authored inner `(100, 60)` / `(1.35, 1.35)` baseline
+  remains unchanged.
+- Dust, trail, and persistent aura each report `0.0000px` position and
+  `0.0000deg` rotation error under Stress ON. Projection round-trip error is
+  `0.0000px`; duplicate starts, unknown stops, leaked instances, renderer
+  conflicts, duplicate roots, duplicate inputs, stale nodes, and non-finite
+  values remain zero.
+- The persistent aura keeps one visible/evaluator/adapter/UIRenderer/
+  Sorting2D instance across six loops and Pause/Resume, including under
+  Stress ON and after rebuild.
+- Two rebuilds finish at `SETUP 3 / TEARDOWN 2 / REBUILDS 2 / INPUT 1`,
+  preserving Stress ON. Exact Reset restores Rest, `STOPPED`, `0.00s`,
+  Stress OFF, baseline transform, zero active VFX, and Debug OFF.
+- Creator and Web Preview consoles contain zero relevant warnings/errors.
+  The Creator-owned Scene and `.meta` hashes remain byte-identical to the
+  frozen preflight values.
+- No TASK-014C, feature-branch MP4/audio, or new engine-neutral Transform
+  Stress control was added. Evidence publication remains the final step
+  before external visual review.
+
 ## Completed plan: TASK-014A1 Persistent Lifecycle Coalescing
 
 - Status: Accepted
@@ -81,7 +199,8 @@ future engine adapter.
 - Tracked-files-only verification after a frozen install passes 376/376.
 - Schema byte identity, generated-output closure, metadata-race, diff, scope,
   and binary/media gates pass.
-- PR #13 is accepted for squash integration into `main`.
+- PR #13 was squash-merged into `main` as
+  `88fe24f3617a136f4dad319024b197e8be81caf7`.
 
 ## Completed plan: TASK-014A Engine-Neutral Character Semantic Event Contract
 

@@ -1,0 +1,29 @@
+// Generated from the tested TASK-014B semantic VFX adapter boundary. Do not hand-edit.
+export const SemanticVfxAdapterErrorCode = {
+  UNSUPPORTED_EVENT_KIND: "TASK_014B_UNSUPPORTED_EVENT_KIND",
+  UNKNOWN_CUE: "TASK_014B_UNKNOWN_CUE",
+  SOCKET_REQUIRED: "TASK_014B_SOCKET_REQUIRED",
+  UNKNOWN_SOCKET: "TASK_014B_UNKNOWN_SOCKET",
+  DUPLICATE_START: "TASK_014B_DUPLICATE_START",
+  UNKNOWN_STOP: "TASK_014B_UNKNOWN_STOP",
+  INVALID_COMMAND: "TASK_014B_INVALID_COMMAND",
+  RENDERER_FAILURE: "TASK_014B_RENDERER_FAILURE",
+  INVALID_DELTA: "TASK_014B_INVALID_DELTA",
+  INVALID_SOCKET_TRANSFORM: "TASK_014B_INVALID_SOCKET_TRANSFORM",
+  INVALID_COMPOSED_TRANSFORM: "TASK_014B_INVALID_COMPOSED_TRANSFORM",
+  RENDERABLE_COMPONENT_CONFLICT:
+    "TASK_014B_RENDERABLE_COMPONENT_CONFLICT",
+} as const;
+
+export type SemanticVfxAdapterErrorCode =
+  (typeof SemanticVfxAdapterErrorCode)[keyof typeof SemanticVfxAdapterErrorCode];
+
+export class SemanticVfxAdapterError extends Error {
+  constructor(
+    readonly code: SemanticVfxAdapterErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = "SemanticVfxAdapterError";
+  }
+}
