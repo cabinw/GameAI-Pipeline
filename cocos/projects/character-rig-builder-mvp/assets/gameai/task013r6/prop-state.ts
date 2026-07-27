@@ -98,8 +98,14 @@ export class PropBridgeState {
     this.propStateId = defaultPropStateId;
   }
 
-  selectClip(clipId: string): PropBridgeStateSnapshot {
-    if (!PROP_REQUIRED_CLIP_IDS.includes(clipId)) {
+  selectClip(
+    clipId: string,
+    additionalCompatibleClipIds: readonly string[] = [],
+  ): PropBridgeStateSnapshot {
+    if (
+      !PROP_REQUIRED_CLIP_IDS.includes(clipId) &&
+      !additionalCompatibleClipIds.includes(clipId)
+    ) {
       throw new Error(`TASK_013R6_UNKNOWN_SEMANTIC_CLIP: ${clipId}`);
     }
     this.clipId = clipId;

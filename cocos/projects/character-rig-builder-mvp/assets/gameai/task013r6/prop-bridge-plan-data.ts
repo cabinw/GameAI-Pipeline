@@ -6,7 +6,7 @@ export const PROP_BRIDGE_PLAN_PROVENANCE = {
   "inputs": [
     {
       "path": "cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/generate-task013r6-runtime.mjs",
-      "sha256": "d4992a3673526fd2d2dd771875319256d7a39133110f90000fc00087126edaea"
+      "sha256": "471415164a4f8fe1799d3ff1c27d8c4078df020447623c134e5994f2838d8900"
     },
     {
       "path": "examples/production-lite-character/animations/arm-wave.json",
@@ -87,6 +87,26 @@ export const PROP_BRIDGE_PLAN_PROVENANCE = {
     {
       "path": "examples/production-lite-character/parts/upper-arm-right.png",
       "sha256": "b23119dfba940d8ab8144228400dfc9cf414f1cd936a8073f1c08cc1de2fea39"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/animations/integration-stress.json",
+      "sha256": "c18d2cb1b047c00779e929e9abbbcec86998b31bcc3caf259bdbce753926efdd"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/animations/prop-swing.json",
+      "sha256": "5144216318165e479f75d2890e4c91b82a6148349aba870328b0599993b158a0"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/animations/rest.json",
+      "sha256": "ceb80b75b9ccdec204a8aaa46a57ec746a80cb2dd682c89fb7e071130db7b714"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/animations/walk.json",
+      "sha256": "8db5769bb1ed1940554e74664c82556d6e437c1df64648f37249793f503baf40"
+    },
+    {
+      "path": "examples/production-lite-full-loadout/animations/wave.json",
+      "sha256": "c5d43805cc397e923bd9b9fe1986890a876977622d79b87f2d992dc6893b6044"
     },
     {
       "path": "examples/production-lite-full-loadout/families/accessories.attachment-layout.json",
@@ -1227,6 +1247,899 @@ export const PROP_BRIDGE_PLAN = {
                 },
                 {
                   "time": 2.4,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schemaVersion": "1.0.0",
+          "animationId": "production-lite-full-loadout-integration-stress",
+          "rigId": "production-lite-character-layout",
+          "rigSchemaVersion": "1.0.0",
+          "duration": 3.2,
+          "loop": true,
+          "tracks": [
+            {
+              "jointId": "hand-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.8,
+                  "value": 58,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.6,
+                  "value": -66,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": 72,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "head",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.7,
+                  "value": 9,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.4,
+                  "value": -8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.1,
+                  "value": 6,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.8,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "lower-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.8,
+                  "value": -104,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.6,
+                  "value": 72,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": -88,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "lower-arm-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.7,
+                  "value": 82,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.4,
+                  "value": 38,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.1,
+                  "value": 72,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.8,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "thigh-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.8,
+                  "value": 20,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.6,
+                  "value": -26,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": 16,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "torso",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.8,
+                  "value": -8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.6,
+                  "value": 10,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": -6,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "upper-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.8,
+                  "value": 78,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.6,
+                  "value": -54,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": 62,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "upper-arm-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.7,
+                  "value": -58,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.4,
+                  "value": 34,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.1,
+                  "value": -38,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.8,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 3.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schemaVersion": "1.0.0",
+          "animationId": "production-lite-full-loadout-prop-swing",
+          "rigId": "production-lite-character-layout",
+          "rigSchemaVersion": "1.0.0",
+          "duration": 2.4,
+          "loop": true,
+          "tracks": [
+            {
+              "jointId": "hand-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 18,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.8,
+                  "value": 14,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "lower-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -36,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.8,
+                  "value": 18,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "upper-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -32,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 28,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.8,
+                  "value": -20,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2.4,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schemaVersion": "1.0.0",
+          "animationId": "production-lite-full-loadout-rest",
+          "rigId": "production-lite-character-layout",
+          "rigSchemaVersion": "1.0.0",
+          "duration": 2,
+          "loop": true,
+          "tracks": [
+            {
+              "jointId": "head",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1,
+                  "value": 1.5,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "pelvis",
+              "property": "position",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1,
+                  "value": {
+                    "x": 0,
+                    "y": 2
+                  },
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 2,
+                  "value": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schemaVersion": "1.0.0",
+          "animationId": "production-lite-full-loadout-walk",
+          "rigId": "production-lite-character-layout",
+          "rigSchemaVersion": "1.0.0",
+          "duration": 1.2,
+          "loop": true,
+          "tracks": [
+            {
+              "jointId": "lower-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": -10,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -26,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -10,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "lower-arm-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": -26,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -10,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -26,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "shin-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 5,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.3,
+                  "value": 25,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.9,
+                  "value": 42,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 5,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "shin-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.3,
+                  "value": 42,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 5,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.9,
+                  "value": 25,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "shoe-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": -4,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -4,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "shoe-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -4,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 8,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "thigh-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "thigh-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": -24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -24,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "upper-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": -22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": -22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "upper-arm-right",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 22,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "schemaVersion": "1.0.0",
+          "animationId": "production-lite-full-loadout-wave",
+          "rigId": "production-lite-character-layout",
+          "rigSchemaVersion": "1.0.0",
+          "duration": 1.2,
+          "loop": true,
+          "tracks": [
+            {
+              "jointId": "hand-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.3,
+                  "value": 12,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -12,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.9,
+                  "value": 12,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "lower-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.3,
+                  "value": -72,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": -112,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.9,
+                  "value": -72,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                }
+              ]
+            },
+            {
+              "jointId": "upper-arm-left",
+              "property": "rotation",
+              "keyframes": [
+                {
+                  "time": 0,
+                  "value": 0,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.3,
+                  "value": 118,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.6,
+                  "value": 92,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 0.9,
+                  "value": 118,
+                  "interpolation": "linear",
+                  "easing": "ease-in-out-sine"
+                },
+                {
+                  "time": 1.2,
                   "value": 0,
                   "interpolation": "linear",
                   "easing": "ease-in-out-sine"
