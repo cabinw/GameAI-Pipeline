@@ -51,6 +51,9 @@ synchronization, and gameplay-triggered injection.
   before evaluator state mutation.
 - [x] Looping/persistent VFX expose stable start/stop identities and
   deterministic reset, switch, and disposal cleanup.
+- [x] TASK-014A1 corrects persistent lifecycle evaluation to one active
+  instance per track/event across loops while retaining the first start cycle
+  in the concrete instance ID.
 - [x] Gameplay windows require valid IDs and reject unmatched, duplicate, or
   unclosed track-local pairs; signals forbid window IDs.
 - [x] Valid fixtures contain footstep dust, hand swing trail, hit-active
@@ -70,3 +73,12 @@ synchronization, and gameplay-triggered injection.
   exact publication totals come from the final commit diff. There are zero
   binary/generated asset, Cocos, Scene, `.meta`, or evidence files.
 - No Cocos VFX runtime exists and no visual effect was rendered.
+
+## TASK-014A1 lifecycle correction
+
+Character Semantic Events 1.0 defines persistent as one active instance per
+`<trackId>:<eventId>`, not one instance per animation cycle. The concrete ID
+retains the cycle of the first actual start. Later authored loop crossings are
+coalesced until Exact Reset, track switch, or disposal emits one cleanup stop.
+Playback after cleanup may start the persistent event again. One-shot and
+looping behavior, the schema, and adapter boundaries are unchanged.

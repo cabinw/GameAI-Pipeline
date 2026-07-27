@@ -30,11 +30,15 @@ and deterministic ordering by time, order, and event ID.
 The public parser and evaluator factory share one fail-closed structural and
 semantic validation boundary. The factory requires an explicit initial track,
 so authored array order cannot select runtime state. One-shot events emit
-authored commands. Looping and persistent VFX create stable
-track/event/cycle-named instances with explicit start/stop commands; reset,
-track switching, and disposal expose deterministic cleanup. Stops precede
-starts at an equal absolute boundary. Advancement rejects non-finite
-accumulated time or more than 10,000 cycles/commands before state mutation.
+authored commands. Looping VFX create stable track/event/cycle-named
+instances with per-cycle start and duration-stop commands. Persistent VFX use
+one logical active key per track/event: the first actual start retains its
+cycle in the concrete instance ID, and later loop crossings are coalesced
+while that instance remains active. Reset, track switching, and disposal
+expose deterministic one-stop-per-instance cleanup and permit a later start
+after cleanup. Stops precede starts at an equal absolute boundary.
+Advancement rejects non-finite accumulated time or more than 10,000
+cycles/commands before state mutation.
 
 Gameplay windows are paired within one authored track. Open/close require a
 window ID, signals forbid one, and unmatched, duplicate, or unclosed windows
@@ -56,6 +60,8 @@ the boundary. It is not implemented by TASK-014A.
 ## Consequences
 
 - Event timing and validation can be tested without an engine.
+- Persistent means one active instance per track/event across animation
+  cycles; every engine adapter receives the same coalesced lifecycle commands.
 - Rig sockets remain stable semantic bindings rather than Cocos node names.
 - Each engine owns resource lookup, effect instances, audio playback,
   gameplay execution, and runtime lifecycle.

@@ -109,12 +109,24 @@ boundary cannot duplicate delivery.
 
 ## Lifecycle commands and compatibility
 
-One-shot events produce an `emit` command. Looping and persistent VFX events
-produce a `start` command with the stable instance ID
-`<trackId>:<eventId>:<cycle>`. A looping duration produces a `stop` command at
-the crossed absolute stop boundary. Persistent instances remain active until
-Exact Reset, track switching, or `dispose()` cleanup. Pause and Resume do not
-alter active instances.
+One-shot events produce an `emit` command at every authored crossing. Looping
+VFX events produce a `start` command for every authored cycle with the stable
+instance ID `<trackId>:<eventId>:<cycle>`; their duration produces a `stop`
+command at the crossed absolute stop boundary.
+
+Persistent VFX use logical active identity `<trackId>:<eventId>`. The first
+authored crossing with no matching active instance emits one `start`; its
+concrete instance ID retains that first start cycle as
+`<trackId>:<eventId>:<startCycle>`. Later animation loops emit no additional
+start and do not replace the active instance ID. Coalescing consults the
+transactional active-instance state, so a single `advance()` crossing many
+cycles also emits only the first persistent start. Different event or track
+IDs remain independent.
+
+Persistent instances remain active until Exact Reset, track switching, or
+`dispose()` cleanup. Each cleanup emits exactly one `stop` per active
+persistent instance. Pause and Resume do not alter active instances; playback
+after cleanup may start a new persistent instance.
 
 Commands order by absolute boundary first. A lifecycle `stop` orders before
 authored commands at the same boundary; authored exact-duration/ordinary
@@ -124,7 +136,8 @@ by stable instance ID.
 
 - `vfx` supports one-shot, looping, and persistent.
 - A looping VFX event requires a positive finite duration.
-- A persistent VFX event has no duration.
+- A persistent VFX event has no duration and means one active instance per
+  track/event, not one instance per animation cycle.
 - `audio` and `gameplay` are one-shot in 1.0.
 - Gameplay events do not carry a duration; window closure is a separate
   semantic event.

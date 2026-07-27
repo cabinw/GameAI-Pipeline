@@ -68,6 +68,16 @@ function clone(
   return structuredClone(contract);
 }
 
+async function persistentWaveContract(): Promise<CharacterSemanticEventContract> {
+  const contract = await validContract();
+  const event = contract.tracks.find(
+    (track) => track.trackId === waveTrackId,
+  )!.events[0]!;
+  event.lifecycle = "persistent";
+  delete event.durationSeconds;
+  return contract;
+}
+
 test("parses separate semantic-event and VFX-cue concepts without engine resources", async () => {
   const contract = await validContract();
   assert.equal(contract.schemaVersion, "1.0.0");
@@ -794,6 +804,246 @@ test("persistent cleanup and same-time lifecycle ordering are deterministic", as
       ["start", 1],
     ],
   );
+});
+
+test("persistent starts coalesce across six cycles and Pause/Resume", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+
+  const commands = evaluator.advance(10.31);
+  const starts = commands.filter((command) => command.command === "start");
+  assert.equal(starts.length, 1);
+  assert.equal(
+    "instanceId" in starts[0]! ? starts[0].instanceId : undefined,
+    `${waveTrackId}:wave-hand-trail:0`,
+  );
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, [
+    `${waveTrackId}:wave-hand-trail:0`,
+  ]);
+
+  evaluator.pause();
+  assert.deepEqual(evaluator.advance(20), []);
+  evaluator.resume();
+  assert.deepEqual(evaluator.advance(12), []);
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, [
+    `${waveTrackId}:wave-hand-trail:0`,
+  ]);
+});
+
+test("one advance crossing many cycles emits one persistent start", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  result.value.play();
+  const commands = result.value.advance(200.31);
+  assert.deepEqual(
+    commands.map((command) => [
+      command.command,
+      "instanceId" in command ? command.instanceId : undefined,
+    ]),
+    [["start", `${waveTrackId}:wave-hand-trail:0`]],
+  );
+  assert.equal(result.value.snapshot.activeInstanceIds.length, 1);
+});
+
+test("Exact Reset stops one persistent instance and replay starts it again", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+  evaluator.advance(8.31);
+
+  const reset = evaluator.exactReset();
+  assert.deepEqual(
+    reset.map((command) => [
+      command.command,
+      command.command === "stop" ? command.reason : undefined,
+      "instanceId" in command ? command.instanceId : undefined,
+    ]),
+    [
+      [
+        "stop",
+        "exact-reset",
+        `${waveTrackId}:wave-hand-trail:0`,
+      ],
+    ],
+  );
+  assert.equal(evaluator.snapshot.status, "stopped");
+  assert.equal(evaluator.snapshot.absoluteTimeSeconds, 0);
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, []);
+
+  evaluator.play();
+  assert.deepEqual(
+    evaluator.advance(0.31).map((command) => [
+      command.command,
+      "instanceId" in command ? command.instanceId : undefined,
+    ]),
+    [["start", `${waveTrackId}:wave-hand-trail:0`]],
+  );
+});
+
+test("track switching stops one persistent instance and switching back restarts", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+  evaluator.advance(6.31);
+
+  assert.deepEqual(
+    evaluator.switchTrack(walkTrackId).map((command) => [
+      command.command,
+      command.command === "stop" ? command.reason : undefined,
+      command.trackId,
+    ]),
+    [["stop", "track-switch", waveTrackId]],
+  );
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, []);
+
+  evaluator.switchTrack(waveTrackId);
+  evaluator.play();
+  assert.deepEqual(
+    evaluator.advance(0.31).map((command) => [
+      command.command,
+      command.trackId,
+    ]),
+    [["start", waveTrackId]],
+  );
+  assert.equal(evaluator.snapshot.activeInstanceIds.length, 1);
+});
+
+test("dispose stops one persistent instance and repeated dispose emits nothing", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+  evaluator.advance(10.31);
+
+  assert.deepEqual(
+    evaluator.dispose().map((command) => [
+      command.command,
+      command.command === "stop" ? command.reason : undefined,
+    ]),
+    [["stop", "dispose"]],
+  );
+  assert.deepEqual(evaluator.snapshot.activeInstanceIds, []);
+  assert.deepEqual(evaluator.dispose(), []);
+});
+
+test("distinct persistent event IDs retain independent active instances", async () => {
+  const contract = await persistentWaveContract();
+  const track = contract.tracks.find(
+    (candidate) => candidate.trackId === waveTrackId,
+  )!;
+  const second = structuredClone(track.events[0]!);
+  second.eventId = "wave-hand-aura-secondary";
+  second.timeSeconds = 0.4;
+  second.order += 1;
+  track.events.push(second);
+
+  const result = createCharacterSemanticEventEvaluator(
+    contract,
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  result.value.play();
+  const commands = result.value.advance(8.41);
+  assert.deepEqual(
+    commands.map((command) => [
+      command.command,
+      command.eventId,
+      "instanceId" in command ? command.instanceId : undefined,
+    ]),
+    [
+      [
+        "start",
+        "wave-hand-trail",
+        `${waveTrackId}:wave-hand-trail:0`,
+      ],
+      [
+        "start",
+        "wave-hand-aura-secondary",
+        `${waveTrackId}:wave-hand-aura-secondary:0`,
+      ],
+    ],
+  );
+  assert.deepEqual(result.value.snapshot.activeInstanceIds, [
+    `${waveTrackId}:wave-hand-aura-secondary:0`,
+    `${waveTrackId}:wave-hand-trail:0`,
+  ]);
+});
+
+test("rejected budget advance preserves the active persistent instance", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+  evaluator.advance(0.31);
+  const before = evaluator.snapshot;
+
+  assert.throws(
+    () =>
+      evaluator.advance(
+        2 * (MAX_SEMANTIC_EVENT_CYCLES_PER_ADVANCE + 2),
+      ),
+    (error) =>
+      error instanceof SemanticEventEvaluationError &&
+      error.code === SemanticEventEvaluationErrorCode.ADVANCE_BUDGET_EXCEEDED,
+  );
+  assert.deepEqual(evaluator.snapshot, before);
+});
+
+test("adapter-like six-cycle Aura reproduction leaves one active instance", async () => {
+  const result = createCharacterSemanticEventEvaluator(
+    await persistentWaveContract(),
+    await context(),
+    waveTrackId,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const evaluator = result.value;
+  evaluator.play();
+  const commands = [];
+  for (let cycle = 0; cycle < 6; cycle += 1) {
+    commands.push(...evaluator.advance(2));
+  }
+  assert.equal(
+    commands.filter((command) => command.command === "start").length,
+    1,
+  );
+  assert.equal(evaluator.snapshot.activeInstanceIds.length, 1);
 });
 
 test("advance overflow and crossing budgets reject without partial mutation", async () => {

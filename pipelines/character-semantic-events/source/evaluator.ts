@@ -75,6 +75,10 @@ function instanceId(
   return `${trackId}:${eventId}:${cycle}`;
 }
 
+function persistentActiveKey(trackId: string, eventId: string): string {
+  return `${trackId}:${eventId}`;
+}
+
 function authoredCommand(
   schemaVersion: string,
   track: CharacterSemanticEventTrack,
@@ -381,6 +385,13 @@ export class CharacterSemanticEventEvaluator {
 
     candidates.sort(candidateOrder);
     const activeInstances = new Map(this.#activeInstances);
+    const activePersistentKeys = new Set(
+      [...activeInstances.values()]
+        .filter((active) => active.event.lifecycle === "persistent")
+        .map((active) =>
+          persistentActiveKey(active.trackId, active.event.eventId),
+        ),
+    );
     const commands: EvaluatedSemanticEvent[] = [];
     for (const candidate of candidates) {
       if (candidate.type === "stop") {
@@ -390,6 +401,16 @@ export class CharacterSemanticEventEvaluator {
         commands.push(
           stopCommand(active, candidate.reason, candidate.absoluteTime),
         );
+        continue;
+      }
+      const persistentKey =
+        candidate.event.lifecycle === "persistent"
+          ? persistentActiveKey(track.trackId, candidate.event.eventId)
+          : undefined;
+      if (
+        persistentKey !== undefined &&
+        activePersistentKeys.has(persistentKey)
+      ) {
         continue;
       }
       const command = authoredCommand(
@@ -404,6 +425,9 @@ export class CharacterSemanticEventEvaluator {
           command.instanceId,
           activeFromStart(command, candidate.absoluteTime),
         );
+        if (persistentKey !== undefined) {
+          activePersistentKeys.add(persistentKey);
+        }
       }
     }
 

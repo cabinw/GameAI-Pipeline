@@ -3,7 +3,84 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014A Engine-Neutral Character Semantic Event Contract
+## Active plan: TASK-014A1 Persistent Lifecycle Coalescing
+
+- Status: Complete; publication pending
+- Started: 2026-07-27
+- Branch: `fix/task-014a1-persistent-lifecycle-coalescing`
+- Baseline `main` / `origin/main`:
+  `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
+- Declared budget: at most 12 changed files and 1,500 changed lines; textual
+  documentation and engine-neutral evaluator/tests only, with zero schema,
+  Cocos, Scene, `.meta`, binary, media, evidence, adapter, TASK-014B, or
+  TASK-014C changes.
+
+### Goal
+
+Correct Character Semantic Events 1.0 persistent lifecycle evaluation so one
+track/event owns at most one active persistent instance across animation
+loops. Preserve the cycle of the first actual start in the concrete instance
+ID and make the engine-neutral evaluator the lifecycle authority for every
+future engine adapter.
+
+### Boundaries
+
+- Change only the engine-neutral evaluator, its tests, and TASK-014A/014A1
+  lifecycle documentation.
+- Keep one-shot events per authored crossing and looping start/stop commands
+  per authored cycle.
+- Coalesce persistent starts against the transactional active-instance copy,
+  including multiple cycle crossings inside one `advance()`.
+- Preserve ordering, Pause/Resume, explicit initial-track selection,
+  advancement bounds, atomic rejection, gameplay windows, and deterministic
+  reset/switch/dispose cleanup.
+- Do not add a schema field/version, adapter behavior, runtime integration,
+  Cocos file, effect/audio asset, evidence, TASK-014B change, or TASK-014C
+  work.
+
+### Execution
+
+1. Freeze the protected uncommitted TASK-014B status and hashes, then create
+   this isolated worktree from the exact main baseline.
+2. Add a logical persistent active key `<trackId>:<eventId>` and consult the
+   transactional active map before emitting each authored persistent start.
+3. Add direct regression coverage for six-cycle and many-cycle coalescing,
+   Pause/Resume, Reset/replay, track switching, disposal, distinct persistent
+   events/tracks, unchanged looping/one-shot behavior, ordering, and rejected
+   advancement atomicity.
+4. Update RFC-0014, ADR-0015, TASK-014A, TASK-014A1, and the semantic-event
+   contract documentation with the corrected 1.0 lifecycle semantics.
+5. Run package, full working-copy, tracked-files-only, schema identity,
+   generated-output closure, metadata-race, diff, clean-tree, MP4, scope, and
+   protected-reference gates.
+6. Commit and push the focused branch, open one Draft PR into `main`, wait for
+   GitHub Actions, and stop for external review without merging.
+
+### Done when
+
+- Six or many crossed cycles yield one persistent start and one active
+  persistent instance per track/event.
+- Exact Reset, track switch, and first disposal emit exactly one cleanup stop;
+  replay or switching back can create one new instance, and repeated disposal
+  emits nothing.
+- Two different persistent event IDs remain independent, while looping and
+  one-shot delivery stay per-cycle/per-crossing.
+- Rejected overflow or command-budget advancement leaves progress and
+  persistent state unchanged.
+- Both verification modes pass from the final diff, the worktree is clean
+  after commit, the Draft PR remains unmerged, and the protected TASK-014B
+  fingerprint is byte-identical to its recorded state.
+
+### Result
+
+- Direct semantic-event tests pass 24/24.
+- Full working-copy verification passes 376/376.
+- Tracked-files-only verification after a frozen install passes 376/376.
+- Schema byte identity, generated-output closure, metadata-race, diff, scope,
+  and binary/media gates pass.
+- Publication remains limited to a Draft PR for external review.
+
+## Completed plan: TASK-014A Engine-Neutral Character Semantic Event Contract
 
 - Status: Complete
 - Started: 2026-07-26
