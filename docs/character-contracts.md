@@ -241,13 +241,17 @@ semantic validation path. The factory accepts an unknown direct value and
 requires an explicit `initialTrackId`; malformed input or an unknown initial
 track returns diagnostics instead of constructing partial evaluator state.
 
-One-shot events produce `emit` commands. Looping and persistent VFX produce
-`start` commands with stable `<trackId>:<eventId>:<cycle>` instance IDs.
-Looping duration crossings, Exact Reset, track switching, and `dispose()`
-produce deterministic `stop` commands. Lifecycle stops precede authored starts
-at the same absolute boundary. Advancement is bounded to 10,000 cycles and
-10,000 commands and rejects overflow or budget exhaustion before state
-mutation.
+One-shot events produce `emit` commands at every authored crossing. Looping
+VFX produce per-cycle `start` commands with stable
+`<trackId>:<eventId>:<cycle>` IDs and duration-based `stop` commands.
+Persistent VFX instead own one logical active instance per
+`<trackId>:<eventId>`. The first actual start retains its cycle in the
+concrete `<trackId>:<eventId>:<startCycle>` ID; later loop crossings are
+coalesced until cleanup. Exact Reset, track switching, and `dispose()` produce
+one deterministic `stop` for each active instance, after which playback may
+start it again. Lifecycle stops precede authored starts at the same absolute
+boundary. Advancement is bounded to 10,000 cycles and 10,000 commands and
+rejects overflow or budget exhaustion before state mutation.
 
 Gameplay `window-open` and `window-close` payloads require `windowId`;
 `signal` forbids it. Opens and closes pair within one authored track in

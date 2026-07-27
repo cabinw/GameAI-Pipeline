@@ -146,11 +146,14 @@ duration before an evaluator can be created.
 
 Normal forward evaluation uses `(previousTime, currentTime]` and orders events
 by `timeSeconds`, `order`, and `eventId`. Skipped frames and bounded loop
-crossings enumerate every crossed command. One-shot events emit once;
-looping/persistent VFX start stable track/event/cycle instances, with duration
-or cleanup stops. Pause emits nothing and preserves active instances; Resume
-continues without duplication. Exact Reset and clip switching emit no authored
-timeline event, but stop active instances before clearing progress.
+crossings enumerate every crossed candidate. One-shot events emit at each
+crossing and looping VFX start/stop per cycle. Persistent VFX start only when
+their track/event has no active persistent instance; the first start cycle
+remains in the concrete instance ID and later cycles are coalesced. Pause
+emits nothing and preserves active instances; Resume continues without
+duplication. Exact Reset and clip switching emit no authored timeline event,
+but stop active instances once before clearing progress. Disposal has the
+same one-stop-per-instance cleanup property.
 
 Initial Rest and the first open boundary at time zero emit nothing. On a loop
 wrap, a zero-time event fires once for the new cycle. An exact-duration event
