@@ -3,9 +3,9 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014B Minimal Cocos Semantic VFX Adapter
+## Completed plan: TASK-014B Minimal Cocos Semantic VFX Adapter
 
-- Status: Final closure verified; replacement evidence pending external visual review
+- Status: Accepted after external visual review
 - Started: 2026-07-26
 - Branch: `feat/task-014b-cocos-semantic-vfx-adapter`
 - Baseline `main`: `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
@@ -43,8 +43,10 @@ behavior through a Cocos-only adapter and cue-renderer registry.
   translation, non-uniform scale, and rotation around the unchanged authored
   rig/socket hierarchy. Rebuild preserves the current stress state and Exact
   Reset restores Stress OFF plus the baseline transform.
-- Keep evidence video and manifest on `evidence/task-014b`; local capture
-  originals remain ignored and untracked. Do not create a TASK-014B PR.
+- Keep evidence video and manifest on `evidence/task-014b` through external
+  review; local capture originals remain ignored and untracked. Publish the
+  accepted feature as a Draft PR, then remove the temporary evidence branch
+  after PR CI passes.
 - Do not start TASK-014C, Unity/Godot adapters, Windows validation, Red Cap
   reconstruction, or production audio/gameplay behavior.
 
@@ -88,8 +90,8 @@ behavior through a Cocos-only adapter and cue-renderer registry.
   rebuild leaves one runtime tree/input handler and zero leaked instances.
 - Working-copy and frozen tracked-files-only verification pass, feature
   branch tracks zero MP4 files, and generated output is byte deterministic.
-- The feature branch is pushed without a PR, verified evidence is published
-  separately, and work stops for external visual review.
+- The feature branch and verified evidence are published separately, external
+  visual review passes, and the accepted feature is published as a Draft PR.
 
 ### Implementation result
 
@@ -144,10 +146,31 @@ behavior through a Cocos-only adapter and cue-renderer registry.
 - The replacement recording is a real 82-second Web Preview capture at
   H.264 High, 1280×720, 30 fps, yuv420p. Local full decode, two-second
   contact-sheet review, effect/rebuild/reset high-frequency review, and ROI
-  pixel-diff review pass with the pointer outside the Canvas.
+  pixel-diff review pass. A small number of macOS recording pointer artifacts
+  are present, but they obscure none of Dust, Trail, or Aura.
 - The original evidence remains preserved and is classified
   `failed-external-visual-framing-and-hud-coverage`; the appended replacement
-  is classified `pending-external-visual-review`.
+  is classified `passed-external-visual-review`.
+
+### External visual acceptance
+
+- External visual review: **PASS**.
+- Reviewed feature SHA:
+  `ebcb087426b0e2519f437e9706658d59f9da18a7`.
+- Reviewed evidence SHA:
+  `9e326f68337c61156a4be19576965e0b5f7e65ae`.
+- Reviewed replacement video SHA-256:
+  `5c1eeb1c574549ae4e7aafd9fd0b2bdfb5f882772a99d4404f75c6a2d4c54a4a`.
+- Dust is clearly visible; the green/white double-layer Trail curve is
+  clearly visible; the complete Aura remains one instance across six loops.
+- Normal and Stress viewport, complete HUD, Rebuild, and Exact Reset: PASS.
+- The replacement recording's final cumulative lifecycle is
+  `SETUP 7 / TEARDOWN 6 / REBUILDS 6 / INPUT 1`. These totals include
+  multiple rebuilds performed during recording. Every stable state retains
+  one root, one input handler, and zero leaks.
+- macOS recording pointer/pointer-trail artifacts are present but do not
+  obscure Dust, Trail, or Aura. The replacement is not claimed to keep the
+  pointer outside the Canvas throughout.
 
 ## Completed plan: TASK-014A1 Persistent Lifecycle Coalescing
 

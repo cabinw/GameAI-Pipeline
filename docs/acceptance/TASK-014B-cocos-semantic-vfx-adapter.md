@@ -3,7 +3,7 @@
 ## Result
 
 Implementation acceptance gate: **PASS**.
-External visual review: **PENDING**.
+External visual review: **PASS**.
 
 TASK-014B is the first visual Cocos Creator 3.8.8 consumer of Character
 Semantic Events 1.0. Engine-neutral evaluator commands drive three procedural
@@ -34,11 +34,11 @@ root transform to Stress OFF.
 
 - Extension TypeScript: PASS.
 - Cocos clean-CI typecheck: PASS.
-- Focused TASK-014B tests: 21/21 PASS.
-- Complete extension tests: 215/215 PASS.
+- Focused TASK-014B tests: 22/22 PASS.
+- Complete extension tests: 216/216 PASS.
 - Semantic-event package tests: 24/24 PASS.
-- Working-copy `CI=true pnpm verify`: 372/372 PASS.
-- Frozen tracked-files-only install and `CI=true pnpm verify`: 372/372 PASS.
+- Working-copy `CI=true pnpm verify`: 373/373 PASS.
+- Frozen tracked-files-only install and `CI=true pnpm verify`: 373/373 PASS.
 - Generated source/runtime mirror closure: PASS.
 - Schema byte identity: PASS.
 - Metadata-race regression: 3/3 PASS.
@@ -113,5 +113,31 @@ No TASK-014C work, production audio/gameplay execution, feature-branch media,
 or Cocos Transform Stress control in the engine-neutral semantic-events
 package is included.
 
-Evidence will be published separately to `evidence/task-014b` and marked
-`pending-external-visual-review`.
+## External visual acceptance
+
+- Review result: **PASS**.
+- Reviewed feature SHA:
+  `ebcb087426b0e2519f437e9706658d59f9da18a7`.
+- Reviewed evidence SHA:
+  `9e326f68337c61156a4be19576965e0b5f7e65ae`.
+- Reviewed replacement video SHA-256:
+  `5c1eeb1c574549ae4e7aafd9fd0b2bdfb5f882772a99d4404f75c6a2d4c54a4a`.
+- Dust is clearly visible.
+- The green/white double-layer Trail curve is clearly visible.
+- Aura is complete and remains a single instance across six loops.
+- Normal and Stress viewport: PASS.
+- Complete HUD: PASS.
+- Rebuild: PASS.
+- Exact Reset: PASS.
+- The replacement recording's final cumulative lifecycle is
+  `SETUP 7 / TEARDOWN 6 / REBUILDS 6 / INPUT 1`. The cumulative values
+  include multiple rebuilds during recording; each stable state remains at
+  one root, one input handler, and zero leaks.
+- A small number of macOS recording pointer/pointer-trail artifacts are
+  present. They do not obscure Dust, Trail, or Aura and do not affect
+  functional acceptance. This report does not claim
+  `pointerOutsideCanvas: true` for the full replacement recording.
+
+The evidence manifest is classified `passed-external-visual-review`. The
+temporary evidence branch may be removed only after the acceptance
+documentation is pushed, the Draft PR exists, and PR CI passes.

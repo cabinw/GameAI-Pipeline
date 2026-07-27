@@ -1,6 +1,6 @@
 # TASK-014B: Minimal Cocos Semantic VFX Adapter
 
-- Status: Final closure verified; replacement evidence pending external visual review
+- Status: Accepted after external visual review
 - Date: 2026-07-26
 - Branch: `feat/task-014b-cocos-semantic-vfx-adapter`
 - Baseline: `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
@@ -66,7 +66,8 @@ Character Semantic Events contract
   initialization, clean Creator/Web consoles, all visual/socket/lifecycle
   controls, transform stress, final Debug OFF, and zero leaks.
 - [x] Feature branch is committed and pushed only after all automated and
-  Creator gates pass; no TASK-014B PR is created.
+  Creator gates pass; after external visual acceptance it is published as a
+  Draft PR.
 - [x] `evidence/task-014b` preserves the original failed-framing video and
   appends one real replacement Web Preview H.264 High 1280×720 30 fps
   yuv420p video whose local/downloaded SHA-256, frame count, metadata, and
@@ -74,11 +75,11 @@ Character Semantic Events contract
 - [x] TASK-014C, real audio/gameplay execution, Unity/Godot changes, Windows
   claims, and Red Cap reconstruction remain absent.
 
-## Evidence stop
+## Evidence acceptance
 
-After feature publication, publish verified evidence on
-`evidence/task-014b` and stop for external visual review. Do not create or
-merge a TASK-014B PR.
+Verified evidence was published on `evidence/task-014b` and passed external
+visual review. The accepted feature may be published as a Draft PR; do not
+mark it Ready or merge it in this task.
 
 ## Implementation gate result
 
@@ -136,12 +137,24 @@ merge a TASK-014B PR.
   detaching the old generated root and preserving the one registered input
   handler across rebuild. Two rebuilds finish with one root, one input,
   zero stale geometry, and zero leaks.
-- External recording self-review passes: character, HUD, Dust, Trail, and
-  Aura are directly visible; Aura remains one instance across six loops and
-  Pause/Resume; Normal/Stress and post-rebuild sequences remain in bounds;
-  Exact Reset leaves a clean frame; the pointer remains outside the Canvas.
+- External visual review passes: character and complete HUD are visible;
+  Dust is clear; the green/white double-layer Trail curve is clear; Aura is
+  complete and remains one instance across six loops; Normal/Stress viewport,
+  Rebuild, and Exact Reset all pass.
+- The replacement recording ends at cumulative
+  `SETUP 7 / TEARDOWN 6 / REBUILDS 6 / INPUT 1`. These totals include the
+  recording's multiple rebuilds; every stable state remains at one root, one
+  input handler, and zero leaks.
+- A small number of macOS recording pointer/pointer-trail artifacts are
+  present. They obscure none of Dust, Trail, or Aura, and the replacement is
+  not claimed to keep the pointer outside the Canvas throughout.
 - The original evidence is retained as
   `failed-external-visual-framing-and-hud-coverage`. Its replacement is an
   82-second H.264 High 1280×720 30 fps yuv420p capture marked
-  `pending-external-visual-review`.
-- No TASK-014B PR exists.
+  `passed-external-visual-review`.
+- Reviewed feature SHA:
+  `ebcb087426b0e2519f437e9706658d59f9da18a7`.
+- Reviewed evidence SHA:
+  `9e326f68337c61156a4be19576965e0b5f7e65ae`.
+- Reviewed replacement video SHA-256:
+  `5c1eeb1c574549ae4e7aafd9fd0b2bdfb5f882772a99d4404f75c6a2d4c54a4a`.
