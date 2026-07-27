@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "outDir": "./dist/runtime-esm",
+    "rootDir": "./source",
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": [
+    "source/runtime.ts",
+    "source/evaluator.ts",
+    "source/diagnostics.ts",
+    "source/types.ts"
+  ]
+}

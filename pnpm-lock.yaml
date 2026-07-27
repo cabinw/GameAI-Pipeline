@@ -29,6 +29,9 @@ importers:
 
   cocos/projects/character-rig-builder-mvp:
     dependencies:
+      '@gameai/character-semantic-events':
+        specifier: workspace:*
+        version: link:../../../pipelines/character-semantic-events
       '@gameai/rig-animation':
         specifier: workspace:*
         version: link:../../../pipelines/rig-animation
@@ -45,6 +48,9 @@ importers:
       '@gameai/character-contracts':
         specifier: workspace:*
         version: link:../../../../../framework/character-contracts
+      '@gameai/character-semantic-events':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/character-semantic-events
       '@gameai/rig-animation':
         specifier: workspace:*
         version: link:../../../../../pipelines/rig-animation

@@ -20,9 +20,36 @@ declare module "cc" {
     constructor(x?: number, y?: number, z?: number);
   }
 
+  export class Quat {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+
+    constructor(x?: number, y?: number, z?: number, w?: number);
+
+    static fromEuler<Out extends Quat>(
+      out: Out,
+      x: number,
+      y: number,
+      z: number,
+    ): Out;
+    static multiply<Out extends Quat>(
+      out: Out,
+      left: Readonly<Quat>,
+      right: Readonly<Quat>,
+    ): Out;
+    static normalize<Out extends Quat>(
+      out: Out,
+      value: Readonly<Quat>,
+    ): Out;
+  }
+
   export class Component {
     readonly node: Node;
   }
+
+  export class UIRenderer extends Component {}
 
   export class Node {
     name: string;
@@ -40,23 +67,36 @@ declare module "cc" {
     setRotationFromEuler(x: number, y: number, z: number): void;
     setScale(x: number, y: number, z?: number): void;
     getWorldPosition(out?: Vec3): Vec3;
+    getWorldRotation(out?: Quat): Quat;
+    getWorldScale(out?: Vec3): Vec3;
+    setWorldRotation(rotation: Readonly<Quat>): void;
     addComponent<T extends Component>(component: new () => T): T;
     getComponent<T extends Component>(component: new () => T): T | null;
+    getComponents<T extends Component>(component: new () => T): T[];
     removeFromParent(): void;
     destroy(): boolean;
   }
 
   export class Color {
+    constructor(r?: number, g?: number, b?: number, a?: number);
     fromHEX(value: string): this;
   }
 
-  export class Graphics extends Component {
+  export class Graphics extends UIRenderer {
     strokeColor: Color;
     fillColor: Color;
     lineWidth: number;
 
     moveTo(x: number, y: number): void;
     lineTo(x: number, y: number): void;
+    bezierCurveTo(
+      c1x: number,
+      c1y: number,
+      c2x: number,
+      c2y: number,
+      x: number,
+      y: number,
+    ): void;
     circle(centerX: number, centerY: number, radius: number): void;
     rect(x: number, y: number, width: number, height: number): void;
     clear(): void;
@@ -64,7 +104,7 @@ declare module "cc" {
     stroke(): void;
   }
 
-  export class Label extends Component {
+  export class Label extends UIRenderer {
     static readonly Overflow: {
       readonly CLAMP: number;
     };
@@ -87,6 +127,7 @@ declare module "cc" {
   };
 
   export class Sorting2D extends Component {
+    sortingLayer: number;
     sortingOrder: number;
   }
 
@@ -96,7 +137,7 @@ declare module "cc" {
     readonly json: unknown;
   }
 
-  export class Sprite extends Component {
+  export class Sprite extends UIRenderer {
     static readonly SizeMode: {
       readonly CUSTOM: number;
     };

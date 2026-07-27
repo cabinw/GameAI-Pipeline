@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "referenceId": "task-014b-cocos-semantic-vfx-adapter",
+  "designResolution": {
+    "width": 1280,
+    "height": 720
+  },
+  "socketProjectionTolerancePx": 0.5
+}

@@ -40,10 +40,11 @@ describe("Character Rig Builder extension manifest", () => {
     assert.deepEqual(
       Object.keys(value.dependencies).sort(),
       [
-      "@gameai/character-asset-intake",
-      "@gameai/character-contracts",
-      "@gameai/rig-animation",
-      "@gameai/rig-layout-generator",
+        "@gameai/character-asset-intake",
+        "@gameai/character-contracts",
+        "@gameai/character-semantic-events",
+        "@gameai/rig-animation",
+        "@gameai/rig-layout-generator",
       ],
     );
     await Promise.all([

@@ -4,10 +4,11 @@
   "private": true,
   "description": "Engine-neutral character semantic-event contracts, validation, and deterministic timeline evaluation.",
   "main": "./dist/index.js",
+  "browser": "./dist/runtime-esm/runtime.js",
   "types": "./dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/copy-schema.mjs",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.runtime.json && node scripts/mark-runtime-esm.mjs && node scripts/copy-schema.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
   },
