@@ -168,7 +168,10 @@ or lifecycle-boundary time fail before state mutation.
 
 See [Character Contracts](character-contracts.md) and
 [RFC-0014](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md). This
-engine-neutral evaluator does not deliver to Cocos and did not render a VFX.
+evaluator remains engine-neutral and does not import Cocos. TASK-014B and
+TASK-014C now deliver its commands through the Cocos Semantic VFX Adapter,
+canonical target registry, and renderer/cue registry; the accepted visible
+effects are Footstep Dust, Wave/Prop Trail, and Persistent Aura.
 
 ## Current limitations
 
@@ -179,9 +182,11 @@ engine-neutral evaluator does not deliver to Cocos and did not render a VFX.
   unchanged; Walk, Hit, blending, and state-machine behavior are still absent.
 - Runtime validation assumes Main supplied normalized, already validated data;
   Scene Script does not duplicate JSON-contract parsing.
-- TASK-014A does not add event delivery to `RigAnimationPlayer`, a Cocos VFX
-  runtime, gameplay-triggered injection, reverse playback, seeking, or network
-  synchronization.
+- Semantic command delivery remains separate from `RigAnimationPlayer`.
+  TASK-014B/TASK-014C add the canonical Cocos VFX consumer, while
+  gameplay-triggered injection, audio/gameplay execution, reverse playback,
+  arbitrary seek, networking, and non-Cocos runtime adapters remain
+  unimplemented.
 - The TASK-007 walk cycle is a minimal in-place articulation reference, not a
   production locomotion system; it adds no root motion, foot locking, IK,
   blending, or state machine.

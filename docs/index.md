@@ -30,11 +30,14 @@
 
 - [TASK-013 engine-neutral acceptance](acceptance/TASK-013-composable-full-character-loadout-reference.md)
 - [TASK-013R7 canonical Cocos acceptance](acceptance/TASK-013R7-full-loadout-release-candidate.md)
+- [TASK-014B Cocos Semantic VFX Adapter acceptance](acceptance/TASK-014B-cocos-semantic-vfx-adapter.md)
+- [TASK-014C canonical full-loadout Semantic VFX acceptance](acceptance/TASK-014C-canonical-loadout-semantic-vfx.md)
 - [TASK-013 Cocos runtime postmortem](postmortems/TASK-013-cocos-runtime-integration.md)
 
 ## Release and roadmap
 
 - [v0.2.0 Character Loadout Baseline](releases/v0.2.0-character-loadout-baseline.md)
+- [v0.3.0 Character Semantic Events & VFX Baseline](releases/v0.3.0-character-semantic-events-vfx-baseline.md)
 - [Compatibility matrix](compatibility.md)
 - [Changelog](../CHANGELOG.md)
 - [Roadmap](../ROADMAP.md)

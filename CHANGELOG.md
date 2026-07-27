@@ -4,6 +4,45 @@ All notable project milestones are recorded in this file. The repository is
 still pre-release package infrastructure; Git tags and GitHub Releases remain
 separate publication actions.
 
+## v0.3.0 — Character Semantic Events & VFX Baseline
+
+Baseline source: `main` at
+`5c3baba4062bd529bb6bd4b787b8c391452ee459`.
+
+### Added
+
+- Character Semantic Events 1.0 with typed VFX, audio, and gameplay payloads,
+  stable validation, and deterministic forward timeline evaluation.
+- Persistent lifecycle coalescing to one logical active instance per
+  track/event across loops and Pause/Resume.
+- A Cocos Creator 3.8.8 Semantic VFX Adapter and renderer/cue registry.
+- Canonical semantic targets for left/right feet, torso, and active hand/tool
+  across all 12 loadout and no/left/right prop states.
+- Procedural Footstep Dust, Wave/Prop Trail, and Persistent Aura reference
+  effects.
+- Deterministic target re-resolution, Transform Stress, lifecycle rebuild,
+  disposal, and Exact Reset cleanup.
+
+### Verification
+
+- Working-copy and tracked-files-only frozen verification: 414/414 tests.
+- Cocos Creator 3.8.8 macOS runtime gate and external visual review: PASS.
+- Single runtime root/input and zero duplicate start, unknown stop, leak,
+  stale target, non-finite transform, or viewport-overflow violations.
+- Zero tracked MP4 or evidence media.
+
+### Known limitations
+
+- Procedural placeholder effects rather than production VFX art.
+- Audio/gameplay contracts have no runtime playback, hitbox, damage, or
+  signal consumers.
+- No reverse playback, arbitrary seek, networking, VFX authoring UI,
+  automatic effect fitting, Unity/Godot adapters, Windows verification, or
+  original Red Cap production reconstruction.
+
+The `v0.3.0` tag and GitHub Release are intentionally not created by this
+documentation closeout.
+
 ## v0.2.0 — Character Loadout Baseline
 
 Baseline source: `main` at
@@ -49,5 +88,6 @@ Baseline source: `main` at
   Windows validation, production editor UI, or original Red Cap production
   reconstruction.
 
-The Git tag and GitHub Release for v0.2.0 are intentionally not created by
-this documentation closeout.
+The original v0.2.0 documentation closeout did not create publication
+objects. The annotated `v0.2.0` tag and prerelease were subsequently published
+without changing this historical capability baseline.

@@ -299,16 +299,22 @@ Stable evaluator-operation codes are:
 
 See [RFC-0014](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md) and
 [ADR-0015](adr/ADR-0015-engine-neutral-character-semantic-events.md).
-TASK-014A defines contracts, validation, and evaluation only. No Cocos VFX
-runtime exists yet and no visual effect was rendered.
+TASK-014A itself defined contracts, validation, and evaluation only; statements
+in its accepted records that no Cocos VFX runtime existed describe that
+historical task boundary. TASK-014B and TASK-014C subsequently connected the
+same engine-neutral command stream to the Cocos Semantic VFX Adapter and
+rendered Footstep Dust, Wave/Prop Trail, and Persistent Aura on the canonical
+loadout. Runtime execution remains Cocos VFX only: the audio and gameplay event
+kinds are contracts without playback, hitbox, or damage consumers.
 
 ## Deliberate limitations
 
 - Referenced image and JSON files are not opened or checked for existence in TASK-001.
 - Rig animation clips are a separate TASK-005 contract documented in
   `docs/rig-animation.md`; Character Rig retains only stable target bindings.
-- Gameplay-triggered semantic-event injection, engine adapters, resource
-  resolution, audio/gameplay execution, and networking are not implemented in
-  TASK-014A.
+- Gameplay-triggered semantic-event injection, audio/gameplay execution,
+  networking, and non-Cocos adapters remain unimplemented. Cocos VFX target
+  resolution and rendering are provided by the later TASK-014B/TASK-014C
+  integration rather than by TASK-014A itself.
 - No Cocos-specific UUID, `Node`, `Sprite`, prefab, scene, or component data is allowed in these schemas.
 - Mesh deformation, IK, Spine, and DragonBones remain outside the MVP contract.

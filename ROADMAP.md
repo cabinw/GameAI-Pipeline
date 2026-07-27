@@ -23,23 +23,54 @@
 - Working-copy and tracked-files-only 349/349 verification plus accepted
   Cocos Creator 3.8.8 evidence
 
+## v0.3.0 — Character Semantic Events & VFX Baseline — Completed
+
+- TASK-014A: Character Semantic Events 1.0 contract, typed VFX/audio/gameplay
+  payloads, stable diagnostics, textual fixtures, and deterministic evaluator
+- TASK-014A1: one persistent logical instance per track/event across loops,
+  Pause/Resume, Reset, track switch, and disposal
+- TASK-014B: Cocos Semantic VFX Adapter with deterministic procedural Dust,
+  Trail, and Aura renderers
+- TASK-014C: canonical 12-state loadout integration with left/right foot,
+  torso, and active hand/tool semantic targets
+- Transform Stress, target re-resolution, rebuild, Exact Reset, finite and
+  viewport-safe rendering, single root/input, and zero leak/stale guarantees
+- Working-copy and tracked-files-only 414/414 verification
+- Cocos Creator 3.8.8 macOS runtime acceptance and external visual review PASS
+- Zero tracked evidence media
+
+The accepted runtime executes Cocos VFX only. Audio and gameplay remain typed
+engine-neutral contracts without playback, hitbox, damage, or signal
+consumers. v0.3.0 is a prerelease framework baseline with procedural
+placeholder VFX, not production-ready final art or complete tooling.
+
 ## Next roadmap
 
-### Character Semantic Events and VFX
+### TASK-014D — Data-Driven Production VFX Cue Authoring
 
-TASK-014A completes the engine-neutral Character Semantic Events 1.0 and VFX
-cue-definition contract, stable validation, textual fixtures, and
-deterministic animation-timeline evaluator. It covers generic cue IDs,
-Rig Layout sockets, local transforms, layer roles, follow policies,
-one-shot/looping/persistent lifecycle commands, typed VFX/audio/gameplay
-payloads, track-local gameplay-window pairing, skipped frames, bounded loop
-crossings, explicit initial-track selection, Pause/Resume, Exact Reset, and
-clip switching.
+Proposed future goal:
 
-TASK-014A is contracts and evaluation only. Gameplay-triggered injection,
-engine adapter delivery, Cocos VFX runtime, effect/audio assets, gameplay
-execution, reverse/seek/network behavior, and TASK-014B have not started. No
-visual effect was rendered.
+- replace hard-coded procedural effect construction with a validated,
+  engine-neutral authoring description;
+- allow AI to generate or modify VFX cue data;
+- support reusable cue presets;
+- preview cue timing, socket binding, transforms, color, duration, and layers;
+- compile engine-neutral cue descriptions into Cocos renderer plans;
+- retain Unity/Godot adapter compatibility; and
+- keep production-quality asset generation separate from runtime logic.
+
+TASK-014D is not implemented or started by the v0.3.0 documentation
+closeout.
+
+### Audio consumer
+
+Deliver validated audio semantic events to an explicit engine audio consumer
+without coupling audio resources to the engine-neutral contract.
+
+### Gameplay event consumer
+
+Deliver validated signals and gameplay windows to explicit hitbox, damage, or
+other gameplay consumers with deterministic lifecycle ownership.
 
 ### Animation authoring improvements
 
