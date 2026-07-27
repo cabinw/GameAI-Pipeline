@@ -3567,9 +3567,9 @@ Establish and prove the minimum reproducible development environment required be
 - The pnpm workspace, frozen lockfile, Cocos 3.8.8 fixture extension, four tests, and CI workflow are implemented.
 - Creator loaded the fixture extension main process and Scene process. The remaining live panel click is explicitly blocked by concurrent-instance accessibility targeting and has exact reproduction steps in `docs/environment.md`.
 - ADR-0003 records the external production-game consumer topology.
-# Active plan: TASK-014C Canonical Full-Loadout Semantic VFX Integration
+# Implemented plan: TASK-014C Canonical Full-Loadout Semantic VFX Integration
 
-- Status: In Progress
+- Status: Pending External Visual Review
 - Started: 2026-07-27
 - Branch: `feat/task-014c-canonical-loadout-semantic-vfx`
 - Baseline: `48316aa2603f9235ebafc83c726b7f0bff822348`

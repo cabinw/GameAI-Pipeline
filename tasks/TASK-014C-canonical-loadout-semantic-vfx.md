@@ -1,6 +1,6 @@
 # TASK-014C: Canonical Full-Loadout Semantic VFX Integration
 
-- Status: In Progress
+- Status: Implemented — Pending External Visual Review
 - Date: 2026-07-27
 - Branch: `feat/task-014c-canonical-loadout-semantic-vfx`
 - Baseline: `48316aa2603f9235ebafc83c726b7f0bff822348`
@@ -159,20 +159,24 @@ Canvas region. Only `manifest.json` and the final MP4 may exist on
 
 ## Automated acceptance criteria
 
-- [ ] All 12 loadout states and all logical target mappings pass.
-- [ ] No/left/right prop active-hand/tool resolution is deterministic.
-- [ ] Target invalidation and atomic re-resolution pass.
-- [ ] Aura coalescing, Trail lifecycle, Dust capture/cleanup, Pause/Resume,
+- [x] All 12 loadout states and all logical target mappings pass.
+- [x] No/left/right prop active-hand/tool resolution is deterministic.
+- [x] Target invalidation and atomic re-resolution pass.
+- [x] Aura coalescing, Trail lifecycle, Dust capture/cleanup, Pause/Resume,
       loops, switching, rebuild, and Exact Reset pass.
-- [ ] Unknown target/socket, duplicate renderer, stale target, sorting,
+- [x] Unknown target/socket, duplicate renderer, stale target, sorting,
       finite-transform, viewport, and ROI failures are rejected.
-- [ ] Source/generated mirror identity and typed input/HUD parity pass.
-- [ ] Build/typecheck, Cocos clean-CI typecheck, focused/extension/semantic
+- [x] Source/generated mirror identity and typed input/HUD parity pass.
+- [x] Build/typecheck, Cocos clean-CI typecheck, focused/extension/semantic
       tests, working-copy verify, and frozen tracked-only verify pass.
-- [ ] Generated closure, schema identity, metadata/atomic-publication
+- [x] Generated closure, schema identity, metadata/atomic-publication
       regressions, `git diff --check`, binary audit, and post-verify clean
       content pass.
-- [ ] Creator 3.8.8 and final evidence gates pass exactly as storyboarded.
+- [x] Creator 3.8.8 and final evidence gates pass exactly as storyboarded.
+
+Implementation, automated verification, Creator acceptance, and local evidence
+self-review are complete. The temporary evidence handoff remains
+`pending-external-visual-review`; no TASK-014C PR has been created.
 
 ## Non-goals
 
