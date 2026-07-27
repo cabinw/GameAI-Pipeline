@@ -103,7 +103,7 @@ interface RendererBinding {
   readonly request: SemanticVfxRendererRequest;
 }
 
-interface RendererComponentMeasurement {
+export interface RendererComponentMeasurement {
   readonly rendererId: string;
   readonly uiRendererCount: number;
   readonly sorting2DCount: number;
@@ -111,7 +111,11 @@ interface RendererComponentMeasurement {
 
 type PrimitiveVisual = (typeof STICKMAN_REFERENCE_PLAN.parts)[number]["visual"];
 
-class CocosSemanticVfxHost implements SemanticVfxHost {
+export type CocosSemanticVfxSocketResolver = (
+  socketId: string,
+) => Node | undefined;
+
+export class CocosSemanticVfxHost implements SemanticVfxHost {
   private readonly renderers = new Map<string, RendererBinding>();
   private readonly socketWorldRotation = new Quat();
   private readonly socketWorldScale = new Vec3();
@@ -127,16 +131,26 @@ class CocosSemanticVfxHost implements SemanticVfxHost {
 
   constructor(
     private readonly overlayRoot: Node,
-    private readonly sockets: ReadonlyMap<string, Node>,
-  ) {}
+    sockets:
+      | ReadonlyMap<string, Node>
+      | CocosSemanticVfxSocketResolver,
+    private readonly diagnosticPrefix = "TASK_014B",
+  ) {
+    this.resolveSocketNode =
+      typeof sockets === "function"
+        ? sockets
+        : (socketId) => sockets.get(socketId);
+  }
+
+  private readonly resolveSocketNode: CocosSemanticVfxSocketResolver;
 
   resolveSocket(socketId: string): SemanticVfxPose | undefined {
-    const socket = this.sockets.get(socketId);
+    const socket = this.resolveSocketNode(socketId);
     if (socket === undefined) return undefined;
     const projected = projectNodeToOverlayLocal(
       socket,
       this.overlayRoot,
-      "TASK_014B",
+      this.diagnosticPrefix,
     );
     this.maximumProjectionError = Math.max(
       this.maximumProjectionError,

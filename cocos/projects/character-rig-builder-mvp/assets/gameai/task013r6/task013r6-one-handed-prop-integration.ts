@@ -125,7 +125,7 @@ export const TASK013R6_DISPLAY_IDENTITY: PropIntegrationDisplayIdentity =
     diagnosticsId: "TASK_013R6",
   });
 
-interface PropIntegrationRuntime {
+export interface PropIntegrationRuntime {
   readonly generatedRoot: Node;
   readonly base: BuiltBaseRigRuntime;
   readonly attachments: BuiltGarmentRuntime;
@@ -183,20 +183,20 @@ interface SpatialRuntimeSnapshot {
 
 @ccclass("GameAITask013R6OneHandedPropIntegration")
 export class GameAITask013R6OneHandedPropIntegration extends Component {
-  private readonly lifecycle = new HarnessLifecycle();
-  private readonly readiness = new PropRuntimeReadiness();
-  private readonly semanticState = new PropBridgeState(
+  protected readonly lifecycle = new HarnessLifecycle();
+  protected readonly readiness = new PropRuntimeReadiness();
+  protected readonly semanticState = new PropBridgeState(
     PLAN.defaultGarmentStateId,
     PLAN.defaultPropStateId,
   );
-  private coordinator: HarnessResourceCoordinator | null = null;
-  private runtime: PropIntegrationRuntime | null = null;
-  private playback: RigAnimationPlayback | null = null;
+  protected coordinator: HarnessResourceCoordinator | null = null;
+  protected runtime: PropIntegrationRuntime | null = null;
+  protected playback: RigAnimationPlayback | null = null;
   private readonly spriteFrames = new Map<string, SpriteFrame>();
-  private inputRegistered = false;
-  private runtimeGeneration = 0;
-  private inputEventCount = 0;
-  private lifecycleRebuildCount = 0;
+  protected inputRegistered = false;
+  protected runtimeGeneration = 0;
+  protected inputEventCount = 0;
+  protected lifecycleRebuildCount = 0;
   private maximumMarkerError = 0;
   private maximumSkeletonError = 0;
   private maximumAccessorySocketError = 0;
@@ -218,6 +218,26 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     return TASK013R6_DISPLAY_IDENTITY;
   }
 
+  protected canonicalPlan(): typeof PLAN {
+    return PLAN;
+  }
+
+  protected additionalSemanticClipIds(): readonly string[] {
+    return Object.freeze([]);
+  }
+
+  protected afterCanonicalRuntimeBuilt(): void {}
+
+  protected afterCanonicalRuntimeReady(): void {}
+
+  protected afterCanonicalFrame(_deltaSeconds: number): void {}
+
+  protected afterCanonicalLoadoutApplied(): void {}
+
+  protected afterCanonicalExactReset(): void {}
+
+  protected beforeCanonicalRuntimeTeardown(_dispose: boolean): void {}
+
   onEnable(): void {
     this.beginRuntimeSetup();
   }
@@ -230,6 +250,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.applyStressTransform();
     this.applyLoadoutState();
     this.updateSpatialAndDebug();
+    this.afterCanonicalFrame(deltaSeconds);
     this.updateHud();
   }
 
@@ -241,7 +262,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.teardownRuntime(true);
   }
 
-  private beginRuntimeSetup(): void {
+  protected beginRuntimeSetup(): void {
     const generation = this.lifecycle.begin();
     this.runtimeGeneration = this.readiness.begin();
     if (generation !== this.runtimeGeneration) {
@@ -282,6 +303,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
           this.lifecycle.ready(generation);
           this.readiness.lifecycleReady(generation);
           this.registerInput(generation);
+          this.afterCanonicalRuntimeReady();
           this.updateHud();
           const identity = this.runtimeDisplayIdentity();
           console.info(
@@ -319,7 +341,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     console.error(diagnostic);
   }
 
-  private buildRuntime(): void {
+  protected buildRuntime(): void {
     if (this.coordinator?.snapshot().terminal !== "passed") {
       throw new Error("TASK_013R6_BUILD_BEFORE_MANIFEST_PASS");
     }
@@ -399,6 +421,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       debugGraphics,
       hudLabel,
     };
+    this.afterCanonicalRuntimeBuilt();
   }
 
   private nodeWithLayer(name: string, parent: Node): Node {
@@ -408,7 +431,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     return node;
   }
 
-  private clip(animationId: string): NormalizedRigAnimation {
+  protected clip(animationId: string): NormalizedRigAnimation {
     const clip = PLAN.garment.base.clips.find(
       (candidate) => candidate.animationId === animationId,
     );
@@ -420,8 +443,11 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     return clip as unknown as NormalizedRigAnimation;
   }
 
-  private selectClip(animationId: string, play: boolean): void {
-    this.semanticState.selectClip(animationId);
+  protected selectClip(animationId: string, play: boolean): void {
+    this.semanticState.selectClip(
+      animationId,
+      this.additionalSemanticClipIds(),
+    );
     this.playback = new RigAnimationPlayback(this.clip(animationId));
     const sample = play ? this.playback.play() : this.playback.stop();
     this.semanticState.setPlaybackStatus(this.playback.status);
@@ -429,7 +455,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.applySample(sample);
   }
 
-  private applySample(sample: RigAnimationSample): void {
+  protected applySample(sample: RigAnimationSample): void {
     const runtime = this.runtime;
     if (runtime === null) return;
     for (const [jointId, binding] of runtime.base.joints) {
@@ -441,7 +467,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     }
   }
 
-  private applyStressTransform(): void {
+  protected applyStressTransform(): void {
     const runtime = this.runtime;
     if (runtime === null) return;
     if (this.semanticState.snapshot().stressEnabled) {
@@ -461,7 +487,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     }
   }
 
-  private applyLoadoutState(): void {
+  protected applyLoadoutState(): void {
     if (this.runtime === null) return;
     this.activeCounts = applyGarmentState(
       this.runtime.attachments,
@@ -471,9 +497,10 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       this.runtime.props,
       this.semanticState.snapshot().propStateId,
     );
+    this.afterCanonicalLoadoutApplied();
   }
 
-  private updateSpatialAndDebug(): void {
+  protected updateSpatialAndDebug(): void {
     const runtime = this.runtime;
     if (runtime === null) return;
     const projections = new Map(
@@ -1117,7 +1144,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.inputRegistered = false;
   }
 
-  private onKeyDown(event: EventKeyboard): void {
+  protected onKeyDown(event: EventKeyboard): void {
     if (!this.readiness.canDispatch(this.runtimeGeneration)) return;
     const binding = BINDING_BY_KEY.get(event.keyCode);
     if (binding === undefined) return;
@@ -1125,7 +1152,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.executeAction(binding);
   }
 
-  private executeAction(binding: PropInputBinding): void {
+  protected executeAction(binding: PropInputBinding): void {
     const action: PropSemanticAction = binding.action;
     if (action.kind === "select-clip") {
       this.selectClip(action.clipId, true);
@@ -1166,7 +1193,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.updateHud();
   }
 
-  private exactReset(): void {
+  protected exactReset(): void {
     this.semanticState.exactReset();
     this.maximumMarkerError = 0;
     this.maximumSkeletonError = 0;
@@ -1183,6 +1210,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.applyStressTransform();
     this.applyLoadoutState();
     this.updateSpatialAndDebug();
+    this.afterCanonicalExactReset();
     this.updateHud();
   }
 
@@ -1197,7 +1225,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     return state.hudLabel;
   }
 
-  private updateHud(): void {
+  protected updateHud(): void {
     const runtime = this.runtime;
     if (runtime === null) return;
     const semantic = this.semanticState.snapshot();
@@ -1230,7 +1258,8 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     ].join("\n");
   }
 
-  private teardownRuntime(dispose: boolean): void {
+  protected teardownRuntime(dispose: boolean): void {
+    this.beforeCanonicalRuntimeTeardown(dispose);
     this.unregisterInput();
     this.runtime?.generatedRoot.removeFromParent();
     this.runtime?.overlayRoot.removeFromParent();

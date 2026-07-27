@@ -92,6 +92,15 @@ const clips = await Promise.all([
       "utf8",
     ),
   ),
+  ...["rest", "walk", "wave", "prop-swing", "integration-stress"].map(
+    async (name) =>
+      JSON.parse(
+        await readFile(
+          path.join(fullLoadoutFixtureRoot, `animations/${name}.json`),
+          "utf8",
+        ),
+      ),
+  ),
 ]);
 const baseDimensions = Object.fromEntries(
   await Promise.all(
@@ -251,6 +260,10 @@ const provenanceInputFiles = [
     path.join(baseFixtureRoot, `animations/${name}.json`),
   ),
   path.join(propFixtureRoot, "animations/prop-swing.json"),
+  ...["rest", "walk", "wave", "prop-swing", "integration-stress"].map(
+    (name) =>
+      path.join(fullLoadoutFixtureRoot, `animations/${name}.json`),
+  ),
   ...rigLayout.parts.map((part) =>
     path.join(baseFixtureRoot, part.file),
   ),

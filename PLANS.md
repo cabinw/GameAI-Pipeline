@@ -3567,3 +3567,160 @@ Establish and prove the minimum reproducible development environment required be
 - The pnpm workspace, frozen lockfile, Cocos 3.8.8 fixture extension, four tests, and CI workflow are implemented.
 - Creator loaded the fixture extension main process and Scene process. The remaining live panel click is explicitly blocked by concurrent-instance accessibility targeting and has exact reproduction steps in `docs/environment.md`.
 - ADR-0003 records the external production-game consumer topology.
+# Accepted plan: TASK-014C Canonical Full-Loadout Semantic VFX Integration
+
+- Status: Accepted
+- Started: 2026-07-27
+- Accepted: 2026-07-28
+- Branch: `feat/task-014c-canonical-loadout-semantic-vfx`
+- Baseline: `48316aa2603f9235ebafc83c726b7f0bff822348`
+- Reviewed feature:
+  `3c734174c04f823b21b0fd6ab8b9c3e3f121fc38`
+- Final evidence:
+  `75b844b14d250d7b10df915275d242ab5128aa59`
+- Expected budget: at most 70 changed files and 12,000 changed lines,
+  including one Creator-owned Scene/`.meta` pair; zero feature-branch MP4 or
+  audio files
+
+## Goal
+
+Compose the accepted Character Semantic Events evaluator and TASK-014B Cocos
+VFX adapter with the canonical V2 full-loadout runtime, proving deterministic
+Dust, Trail, and Aura behavior across all 12 loadout states, all five
+production-lite semantic clips, transform stress, lifecycle rebuilds, and
+Exact Reset.
+
+## Authoritative flow
+
+```text
+full-loadout-source.json
+→ engine-neutral contracts
+→ resolveCharacterLoadout
+→ deterministic canonical Cocos plan
+→ evaluated pose and semantic target registry
+→ Character Semantic Events evaluator
+→ accepted TASK-014B semantic VFX adapter
+→ Cocos renderer registry
+```
+
+The composition layer reuses the accepted resolver, evaluator, adapter,
+readiness, sorting, projection, and lifecycle boundaries. It does not copy the
+superseded TASK-013 monolith or introduce Cocos types into engine-neutral
+packages.
+
+## Scope
+
+- Add one reusable Cocos-only canonical semantic-VFX composition layer.
+- Add one Creator-owned TASK-014C acceptance Scene and component identity.
+- Resolve left foot, right foot, torso/body, and active hand/tool targets from
+  the canonical evaluated pose and declared loadout/prop state.
+- Reuse procedural Dust, Trail, and Aura renderers through the TASK-014B
+  adapter contract.
+- Add one typed input registry that owns action IDs, keys, Cocos KeyCodes,
+  dispatch intent, and HUD help.
+- Expose complete lifecycle, target, VFX, resource, projection, duplicate,
+  stale-reference, viewport, and finite-value diagnostics.
+- Add deterministic focused, generated-closure, Scene/meta, identity,
+  viewport/AABB, ROI, and negative tests.
+- Run working-copy and frozen tracked-files-only verification, then one
+  Creator 3.8.8 open/switch/reopen/live/visual/evidence gate.
+
+## Loadout and target policy
+
+- The canonical 4×3 resolver-derived matrix remains authoritative.
+- No prop resolves the active effect target to the authored default hand.
+- Left/right prop resolves to the declared matching prop grip/effect target.
+- Unknown or unavailable targets fail closed; there is no Canvas-coordinate,
+  opposite-hand, asset-name, or scene-name fallback.
+- A loadout change atomically re-resolves target references. A persistent
+  instance is retained only while its logical target remains valid, and is
+  reprojected immediately. Invalidated instances stop exactly once.
+
+## Lifecycle policy
+
+```text
+LOADING
+→ RESOURCES_PASSED
+→ LOADOUT_BUILT
+→ SOCKETS_RESOLVED
+→ EVENTS_READY
+→ RESET_COMPLETE
+→ READY
+```
+
+Exactly one input handler is registered only after `READY`. Failure, disable,
+destroy, rebuild, and generation invalidation unregister input, invalidate
+pending work, dispose evaluator state, clean each active renderer exactly
+once, destroy partial nodes, and clear target references. Exact Reset restores
+the canonical default/no-prop loadout, authored Rest pose, Rest semantic
+track, stopped time zero, stress/debug OFF, zero VFX and stale targets, one
+runtime root, one input handler, and zero leaks.
+
+## Execution
+
+1. Record the task, acceptance matrix, controls, HUD, target/VFX mapping,
+   lifecycle policy, storyboard, and non-goals before runtime changes.
+2. Add the deterministic composition contracts, target resolver, semantic
+   tracks, unified input registry, runtime diagnostics, and focused tests.
+3. Add the Creator runtime composition and generated mirror without changing
+   canonical V2 behavior or engine-neutral schemas/evaluator semantics.
+4. Create and save the TASK-014C Scene and metadata through Creator 3.8.8,
+   then lock their identity and byte-closure tests.
+5. Run every automated, tracked-only, generated, schema, metadata, binary,
+   viewport, and content-closure gate.
+6. Run the uninterrupted Creator gate, inspect presentation quality, and
+   correct ordinary in-scope integration defects as one concentrated pass.
+7. Commit and push the feature, record and self-review one final Web Preview
+   video, publish only its manifest and MP4 on `evidence/task-014c`, and
+   revalidate the downloaded copy.
+8. Stop at pending external visual review without a PR or merge.
+
+## Non-goals
+
+No Character Semantic Events schema/version or evaluator change, loadout
+resolver rewrite, new effect art, audio/gameplay execution, TASK-014D,
+canonical V2 behavior change, superseded monolith repair, Red Cap work,
+Unity/Godot/Windows support, tag, release, feature PR, merge, or protected
+reference mutation.
+
+## Done when
+
+- All 12 states and five clips pass deterministic target/VFX behavior.
+- Dust captures alternating real feet; Trail follows the active hand/tool;
+  Aura remains one logical instance across six loops and Pause/Resume.
+- Two consecutive rebuilds are followed by successful state switching and
+  all three effects with zero duplicates, stale targets, inputs, or leaks.
+- Both verification modes, generated closure, schema identity, metadata/
+  atomic-publication regressions, binary audit, and post-verify clean-tree
+  checks pass within budget.
+- Creator 3.8.8 passes the complete one-pass runtime and visual gate with
+  every relevant warning/error/violation counter at zero.
+- The final H.264 High 1280×720 30 fps yuv420p evidence fully decodes,
+  self-review passes, and its uploaded copy is byte-identical.
+- Feature implementation and temporary evidence are pushed, no MP4 is
+  tracked on the feature branch, and no PR exists.
+
+## Acceptance result
+
+- External visual review: PASS.
+- The complete 65-second core video passed canonical 12-state traversal,
+  no/left/right prop behavior, Footstep Dust, Wave Trail, Prop Swing Trail,
+  persistent Aura across six loops, Pause/Resume, loadout and prop switching,
+  Transform Stress, two Lifecycle Rebuilds, and effects after rebuild.
+- Core video:
+  `task-014c-canonical-loadout-semantic-vfx.mp4`, SHA-256
+  `6952013fe22c9c04dcc1d2fce1731434511617015c640d7f92a336006a00df01`.
+- The supplemental tail passed Aura-before-Reset, Exact Reset, canonical
+  no-prop Rest at stopped time zero, debug/stress OFF, zero evaluator,
+  adapter, visible-VFX, leak, stale-target, viewport, and finite-value
+  violations, plus approximately nine seconds of unchanged clean hold.
+- Supplemental video: `task-014c-acceptance-tail.mp4`, SHA-256
+  `ffddbec09ff087baf82be80c0c2ae48e711f6a26a24276ef510a4e88262cf601`.
+- The stable final state remained one runtime root, one input handler, and
+  `SETUP 7 / TEARDOWN 6 / REBUILDS 6`. HUD `ROOTS 0 / INPUT 0` are the
+  duplicate-root and excess-handler counters.
+- A pointer remains in unused blank space in the supplemental tail and
+  obscures no HUD, character, or VFX region.
+- Procedural Dust, Trail, and Aura remain placeholder art. Audio/gameplay
+  execution, Red Cap, Unity, Godot, Windows, and TASK-014D remain out of
+  scope.
