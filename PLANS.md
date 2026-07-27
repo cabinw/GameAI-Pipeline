@@ -3,9 +3,9 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014A1 Persistent Lifecycle Coalescing
+## Completed plan: TASK-014A1 Persistent Lifecycle Coalescing
 
-- Status: Complete; publication pending
+- Status: Accepted
 - Started: 2026-07-27
 - Branch: `fix/task-014a1-persistent-lifecycle-coalescing`
 - Baseline `main` / `origin/main`:
@@ -73,12 +73,15 @@ future engine adapter.
 
 ### Result
 
+- External acceptance: PASS on 2026-07-27.
+- Accepted implementation:
+  `ae66de71dd99e5a899a2f1cae9e0a9c3726a58fc`.
 - Direct semantic-event tests pass 24/24.
 - Full working-copy verification passes 376/376.
 - Tracked-files-only verification after a frozen install passes 376/376.
 - Schema byte identity, generated-output closure, metadata-race, diff, scope,
   and binary/media gates pass.
-- Publication remains limited to a Draft PR for external review.
+- PR #13 is accepted for squash integration into `main`.
 
 ## Completed plan: TASK-014A Engine-Neutral Character Semantic Event Contract
 

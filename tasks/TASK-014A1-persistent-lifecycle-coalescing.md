@@ -1,6 +1,6 @@
 # TASK-014A1: Persistent Lifecycle Coalescing
 
-- Status: Complete; publication pending
+- Status: Accepted
 - Date: 2026-07-27
 - Branch: `fix/task-014a1-persistent-lifecycle-coalescing`
 - Baseline: `1ab573e4b99d6c04973dc62803c5c2579c56e4a9`
@@ -56,6 +56,9 @@ schema field or schema version.
 
 ## Verification
 
+- External acceptance: PASS on 2026-07-27.
+- Accepted implementation:
+  `ae66de71dd99e5a899a2f1cae9e0a9c3726a58fc`.
 - Direct semantic-event package tests: 24/24 PASS.
 - Final working-copy verification: 376/376 PASS.
 - Tracked-files-only frozen-install verification: 376/376 PASS.
@@ -63,8 +66,8 @@ schema field or schema version.
 - Generated-output closure and Cocos Scene metadata-race regression: PASS.
 - Tracked MP4 count: zero.
 
-## Publication gate
+## Acceptance
 
-Commit and push only after all acceptance criteria pass. Open one Draft PR
-targeting `main`, wait for GitHub Actions, keep it Draft and unmerged, then
-stop for external review.
+All acceptance criteria and external review passed. PR #13 is approved for
+squash integration into `main` with no Cocos, schema, binary, media,
+TASK-014B, or TASK-014C scope.
