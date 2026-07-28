@@ -3,9 +3,9 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
+## Accepted plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
 
-- Status: Remediation complete; Draft PR pending external review.
+- Status: Accepted
 - Started: 2026-07-28
 - Branch: `feat/task-014d1-vfx-cue-authoring-contract`
 - Baseline `main`: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
@@ -73,8 +73,9 @@ Cocos, Unity, and Godot compilers.
 - Canonical/package schema bytes and repeated render-plan bytes are identical.
 - The complete remediated PR stays within 55 files and 10,000 lines and contains text
   and source only.
-- The Draft PR targets `main`, GitHub Actions passes, and no merge, tag,
-  release, Scene, media, or runtime-adapter change occurs.
+- Exact-head local, frozen, and GitHub Actions verification passes; external
+  review is clear; and no tag, release, Scene, media, or runtime-adapter
+  change occurs within TASK-014D1.
 
 ## Implemented plan: v0.3.0 Character Semantic Events & VFX Baseline
 

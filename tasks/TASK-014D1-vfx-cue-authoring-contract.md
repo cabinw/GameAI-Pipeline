@@ -1,6 +1,6 @@
 # TASK-014D1: Engine-Neutral Data-Driven VFX Cue Authoring Contract
 
-- Status: Remediation complete; Draft PR pending external review.
+- Status: Accepted
 - Date: 2026-07-28
 - Branch: `feat/task-014d1-vfx-cue-authoring-contract`
 - Baseline: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
@@ -57,8 +57,8 @@ Render Plans without changing Character Semantic Events semantics.
 - [x] Schema identity, generated-output closure, Markdown links,
       `git diff --check`, post-verify clean tree, binary/media, tracked MP4,
       file-count, and changed-line budgets pass.
-- [ ] The feature branch is committed and pushed; a Draft PR targets `main`;
-      GitHub Actions passes; the PR remains Draft and unmerged.
+- [x] The feature branch is committed and pushed; exact-head local, frozen,
+      and GitHub Actions verification passes; external review is clear.
 
 ## Explicit non-goals
 

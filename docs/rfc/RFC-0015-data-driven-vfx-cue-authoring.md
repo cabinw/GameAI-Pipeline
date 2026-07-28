@@ -1,6 +1,6 @@
 # RFC-0015: Data-Driven VFX Cue Authoring
 
-- Status: Accepted for TASK-014D1 implementation; external review pending
+- Status: Accepted
 - Date: 2026-07-28
 - Scope: engine-neutral authoring, validation, normalization, and compilation
 
