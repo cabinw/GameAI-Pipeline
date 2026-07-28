@@ -3912,6 +3912,8 @@ reference mutation.
   ownership cleanup, explicit recipe/primitive and blend-role realization,
   exact D1 range/order/particle-schedule validation, live-set global sorting,
   and hierarchy-corner AABB evaluation that preserves nested affine shear.
+- Creator regating additionally replaces shear-sensitive world-quaternion
+  decomposition with an exact world-axis-to-target-local round-trip guard.
 - Replace non-atomic instance creation with transactional renderer ownership,
   exact ownership-set diagnostics, destroy-once cleanup, and one terminal
   runtime failure path.

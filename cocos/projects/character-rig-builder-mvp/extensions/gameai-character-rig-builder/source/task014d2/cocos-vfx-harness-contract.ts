@@ -284,6 +284,19 @@ export function task014d2BoundsOverflowPx(bounds: Task014D2Bounds): number {
   );
 }
 
+export function task014d2SpatialErrorsWithinTolerance(
+  positionErrorPx: number,
+  rotationErrorDegrees: number,
+  aabbOverflowPx: number,
+): boolean {
+  return (
+    [positionErrorPx, rotationErrorDegrees, aabbOverflowPx].every(Number.isFinite) &&
+    positionErrorPx <= TASK014D2_SPATIAL.positionTolerancePx &&
+    rotationErrorDegrees <= TASK014D2_SPATIAL.rotationToleranceDegrees &&
+    aabbOverflowPx <= TASK014D2_SPATIAL.positionTolerancePx
+  );
+}
+
 export function task014d2MaterialBlendMatches(
   target: unknown,
   expectedSource: number,

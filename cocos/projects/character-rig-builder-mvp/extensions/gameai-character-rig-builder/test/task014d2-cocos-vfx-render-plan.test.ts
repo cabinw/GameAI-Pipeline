@@ -29,6 +29,7 @@ import {
   task014d2BoundsOverflowPx,
   task014d2MaterialBlendMatches,
   task014d2PointInsideSafeViewport,
+  task014d2SpatialErrorsWithinTolerance,
   task014d2VisibilityRequiresSpatialMeasurement,
   transformTask014D2Bounds,
   transformTask014D2NestedBounds,
@@ -1297,6 +1298,8 @@ test("transformed primitive bounds include rotation, non-uniform scale, and safe
   );
   assert.equal(task014d2BoundsOverflowPx(exactNested), 0);
   assert.ok(Object.values(exactNested).every(Number.isFinite));
+  assert.equal(task014d2SpatialErrorsWithinTolerance(0.5, 0.25, 0.5), true);
+  assert.equal(task014d2SpatialErrorsWithinTolerance(0, 0, 0.500001), false);
 });
 
 test("HUD and tests consume one typed diagnostic model", () => {
@@ -1408,6 +1411,8 @@ test("primitive dispatch is exhaustive and contains no cue-name conditional bran
   assert.match(actualRuntime, /node\.setParent\(target\)/u);
   assert.match(actualRuntime, /descriptor\.blendRole/u);
   assert.match(actualRuntime, /descriptor\.lifecycle/u);
+  assert.match(actualRuntime, /observedAxisInTarget/u);
+  assert.doesNotMatch(actualRuntime, /getWorldRotation/u);
   assert.match(actualRuntime, /activeStartStop/u);
   assert.match(
     actualRuntime,

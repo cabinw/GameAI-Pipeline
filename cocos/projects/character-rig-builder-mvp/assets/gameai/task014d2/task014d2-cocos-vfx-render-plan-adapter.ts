@@ -12,7 +12,6 @@ import {
   Layers,
   Material,
   Node,
-  Quat,
   resources,
   Sorting2D,
   Sprite,
@@ -31,6 +30,7 @@ import {
   formatTask014D2Diagnostics,
   task014d2BoundsOverflowPx,
   task014d2MaterialBlendMatches,
+  task014d2SpatialErrorsWithinTolerance,
   task014d2VisibilityRequiresSpatialMeasurement,
   type Task014D2Bounds,
   type Task014D2InputAction,
@@ -129,12 +129,9 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   private readonly verifiedBlendRenderers = new WeakSet<UIRenderer>();
   private readonly world = new Vec3();
   private readonly observedWorld = new Vec3();
+  private readonly observedAxisWorld = new Vec3();
   private readonly local = new Vec3();
   private readonly overlayLocal = new Vec3();
-  private readonly targetRotation = new Quat();
-  private readonly localRotation = new Quat();
-  private readonly expectedRotation = new Quat();
-  private readonly observedRotation = new Quat();
   private debug = false;
   maximumProjectionErrorPx = 0;
   maximumPositionErrorPx = 0;
@@ -303,10 +300,6 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       throw new Error("TASK_014D2_NON_FINITE_PROJECTION");
     }
     binding.node.setPosition(sample.position.x, sample.position.y, 0);
-    binding.target.getWorldRotation(this.targetRotation);
-    Quat.fromEuler(this.localRotation, 0, 0, sample.rotationDegrees);
-    Quat.multiply(this.expectedRotation, this.targetRotation, this.localRotation);
-    Quat.normalize(this.expectedRotation, this.expectedRotation);
     binding.node.setRotationFromEuler(0, 0, sample.rotationDegrees);
     binding.node.setScale(sample.scale.x, sample.scale.y, 1);
     this.applyVisual(binding, sample);
@@ -731,16 +724,35 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       this.maximumProjectionErrorPx,
       Math.hypot(roundTrip.x - sample.position.x, roundTrip.y - sample.position.y),
     );
-    binding.node.getWorldRotation(this.observedRotation);
-    const dot = Math.min(1, Math.abs(
-      this.observedRotation.x * this.expectedRotation.x +
-      this.observedRotation.y * this.expectedRotation.y +
-      this.observedRotation.z * this.expectedRotation.z +
-      this.observedRotation.w * this.expectedRotation.w,
+    const radians = (sample.rotationDegrees * Math.PI) / 180;
+    this.local.x = 1;
+    this.local.y = 0;
+    binding.node.getComponent(UITransform)?.convertToWorldSpaceAR(
+      this.local,
+      this.observedAxisWorld,
+    );
+    const observedAxisInTarget = targetTransform.convertToNodeSpaceAR(
+      this.observedAxisWorld,
+    );
+    const expectedAxisX = Math.cos(radians);
+    const expectedAxisY = Math.sin(radians);
+    const observedAxisX = observedAxisInTarget.x - sample.position.x;
+    const observedAxisY = observedAxisInTarget.y - sample.position.y;
+    const observedAxisLength = Math.hypot(observedAxisX, observedAxisY);
+    if (
+      !Number.isFinite(observedAxisLength) ||
+      observedAxisLength <= 0
+    ) {
+      throw new Error("TASK_014D2_NON_FINITE_ROTATION");
+    }
+    const dot = Math.max(-1, Math.min(
+      1,
+      (expectedAxisX * observedAxisX + expectedAxisY * observedAxisY) /
+        observedAxisLength,
     ));
     this.maximumRotationErrorDegrees = Math.max(
       this.maximumRotationErrorDegrees,
-      (2 * Math.acos(dot) * 180) / Math.PI,
+      (Math.acos(dot) * 180) / Math.PI,
     );
     const corners = [
       [binding.localBounds.minimumX, binding.localBounds.minimumY],
@@ -1190,13 +1202,14 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
       }
     }
     if (
-      (this.host?.maximumProjectionErrorPx ?? 0) >
-        TASK014D2_SPATIAL.positionTolerancePx ||
-      (this.host?.maximumPositionErrorPx ?? 0) >
-        TASK014D2_SPATIAL.positionTolerancePx ||
-      (this.host?.maximumRotationErrorDegrees ?? 0) >
-        TASK014D2_SPATIAL.rotationToleranceDegrees ||
-      (this.host?.maximumViewportOverflowPx ?? 0) > 0 ||
+      !task014d2SpatialErrorsWithinTolerance(
+        Math.max(
+          this.host?.maximumProjectionErrorPx ?? 0,
+          this.host?.maximumPositionErrorPx ?? 0,
+        ),
+        this.host?.maximumRotationErrorDegrees ?? 0,
+        this.host?.maximumViewportOverflowPx ?? 0,
+      ) ||
       (this.host?.materialBlendMismatches ?? 0) !== 0 ||
       (this.host?.duplicateDestroys ?? 0) !== 0 ||
       (this.host?.visibilityMismatches ?? 0) !== 0

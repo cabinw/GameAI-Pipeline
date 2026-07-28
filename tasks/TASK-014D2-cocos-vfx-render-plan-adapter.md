@@ -81,6 +81,11 @@ historical and is not acceptance proof.
   exact deterministic particle schedule; live instance sorting is ranked as
   one global set; and nested bounds preserve affine shear by transforming all
   corners through every hierarchy level.
+- Creator regating then exposed one engine-only measurement gap: quaternion
+  decomposition reports a false rotation delta when nested non-uniform scale
+  and rotation produce affine shear. Rotation tolerance now maps an observed
+  world-space direction axis back through the target transform and compares
+  it with the authored local axis without decomposing the matrix.
 - Creation and first update now form one transaction. Any construction,
   sampling, projection, viewport, or renderer-update failure removes the
   active key, detaches and destroys every owned node exactly once, and permits
