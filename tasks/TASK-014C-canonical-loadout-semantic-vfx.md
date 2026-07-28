@@ -1,6 +1,6 @@
 # TASK-014C: Canonical Full-Loadout Semantic VFX Integration
 
-- Status: Implemented — Pending External Visual Review
+- Status: Accepted
 - Date: 2026-07-27
 - Branch: `feat/task-014c-canonical-loadout-semantic-vfx`
 - Baseline: `48316aa2603f9235ebafc83c726b7f0bff822348`
@@ -174,13 +174,17 @@ Canvas region. Only `manifest.json` and the final MP4 may exist on
       content pass.
 - [x] Creator 3.8.8 and final evidence gates pass exactly as storyboarded.
 
-Implementation, automated verification, Creator acceptance, and local evidence
-self-review are complete. The temporary evidence handoff remains
-`pending-external-visual-review`; no TASK-014C PR has been created.
+Implementation, automated verification, Creator acceptance, and external
+visual review are complete. The accepted feature was published through PR #15
+and squash-merged to `main` at
+`5c3baba4062bd529bb6bd4b787b8c391452ee459`. The temporary evidence branch
+was removed after its manifest hashes and PASS conclusion were recorded; no
+MP4 is tracked by the feature or `main`.
 
 ## Non-goals
 
 No schema/version or evaluator-semantics change, loadout resolver rewrite,
 new VFX art, audio/gameplay execution, canonical V2 behavior change,
 superseded TASK-013 monolith reuse, Red Cap work, Unity/Godot/Windows claims,
-TASK-014D, tag, release, PR, merge, or protected-reference mutation.
+TASK-014D, tag, release, or protected-reference mutation was part of the
+implementation.

@@ -141,55 +141,47 @@ historical provenance and deterministic regression. Its generators are not
 part of the normal build and run only through the explicit
 `legacy:verify-task013-provenance` command.
 
-## Current status — v0.2.0 Character Loadout Baseline
+## Current status — v0.3.0 Character Semantic Events & VFX Baseline
 
-The Character Pipeline now validates deterministic Character Rig, Rig Layout,
-Rig Animation, and rigid Attachment Layout data; reconstructs authored
-production-lite characters; resolves composable loadouts; and adapts the
-resolved result to Cocos Creator.
+The accepted Character Pipeline combines the v0.2.0 canonical 12-state
+loadout with Character Semantic Events 1.0, deterministic persistent
+lifecycle coalescing, a Cocos Semantic VFX Adapter, and canonical full-loadout
+semantic target resolution.
 
 The authoritative flow is:
 
 ```text
-engine-neutral contracts
-→ semantic validation and resolveCharacterLoadout
-→ immutable resolved rig/loadout
-→ generated R6-compatible Cocos plan
-→ canonical Cocos V2 adapter
+Character Semantic Events contract
+→ deterministic evaluator
+→ canonical resolved character loadout
+→ evaluated semantic target/socket registry
+→ Cocos Semantic VFX Adapter
+→ renderer/cue registry
+→ Creator runtime
 ```
 
-The baseline supports a 17-part rigid base rig, layered head accessories, an
-11-part garment with authored AABB seam validation, and no/left/right
-one-handed props with hand overlays and sampled grip lock. The canonical
-12-state matrix composes base/accessories/garment membership with all three
-prop states.
+Engine-neutral event kinds are `vfx`, `audio`, and `gameplay`. The implemented
+runtime consumer is Cocos VFX only: validated audio and gameplay commands are
+not played or executed.
 
-Engine-neutral animation data supports Rest, Walk, Wave, Prop Swing, and
-Integration Stress. The canonical V2 runtime exposes the accepted Rest, Wave,
-Prop Swing, and Integration Stress controls plus Pause/Resume and Exact Reset.
+The Cocos Creator 3.8.8 macOS baseline drives alternating Footstep Dust,
+Wave/Prop Trail, and one coalesced Persistent Aura across all 12 canonical
+loadout states, no/left/right prop states, Transform Stress, Pause/Resume,
+track switching, rebuild, disposal, and Exact Reset. Stable states retain one
+runtime root and one input handler with zero duplicate starts, unknown stops,
+leaks, stale targets, non-finite transforms, or viewport overflow.
 
-Canonical production-facing entry points:
+Working-copy and tracked-files-only verification each pass 414/414 tests.
+Creator runtime acceptance and external visual review pass, while feature and
+documentation branches track zero evidence media.
 
-- Scene:
-  `cocos/projects/character-rig-builder-mvp/assets/composable-character-loadout-reference-v2.scene`
-- Adapter:
-  `cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/source/composable-loadout/canonical-loadout-adapter.ts`
-- Adapter ID: `composable-character-loadout-reference-v2`
+v0.3.0 is a prerelease framework baseline, not a finished commercial tool.
+Its VFX are procedural placeholders. Audio/gameplay consumers, reverse/seek,
+networking, VFX authoring UI, automatic effect fitting, Unity/Godot adapters,
+Windows verification, and original Red Cap reconstruction remain future work.
 
-The baseline passes 349/349 automated tests in both the working copy and a
-tracked-files-only frozen install. Its Creator 3.8.8 acceptance passed clean
-open/switch/reopen, 35/35 resources, all 12 states, semantic controls,
-runtime/spatial diagnostics, two lifecycle rebuilds, and Exact Reset with
-clean Creator and Preview consoles.
-
-The original `composable-full-loadout-reference.scene` is superseded and
-non-production. It remains only for historical provenance and deterministic
-legacy verification.
-
-Current limitations include rigid sprites, authored fitting and grip
-positions, transformed-AABB rather than cloth seam validation, in-place
-motion, and no IK, automatic fitting, cloth/prop physics, mesh deformation,
-animation blending, root motion, VFX runtime, Unity/Godot adapter, Windows
-validation, or production Red Cap reconstruction. See the
-[v0.2.0 release baseline](docs/releases/v0.2.0-character-loadout-baseline.md)
-and [compatibility matrix](docs/compatibility.md).
+See the [v0.3.0 release
+baseline](docs/releases/v0.3.0-character-semantic-events-vfx-baseline.md),
+[v0.2.0 loadout
+baseline](docs/releases/v0.2.0-character-loadout-baseline.md), and
+[compatibility matrix](docs/compatibility.md).

@@ -3,6 +3,77 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Implemented plan: v0.3.0 Character Semantic Events & VFX Baseline
+
+- Status: Draft PR pending review
+- Started: 2026-07-28
+- Branch: `docs/release-v0.3.0-semantic-vfx`
+- Baseline `main`: `5c3baba4062bd529bb6bd4b787b8c391452ee459`
+- Expected scope: at most 12 documentation files and 2,500 changed lines;
+  zero runtime, schema, test, Scene, `.meta`, package, lockfile, binary,
+  media, MP4, evidence-branch, tag, or GitHub Release changes
+
+### Goal
+
+Establish the documentation baseline for the accepted Character Semantic
+Events 1.0, persistent lifecycle correction, Cocos Semantic VFX Adapter, and
+canonical full-loadout integration. Position v0.3.0 as a prerelease framework
+baseline and separate accepted capabilities from future authoring, audio,
+gameplay, cross-engine, Windows, and production-art work.
+
+### Authoritative architecture
+
+```text
+Character Semantic Events contract
+→ deterministic evaluator
+→ canonical resolved character loadout
+→ evaluated semantic target/socket registry
+→ Cocos Semantic VFX Adapter
+→ renderer/cue registry
+→ Creator runtime
+```
+
+The engine-neutral contract supports typed VFX, audio, and gameplay events.
+Only Cocos VFX execution is implemented. Audio and gameplay remain validated
+contracts without playback, hitbox, damage, or other runtime consumers.
+
+### Boundaries
+
+- Create one release task and one v0.3.0 baseline document.
+- Update only current-facing release, roadmap, compatibility, index,
+  contract, animation, and accepted TASK-014C status documentation.
+- Preserve statements that accurately describe the historical scope of
+  TASK-014A, ADR-0015, RFC-0014, and older accepted baselines.
+- Record 414/414 working-copy and tracked-files-only verification, Creator
+  3.8.8 macOS acceptance, external visual review PASS, and zero tracked
+  evidence media.
+- Do not create or move `v0.3.0`, create a GitHub Release, change v0.2.0,
+  modify runtime/contracts/tests, or start TASK-014D.
+
+### Next direction
+
+Recommend TASK-014D — Data-Driven Production VFX Cue Authoring. Its future
+scope is a validated engine-neutral cue description that AI can generate or
+modify, reusable presets, timing/socket/transform/color/duration/layer
+preview, and compilation to Cocos renderer plans while preserving independent
+Unity/Godot adapter boundaries. Production-quality asset generation remains
+separate from runtime logic.
+
+### Done when
+
+- README, roadmap, changelog, documentation index, compatibility matrix,
+  current contract/animation guidance, TASK-014C status, and v0.2.0 release
+  page no longer present stale current-state claims.
+- The v0.3.0 task and release baseline document accepted architecture,
+  capabilities, runtime guarantees, verification, positioning, limitations,
+  and non-goals without claiming tag/release publication.
+- Markdown links/paths, release consistency, stale-statement audit,
+  `git diff --check`, working-copy and tracked-files-only 414/414
+  verification, post-verify closure, documentation-only scope, binary/media,
+  and tracked-MP4 gates pass.
+- One Draft PR targets `main`; Actions passes; the PR remains Draft and
+  unmerged; `v0.3.0` and TASK-014D remain uncreated.
+
 ## Completed plan: TASK-014B Minimal Cocos Semantic VFX Adapter
 
 - Status: Accepted after external visual review
