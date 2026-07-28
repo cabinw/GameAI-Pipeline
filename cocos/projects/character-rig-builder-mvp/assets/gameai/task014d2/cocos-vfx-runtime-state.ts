@@ -37,17 +37,21 @@ export interface CocosVfxRendererOwnership {
   readonly rendererId: string;
   readonly instanceId: string;
   readonly descriptorId: string;
+  readonly visibility: CocosVfxLayerVisibility;
 }
+
+export type CocosVfxLayerVisibility = "pending" | "active" | "removed";
 
 export interface CocosVfxRuntimeHost {
   createLayer(
     ownership: CocosVfxRendererOwnership,
     descriptor: CocosVfxLayerDescriptor,
   ): void;
-  updateLayer(
+  sampleLayer(
     rendererId: string,
     descriptor: CocosVfxLayerDescriptor,
     sample: VfxLayerSample,
+    visibility: CocosVfxLayerVisibility,
     commandElapsedSeconds: number,
   ): void;
   destroyLayer(rendererId: string, reason: string): void;
@@ -55,8 +59,9 @@ export interface CocosVfxRuntimeHost {
 }
 
 interface ActiveRenderer {
-  readonly ownership: CocosVfxRendererOwnership;
+  ownership: CocosVfxRendererOwnership;
   readonly descriptor: CocosVfxLayerDescriptor;
+  visibility: CocosVfxLayerVisibility;
 }
 
 interface ActiveCue {
@@ -76,6 +81,8 @@ export interface CocosVfxRuntimeSnapshot {
   readonly paused: boolean;
   readonly activeCueKeys: readonly string[];
   readonly activeRendererCount: number;
+  readonly pendingRendererCount: number;
+  readonly removedRendererCount: number;
   readonly missingRendererIds: readonly string[];
   readonly extraRendererIds: readonly string[];
   readonly mismatchedRendererIds: readonly string[];
@@ -90,7 +97,8 @@ function ownershipEqual(
 ): boolean {
   return left.rendererId === right.rendererId &&
     left.instanceId === right.instanceId &&
-    left.descriptorId === right.descriptorId;
+    left.descriptorId === right.descriptorId &&
+    left.visibility === right.visibility;
 }
 
 function runtimeError(error: unknown): CocosVfxRuntimeError {
@@ -171,7 +179,9 @@ export class CocosVfxRuntimeState {
           `${this.generation}:${key}:${descriptor.descriptorId}`,
         instanceId: key,
         descriptorId: descriptor.descriptorId,
+        visibility: "pending" as const,
       },
+      visibility: "pending" as CocosVfxLayerVisibility,
     }));
     const candidate: ActiveCue = {
       key,
@@ -272,7 +282,15 @@ export class CocosVfxRuntimeState {
     return {
       paused: this.paused,
       activeCueKeys: [...this.active.keys()].sort(compareCodeUnits),
-      activeRendererCount: actualEntries.length,
+      activeRendererCount: actualEntries.filter(
+        (ownership) => ownership.visibility === "active",
+      ).length,
+      pendingRendererCount: actualEntries.filter(
+        (ownership) => ownership.visibility === "pending",
+      ).length,
+      removedRendererCount: actualEntries.filter(
+        (ownership) => ownership.visibility === "removed",
+      ).length,
       missingRendererIds: missing,
       extraRendererIds: extra,
       mismatchedRendererIds: mismatched,
@@ -320,15 +338,21 @@ export class CocosVfxRuntimeState {
         renderer.descriptor.layer,
         active.elapsedSeconds,
       );
-      if (!sample.removed) allRemoved = false;
-      if (sample.active) {
-        this.host.updateLayer(
-          renderer.ownership.rendererId,
-          renderer.descriptor,
-          sample,
-          active.elapsedSeconds,
-        );
-      }
+      const visibility: CocosVfxLayerVisibility = sample.removed
+        ? "removed"
+        : sample.active
+          ? "active"
+          : "pending";
+      if (visibility !== "removed") allRemoved = false;
+      this.host.sampleLayer(
+        renderer.ownership.rendererId,
+        renderer.descriptor,
+        sample,
+        visibility,
+        active.elapsedSeconds,
+      );
+      renderer.visibility = visibility;
+      renderer.ownership = { ...renderer.ownership, visibility };
     }
     if (allRemoved) this.destroy(active, "one-shot-complete");
     return allRemoved;

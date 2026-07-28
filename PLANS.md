@@ -3,9 +3,9 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014D2 Minimal Cocos VFX Render Plan Adapter
+## Active plan: TASK-014D2 Final Runtime Semantics Closure
 
-- Status: Implementation and Creator gates complete; external visual review pending
+- Status: Final runtime-semantics remediation complete; external code and visual review pending
 - Started: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
@@ -46,6 +46,13 @@ time math, or canonical full-character integration.
 6. Commit and push the feature branch without a PR, publish video evidence
    only on `evidence/task-014d2`, verify its bytes and decode, and stop for
    external visual review without starting TASK-014D3.
+7. Close the final runtime findings append-only: inspect actual Cocos material
+   pass blend targets after `updateMaterial()`, propagate pending/active/removed
+   samples to the host with destroy-once ownership, and reject every
+   unrealizable registry recipe/primitive capability even when unused.
+8. Repeat all automated and Creator 3.8.8 gates, publish a third provenance-bound
+   evidence video while retaining both predecessors, and stop for final external
+   code and visual review.
 
 ### Done when
 

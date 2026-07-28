@@ -67,6 +67,7 @@ declare module "cc" {
     name: string;
     layer: number;
     active: boolean;
+    readonly activeInHierarchy: boolean;
     readonly children: readonly Node[];
     readonly position: Vec3;
     readonly eulerAngles: Vec3;
@@ -144,6 +145,11 @@ declare module "cc" {
   }
 
   export class SpriteFrame {}
+
+  export class Material {
+    copy(material: Material, overrides?: unknown): void;
+    destroy(): boolean;
+  }
 
   export class JsonAsset {
     readonly json: unknown;

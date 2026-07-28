@@ -251,7 +251,9 @@ function rendererKind(
   return null;
 }
 
-function blendState(role: VfxBlendRole): CocosVfxBlendState {
+export function cocosVfxBlendState(
+  role: VfxBlendRole,
+): CocosVfxBlendState {
   switch (role) {
     case "alpha":
       return { source: "src-alpha", destination: "one-minus-src-alpha" };
@@ -404,6 +406,23 @@ export function compileCocosVfxRenderDescriptors(
         ),
       );
       continue;
+    }
+    for (const [capabilityIndex, primitive] of
+      primitiveCapabilities.entries()) {
+      if (
+        rendererKind(
+          resource.recipeKind as VfxResourceRecipeKind,
+          primitive as VfxPrimitive,
+        ) === null
+      ) {
+        errors.push(
+          diagnostic(
+            CocosVfxPlanErrorCode.UNSUPPORTED_RECIPE,
+            `/resources/${index}/compatiblePrimitives/${capabilityIndex}`,
+            `Resource recipe ${String(resource.recipeKind)} has no concrete factory for ${String(primitive)}.`,
+          ),
+        );
+      }
     }
     resources.set(
       resource.resourceId,
@@ -672,7 +691,7 @@ export function compileCocosVfxRenderDescriptors(
             rendererKind: kind,
             resourceId: layer.resource.resourceId,
             blendRole: layer.blendRole,
-            blendState: blendState(layer.blendRole),
+            blendState: cocosVfxBlendState(layer.blendRole),
             lifecycle: cue.lifecycle,
             commandMode: cue.commandMode,
             sortingOrder: order,

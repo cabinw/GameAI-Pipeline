@@ -88,7 +88,20 @@ historical and is not acceptance proof.
 - Textured recipes produce Cocos `Sprite`/`SpriteFrame` realizations,
   procedural ring/ribbon recipes produce `Graphics`, and accepted alpha,
   additive, screen, and multiply roles compile to explicit blend-factor
-  states. Registry capabilities advertise only realizations that exist.
+  states. The host creates owned custom `Material` instances with explicit
+  pass-state overrides, calls `updateMaterial()`, and reads the resulting
+  Cocos material pass target before accepting each renderer. A startup gate
+  covers Sprite, Graphics, and particle Sprite for all four blend roles;
+  material-pass mismatch is terminal and visible in the shared HUD.
+  Registry capabilities advertise only realizations that exist, and every
+  declared recipe/primitive pair is checked even when no cue references it.
+- Every renderer starts inactive. The exact D1 sample is delivered for
+  pending, active, and removed states: pending/removed nodes are inactive and
+  bypass spatial measurement, active nodes render and measure, the final
+  phase-one sample remains visible, and individual layers become removed
+  independently while longer siblings continue. Ownership includes the
+  layer visibility state, while the HUD active-renderer count includes only
+  nodes that are actually renderable.
 - Active layers receive globally unique orders from authored order plus
   UTF-16 code-unit cue/layer/instance ordering inside the centralized VFX
   range. Activation order cannot affect the result and range overflow fails
@@ -106,7 +119,7 @@ historical and is not acceptance proof.
 
 ## Verification record
 
-- Direct adapter extension: 256/256 tests passed; Creator CI contract:
+- Direct adapter extension: 260/260 tests passed; Creator CI contract:
   3/3 tests passed; direct `@gameai/vfx-authoring`: 16/16 tests passed.
 - Working-copy and frozen tracked-files-only `CI=true pnpm verify`, schema and
   D1 vector identity, generated closure, metadata/atomic publication,
@@ -120,6 +133,12 @@ historical and is not acceptance proof.
   instances/renderers and zero stale/missing/extra/mismatched ownership,
   `0.000 px` maximum position/AABB overflow, and `0.000°` rotation error.
   Creator and Preview consoles contained zero relevant warnings/errors.
+- Final runtime-semantics closure measured twelve startup material-pass
+  checks (Sprite, Graphics, and particle Sprite across alpha, additive,
+  multiply, and screen) with zero mismatch. Focused regressions cover a
+  delayed Sprite remaining pending, Footstep ring removal before its longer
+  particle sibling, and Combined layer exits at 0.5, 0.65, and 0.8 seconds
+  with exact following-tick removal.
 - Replacement evidence is retained on `evidence/task-014d2`; the original is
   retained and marked `failed-external-review-incomplete-runtime-and-visual-coverage`.
 

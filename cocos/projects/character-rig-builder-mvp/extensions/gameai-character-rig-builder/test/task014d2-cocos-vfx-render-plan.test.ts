@@ -26,17 +26,21 @@ import {
   formatTask014D2Diagnostics,
   projectTask014D2WorldToOverlay,
   task014d2BoundsOverflowPx,
+  task014d2MaterialBlendMatches,
   task014d2PointInsideSafeViewport,
+  task014d2VisibilityRequiresSpatialMeasurement,
   transformTask014D2Bounds,
 } from "../source/task014d2/cocos-vfx-harness-contract";
 import {
   COCOS_VFX_PLAN_BUDGETS,
   compileCocosVfxRenderDescriptors,
+  cocosVfxBlendState,
   type CocosVfxLayerDescriptor,
   type CocosVfxResourceRecipe,
 } from "../source/task014d2/cocos-vfx-render-descriptor";
 import {
   CocosVfxRuntimeState,
+  type CocosVfxLayerVisibility,
   type CocosVfxRendererOwnership,
   type CocosVfxRuntimeHost,
 } from "../source/task014d2/cocos-vfx-runtime-state";
@@ -147,10 +151,11 @@ class FakeHost implements CocosVfxRuntimeHost {
     this.ownership.set(rendererId, ownership);
   }
 
-  updateLayer(
+  sampleLayer(
     rendererId: string,
     _descriptor: CocosVfxLayerDescriptor,
     sample: VfxLayerSample,
+    visibility: CocosVfxLayerVisibility,
     _commandElapsedSeconds: number,
   ): void {
     if (this.updateCount++ === this.failAtUpdate) {
@@ -158,6 +163,9 @@ class FakeHost implements CocosVfxRuntimeHost {
     }
     assert.ok(this.descriptors.has(rendererId));
     this.samples.set(rendererId, sample);
+    const ownership = this.ownership.get(rendererId);
+    assert.ok(ownership);
+    this.ownership.set(rendererId, { ...ownership, visibility });
   }
 
   destroyLayer(rendererId: string, reason: string): void {
@@ -168,7 +176,22 @@ class FakeHost implements CocosVfxRuntimeHost {
   }
 
   activeRendererCount(): number {
+    return [...this.ownership.values()].filter(
+      (ownership) => ownership.visibility === "active",
+    ).length;
+  }
+
+  ownedRendererCount(): number {
     return this.descriptors.size;
+  }
+
+  visibility(layerId: string): CocosVfxLayerVisibility | undefined {
+    const rendererId = [...this.descriptors.entries()].find(
+      ([, descriptor]) => descriptor.layerId === layerId,
+    )?.[0];
+    return rendererId === undefined
+      ? undefined
+      : this.ownership.get(rendererId)?.visibility;
   }
 
   rendererOwnership(): readonly CocosVfxRendererOwnership[] {
@@ -366,6 +389,39 @@ test("untrusted plan and registry values fail closed, stably, and without mutati
   }
 });
 
+test("unused registry recipe capabilities must each have a concrete renderer factory", () => {
+  const cases: readonly [
+    CocosVfxResourceRecipe["recipeKind"],
+    CocosVfxResourceRecipe["compatiblePrimitives"][number],
+  ][] = [
+    ["procedural-ring", "sprite-quad"],
+    ["procedural-ribbon", "ring"],
+    ["textured-sprite", "ring"],
+    ["textured-sprite", "ribbon"],
+  ];
+  for (const [recipeKind, primitive] of cases) {
+    const registry = [
+      ...TASK014D2_RESOURCE_REGISTRY,
+      {
+        resourceId: `unused.${recipeKind}.${primitive}`,
+        recipeKind,
+        compatiblePrimitives: [primitive],
+        compatibleBlendRoles: ["alpha"] as const,
+      },
+    ];
+    const before = structuredClone(registry);
+    const result = compileCocosVfxRenderDescriptors(renderPlan(), registry);
+    assert.equal(result.ok, false);
+    assert.equal("value" in result, false);
+    assert.deepEqual(registry, before);
+    if (!result.ok) {
+      assert.ok(result.errors.some((error) =>
+        error.code === CocosVfxPlanErrorCode.UNSUPPORTED_RECIPE &&
+        error.path.includes("compatiblePrimitives")));
+    }
+  }
+});
+
 test("malformed concrete layer fields and schedules never throw or emit partial descriptors", () => {
   const mutations: Array<(layer: Record<string, unknown>) => void> = [
     (layer) => { layer.order = 0.5; },
@@ -403,7 +459,7 @@ test("malformed concrete layer fields and schedules never throw or emit partial 
     expectCode(plan, CocosVfxPlanErrorCode.BUDGET_EXCEEDED));
 });
 
-test("every accepted layer compiles to its typed recipe, component, and real blend state", () => {
+test("every accepted layer compiles to its typed recipe and material-pass blend target", () => {
   const descriptors = descriptorPlan().cues.flatMap((cue) => cue.layers);
   const expected = new Map([
     ["textured-sprite:sprite-quad", "sprite"],
@@ -424,11 +480,51 @@ test("every accepted layer compiles to its typed recipe, component, and real ble
           ? { source: "src-alpha", destination: "one" }
           : { source: "one", destination: "one-minus-src-color" },
     );
+    const source = descriptor.blendState.source === "src-alpha"
+      ? 1
+      : descriptor.blendState.source === "one"
+        ? 2
+        : 3;
+    const destination =
+      descriptor.blendState.destination === "one-minus-src-alpha"
+        ? 4
+        : descriptor.blendState.destination === "one"
+          ? 2
+          : 5;
+    const actualPassTarget = { blendSrc: source, blendDst: destination };
+    assert.equal(
+      task014d2MaterialBlendMatches(
+        actualPassTarget,
+        source,
+        destination,
+      ),
+      true,
+    );
+    assert.equal(
+      task014d2MaterialBlendMatches(
+        { ...actualPassTarget, blendDst: -1 },
+        source,
+        destination,
+      ),
+      false,
+    );
   }
   assert.ok(descriptors.some((descriptor) =>
     descriptor.rendererKind === "sprite"));
   assert.ok(descriptors.some((descriptor) =>
     descriptor.rendererKind === "sprite-particles"));
+  assert.deepEqual(
+    ["alpha", "additive", "multiply", "screen"].map((role) =>
+      cocosVfxBlendState(
+        role as Parameters<typeof cocosVfxBlendState>[0],
+      )),
+    [
+      { source: "src-alpha", destination: "one-minus-src-alpha" },
+      { source: "src-alpha", destination: "one" },
+      { source: "dst-color", destination: "one-minus-src-alpha" },
+      { source: "one", destination: "one-minus-src-color" },
+    ],
+  );
 });
 
 test("descriptor budgets and concrete particle schedules fail without partial output", () => {
@@ -538,13 +634,109 @@ test("one-shot uses the final sample and removes exactly one canonical tick late
     cueId: plan.cues[0]?.cueId as string,
     commandId: "one",
   });
-  assert.equal(host.activeRendererCount(), 4);
+  assert.equal(host.activeRendererCount(), 2);
+  assert.equal(host.ownedRendererCount(), 4);
   runtime.tick(0.8);
-  assert.equal(host.activeRendererCount(), 4);
+  assert.equal(host.activeRendererCount(), 1);
   assert.ok([...host.samples.values()].some((sample) => sample.phase === 1));
   runtime.tick(1 / VFX_TIME_TICKS_PER_SECOND);
   assert.equal(host.activeRendererCount(), 0);
   assert.deepEqual(runtime.snapshot().activeCueKeys, []);
+});
+
+test("delayed layers remain pending and cannot render before their delay", () => {
+  assert.equal(task014d2VisibilityRequiresSpatialMeasurement("pending"), false);
+  assert.equal(task014d2VisibilityRequiresSpatialMeasurement("removed"), false);
+  assert.equal(task014d2VisibilityRequiresSpatialMeasurement("active"), true);
+  const plan = structuredClone(renderPlan());
+  const cue = plan.cues.find((candidate) =>
+    candidate.layers.some((layer) => layer.primitive === "sprite-quad"));
+  const layer = cue?.layers.find(
+    (candidate) => candidate.primitive === "sprite-quad",
+  );
+  assert.ok(cue);
+  assert.ok(layer);
+  (layer.timing as { delaySeconds: number }).delaySeconds = 0.1;
+  const compiled = descriptorPlan(plan);
+  const descriptorCue = compiled.cues.find(
+    (candidate) => candidate.cueId === cue.cueId,
+  );
+  assert.ok(descriptorCue);
+  const host = new FakeHost();
+  const runtime = new CocosVfxRuntimeState(compiled, host);
+  runtime.dispatch({
+    command: "emit",
+    cueId: descriptorCue.cueId,
+    commandId: "delayed-sprite",
+  });
+  assert.equal(host.visibility(layer.layerId), "pending");
+  assert.equal(
+    [...host.ownership.values()].filter(
+      (ownership) => ownership.visibility === "pending",
+    ).length,
+    3,
+  );
+  assert.equal(runtime.snapshot().pendingRendererCount, 3);
+  assert.equal(runtime.snapshot().activeRendererCount, 1);
+  runtime.tick(0.1);
+  assert.equal(host.visibility(layer.layerId), "active");
+  assert.equal(runtime.snapshot().pendingRendererCount, 0);
+});
+
+test("one-shot layers leave independently at their exact D1 boundaries", () => {
+  const plan = descriptorPlan();
+  const footstep = plan.cues.find((cue) =>
+    cue.layers.some((layer) => layer.layerId === "ground-ring"));
+  const combined = plan.cues.find((cue) =>
+    cue.layers.some((layer) => layer.layerId === "front-ribbon"));
+  assert.ok(footstep);
+  assert.ok(combined);
+  const tick = 1 / VFX_TIME_TICKS_PER_SECOND;
+
+  const sampleAt = (
+    cue: typeof footstep,
+    seconds: number,
+  ): FakeHost => {
+    const host = new FakeHost();
+    const runtime = new CocosVfxRuntimeState(plan, host);
+    runtime.dispatch({
+      command: "emit",
+      cueId: cue.cueId,
+      commandId: `sample-${seconds}`,
+    });
+    runtime.tick(seconds);
+    return host;
+  };
+
+  let host = sampleAt(footstep, 0.3);
+  assert.equal(host.visibility("ground-ring"), "active");
+  assert.equal(host.visibility("dust-burst"), "active");
+  host = sampleAt(footstep, 0.3 + tick);
+  assert.equal(host.visibility("ground-ring"), "removed");
+  assert.equal(host.visibility("dust-burst"), "active");
+  assert.equal(host.activeRendererCount(), 1);
+  host = sampleAt(footstep, 0.45);
+  assert.equal(host.visibility("dust-burst"), "active");
+  host = sampleAt(footstep, 0.45 + tick);
+  assert.equal(host.ownedRendererCount(), 0);
+
+  const boundaries = [
+    ["front-ribbon", 0.5],
+    ["spark-burst", 0.5],
+    ["middle-ring", 0.65],
+    ["back-glow", 0.8],
+  ] as const;
+  for (const [layerId, boundary] of boundaries) {
+    assert.equal(sampleAt(combined, boundary).visibility(layerId), "active");
+    const following = sampleAt(combined, boundary + tick);
+    if (boundary === 0.8) {
+      assert.equal(following.ownedRendererCount(), 0);
+    } else {
+      assert.equal(following.visibility(layerId), "removed");
+    }
+  }
+  assert.equal(sampleAt(combined, 0.5 + tick).activeRendererCount(), 2);
+  assert.equal(sampleAt(combined, 0.65 + tick).activeRendererCount(), 1);
 });
 
 test("looping skipped frames repeat until authoritative stop", () => {
@@ -636,6 +828,8 @@ test("persistent starts coalesce across six loops and cleanup is symmetric", () 
     paused: false,
     activeCueKeys: [],
     activeRendererCount: 0,
+    pendingRendererCount: 0,
+    removedRendererCount: 0,
     missingRendererIds: [],
     extraRendererIds: [],
     mismatchedRendererIds: [],
@@ -784,16 +978,18 @@ test("ownership snapshots detect missing, extra, and mismatched IDs even at equa
   });
   const first = host.rendererOwnership()[0];
   assert.ok(first);
+  const expectedActive = host.activeRendererCount();
   host.ownership.delete(first.rendererId);
   host.ownership.set("extra", {
     rendererId: "extra",
     instanceId: "other",
     descriptorId: "other",
+    visibility: first.visibility,
   });
   let snapshot = runtime.snapshot();
   assert.deepEqual(snapshot.missingRendererIds, [first.rendererId]);
   assert.deepEqual(snapshot.extraRendererIds, ["extra"]);
-  assert.equal(snapshot.activeRendererCount, plan.cues[0]?.layers.length);
+  assert.equal(snapshot.activeRendererCount, expectedActive);
 
   host.ownership.delete("extra");
   host.ownership.set(first.rendererId, {

@@ -96,10 +96,17 @@ export interface Task014D2RuntimeDiagnostics {
   coalescedPersistentStarts: number;
   activeInstances: number;
   activeRenderers: number;
+  pendingRenderers: number;
+  removedRenderers: number;
   missingRenderers: number;
   extraRenderers: number;
   mismatchedRenderers: number;
   staleRenderers: number;
+  rendererLeaks: number;
+  duplicateDestroys: number;
+  materialBlendChecks: number;
+  materialBlendMismatches: number;
+  visibilityMismatches: number;
   runtimeRoots: number;
   inputHandlers: number;
   activeRecipeBlendSummary: string;
@@ -121,10 +128,17 @@ Task014D2RuntimeDiagnostics {
     coalescedPersistentStarts: 0,
     activeInstances: 0,
     activeRenderers: 0,
+    pendingRenderers: 0,
+    removedRenderers: 0,
     missingRenderers: 0,
     extraRenderers: 0,
     mismatchedRenderers: 0,
     staleRenderers: 0,
+    rendererLeaks: 0,
+    duplicateDestroys: 0,
+    materialBlendChecks: 0,
+    materialBlendMismatches: 0,
+    visibilityMismatches: 0,
     runtimeRoots: 0,
     inputHandlers: 0,
     activeRecipeBlendSummary: "none",
@@ -150,7 +164,9 @@ export function formatTask014D2Diagnostics(
     `Gate ${state.ready ? "PASS" : "WAIT"} · ${state.playing ? "PLAYING" : "STOPPED"} ${state.elapsedSeconds.toFixed(2)}s · Stress ${state.stress ? "ON" : "OFF"} · Debug ${state.debug ? "ON" : "OFF"}`,
     `Setup ${diagnostics.setupCount} · Teardown ${diagnostics.teardownCount} · Rebuild ${diagnostics.rebuildCount} · Last ${diagnostics.lastAction}`,
     `Persistent attempts ${diagnostics.persistentStartAttempts} · accepted ${diagnostics.acceptedPersistentStarts} · coalesced ${diagnostics.coalescedPersistentStarts}`,
-    `Instances ${diagnostics.activeInstances} · Renderers ${diagnostics.activeRenderers} · Missing ${diagnostics.missingRenderers} · Extra ${diagnostics.extraRenderers} · Mismatch ${diagnostics.mismatchedRenderers} · Stale ${diagnostics.staleRenderers}`,
+    `Instances ${diagnostics.activeInstances} · Active renderers ${diagnostics.activeRenderers} · Missing ${diagnostics.missingRenderers} · Extra ${diagnostics.extraRenderers} · Mismatch ${diagnostics.mismatchedRenderers} · Stale ${diagnostics.staleRenderers}`,
+    `Layer states pending ${diagnostics.pendingRenderers} / active ${diagnostics.activeRenderers} / removed ${diagnostics.removedRenderers} · Visibility mismatch ${diagnostics.visibilityMismatches}`,
+    `Leak ${diagnostics.rendererLeaks} · Destroy duplicate ${diagnostics.duplicateDestroys} · Material blend ${diagnostics.materialBlendChecks} checked / ${diagnostics.materialBlendMismatches} mismatch`,
     `Root ${diagnostics.runtimeRoots} · Input ${diagnostics.inputHandlers} · Active ${diagnostics.activeRecipeBlendSummary}`,
     `Max position ${diagnostics.maximumPositionErrorPx.toFixed(3)}px · rotation ${diagnostics.maximumRotationErrorDegrees.toFixed(3)}° · AABB overflow ${diagnostics.maximumAabbOverflowPx.toFixed(3)}px`,
     diagnostics.terminalError || "No errors",
@@ -257,4 +273,28 @@ export function task014d2BoundsOverflowPx(bounds: Task014D2Bounds): number {
     -vertical - bounds.minimumY,
     bounds.maximumY - vertical,
   );
+}
+
+export function task014d2MaterialBlendMatches(
+  target: unknown,
+  expectedSource: number,
+  expectedDestination: number,
+): boolean {
+  if (typeof target !== "object" || target === null) return false;
+  const blendTarget = target as {
+    readonly blendSrc?: unknown;
+    readonly blendDst?: unknown;
+  };
+  return (
+    Number.isFinite(expectedSource) &&
+    Number.isFinite(expectedDestination) &&
+    blendTarget.blendSrc === expectedSource &&
+    blendTarget.blendDst === expectedDestination
+  );
+}
+
+export function task014d2VisibilityRequiresSpatialMeasurement(
+  visibility: "pending" | "active" | "removed",
+): boolean {
+  return visibility === "active";
 }

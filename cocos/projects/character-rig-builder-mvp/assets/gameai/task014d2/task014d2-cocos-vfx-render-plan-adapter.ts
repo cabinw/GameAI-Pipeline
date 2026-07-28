@@ -10,6 +10,7 @@ import {
   KeyCode,
   Label,
   Layers,
+  Material,
   Node,
   Quat,
   resources,
@@ -29,11 +30,15 @@ import {
   createTask014D2RuntimeDiagnostics,
   formatTask014D2Diagnostics,
   task014d2BoundsOverflowPx,
+  task014d2MaterialBlendMatches,
+  task014d2VisibilityRequiresSpatialMeasurement,
   type Task014D2Bounds,
   type Task014D2InputAction,
 } from "./cocos-vfx-harness-contract";
 import {
   compileCocosVfxRenderDescriptors,
+  cocosVfxBlendState,
+  type CocosVfxBlendState,
   type CocosVfxBlendFactor,
   type CocosVfxCueDescriptor,
   type CocosVfxDescriptorPlan,
@@ -41,7 +46,12 @@ import {
   type CocosVfxRendererKind,
 } from "./cocos-vfx-render-descriptor";
 import {
+  CocosVfxPlanErrorCode,
+  CocosVfxRuntimeError,
+} from "./cocos-vfx-diagnostics";
+import {
   CocosVfxRuntimeState,
+  type CocosVfxLayerVisibility,
   type CocosVfxRendererOwnership,
   type CocosVfxRuntimeHost,
 } from "./cocos-vfx-runtime-state";
@@ -66,6 +76,8 @@ interface RendererBinding {
   readonly graphics: Graphics | null;
   readonly particleSprites: readonly Sprite[];
   readonly debugGraphics: Graphics;
+  readonly materials: readonly Material[];
+  visibility: CocosVfxLayerVisibility;
   localBounds: Task014D2Bounds;
 }
 
@@ -75,9 +87,19 @@ interface CocosResourceRealization {
   readonly spriteFrame: SpriteFrame | null;
 }
 
-interface BlendMutableRenderer {
+interface BlendInspectableRenderer {
   srcBlendFactor: gfx.BlendFactor;
   dstBlendFactor: gfx.BlendFactor;
+  updateMaterial(): void;
+  customMaterial: Material | null;
+  getRenderMaterial(index: number): Material | null;
+  getMaterialInstance(index: number): {
+    readonly passes: readonly {
+      readonly blendState: {
+        readonly targets: readonly unknown[];
+      };
+    }[];
+  } | null;
 }
 
 function blendFactor(value: CocosVfxBlendFactor): gfx.BlendFactor {
@@ -103,6 +125,7 @@ function assertNever(value: never): never {
 
 class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   private readonly bindings = new Map<string, RendererBinding>();
+  private readonly verifiedBlendRenderers = new WeakSet<UIRenderer>();
   private readonly world = new Vec3();
   private readonly local = new Vec3();
   private readonly overlayLocal = new Vec3();
@@ -116,6 +139,10 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   maximumPositionErrorPx = 0;
   maximumRotationErrorDegrees = 0;
   maximumViewportOverflowPx = 0;
+  materialBlendChecks = 0;
+  materialBlendMismatches = 0;
+  duplicateDestroys = 0;
+  visibilityMismatches = 0;
 
   constructor(
     private readonly overlay: Node,
@@ -123,6 +150,50 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     private readonly cueOrder: ReadonlyMap<string, number>,
     private readonly resources: ReadonlyMap<string, CocosResourceRealization>,
   ) {}
+
+  verifyMaterialBlendGate(spriteFrame: SpriteFrame): void {
+    const roles = [
+      "alpha",
+      "additive",
+      "multiply",
+      "screen",
+    ] as const satisfies readonly CocosVfxLayerDescriptor["blendRole"][];
+    const rendererKinds = [
+      "sprite",
+      "graphics",
+      "particle-sprite",
+    ] as const;
+    for (const role of roles) {
+      for (const rendererKind of rendererKinds) {
+        const node = new Node(`BlendGate_${rendererKind}_${role}`);
+        node.active = false;
+        node.layer = Layers.Enum.UI_2D;
+        node.setParent(this.overlay);
+        node.addComponent(UITransform).setContentSize(8, 8);
+        let material: Material | null = null;
+        try {
+          const renderer = rendererKind === "graphics"
+            ? node.addComponent(Graphics)
+            : node.addComponent(Sprite);
+          if (renderer instanceof Sprite) renderer.spriteFrame = spriteFrame;
+          material = this.applyBlend(
+            renderer,
+            cocosVfxBlendState(role),
+          );
+          node.active = true;
+          this.verifyRendererBlend(
+            renderer,
+            cocosVfxBlendState(role),
+            `blend-gate:${rendererKind}:${role}`,
+          );
+        } finally {
+          node.removeFromParent();
+          node.destroy();
+          material?.destroy();
+        }
+      }
+    }
+  }
 
   createLayer(
     ownership: CocosVfxRendererOwnership,
@@ -139,11 +210,18 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     }
     this.assertLifecycle(descriptor);
     const node = new Node(`VFX_${ownership.rendererId}`);
+    node.active = false;
     node.layer = Layers.Enum.UI_2D;
     node.setParent(this.overlay);
     node.addComponent(UITransform).setContentSize(240, 240);
+    const materials: Material[] = [];
     try {
-      const recipe = this.createRecipe(node, descriptor, resource);
+      const recipe = this.createRecipe(
+        node,
+        descriptor,
+        resource,
+        materials,
+      );
       const debugNode = new Node("DebugBounds");
       debugNode.layer = Layers.Enum.UI_2D;
       debugNode.setParent(node);
@@ -162,6 +240,8 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
         graphics: recipe.graphics,
         particleSprites: recipe.particleSprites,
         debugGraphics,
+        materials: recipe.materials,
+        visibility: "pending",
         localBounds: recipe.localBounds,
       });
       this.refreshSorting();
@@ -169,20 +249,30 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       this.bindings.delete(ownership.rendererId);
       node.removeFromParent();
       node.destroy();
+      for (const material of materials) material.destroy();
       throw error;
     }
   }
 
-  updateLayer(
+  sampleLayer(
     rendererId: string,
     descriptor: CocosVfxLayerDescriptor,
     sample: VfxLayerSample,
+    visibility: CocosVfxLayerVisibility,
     commandElapsedSeconds: number,
   ): void {
     const binding = this.bindings.get(rendererId);
     if (binding === undefined || binding.descriptor !== descriptor) {
       throw new Error(`TASK_014D2_UNKNOWN_OR_MISMATCHED_RENDERER: ${rendererId}`);
     }
+    binding.visibility = visibility;
+    if (!task014d2VisibilityRequiresSpatialMeasurement(visibility)) {
+      binding.node.active = false;
+      if (binding.node.activeInHierarchy) this.visibilityMismatches += 1;
+      return;
+    }
+    binding.node.active = true;
+    if (!binding.node.activeInHierarchy) this.visibilityMismatches += 1;
     if (![
       sample.position.x,
       sample.position.y,
@@ -222,33 +312,44 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       1,
     );
     this.applyVisual(binding, sample);
+    this.verifyActiveRendererBlends(binding);
     this.measure(binding, sample, targetTransform, overlayTransform);
   }
 
   destroyLayer(rendererId: string, _reason: string): void {
     const binding = this.bindings.get(rendererId);
-    if (binding === undefined) return;
+    if (binding === undefined) {
+      this.duplicateDestroys += 1;
+      return;
+    }
     this.bindings.delete(rendererId);
+    for (const material of binding.materials) material.destroy();
     binding.node.removeFromParent();
     binding.node.destroy();
     this.refreshSorting();
   }
 
   rendererOwnership(): readonly CocosVfxRendererOwnership[] {
-    return [...this.bindings.values()].map((binding) => binding.ownership);
+    return [...this.bindings.values()].map((binding) => ({
+      ...binding.ownership,
+      visibility: binding.visibility,
+    }));
   }
 
   setDebug(value: boolean): void {
     this.debug = value;
     for (const binding of this.bindings.values()) {
-      binding.debugGraphics.node.active = value;
+      binding.debugGraphics.node.active =
+        value && binding.visibility === "active";
       if (value) this.drawDebugBounds(binding);
     }
   }
 
   activeSummary(): string {
-    const values = [...this.bindings.values()].map((binding) =>
-      `${binding.descriptor.rendererKind}/${binding.descriptor.blendRole}`);
+    const values = [...this.bindings.values()]
+      .filter((binding) => binding.visibility === "active")
+      .map((binding) =>
+        `${binding.descriptor.rendererKind}/${binding.descriptor.blendRole}`);
     return [...new Set(values)].sort(compareCodeUnits).join(", ") || "none";
   }
 
@@ -276,11 +377,13 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     node: Node,
     descriptor: CocosVfxLayerDescriptor,
     resource: CocosResourceRealization,
+    materials: Material[],
   ): {
     renderers: readonly UIRenderer[];
     sorting: readonly Sorting2D[];
     graphics: Graphics | null;
     particleSprites: readonly Sprite[];
+    materials: readonly Material[];
     localBounds: Task014D2Bounds;
   } {
     switch (descriptor.rendererKind) {
@@ -291,7 +394,11 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
         }
         sprite.spriteFrame = resource.spriteFrame;
         node.getComponent(UITransform)?.setContentSize(108, 108);
-        this.applyBlend(sprite, descriptor);
+        const material = this.applyBlend(
+          sprite,
+          descriptor.blendState,
+        );
+        materials.push(material);
         const sorting = node.addComponent(Sorting2D);
         sorting.sortingOrder = descriptor.sortingOrder;
         return {
@@ -299,6 +406,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           sorting: [sorting],
           graphics: null,
           particleSprites: [],
+          materials,
           localBounds: {
             minimumX: -54,
             minimumY: -54,
@@ -310,7 +418,11 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       case "graphics-ring":
       case "graphics-ribbon": {
         const graphics = node.addComponent(Graphics);
-        this.applyBlend(graphics, descriptor);
+        const material = this.applyBlend(
+          graphics,
+          descriptor.blendState,
+        );
+        materials.push(material);
         const sorting = node.addComponent(Sorting2D);
         sorting.sortingOrder = descriptor.sortingOrder;
         return {
@@ -318,6 +430,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           sorting: [sorting],
           graphics,
           particleSprites: [],
+          materials,
           localBounds: descriptor.rendererKind === "graphics-ring"
             ? { minimumX: -72, minimumY: -72, maximumX: 72, maximumY: 72 }
             : { minimumX: -104, minimumY: -58, maximumX: 50, maximumY: 60 },
@@ -335,7 +448,10 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           particleNode.addComponent(UITransform).setContentSize(14, 14);
           const sprite = particleNode.addComponent(Sprite);
           sprite.spriteFrame = resource.spriteFrame;
-          this.applyBlend(sprite, descriptor);
+          materials.push(this.applyBlend(
+            sprite,
+            descriptor.blendState,
+          ));
           const sorting = particleNode.addComponent(Sorting2D);
           sorting.sortingOrder = descriptor.sortingOrder;
           particleSorting.push(sorting);
@@ -347,6 +463,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           sorting: particleSorting,
           graphics: null,
           particleSprites: particles,
+          materials,
           localBounds: { minimumX: 0, minimumY: 0, maximumX: 0, maximumY: 0 },
         };
       }
@@ -357,11 +474,90 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
 
   private applyBlend(
     renderer: Sprite | Graphics,
-    descriptor: CocosVfxLayerDescriptor,
+    blendState: CocosVfxBlendState,
+  ): Material {
+    const materialRenderer =
+      renderer as unknown as BlendInspectableRenderer;
+    const expectedSource = blendFactor(blendState.source);
+    const expectedDestination = blendFactor(
+      blendState.destination,
+    );
+    materialRenderer.updateMaterial();
+    const baseMaterial = materialRenderer.getRenderMaterial(0);
+    if (baseMaterial === null) {
+      throw new Error("TASK_014D2_BASE_MATERIAL_MISSING");
+    }
+    const material = new Material();
+    try {
+      material.copy(baseMaterial, {
+        states: {
+          blendState: {
+            targets: [{
+              blend: true,
+              blendSrc: expectedSource,
+              blendDst: expectedDestination,
+              blendSrcAlpha: gfx.BlendFactor.ONE,
+              blendDstAlpha: gfx.BlendFactor.ONE_MINUS_SRC_ALPHA,
+            }],
+          },
+        },
+      });
+      materialRenderer.srcBlendFactor = expectedSource;
+      materialRenderer.dstBlendFactor = expectedDestination;
+      materialRenderer.customMaterial = material;
+      materialRenderer.updateMaterial();
+      return material;
+    } catch (error) {
+      material.destroy();
+      throw error;
+    }
+  }
+
+  private verifyActiveRendererBlends(binding: RendererBinding): void {
+    for (const [index, renderer] of binding.renderers.entries()) {
+      if (
+        renderer.node.activeInHierarchy &&
+        !this.verifiedBlendRenderers.has(renderer)
+      ) {
+        this.verifyRendererBlend(
+          renderer,
+          binding.descriptor.blendState,
+          `${binding.descriptor.descriptorId}:renderer:${index}`,
+        );
+      }
+    }
+  }
+
+  private verifyRendererBlend(
+    renderer: UIRenderer,
+    blendState: CocosVfxBlendState,
+    diagnosticId: string,
   ): void {
-    const mutable = renderer as unknown as BlendMutableRenderer;
-    mutable.srcBlendFactor = blendFactor(descriptor.blendState.source);
-    mutable.dstBlendFactor = blendFactor(descriptor.blendState.destination);
+    const materialRenderer =
+      renderer as unknown as BlendInspectableRenderer;
+    const expectedSource = blendFactor(blendState.source);
+    const expectedDestination = blendFactor(
+      blendState.destination,
+    );
+    const target = materialRenderer
+      .getMaterialInstance(0)
+      ?.passes[0]
+      ?.blendState.targets[0];
+    this.materialBlendChecks += 1;
+    if (
+      !task014d2MaterialBlendMatches(
+        target,
+        expectedSource,
+        expectedDestination,
+      )
+    ) {
+      this.materialBlendMismatches += 1;
+      throw new CocosVfxRuntimeError(
+        CocosVfxPlanErrorCode.MATERIAL_BLEND_MISMATCH,
+        `COCOS_VFX_MATERIAL_BLEND_MISMATCH: ${diagnosticId} expected ${expectedSource}/${expectedDestination} observed ${String((target as { blendSrc?: unknown } | undefined)?.blendSrc)}/${String((target as { blendDst?: unknown } | undefined)?.blendDst)}`,
+      );
+    }
+    this.verifiedBlendRenderers.add(renderer);
   }
 
   private refreshSorting(): void {
@@ -426,6 +622,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       default:
         assertNever(binding.descriptor.rendererKind);
     }
+    binding.debugGraphics.node.active = this.debug;
     if (this.debug) this.drawDebugBounds(binding);
   }
 
@@ -713,6 +910,13 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
       cueOrder,
       resourcesById,
     );
+    const spriteFrame = [...resourcesById.values()].find(
+      (resource) => resource.spriteFrame !== null,
+    )?.spriteFrame;
+    if (spriteFrame === null || spriteFrame === undefined) {
+      throw new Error("TASK_014D2_BLEND_GATE_SPRITE_FRAME_MISSING");
+    }
+    this.host.verifyMaterialBlendGate(spriteFrame);
     this.runtime = new CocosVfxRuntimeState(plan, this.host);
     const hudNode = this.target("Task014D2Hud", root, -620, 340);
     const hudTransform = hudNode.getComponent(UITransform) as UITransform;
@@ -944,7 +1148,10 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
         TASK014D2_SPATIAL.positionTolerancePx ||
       (this.host?.maximumRotationErrorDegrees ?? 0) >
         TASK014D2_SPATIAL.rotationToleranceDegrees ||
-      (this.host?.maximumViewportOverflowPx ?? 0) > 0
+      (this.host?.maximumViewportOverflowPx ?? 0) > 0 ||
+      (this.host?.materialBlendMismatches ?? 0) !== 0 ||
+      (this.host?.duplicateDestroys ?? 0) !== 0 ||
+      (this.host?.visibilityMismatches ?? 0) !== 0
     ) {
       throw new Error("TASK_014D2_SPATIAL_TOLERANCE_FAILED");
     }
@@ -954,12 +1161,26 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     const snapshot = this.runtime?.snapshot();
     this.diagnostics.activeInstances = snapshot?.activeCueKeys.length ?? 0;
     this.diagnostics.activeRenderers = snapshot?.activeRendererCount ?? 0;
+    this.diagnostics.pendingRenderers =
+      snapshot?.pendingRendererCount ?? 0;
+    this.diagnostics.removedRenderers =
+      snapshot?.removedRendererCount ?? 0;
     this.diagnostics.missingRenderers =
       snapshot?.missingRendererIds.length ?? 0;
     this.diagnostics.extraRenderers = snapshot?.extraRendererIds.length ?? 0;
     this.diagnostics.mismatchedRenderers =
       snapshot?.mismatchedRendererIds.length ?? 0;
     this.diagnostics.staleRenderers = snapshot?.staleRendererCount ?? 0;
+    this.diagnostics.rendererLeaks =
+      snapshot?.extraRendererIds.length ?? 0;
+    this.diagnostics.duplicateDestroys =
+      this.host?.duplicateDestroys ?? 0;
+    this.diagnostics.materialBlendChecks =
+      this.host?.materialBlendChecks ?? 0;
+    this.diagnostics.materialBlendMismatches =
+      this.host?.materialBlendMismatches ?? 0;
+    this.diagnostics.visibilityMismatches =
+      this.host?.visibilityMismatches ?? 0;
     this.diagnostics.runtimeRoots = this.runtimeRootCount();
     this.diagnostics.inputHandlers = this.inputRegistered ? 1 : 0;
     this.diagnostics.activeRecipeBlendSummary =
