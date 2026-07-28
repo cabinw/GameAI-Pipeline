@@ -25,7 +25,9 @@ import {
   createTask014D2RuntimeDiagnostics,
   composeTask014D2Affine,
   formatTask014D2Diagnostics,
+  measureTask014D2RoiDifference,
   projectTask014D2WorldToOverlay,
+  runTask014D2FailureCleanup,
   task014d2BoundsOverflowPx,
   task014d2MaterialBlendMatches,
   task014d2PointInsideSafeViewport,
@@ -1333,6 +1335,100 @@ test("HUD and tests consume one typed diagnostic model", () => {
   }
 });
 
+test("setup faults preserve the first error and sweep every partial owner before retry", () => {
+  for (const fault of [
+    "material-mismatch",
+    "registered-before-throw",
+    "initial-sample",
+    "hud-input-setup",
+    "cleanup-failure",
+  ]) {
+    const state = {
+      input: fault === "registered-before-throw" ? 1 : 0,
+      root: 1,
+      runtime: 1,
+      hostBindings: 2,
+      materials: 2,
+      generation: 4,
+    };
+    const result = runTask014D2FailureCleanup(
+      new Error(`first:${fault}`),
+      [
+        {
+          id: "runtime",
+          run: () => {
+            state.runtime = 0;
+            if (fault === "cleanup-failure") {
+              throw new Error("later cleanup failure");
+            }
+          },
+        },
+        { id: "input", run: () => { state.input = 0; } },
+        {
+          id: "host",
+          run: () => {
+            state.hostBindings = 0;
+            state.materials = 0;
+          },
+        },
+        { id: "root", run: () => { state.root = 0; } },
+        { id: "generation", run: () => { state.generation += 1; } },
+        { id: "root", run: () => { throw new Error("duplicate step"); } },
+      ],
+    );
+    assert.equal(result.firstError, `first:${fault}`);
+    assert.deepEqual(
+      result.completedStepIds,
+      ["runtime", "input", "host", "root", "generation"],
+    );
+    assert.deepEqual(state, {
+      input: 0,
+      root: 0,
+      runtime: 0,
+      hostBindings: 0,
+      materials: 0,
+      generation: 5,
+    });
+    const retry = {
+      root: state.root + 1,
+      input: state.input + 1,
+      ready: true,
+      terminalError: "",
+    };
+    assert.deepEqual(retry, {
+      root: 1,
+      input: 1,
+      ready: true,
+      terminalError: "",
+    });
+  }
+});
+
+test("Trail ROI gate requires visible pixels, stable Pause, and changing Resume", () => {
+  const reset = new Uint8Array(4_000);
+  const active = new Uint8Array(reset);
+  for (let pixel = 0; pixel < 640; pixel += 1) {
+    active[pixel * 4 + 1] = 32;
+    active[pixel * 4 + 3] = 255;
+  }
+  const visible = measureTask014D2RoiDifference(reset, active);
+  assert.ok(visible.maxChannelDifference >= 20);
+  assert.ok(visible.changedPixels >= 500);
+  assert.deepEqual(measureTask014D2RoiDifference(active, active), {
+    maxChannelDifference: 0,
+    changedPixels: 0,
+  });
+  const resumed = new Uint8Array(active);
+  resumed[900 * 4 + 1] = 48;
+  assert.ok(
+    measureTask014D2RoiDifference(active, resumed).changedPixels > 0,
+  );
+  assert.throws(
+    () => measureTask014D2RoiDifference(reset, new Uint8Array(3)),
+    /TASK_014D2_INVALID_ROI_PIXEL_BUFFER/u,
+  );
+});
+
 test("generated D2 mirrors, exact D1 sampler source, and concrete plan data are closed", () => {
   const modules = readdirSync(sourceRoot)
     .filter((name) => name.endsWith(".ts"))
@@ -1412,6 +1508,22 @@ test("primitive dispatch is exhaustive and contains no cue-name conditional bran
   assert.match(actualRuntime, /descriptor\.blendRole/u);
   assert.match(actualRuntime, /descriptor\.lifecycle/u);
   assert.match(actualRuntime, /observedAxisInTarget/u);
+  assert.match(
+    actualRuntime,
+    /renderer instanceof Graphics[\s\S]*getMaterialInstance\(0\)\?\.recompileShaders/u,
+  );
+  assert.match(actualRuntime, /addComponent\(Graphics\);\s*graphics\.stroke\(\)/u);
+  assert.match(actualRuntime, /showFailureHud/u);
+  assert.match(actualRuntime, /destroyAll\("terminal-failure"\)/u);
+  for (const fault of [
+    "material-mismatch",
+    "registered-before-throw",
+    "initial-sample",
+    "hud-input-setup",
+    "cleanup-failure",
+  ]) {
+    assert.match(actualRuntime, new RegExp(`injectSetupFault\\("${fault}"\\)`, "u"));
+  }
   assert.doesNotMatch(actualRuntime, /getWorldRotation/u);
   assert.match(actualRuntime, /activeStartStop/u);
   assert.match(

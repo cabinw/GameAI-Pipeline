@@ -28,6 +28,7 @@ import {
   TASK014D2_SPATIAL,
   createTask014D2RuntimeDiagnostics,
   formatTask014D2Diagnostics,
+  runTask014D2FailureCleanup,
   task014d2BoundsOverflowPx,
   task014d2MaterialBlendMatches,
   task014d2SpatialErrorsWithinTolerance,
@@ -95,6 +96,7 @@ interface BlendInspectableRenderer {
   customMaterial: Material | null;
   getRenderMaterial(index: number): Material | null;
   getMaterialInstance(index: number): {
+    recompileShaders(defines: Readonly<Record<string, boolean>>): void;
     readonly passes: readonly {
       readonly blendState: {
         readonly targets: readonly unknown[];
@@ -174,6 +176,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
             ? node.addComponent(Graphics)
             : node.addComponent(Sprite);
           if (renderer instanceof Sprite) renderer.spriteFrame = spriteFrame;
+          if (renderer instanceof Graphics) renderer.stroke();
           material = this.applyBlend(
             renderer,
             role,
@@ -320,6 +323,18 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     this.refreshSorting();
   }
 
+  destroyAll(reason: string): void {
+    let firstError: unknown = null;
+    for (const rendererId of [...this.bindings.keys()]) {
+      try {
+        this.destroyLayer(rendererId, reason);
+      } catch (error) {
+        firstError ??= error;
+      }
+    }
+    if (firstError !== null) throw firstError;
+  }
+
   rendererOwnership(): readonly CocosVfxRendererOwnership[] {
     return [...this.bindings.values()].map((binding) => ({
       ...binding.ownership,
@@ -434,7 +449,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           sprite,
           descriptor.blendRole,
         );
-        materials.push(material);
+        if (material !== null) materials.push(material);
         const sorting = node.addComponent(Sorting2D);
         sorting.sortingOrder = descriptor.sortingOrder;
         return {
@@ -454,11 +469,12 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       case "graphics-ring":
       case "graphics-ribbon": {
         const graphics = node.addComponent(Graphics);
+        graphics.stroke();
         const material = this.applyBlend(
           graphics,
           descriptor.blendRole,
         );
-        materials.push(material);
+        if (material !== null) materials.push(material);
         const sorting = node.addComponent(Sorting2D);
         sorting.sortingOrder = descriptor.sortingOrder;
         return {
@@ -484,10 +500,11 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           particleNode.addComponent(UITransform).setContentSize(14, 14);
           const sprite = particleNode.addComponent(Sprite);
           sprite.spriteFrame = resource.spriteFrame;
-          materials.push(this.applyBlend(
+          const material = this.applyBlend(
             sprite,
             descriptor.blendRole,
-          ));
+          );
+          if (material !== null) materials.push(material);
           const sorting = particleNode.addComponent(Sorting2D);
           sorting.sortingOrder = descriptor.sortingOrder;
           particleSorting.push(sorting);
@@ -511,7 +528,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   private applyBlend(
     renderer: Sprite | Graphics,
     blendRole: CocosVfxLayerDescriptor["blendRole"],
-  ): Material {
+  ): Material | null {
     const blendState = cocosVfxBlendState(blendRole);
     const materialRenderer =
       renderer as unknown as BlendInspectableRenderer;
@@ -519,6 +536,8 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     const expectedDestination = blendFactor(
       blendState.destination,
     );
+    materialRenderer.srcBlendFactor = expectedSource;
+    materialRenderer.dstBlendFactor = expectedDestination;
     materialRenderer.updateMaterial();
     const baseMaterial = materialRenderer.getRenderMaterial(0);
     if (baseMaterial === null) {
@@ -539,9 +558,12 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           },
         },
       });
-      materialRenderer.srcBlendFactor = expectedSource;
-      materialRenderer.dstBlendFactor = expectedDestination;
       materialRenderer.customMaterial = material;
+      if (renderer instanceof Graphics) {
+        materialRenderer.getMaterialInstance(0)?.recompileShaders({
+          USE_LOCAL: true,
+        });
+      }
       materialRenderer.updateMaterial();
       return material;
     } catch (error) {
@@ -724,36 +746,35 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       this.maximumProjectionErrorPx,
       Math.hypot(roundTrip.x - sample.position.x, roundTrip.y - sample.position.y),
     );
-    const radians = (sample.rotationDegrees * Math.PI) / 180;
-    this.local.x = 1;
-    this.local.y = 0;
-    binding.node.getComponent(UITransform)?.convertToWorldSpaceAR(
-      this.local,
-      this.observedAxisWorld,
-    );
-    const observedAxisInTarget = targetTransform.convertToNodeSpaceAR(
-      this.observedAxisWorld,
-    );
-    const expectedAxisX = Math.cos(radians);
-    const expectedAxisY = Math.sin(radians);
-    const observedAxisX = observedAxisInTarget.x - sample.position.x;
-    const observedAxisY = observedAxisInTarget.y - sample.position.y;
-    const observedAxisLength = Math.hypot(observedAxisX, observedAxisY);
-    if (
-      !Number.isFinite(observedAxisLength) ||
-      observedAxisLength <= 0
-    ) {
-      throw new Error("TASK_014D2_NON_FINITE_ROTATION");
+    if (Math.abs(sample.scale.x) + Math.abs(sample.scale.y) > 1e-12) {
+      const radians = (sample.rotationDegrees * Math.PI) / 180;
+      this.local.x = Math.abs(sample.scale.x) > 1e-12 ? 1 : 0;
+      this.local.y = this.local.x === 0 ? 1 : 0;
+      binding.node.getComponent(UITransform)?.convertToWorldSpaceAR(
+        this.local,
+        this.observedAxisWorld,
+      );
+      const observedAxisInTarget = targetTransform.convertToNodeSpaceAR(
+        this.observedAxisWorld,
+      );
+      const expectedAxisX = Math.cos(radians);
+      const expectedAxisY = Math.sin(radians);
+      const observedAxisX = observedAxisInTarget.x - sample.position.x;
+      const observedAxisY = observedAxisInTarget.y - sample.position.y;
+      const observedAxisLength = Math.hypot(observedAxisX, observedAxisY);
+      if (!Number.isFinite(observedAxisLength) || observedAxisLength <= 0) {
+        throw new Error("TASK_014D2_NON_FINITE_ROTATION");
+      }
+      const dot = Math.max(-1, Math.min(
+        1,
+        (expectedAxisX * observedAxisX + expectedAxisY * observedAxisY) /
+          observedAxisLength,
+      ));
+      this.maximumRotationErrorDegrees = Math.max(
+        this.maximumRotationErrorDegrees,
+        (Math.acos(dot) * 180) / Math.PI,
+      );
     }
-    const dot = Math.max(-1, Math.min(
-      1,
-      (expectedAxisX * observedAxisX + expectedAxisY * observedAxisY) /
-        observedAxisLength,
-    ));
-    this.maximumRotationErrorDegrees = Math.max(
-      this.maximumRotationErrorDegrees,
-      (Math.acos(dot) * 180) / Math.PI,
-    );
     const corners = [
       [binding.localBounds.minimumX, binding.localBounds.minimumY],
       [binding.localBounds.minimumX, binding.localBounds.maximumY],
@@ -828,6 +849,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private stressRoot: Node | null = null;
   private overlay: Node | null = null;
   private hud: Label | null = null;
+  private failureHud: Node | null = null;
   private descriptorPlan: CocosVfxDescriptorPlan | null = null;
   private host: CocosRenderPlanHost | null = null;
   private runtime: CocosVfxRuntimeState | null = null;
@@ -839,6 +861,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private elapsedSeconds = 0;
   private commandCounter = 0;
   private terminal = false;
+  private readonly injectedFaults = new Set<string>();
   private activeStartStop: {
     cueId: string;
     instanceId: string;
@@ -885,6 +908,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   }
 
   private beginSetup(): void {
+    this.destroyFailureHud();
     const generation = ++this.generation;
     this.ready = false;
     this.terminal = false;
@@ -925,11 +949,16 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
             });
           }
           this.buildRuntime(compiled.value, realizations);
+          this.injectSetupFault("material-mismatch");
+          this.injectSetupFault("cleanup-trigger", "cleanup-failure");
           if (generation !== this.generation) return;
           this.ready = true;
           this.diagnostics.setupCount += 1;
           this.exactReset("Initial Reset");
+          this.injectSetupFault("initial-sample");
           this.registerInput();
+          this.injectSetupFault("registered-before-throw");
+          this.injectSetupFault("hud-input-setup");
           this.syncDiagnostics();
           this.updateHud();
           console.info("TASK_014D2_RUNTIME_READY", this.snapshot());
@@ -1138,6 +1167,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.unregisterInput();
     this.destroyRuntimeRoot();
     this.clearRuntimeReferences();
+    this.destroyFailureHud();
   }
 
   private destroyRuntimeRoot(): void {
@@ -1160,23 +1190,69 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
 
   private unregisterInput(): void {
     if (!this.inputRegistered) return;
-    input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-    this.inputRegistered = false;
+    try {
+      input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+    } finally {
+      this.inputRegistered = false;
+    }
   }
 
   private enterTerminalFailure(error: unknown): void {
     if (this.terminal) return;
     this.terminal = true;
+    ++this.generation;
     this.ready = false;
     this.playing = false;
-    this.runtime?.cleanup("terminal-failure");
-    this.activeStartStop = null;
-    this.unregisterInput();
-    this.diagnostics.terminalError =
-      error instanceof Error ? error.message : String(error);
+    const result = runTask014D2FailureCleanup(error, [
+      {
+        id: "injected-cleanup",
+        run: () => this.injectSetupFault("cleanup-failure"),
+      },
+      { id: "runtime", run: () => this.runtime?.cleanup("terminal-failure") },
+      { id: "input", run: () => this.unregisterInput() },
+      { id: "host", run: () => this.host?.destroyAll("terminal-failure") },
+      { id: "root", run: () => this.destroyRuntimeRoot() },
+      { id: "references", run: () => this.clearRuntimeReferences() },
+    ]);
+    this.diagnostics.terminalError = result.firstError;
     this.syncDiagnostics();
-    this.updateHud();
+    this.showFailureHud();
     console.error(this.diagnostics.terminalError);
+  }
+
+  private showFailureHud(): void {
+    this.destroyFailureHud();
+    const node = this.target("Task014D2FailureHud", this.node, -620, 340);
+    const transform = node.getComponent(UITransform) as UITransform;
+    transform.setContentSize(1240, 190);
+    transform.setAnchorPoint(0, 1);
+    const label = node.addComponent(Label);
+    label.fontSize = 14;
+    label.lineHeight = 19;
+    label.color = new Color(248, 113, 113, 255);
+    label.string = formatTask014D2Diagnostics(this.diagnostics, {
+      ready: false,
+      playing: false,
+      elapsedSeconds: this.elapsedSeconds,
+      stress: this.stress,
+      debug: this.debug,
+    });
+    node.addComponent(Sorting2D).sortingOrder = TASK014D2_SORTING.hud;
+    this.failureHud = node;
+  }
+
+  private destroyFailureHud(): void {
+    this.failureHud?.removeFromParent();
+    this.failureHud?.destroy();
+    this.failureHud = null;
+  }
+
+  private injectSetupFault(stage: string, requestedStage = stage): void {
+    const requested = new URLSearchParams(globalThis.location?.search ?? "")
+      .get("task014d2Fault");
+    if (requested !== requestedStage || this.injectedFaults.has(stage)) return;
+    this.injectedFaults.add(stage);
+    throw new Error(`TASK_014D2_INJECTED_SETUP_FAULT:${stage}`);
   }
 
   private assertRuntime(): void {

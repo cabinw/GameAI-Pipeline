@@ -115,6 +115,67 @@ export interface Task014D2RuntimeDiagnostics {
   terminalError: string;
 }
 
+export interface Task014D2CleanupStep {
+  readonly id: string;
+  readonly run: () => void;
+}
+
+export interface Task014D2CleanupResult {
+  readonly firstError: string;
+  readonly cleanupErrors: readonly string[];
+  readonly completedStepIds: readonly string[];
+}
+
+export function runTask014D2FailureCleanup(
+  error: unknown,
+  steps: readonly Task014D2CleanupStep[],
+): Task014D2CleanupResult {
+  const firstError = error instanceof Error ? error.message : String(error);
+  const cleanupErrors: string[] = [];
+  const completedStepIds: string[] = [];
+  const seen = new Set<string>();
+  for (const step of steps) {
+    if (seen.has(step.id)) continue;
+    seen.add(step.id);
+    try {
+      step.run();
+    } catch (cleanupError) {
+      cleanupErrors.push(
+        cleanupError instanceof Error
+          ? cleanupError.message
+          : String(cleanupError),
+      );
+    } finally {
+      completedStepIds.push(step.id);
+    }
+  }
+  return { firstError, cleanupErrors, completedStepIds };
+}
+
+export function measureTask014D2RoiDifference(
+  reference: ArrayLike<number>,
+  observed: ArrayLike<number>,
+): Readonly<{ maxChannelDifference: number; changedPixels: number }> {
+  if (reference.length !== observed.length || reference.length % 4 !== 0) {
+    throw new Error("TASK_014D2_INVALID_ROI_PIXEL_BUFFER");
+  }
+  let maxChannelDifference = 0;
+  let changedPixels = 0;
+  for (let offset = 0; offset < reference.length; offset += 4) {
+    let pixelChanged = false;
+    for (let channel = 0; channel < 3; channel += 1) {
+      const difference = Math.abs(
+        Number(reference[offset + channel]) -
+        Number(observed[offset + channel]),
+      );
+      maxChannelDifference = Math.max(maxChannelDifference, difference);
+      if (difference > 0) pixelChanged = true;
+    }
+    if (pixelChanged) changedPixels += 1;
+  }
+  return { maxChannelDifference, changedPixels };
+}
+
 export function createTask014D2RuntimeDiagnostics():
 Task014D2RuntimeDiagnostics {
   return {

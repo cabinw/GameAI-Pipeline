@@ -148,6 +148,7 @@ declare module "cc" {
 
   export class Material {
     copy(material: Material, overrides?: unknown): void;
+    recompileShaders(defines: Readonly<Record<string, boolean>>): void;
     destroy(): boolean;
   }
 

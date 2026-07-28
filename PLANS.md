@@ -5,11 +5,11 @@ time.
 
 ## Active plan: TASK-014D2 Final Runtime Semantics Closure
 
-- Status: Final runtime-semantics remediation complete; external code and visual review pending
+- Status: Transaction/Trail remediation complete; external code and visual review pending
 - Started: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
-- Scope ceiling: at most 48 changed files and 8,000 changed lines.
+- Scope ceiling: at most 48 changed files and 8,500 changed lines.
 - Feature branch media budget: zero MP4 or other generated evidence media.
 
 ### Goal
@@ -53,13 +53,18 @@ time math, or canonical full-character integration.
 8. Repeat all automated and Creator 3.8.8 gates, publish a third provenance-bound
    evidence video while retaining both predecessors, and stop for final external
    code and visual review.
+9. Close the external-review findings append-only: make setup failure cleanup
+   transactional with a root-independent terminal HUD and retry, preserve the
+   first failure across cleanup faults, retain the built-in Graphics material
+   so ribbon vertices honor node transforms, and add framebuffer ROI gates for
+   standalone, paused/resumed, stressed, and post-rebuild Trail.
 
 ### Done when
 
 - All pure and Creator gates pass with all four primitives visibly exercised.
 - Exact Reset is Rest, stopped at `0.00s`, stress/debug off, zero active/stale
   renderers, one runtime root, and one input handler.
-- Feature scope is within 48 files/8,000 lines with zero tracked MP4 files.
+- Feature scope is within 48 files/8,500 lines with zero tracked MP4 files.
 - Evidence is isolated, reproducible, decoded, and available for review.
 
 ## Accepted plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract

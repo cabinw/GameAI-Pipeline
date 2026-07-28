@@ -4,7 +4,7 @@
 - Date: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
-- Maximum scope: 48 changed files, 8,000 changed lines
+- Maximum scope: 48 changed files, 8,500 changed lines
 
 ## Objective
 
@@ -73,6 +73,28 @@ historical and is not acceptance proof.
 
 ## Remediation closure
 
+- Setup is now one failure transaction from resource completion through
+  material gate, host/runtime construction, initial Reset/sample, HUD, and
+  input registration. The first error survives cleanup faults; input,
+  runtime/host bindings, owned renderers/materials, partial root, references,
+  and generation callbacks are swept once. A Canvas-owned failure HUD remains
+  after the runtime root reaches zero, while a later enable/retry starts clean.
+- A five-case fault matrix covers material mismatch, a registered input before
+  throw, initial sample, HUD/input setup, and cleanup failure. Creator negative
+  runs visibly end at root `0`, input `0`, no owners/leaks, and retain the
+  injected setup error before a clean normal `READY` recovery.
+- The invisible Trail was not a color or D1 sampling defect. Cocos Graphics
+  creates its real `ui-graphics-material` lazily and custom material instances
+  must compile `USE_LOCAL`; copying the pre-Graphics material made submitted
+  ribbon vertices render at the Canvas origin while node diagnostics remained
+  correct. Graphics now initializes first, copies the real pass, recompiles
+  the material instance with `USE_LOCAL`, and retains authored additive blend.
+- The Trail framebuffer ROI relative to Exact Reset measures maximum-channel
+  difference `252` and `3,647` changed pixels. Paused frames are byte-stable
+  (`0` / `0`); Resume changes `3,661` pixels with maximum-channel difference
+  `248`. A legal phase-one sample with zero scale no longer asks for an
+  undefined rotation measurement.
+
 - The final boundary audit closed five residual proof gaps: a host that
   registered a renderer before throwing is now swept by observed ownership;
   the Creator host explicitly binds every recipe/primitive pair and derives
@@ -132,9 +154,10 @@ historical and is not acceptance proof.
 
 ## Verification record
 
-- Direct adapter extension: 260/260 tests passed; Creator CI contract:
+- Direct adapter extension: 262/262 tests passed; Creator CI contract:
   3/3 tests passed; direct `@gameai/vfx-authoring`: 16/16 tests passed.
-- Working-copy and frozen tracked-files-only `CI=true pnpm verify`, schema and
+- Working-copy and frozen tracked-files-only `CI=true pnpm verify` each passed
+  the 460/460 workspace baseline. Schema and
   D1 vector identity, generated closure, metadata/atomic publication,
   Markdown links, diff/byte/clean-tree closure, and media audits passed.
 - Creator 3.8.8 passed clean import/open, alternate-Scene reopen, second
