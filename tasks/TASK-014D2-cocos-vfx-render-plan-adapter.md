@@ -99,6 +99,10 @@ historical and is not acceptance proof.
 - One typed diagnostics value supplies both HUD and tests, including lifecycle
   counters, exact ownership, recipe/blend summary, spatial maxima, root/input
   counts, and terminal state.
+- Selecting a different start/stop reference first sends the authoritative
+  stop for the previously selected start/stop instance; repeated starts of the
+  same persistent reference still coalesce. The six-attempt Aura acceptance
+  state therefore contains exactly one active instance.
 
 ## Verification record
 

@@ -3925,6 +3925,9 @@ reference mutation.
 - Runtime factories exhaustively realize typed textured-sprite,
   procedural-ring, procedural-ribbon, alpha, additive, screen, lifecycle, and
   particle behavior without cue/resource-name dispatch.
+- Switching between looping and persistent references sends an authoritative
+  stop before the new start, while repeated starts of the same persistent
+  reference coalesce to one active instance.
 - Global sorting is unique and activation-order independent; transformed
   four-corner bounds include nested rotation, non-uniform Stress, and
   primitive/particle geometry.

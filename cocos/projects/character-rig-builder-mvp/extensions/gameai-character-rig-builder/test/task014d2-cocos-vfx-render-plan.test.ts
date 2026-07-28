@@ -570,6 +570,37 @@ test("looping skipped frames repeat until authoritative stop", () => {
   assert.equal(host.activeRendererCount(), 0);
 });
 
+test("switching start-stop references stops the previous instance before persistent coalescing", () => {
+  const plan = descriptorPlan();
+  const looping = plan.cues.find((cue) => cue.lifecycle === "looping");
+  const persistent = plan.cues.find((cue) => cue.lifecycle === "persistent");
+  assert.ok(looping);
+  assert.ok(persistent);
+  const host = new FakeHost();
+  const runtime = new CocosVfxRuntimeState(plan, host);
+  runtime.dispatch({
+    command: "start",
+    cueId: looping.cueId,
+    commandId: "looping-start",
+    instanceId: "looping-instance",
+  });
+  runtime.dispatch({
+    command: "stop",
+    instanceId: "looping-instance",
+    reason: "switch",
+  });
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    runtime.dispatch({
+      command: "start",
+      cueId: persistent.cueId,
+      commandId: `persistent-start-${attempt}`,
+      instanceId: "persistent-instance",
+    });
+  }
+  assert.deepEqual(runtime.snapshot().activeCueKeys, ["persistent-instance"]);
+  assert.equal(host.activeRendererCount(), persistent.layers.length);
+});
+
 test("persistent starts coalesce across six loops and cleanup is symmetric", () => {
   const plan = descriptorPlan();
   const cue = plan.cues.find(
@@ -981,6 +1012,11 @@ test("primitive dispatch is exhaustive and contains no cue-name conditional bran
   assert.match(actualRuntime, /rendererKind/u);
   assert.match(actualRuntime, /recipeKind/u);
   assert.match(actualRuntime, /descriptor\.lifecycle/u);
+  assert.match(actualRuntime, /activeStartStop/u);
+  assert.match(
+    actualRuntime,
+    /command:\s*"stop"[\s\S]*activeStartStop[\s\S]*command:\s*"start"/u,
+  );
   const primitives = descriptorPlan().cues.flatMap((cue) =>
     cue.layers.map((layer) => layer.primitive),
   );

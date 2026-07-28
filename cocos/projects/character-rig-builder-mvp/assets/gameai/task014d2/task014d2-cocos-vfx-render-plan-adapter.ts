@@ -582,6 +582,10 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private elapsedSeconds = 0;
   private commandCounter = 0;
   private terminal = false;
+  private activeStartStop: {
+    cueId: string;
+    instanceId: string;
+  } | null = null;
   private readonly diagnostics = createTask014D2RuntimeDiagnostics();
   private readonly onKeyDown = (event: EventKeyboard): void => {
     const key = this.keyName(event.keyCode);
@@ -770,6 +774,18 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
           commandId: `command-${++this.commandCounter}`,
         });
       } else {
+        const instanceId = `${cue.lifecycle}-instance`;
+        if (
+          this.activeStartStop !== null &&
+          this.activeStartStop.cueId !== cue.cueId
+        ) {
+          this.runtime.dispatch({
+            command: "stop",
+            instanceId: this.activeStartStop.instanceId,
+            reason: "switch",
+          });
+          this.activeStartStop = null;
+        }
         if (cue.lifecycle === "persistent") {
           this.diagnostics.persistentStartAttempts += 1;
         }
@@ -777,8 +793,11 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
           command: "start",
           cueId: cue.cueId,
           commandId: `command-${++this.commandCounter}`,
-          instanceId: `${cue.lifecycle}-instance`,
+          instanceId,
         });
+        if (result.accepted) {
+          this.activeStartStop = { cueId: cue.cueId, instanceId };
+        }
         if (cue.lifecycle === "persistent") {
           if (result.accepted) this.diagnostics.acceptedPersistentStarts += 1;
           if (result.coalesced) this.diagnostics.coalescedPersistentStarts += 1;
@@ -827,6 +846,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
 
   private exactReset(action: string): void {
     this.runtime?.cleanup("reset");
+    this.activeStartStop = null;
     this.runtime?.setPaused(true);
     this.playing = false;
     this.elapsedSeconds = 0;
@@ -871,6 +891,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.hud = null;
     this.host = null;
     this.runtime = null;
+    this.activeStartStop = null;
   }
 
   private unregisterInput(): void {
@@ -885,6 +906,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.ready = false;
     this.playing = false;
     this.runtime?.cleanup("terminal-failure");
+    this.activeStartStop = null;
     this.unregisterInput();
     this.diagnostics.terminalError =
       error instanceof Error ? error.message : String(error);
