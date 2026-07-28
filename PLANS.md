@@ -3,6 +3,58 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Active plan: TASK-014D2 Minimal Cocos VFX Render Plan Adapter
+
+- Status: Implementation and Creator gates complete; external visual review pending
+- Started: 2026-07-28
+- Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
+- Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
+- Scope ceiling: at most 48 changed files and 8,000 changed lines.
+- Feature branch media budget: zero MP4 or other generated evidence media.
+
+### Goal
+
+Prove that the accepted TASK-014D1 concrete Render Plan drives a generic
+Cocos Creator 3.8.8 runtime through typed primitive/recipe/lifecycle dispatch,
+without authoring parsing, parameter resolution, cue-name matching, duplicated
+time math, or canonical full-character integration.
+
+### Boundaries
+
+- Compile the four accepted D1 fixtures before runtime and feed only concrete
+  normalized plans into a pure Cocos render-descriptor compiler.
+- Consume the exact D1 sampler through a generated source mirror; never
+  reimplement phase, curve, delay, repetition, or final-boundary behavior.
+- Dispatch exhaustively by primitive, portable recipe, blend capability, and
+  exact lifecycle.
+- Add one minimal Creator-owned Scene with generic nested targets, procedural
+  Graphics recipes, centralized sorting, projection and viewport guards,
+  readiness gating, generation ownership, symmetric teardown, and one shared
+  HUD/input registry.
+- Keep TASK-014D3, canonical loadouts, authoring UI, Unity/Godot, Red Cap,
+  Windows, tags, Releases, and D1 semantics out of scope.
+
+### Execution
+
+1. Add the bounded TASK-014D2 specification and declare scope before code.
+2. Add pure descriptor compilation, runtime lifecycle state, typed resources,
+   sorting/spatial/input contracts, stable failures, and focused tests.
+3. Generate stale-checked concrete plan data and exact D1 sampler/type mirrors.
+4. Add the Creator runtime host, stable metadata, and minimal acceptance Scene.
+5. Run direct, workspace, frozen, closure, metadata, binary/media, scope, and
+   Creator 3.8.8 clean-open/reopen/restart/Preview acceptance gates.
+6. Commit and push the feature branch without a PR, publish video evidence
+   only on `evidence/task-014d2`, verify its bytes and decode, and stop for
+   external visual review without starting TASK-014D3.
+
+### Done when
+
+- All pure and Creator gates pass with all four primitives visibly exercised.
+- Exact Reset is Rest, stopped at `0.00s`, stress/debug off, zero active/stale
+  renderers, one runtime root, and one input handler.
+- Feature scope is within 48 files/8,000 lines with zero tracked MP4 files.
+- Evidence is isolated, reproducible, decoded, and available for review.
+
 ## Accepted plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
 
 - Status: Accepted

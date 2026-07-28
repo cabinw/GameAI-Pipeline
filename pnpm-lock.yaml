@@ -57,6 +57,9 @@ importers:
       '@gameai/rig-layout-generator':
         specifier: workspace:*
         version: link:../../../../../pipelines/rig-layout-generator
+      '@gameai/vfx-authoring':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/vfx-authoring
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

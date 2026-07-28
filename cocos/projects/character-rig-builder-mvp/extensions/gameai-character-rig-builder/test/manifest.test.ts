@@ -45,6 +45,7 @@ describe("Character Rig Builder extension manifest", () => {
         "@gameai/character-semantic-events",
         "@gameai/rig-animation",
         "@gameai/rig-layout-generator",
+        "@gameai/vfx-authoring",
       ],
     );
     await Promise.all([
