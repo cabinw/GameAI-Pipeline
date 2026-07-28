@@ -1,0 +1,25 @@
+{
+  "document": {
+    "schemaVersion": "1.0.0",
+    "cues": [
+      {
+        "cueId": "footstep-dust",
+        "lifecycle": "one-shot",
+        "deterministicSeed": 1,
+        "layers": [
+          {
+            "layerId": "dust",
+            "order": 0,
+            "primitive": "ring",
+            "logicalResourceId": "vfx.ring-soft",
+            "durationSeconds": 1
+          }
+        ]
+      }
+    ]
+  },
+  "semanticCues": [
+    { "cueId": "footstep-dust", "commandMode": "emit" },
+    { "cueId": "footstep-dust", "commandMode": "start-stop" }
+  ]
+}

@@ -5,7 +5,15 @@
       "cueId": "footstep-dust",
       "lifecycle": "one-shot",
       "deterministicSeed": -1,
-      "layers": []
+      "layers": [
+        {
+          "layerId": "dust",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1
+        }
+      ]
     }
   ]
 }

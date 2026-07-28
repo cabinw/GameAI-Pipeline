@@ -14,6 +14,14 @@
           "maximum": 3
         }
       ],
+      "bindings": [
+        {
+          "parameterId": "trail-width",
+          "layerId": "core-ribbon",
+          "target": "scale-y",
+          "operation": "multiply"
+        }
+      ],
       "layers": [
         {
           "layerId": "core-ribbon",

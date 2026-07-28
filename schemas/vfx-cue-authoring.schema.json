@@ -89,11 +89,28 @@
         "parameterId": { "$ref": "#/definitions/identifier" },
         "type": {
           "type": "string",
-          "enum": ["number", "integer", "boolean", "color"]
+          "enum": ["number", "integer", "color"]
         },
         "default": {},
         "minimum": { "type": "number" },
         "maximum": { "type": "number" }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parameterId", "layerId", "target", "operation"],
+      "properties": {
+        "parameterId": { "$ref": "#/definitions/identifier" },
+        "layerId": { "$ref": "#/definitions/identifier" },
+        "target": {
+          "type": "string",
+          "enum": ["opacity", "scale-x", "scale-y", "color"]
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["multiply", "replace"]
+        }
       }
     },
     "layer": {
@@ -139,6 +156,10 @@
         "parameters": {
           "type": "array",
           "items": { "$ref": "#/definitions/parameter" }
+        },
+        "bindings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/binding" }
         },
         "layers": {
           "type": "array",

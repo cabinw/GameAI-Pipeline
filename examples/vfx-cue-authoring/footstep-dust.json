@@ -14,6 +14,20 @@
           "maximum": 1
         }
       ],
+      "bindings": [
+        {
+          "parameterId": "intensity",
+          "layerId": "dust-burst",
+          "target": "opacity",
+          "operation": "multiply"
+        },
+        {
+          "parameterId": "intensity",
+          "layerId": "ground-ring",
+          "target": "opacity",
+          "operation": "multiply"
+        }
+      ],
       "layers": [
         {
           "layerId": "dust-burst",

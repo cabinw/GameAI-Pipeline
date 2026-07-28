@@ -5,7 +5,15 @@
       "cueId": "unknown-cue",
       "lifecycle": "one-shot",
       "deterministicSeed": 1,
-      "layers": []
+      "layers": [
+        {
+          "layerId": "unknown",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1
+        }
+      ]
     }
   ]
 }

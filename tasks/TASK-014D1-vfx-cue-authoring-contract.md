@@ -1,11 +1,12 @@
 # TASK-014D1: Engine-Neutral Data-Driven VFX Cue Authoring Contract
 
-- Status: Implementation and local verification complete; publication pending
+- Status: Remediation complete; Draft PR pending external review.
 - Date: 2026-07-28
 - Branch: `feat/task-014d1-vfx-cue-authoring-contract`
 - Baseline: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
 - Release baseline: `v0.3.0` at the same commit
-- Maximum scope: 40 changed files, 7,000 changed lines, text/source only
+- Maximum remediated PR scope: 55 changed files, 10,000 changed lines,
+  text/source only
 
 ## Objective
 
@@ -24,6 +25,17 @@ Render Plans without changing Character Semantic Events semantics.
       rotation curves, seed, emission, blend role, and lifecycle rules.
 - [x] Typed parameter defaults and bounded compilation overrides validate and
       normalize deterministically.
+- [x] Closed typed bindings resolve defaults/overrides into concrete layer
+      opacity, scale, and color; parameter names do not enter the plan.
+- [x] Typed semantic descriptors enforce `emit` versus `start-stop`
+      lifecycle compatibility without duplicating evaluator behavior.
+- [x] Typed resource descriptors carry recipe/capability data and reject
+      incompatible primitive use without name-based dispatch.
+- [x] Linear/clamped curves, exact endpoints, relative transform and alpha
+      composition, layer activation/repetition/removal boundaries, and
+      semantic cleanup authority are executable and tested.
+- [x] Burst schedules, zero-rate behavior, lifetime fit, `xorshift32-v1`, and
+      compiled random samples have golden vectors.
 - [x] Every public diagnostic has one focused invalid textual fixture and is
       asserted by tests.
 - [x] Unknown semantic cue/resource IDs, unsupported primitives, non-finite

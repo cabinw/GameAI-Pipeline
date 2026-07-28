@@ -5,16 +5,16 @@ time.
 
 ## Active plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
 
-- Status: Implementation and local verification complete; publication pending
+- Status: Remediation complete; Draft PR pending external review.
 - Started: 2026-07-28
 - Branch: `feat/task-014d1-vfx-cue-authoring-contract`
 - Baseline `main`: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
 - Release baseline: `v0.3.0` at the same commit
-- Expected scope: at most 40 changed files and 7,000 changed lines; at most
-  11 hand-authored package/source/test files, one canonical schema, 23 textual
-  fixtures, four required planning/architecture documents, and the workspace
-  lockfile. Zero generated mirrors, binary/media files, Scene/`.meta` pairs,
-  runtime adapters, or evidence.
+- Total PR scope ceiling: at most 55 changed files and 10,000 changed lines.
+  The remediation may add at most nine focused diagnostic cases, four textual
+  golden render plans, and one engine-neutral executable-semantics module.
+  Zero generated mirrors, binary/media files, Scene/`.meta` pairs, runtime
+  adapters, or evidence.
 
 ### Goal
 
@@ -33,6 +33,10 @@ Cocos, Unity, and Godot compilers.
   opacity, curves, seed, emission, blend role, and bounded parameters.
 - Reject unknown semantic cues/resources, incompatible shapes, non-finite
   values, conflicts, and budget violations before returning any partial plan.
+- Compile closed typed parameter bindings into concrete layer properties,
+  validate semantic command-mode and resource capability descriptors, and
+  make curve, timing, alpha, particle scheduling, and PRNG rules executable
+  without engine inference.
 - Keep source documents and compiled plans free of engine paths, nodes,
   components, materials, APIs, and engine types.
 - Do not implement rendering, a Creator Scene, visual evidence, TASK-014D2,
@@ -54,13 +58,16 @@ Cocos, Unity, and Godot compilers.
    tracked-MP4, file-count, and line-count audits.
 6. Commit and push the feature branch, create a Draft PR to `main`, require
    GitHub Actions PASS, and leave the PR Draft and unmerged.
+7. Remediate executable semantics append-only on the same branch, update
+   existing Draft PR #17, repeat every verification gate, and preserve the
+   reviewed `a3bd2ed` commit as an ancestor.
 
 ### Done when
 
 - All TASK-014D1 acceptance criteria pass with stable diagnostics and no
   partial output on failure.
 - Canonical/package schema bytes and repeated render-plan bytes are identical.
-- The complete diff stays within 40 files and 7,000 lines and contains text
+- The complete remediated PR stays within 55 files and 10,000 lines and contains text
   and source only.
 - The Draft PR targets `main`, GitHub Actions passes, and no merge, tag,
   release, Scene, media, or runtime-adapter change occurs.

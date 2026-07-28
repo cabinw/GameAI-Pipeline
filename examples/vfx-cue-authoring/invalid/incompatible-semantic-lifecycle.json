@@ -3,7 +3,7 @@
   "cues": [
     {
       "cueId": "footstep-dust",
-      "lifecycle": "one-shot",
+      "lifecycle": "looping",
       "deterministicSeed": 1,
       "layers": [
         {
@@ -11,13 +11,7 @@
           "order": 0,
           "primitive": "ring",
           "logicalResourceId": "vfx.ring-soft",
-          "durationSeconds": 1,
-          "scaleCurve": [
-            { "time": 0, "value": 1 },
-            { "time": 0.5, "value": 1 },
-            { "time": 0.5, "value": 2 },
-            { "time": 1, "value": 1 }
-          ]
+          "durationSeconds": 1
         }
       ]
     }

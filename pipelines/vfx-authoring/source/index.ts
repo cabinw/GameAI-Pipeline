@@ -14,4 +14,11 @@ export type {
   VfxAuthoringResult,
 } from "./diagnostics";
 export { parseAndCompileVfxAuthoring } from "./parser";
+export {
+  VFX_EXECUTABLE_SEMANTICS,
+  compareCodeUnits,
+  nextXorshift32,
+  sampleLinearCurve,
+  sampleVfxLayerAtTime,
+} from "./semantics";
 export type * from "./types";

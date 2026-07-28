@@ -7,14 +7,23 @@
       "deterministicSeed": 314159,
       "parameters": [
         {
-          "parameterId": "enabled",
-          "type": "boolean",
-          "default": true
-        },
-        {
           "parameterId": "tint",
           "type": "color",
           "default": { "r": 0.3, "g": 0.65, "b": 1, "a": 1 }
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "tint",
+          "layerId": "inner-glow",
+          "target": "color",
+          "operation": "replace"
+        },
+        {
+          "parameterId": "tint",
+          "layerId": "outer-ring",
+          "target": "color",
+          "operation": "replace"
         }
       ],
       "layers": [

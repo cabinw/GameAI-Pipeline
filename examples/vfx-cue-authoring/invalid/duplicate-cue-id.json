@@ -5,13 +5,29 @@
       "cueId": "footstep-dust",
       "lifecycle": "one-shot",
       "deterministicSeed": 1,
-      "layers": []
+      "layers": [
+        {
+          "layerId": "first",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1
+        }
+      ]
     },
     {
       "cueId": "footstep-dust",
       "lifecycle": "one-shot",
       "deterministicSeed": 2,
-      "layers": []
+      "layers": [
+        {
+          "layerId": "second",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1
+        }
+      ]
     }
   ]
 }

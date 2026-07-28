@@ -9,7 +9,7 @@
         {
           "parameterId": "intensity",
           "type": "number",
-          "default": 2,
+          "default": 0.5,
           "minimum": 0,
           "maximum": 1
         }
@@ -17,7 +17,7 @@
       "bindings": [
         {
           "parameterId": "intensity",
-          "layerId": "dust",
+          "layerId": "missing-layer",
           "target": "opacity",
           "operation": "multiply"
         }

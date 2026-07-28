@@ -23,13 +23,17 @@ canonical `schemas/vfx-cue-authoring.schema.json`.
 
 The authoring document references existing semantic cue IDs and logical
 resource IDs. It describes bounded typed layers, deterministic properties,
-parameter defaults, and bounded overrides. Validation receives registries of
-known semantic cue and logical resource IDs; the registries contain IDs only.
+parameter defaults, and closed typed bindings. Validation receives semantic
+cue descriptors with `emit`/`start-stop` command mode and resource descriptors
+with portable recipe kind and compatible primitives.
 
-The package validates and normalizes the document, then produces a
-byte-deterministic VFX Render Plan containing no engine types. Engine-specific
-compilers will separately map that plan into Cocos, Unity, or Godot resources
-and runtime objects.
+The package validates and normalizes the document, resolves every parameter
+into concrete layer values, and produces a byte-deterministic executable VFX
+Render Plan containing no engine types. The plan fixes linear/clamped curve
+sampling, relative transform composition, alpha composition, phase and exact
+boundary behavior, cleanup authority, particle spawn schedule, and compiled
+`xorshift32-v1` samples. Engine-specific compilers only map typed recipes into
+Cocos, Unity, or Godot resources and runtime objects.
 
 Character Semantic Events schema and evaluator semantics remain unchanged.
 Their command output selects a cue; it does not compile or render the cue.
@@ -40,6 +44,10 @@ Their command output selects a cue; it does not compile or render the cue.
 - A cue can be composed once and compiled by independent future engines.
 - Registry validation catches missing semantic/resource bindings before an
   engine compiler runs.
+- Semantic `emit` cannot compile as looping/persistent, and semantic
+  `start-stop` cannot compile as one-shot.
+- Engine compilers do not interpret parameter or resource names and do not
+  choose curve, timing, emission, or random semantics.
 - Explicit limits prevent unbounded layer, curve, particle, and serialized
   output growth.
 - Versioning of visual authoring can evolve independently from semantic event
@@ -58,5 +66,9 @@ Godot implementation, tag, or release.
   portable validation and compilation.
 - Allowing arbitrary dictionaries or expressions would make exhaustive
   validation and deterministic output impractical.
+- Leaving parameters as metadata would require adapters to hard-code names;
+  closed bindings instead disappear after compilation into concrete values.
+- ID-only registries would require engines to guess lifecycle and resource
+  capabilities; typed descriptors make those checks portable.
 - Emitting a partial plan alongside diagnostics would let invalid AI output
   leak into later compilers.

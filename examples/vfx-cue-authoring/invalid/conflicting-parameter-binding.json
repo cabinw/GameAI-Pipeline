@@ -7,16 +7,29 @@
       "deterministicSeed": 1,
       "parameters": [
         {
-          "parameterId": "intensity",
+          "parameterId": "first",
           "type": "number",
-          "default": 2,
+          "default": 0.5,
+          "minimum": 0,
+          "maximum": 1
+        },
+        {
+          "parameterId": "second",
+          "type": "number",
+          "default": 0.5,
           "minimum": 0,
           "maximum": 1
         }
       ],
       "bindings": [
         {
-          "parameterId": "intensity",
+          "parameterId": "first",
+          "layerId": "dust",
+          "target": "opacity",
+          "operation": "multiply"
+        },
+        {
+          "parameterId": "second",
           "layerId": "dust",
           "target": "opacity",
           "operation": "multiply"
