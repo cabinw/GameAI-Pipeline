@@ -1,0 +1,50 @@
+export const VfxAuthoringErrorCode = {
+  JSON_PARSE_ERROR: "VFX_AUTHORING_JSON_PARSE_ERROR",
+  SCHEMA_VALIDATION_ERROR: "VFX_AUTHORING_SCHEMA_VALIDATION_ERROR",
+  UNSUPPORTED_SCHEMA_VERSION: "UNSUPPORTED_VFX_AUTHORING_SCHEMA_VERSION",
+  DUPLICATE_CUE_ID: "DUPLICATE_VFX_AUTHORING_CUE_ID",
+  DUPLICATE_LAYER_ID: "DUPLICATE_VFX_AUTHORING_LAYER_ID",
+  UNKNOWN_SEMANTIC_CUE_ID: "UNKNOWN_VFX_AUTHORING_SEMANTIC_CUE_ID",
+  UNKNOWN_RESOURCE_ID: "UNKNOWN_VFX_AUTHORING_RESOURCE_ID",
+  UNSUPPORTED_PRIMITIVE: "UNSUPPORTED_VFX_AUTHORING_PRIMITIVE",
+  INVALID_TIMING: "INVALID_VFX_AUTHORING_TIMING",
+  INVALID_TRANSFORM: "INVALID_VFX_AUTHORING_TRANSFORM",
+  INVALID_COLOR_OR_OPACITY: "INVALID_VFX_AUTHORING_COLOR_OR_OPACITY",
+  INVALID_CURVE: "INVALID_VFX_AUTHORING_CURVE",
+  INVALID_CURVE_TIME: "INVALID_VFX_AUTHORING_CURVE_TIME",
+  INVALID_EMISSION: "INVALID_VFX_AUTHORING_EMISSION",
+  INVALID_DETERMINISTIC_SEED: "INVALID_VFX_AUTHORING_DETERMINISTIC_SEED",
+  INCOMPATIBLE_LIFECYCLE_PRIMITIVE:
+    "INCOMPATIBLE_VFX_AUTHORING_LIFECYCLE_PRIMITIVE",
+  LAYER_ORDER_CONFLICT: "VFX_AUTHORING_LAYER_ORDER_CONFLICT",
+  PARAMETER_VALIDATION_ERROR: "VFX_AUTHORING_PARAMETER_VALIDATION_ERROR",
+  COMPILATION_BUDGET_EXCEEDED: "VFX_AUTHORING_COMPILATION_BUDGET_EXCEEDED"
+} as const;
+
+export type VfxAuthoringErrorCode =
+  (typeof VfxAuthoringErrorCode)[keyof typeof VfxAuthoringErrorCode];
+
+export interface VfxAuthoringDiagnostic {
+  readonly code: VfxAuthoringErrorCode;
+  readonly path: string;
+  readonly message: string;
+  readonly details?: Readonly<Record<string, unknown>>;
+}
+
+export type VfxAuthoringResult<T> =
+  | { readonly ok: true; readonly value: T; readonly errors: readonly [] }
+  | {
+      readonly ok: false;
+      readonly errors: readonly VfxAuthoringDiagnostic[];
+    };
+
+export function sortVfxAuthoringDiagnostics(
+  diagnostics: readonly VfxAuthoringDiagnostic[],
+): VfxAuthoringDiagnostic[] {
+  return [...diagnostics].sort(
+    (left, right) =>
+      left.path.localeCompare(right.path) ||
+      left.code.localeCompare(right.code) ||
+      left.message.localeCompare(right.message),
+  );
+}

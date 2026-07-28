@@ -3,6 +3,68 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Active plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
+
+- Status: Implementation and local verification complete; publication pending
+- Started: 2026-07-28
+- Branch: `feat/task-014d1-vfx-cue-authoring-contract`
+- Baseline `main`: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
+- Release baseline: `v0.3.0` at the same commit
+- Expected scope: at most 40 changed files and 7,000 changed lines; at most
+  11 hand-authored package/source/test files, one canonical schema, 23 textual
+  fixtures, four required planning/architecture documents, and the workspace
+  lockfile. Zero generated mirrors, binary/media files, Scene/`.meta` pairs,
+  runtime adapters, or evidence.
+
+### Goal
+
+Replace hard-coded future effect construction as the authoring source with a
+validated, deterministic, engine-neutral VFX document and compiler. The
+package accepts existing Character Semantic Event cue IDs and logical
+resource IDs, then emits a normalized VFX Render Plan suitable for independent
+Cocos, Unity, and Godot compilers.
+
+### Boundaries
+
+- Add `@gameai/vfx-authoring` without changing Character Semantic Events
+  schema, evaluator semantics, or TASK-014A/B/C behavior.
+- Author and compile sprite/textured quad, ring, ribbon/trail, and burst
+  particle layers with explicit lifecycle, transforms, timing, color,
+  opacity, curves, seed, emission, blend role, and bounded parameters.
+- Reject unknown semantic cues/resources, incompatible shapes, non-finite
+  values, conflicts, and budget violations before returning any partial plan.
+- Keep source documents and compiled plans free of engine paths, nodes,
+  components, materials, APIs, and engine types.
+- Do not implement rendering, a Creator Scene, visual evidence, TASK-014D2,
+  TASK-014D3, release/tag changes, or protected-reference changes.
+
+### Execution
+
+1. Approve the authoring/compiler boundary in RFC-0015 and ADR-0016.
+2. Add the canonical schema, TypeScript package, stable diagnostics,
+   fail-closed parser, semantic validator, normalizer, compiler, and
+   byte-deterministic serializer.
+3. Add four valid reference fixtures and one focused invalid textual fixture
+   for every public diagnostic.
+4. Test schema identity, parsing, validation, normalization, compilation,
+   serialization, immutability, registries, lifecycles, curves, parameters,
+   budgets, repeated byte identity, and engine-import absence.
+5. Run direct tests, working-copy and frozen tracked-only verification, schema
+   and generated-output closure, Markdown links, diff/clean-tree, binary/media,
+   tracked-MP4, file-count, and line-count audits.
+6. Commit and push the feature branch, create a Draft PR to `main`, require
+   GitHub Actions PASS, and leave the PR Draft and unmerged.
+
+### Done when
+
+- All TASK-014D1 acceptance criteria pass with stable diagnostics and no
+  partial output on failure.
+- Canonical/package schema bytes and repeated render-plan bytes are identical.
+- The complete diff stays within 40 files and 7,000 lines and contains text
+  and source only.
+- The Draft PR targets `main`, GitHub Actions passes, and no merge, tag,
+  release, Scene, media, or runtime-adapter change occurs.
+
 ## Implemented plan: v0.3.0 Character Semantic Events & VFX Baseline
 
 - Status: Draft PR pending review

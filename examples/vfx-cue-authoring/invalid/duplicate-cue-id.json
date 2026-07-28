@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1,
+      "layers": []
+    },
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 2,
+      "layers": []
+    }
+  ]
+}

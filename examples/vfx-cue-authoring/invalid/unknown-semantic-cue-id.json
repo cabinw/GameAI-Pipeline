@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "unknown-cue",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1,
+      "layers": []
+    }
+  ]
+}

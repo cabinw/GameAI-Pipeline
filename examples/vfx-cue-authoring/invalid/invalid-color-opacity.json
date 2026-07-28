@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1,
+      "layers": [
+        {
+          "layerId": "dust",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1,
+          "color": { "r": 1.2, "g": 1, "b": 1, "a": 1 },
+          "opacity": -0.1
+        }
+      ]
+    }
+  ]
+}

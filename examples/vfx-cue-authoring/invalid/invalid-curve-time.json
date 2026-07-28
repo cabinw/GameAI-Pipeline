@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1,
+      "layers": [
+        {
+          "layerId": "dust",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1,
+          "scaleCurve": [
+            { "time": 0.5, "value": 1 },
+            { "time": 0.5, "value": 2 }
+          ]
+        }
+      ]
+    }
+  ]
+}
