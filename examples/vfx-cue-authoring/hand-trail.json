@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.3",
+  "cues": [
+    {
+      "cueId": "hand-tool-trail",
+      "lifecycle": "looping",
+      "deterministicSeed": 271828,
+      "parameters": [
+        {
+          "parameterId": "trail-width",
+          "type": "number",
+          "default": 1,
+          "minimum": 0.25,
+          "maximum": 3
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "trail-width",
+          "layerId": "core-ribbon",
+          "target": "scale-y",
+          "operation": "multiply"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "core-ribbon",
+          "order": 0,
+          "primitive": "ribbon",
+          "logicalResourceId": "vfx.ribbon-core",
+          "durationSeconds": 0.24,
+          "transform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "color": { "r": 0.35, "g": 1, "b": 0.62, "a": 1 },
+          "opacity": 0.92,
+          "scaleCurve": [
+            { "time": 0, "value": 1 },
+            { "time": 1, "value": 0 }
+          ],
+          "blendRole": "additive"
+        }
+      ]
+    }
+  ]
+}

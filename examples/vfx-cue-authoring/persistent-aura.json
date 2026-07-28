@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "persistent-aura",
+      "lifecycle": "persistent",
+      "deterministicSeed": 314159,
+      "parameters": [
+        {
+          "parameterId": "tint",
+          "type": "color",
+          "default": { "r": 0.3, "g": 0.65, "b": 1, "a": 1 }
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "tint",
+          "layerId": "inner-glow",
+          "target": "color",
+          "operation": "replace"
+        },
+        {
+          "parameterId": "tint",
+          "layerId": "outer-ring",
+          "target": "color",
+          "operation": "replace"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "outer-ring",
+          "order": 10,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.aura-ring",
+          "durationSeconds": 1.5,
+          "color": { "r": 0.3, "g": 0.65, "b": 1, "a": 1 },
+          "opacity": 0.72,
+          "scaleCurve": [
+            { "time": 0, "value": 0.9 },
+            { "time": 0.5, "value": 1.05 },
+            { "time": 1, "value": 0.9 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": 0 },
+            { "time": 1, "value": 360 }
+          ],
+          "blendRole": "screen"
+        },
+        {
+          "layerId": "inner-glow",
+          "order": 0,
+          "primitive": "sprite-quad",
+          "logicalResourceId": "vfx.aura-glow",
+          "durationSeconds": 1.5,
+          "opacity": 0.4,
+          "blendRole": "additive"
+        }
+      ]
+    }
+  ]
+}

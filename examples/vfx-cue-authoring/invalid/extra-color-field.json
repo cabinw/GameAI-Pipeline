@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "persistent-aura",
+      "lifecycle": "persistent",
+      "deterministicSeed": 1,
+      "parameters": [
+        {
+          "parameterId": "tint",
+          "type": "color",
+          "default": { "r": 1, "g": 1, "b": 1, "a": 1, "name": "unsafe" }
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "tint",
+          "layerId": "aura",
+          "target": "color",
+          "operation": "replace"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "aura",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.aura-ring",
+          "durationSeconds": 1
+        }
+      ]
+    }
+  ]
+}

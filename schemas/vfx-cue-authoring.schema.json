@@ -1,0 +1,171 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gameai-pipeline.dev/schemas/vfx-cue-authoring/v1.0.0",
+  "title": "GameAI VFX Cue Authoring",
+  "description": "Engine-neutral layered VFX cue authoring input.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "cues"],
+  "properties": {
+    "schemaVersion": { "$ref": "#/definitions/schemaVersion" },
+    "cues": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/cue" }
+    }
+  },
+  "definitions": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "resourceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$"
+    },
+    "vector2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "position": { "$ref": "#/definitions/vector2" },
+        "rotationDegrees": { "type": "number" },
+        "scale": { "$ref": "#/definitions/vector2" }
+      }
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["r", "g", "b", "a"],
+      "properties": {
+        "r": { "type": "number" },
+        "g": { "type": "number" },
+        "b": { "type": "number" },
+        "a": { "type": "number" }
+      }
+    },
+    "keyframe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time", "value"],
+      "properties": {
+        "time": { "type": "number" },
+        "value": { "type": "number" }
+      }
+    },
+    "curve": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/keyframe" }
+    },
+    "emission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "ratePerSecond"],
+      "properties": {
+        "count": { "type": "number" },
+        "ratePerSecond": { "type": "number" }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parameterId", "type", "default"],
+      "properties": {
+        "parameterId": { "$ref": "#/definitions/identifier" },
+        "type": {
+          "type": "string",
+          "enum": ["number", "integer", "color"]
+        },
+        "default": {},
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parameterId", "layerId", "target", "operation"],
+      "properties": {
+        "parameterId": { "$ref": "#/definitions/identifier" },
+        "layerId": { "$ref": "#/definitions/identifier" },
+        "target": {
+          "type": "string",
+          "enum": ["opacity", "scale-x", "scale-y", "color"]
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["multiply", "replace"]
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layerId",
+        "order",
+        "primitive",
+        "logicalResourceId",
+        "durationSeconds"
+      ],
+      "properties": {
+        "layerId": { "$ref": "#/definitions/identifier" },
+        "order": { "type": "number" },
+        "primitive": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "logicalResourceId": { "$ref": "#/definitions/resourceId" },
+        "durationSeconds": { "type": "number" },
+        "delaySeconds": { "type": "number" },
+        "transform": { "$ref": "#/definitions/transform" },
+        "color": { "$ref": "#/definitions/color" },
+        "opacity": { "type": "number" },
+        "scaleCurve": { "$ref": "#/definitions/curve" },
+        "rotationCurve": { "$ref": "#/definitions/curve" },
+        "emission": { "$ref": "#/definitions/emission" },
+        "blendRole": {
+          "type": "string",
+          "enum": ["alpha", "additive", "multiply", "screen"]
+        }
+      }
+    },
+    "cue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cueId", "lifecycle", "deterministicSeed", "layers"],
+      "properties": {
+        "cueId": { "$ref": "#/definitions/identifier" },
+        "lifecycle": {
+          "type": "string",
+          "enum": ["one-shot", "looping", "persistent"]
+        },
+        "deterministicSeed": { "type": "number" },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/parameter" }
+        },
+        "bindings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/binding" }
+        },
+        "layers": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/layer" }
+        }
+      }
+    }
+  }
+}

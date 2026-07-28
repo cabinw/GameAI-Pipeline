@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "persistent-aura",
+      "lifecycle": "persistent",
+      "deterministicSeed": 1,
+      "layers": [
+        {
+          "layerId": "dust",
+          "order": 0,
+          "primitive": "burst-particles",
+          "logicalResourceId": "vfx.dust-soft",
+          "durationSeconds": 1,
+          "emission": { "count": 1, "ratePerSecond": 1 }
+        }
+      ]
+    }
+  ]
+}

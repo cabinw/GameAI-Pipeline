@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 104729,
+      "parameters": [
+        {
+          "parameterId": "intensity",
+          "type": "number",
+          "default": 0.8,
+          "minimum": 0,
+          "maximum": 1
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "intensity",
+          "layerId": "dust-burst",
+          "target": "opacity",
+          "operation": "multiply"
+        },
+        {
+          "parameterId": "intensity",
+          "layerId": "ground-ring",
+          "target": "opacity",
+          "operation": "multiply"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "dust-burst",
+          "order": 10,
+          "primitive": "burst-particles",
+          "logicalResourceId": "vfx.dust-soft",
+          "durationSeconds": 0.45,
+          "delaySeconds": 0,
+          "transform": {
+            "position": { "x": 0, "y": 2 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 0.65 }
+          },
+          "color": { "r": 0.72, "g": 0.5, "b": 0.28, "a": 1 },
+          "opacity": 0.9,
+          "scaleCurve": [
+            { "time": 0, "value": 0.35 },
+            { "time": 1, "value": 1.4 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": -8 },
+            { "time": 1, "value": 12 }
+          ],
+          "emission": { "count": 8, "ratePerSecond": 32 },
+          "blendRole": "alpha"
+        },
+        {
+          "layerId": "ground-ring",
+          "order": 20,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 0.3,
+          "color": { "r": 0.85, "g": 0.65, "b": 0.38, "a": 1 },
+          "opacity": 0.65,
+          "scaleCurve": [
+            { "time": 0, "value": 0.2 },
+            { "time": 1, "value": 1.25 }
+          ]
+        }
+      ]
+    }
+  ]
+}

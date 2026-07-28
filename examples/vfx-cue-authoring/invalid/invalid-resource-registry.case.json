@@ -1,0 +1,33 @@
+{
+  "document": {
+    "schemaVersion": "1.0.0",
+    "cues": [
+      {
+        "cueId": "footstep-dust",
+        "lifecycle": "one-shot",
+        "deterministicSeed": 1,
+        "layers": [
+          {
+            "layerId": "dust",
+            "order": 0,
+            "primitive": "ring",
+            "logicalResourceId": "vfx.ring-soft",
+            "durationSeconds": 1
+          }
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "resourceId": "vfx.ring-soft",
+      "recipeKind": "procedural-ring",
+      "compatiblePrimitives": ["ring"]
+    },
+    {
+      "resourceId": "vfx.ring-soft",
+      "recipeKind": "textured-sprite",
+      "compatiblePrimitives": ["sprite-quad"]
+    }
+  ]
+}

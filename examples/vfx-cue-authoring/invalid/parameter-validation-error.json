@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1,
+      "parameters": [
+        {
+          "parameterId": "intensity",
+          "type": "number",
+          "default": 2,
+          "minimum": 0,
+          "maximum": 1
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "intensity",
+          "layerId": "dust",
+          "target": "opacity",
+          "operation": "multiply"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "dust",
+          "order": 0,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 1
+        }
+      ]
+    }
+  ]
+}

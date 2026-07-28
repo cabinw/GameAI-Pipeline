@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "combined-reference",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1618033,
+      "layers": [
+        {
+          "layerId": "back-glow",
+          "order": 0,
+          "primitive": "sprite-quad",
+          "logicalResourceId": "vfx.aura-glow",
+          "durationSeconds": 0.8,
+          "color": { "r": 0.2, "g": 0.5, "b": 1, "a": 1 },
+          "opacity": 0.35,
+          "blendRole": "additive"
+        },
+        {
+          "layerId": "middle-ring",
+          "order": 10,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 0.6,
+          "delaySeconds": 0.05,
+          "scaleCurve": [
+            { "time": 0, "value": 0.25 },
+            { "time": 1, "value": 1.5 }
+          ]
+        },
+        {
+          "layerId": "front-ribbon",
+          "order": 20,
+          "primitive": "ribbon",
+          "logicalResourceId": "vfx.ribbon-core",
+          "durationSeconds": 0.4,
+          "delaySeconds": 0.1,
+          "rotationCurve": [
+            { "time": 0, "value": 0 },
+            { "time": 1, "value": 90 }
+          ],
+          "blendRole": "screen"
+        },
+        {
+          "layerId": "spark-burst",
+          "order": 30,
+          "primitive": "burst-particles",
+          "logicalResourceId": "vfx.spark",
+          "durationSeconds": 0.5,
+          "emission": { "count": 12, "ratePerSecond": 48 },
+          "blendRole": "additive"
+        }
+      ]
+    }
+  ]
+}
