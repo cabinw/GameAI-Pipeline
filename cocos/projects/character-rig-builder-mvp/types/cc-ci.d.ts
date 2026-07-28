@@ -49,7 +49,19 @@ declare module "cc" {
     readonly node: Node;
   }
 
-  export class UIRenderer extends Component {}
+  export class UIRenderer extends Component {
+    color: Color;
+  }
+
+  export namespace gfx {
+    enum BlendFactor {
+      ONE,
+      SRC_ALPHA,
+      DST_COLOR,
+      ONE_MINUS_SRC_ALPHA,
+      ONE_MINUS_SRC_COLOR,
+    }
+  }
 
   export class Node {
     name: string;

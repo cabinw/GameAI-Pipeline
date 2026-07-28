@@ -3,6 +3,7 @@ import {
   Color,
   Component,
   EventKeyboard,
+  gfx,
   Graphics,
   input,
   Input,
@@ -11,7 +12,10 @@ import {
   Layers,
   Node,
   Quat,
+  resources,
   Sorting2D,
+  Sprite,
+  SpriteFrame,
   UITransform,
   UIRenderer,
   Vec3,
@@ -22,34 +26,85 @@ import {
   TASK014D2_RESOURCE_REGISTRY,
   TASK014D2_SORTING,
   TASK014D2_SPATIAL,
+  createTask014D2RuntimeDiagnostics,
+  formatTask014D2Diagnostics,
+  task014d2BoundsOverflowPx,
+  type Task014D2Bounds,
   type Task014D2InputAction,
 } from "./cocos-vfx-harness-contract";
 import {
   compileCocosVfxRenderDescriptors,
+  type CocosVfxBlendFactor,
   type CocosVfxCueDescriptor,
   type CocosVfxDescriptorPlan,
   type CocosVfxLayerDescriptor,
+  type CocosVfxRendererKind,
 } from "./cocos-vfx-render-descriptor";
 import {
   CocosVfxRuntimeState,
+  type CocosVfxRendererOwnership,
   type CocosVfxRuntimeHost,
 } from "./cocos-vfx-runtime-state";
 import type { VfxLayerSample } from "./d1/types";
+import {
+  canonicalTimeToTicks,
+  compareCodeUnits,
+} from "./d1/semantics";
 import { TASK014D2_RENDER_PLAN } from "./render-plan-data";
 
 const { ccclass } = _decorator;
+const TEXTURE_RESOURCE_PATH =
+  "production-lite-character/parts/head/spriteFrame";
 
 interface RendererBinding {
+  readonly ownership: CocosVfxRendererOwnership;
   readonly node: Node;
-  readonly graphics: Graphics;
   readonly descriptor: CocosVfxLayerDescriptor;
   readonly target: Node;
+  readonly renderers: readonly UIRenderer[];
+  readonly sorting: readonly Sorting2D[];
+  readonly graphics: Graphics | null;
+  readonly particleSprites: readonly Sprite[];
+  readonly debugGraphics: Graphics;
+  localBounds: Task014D2Bounds;
+}
+
+interface CocosResourceRealization {
+  readonly resourceId: string;
+  readonly recipeKind: CocosVfxLayerDescriptor["recipeKind"];
+  readonly spriteFrame: SpriteFrame | null;
+}
+
+interface BlendMutableRenderer {
+  srcBlendFactor: gfx.BlendFactor;
+  dstBlendFactor: gfx.BlendFactor;
+}
+
+function blendFactor(value: CocosVfxBlendFactor): gfx.BlendFactor {
+  switch (value) {
+    case "src-alpha":
+      return gfx.BlendFactor.SRC_ALPHA;
+    case "one-minus-src-alpha":
+      return gfx.BlendFactor.ONE_MINUS_SRC_ALPHA;
+    case "one":
+      return gfx.BlendFactor.ONE;
+    case "dst-color":
+      return gfx.BlendFactor.DST_COLOR;
+    case "one-minus-src-color":
+      return gfx.BlendFactor.ONE_MINUS_SRC_COLOR;
+    default:
+      return assertNever(value);
+  }
+}
+
+function assertNever(value: never): never {
+  throw new Error(`TASK_014D2_UNREACHABLE_ENUM: ${String(value)}`);
 }
 
 class CocosRenderPlanHost implements CocosVfxRuntimeHost {
-  private readonly renderers = new Map<string, RendererBinding>();
+  private readonly bindings = new Map<string, RendererBinding>();
   private readonly world = new Vec3();
-  private readonly authoredLocal = new Vec3();
+  private readonly local = new Vec3();
   private readonly overlayLocal = new Vec3();
   private readonly worldScale = new Vec3();
   private readonly targetRotation = new Quat();
@@ -66,50 +121,53 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     private readonly overlay: Node,
     private readonly targets: readonly Node[],
     private readonly cueOrder: ReadonlyMap<string, number>,
+    private readonly resources: ReadonlyMap<string, CocosResourceRealization>,
   ) {}
 
   createLayer(
-    rendererId: string,
+    ownership: CocosVfxRendererOwnership,
     descriptor: CocosVfxLayerDescriptor,
   ): void {
-    if (this.renderers.has(rendererId)) {
-      throw new Error(`TASK_014D2_DUPLICATE_RENDERER: ${rendererId}`);
+    if (this.bindings.has(ownership.rendererId)) {
+      throw new Error(`TASK_014D2_DUPLICATE_RENDERER: ${ownership.rendererId}`);
     }
     const cueIndex = this.cueOrder.get(descriptor.cueId);
-    if (cueIndex === undefined) {
-      throw new Error(`TASK_014D2_UNKNOWN_CUE_INDEX: ${descriptor.cueId}`);
+    const resource = this.resources.get(descriptor.resourceId);
+    if (cueIndex === undefined || resource === undefined ||
+        resource.recipeKind !== descriptor.recipeKind) {
+      throw new Error("TASK_014D2_RESOURCE_REALIZATION_MISSING");
     }
-    const node = new Node(`VFX_${rendererId}`);
+    this.assertLifecycle(descriptor);
+    const node = new Node(`VFX_${ownership.rendererId}`);
     node.layer = Layers.Enum.UI_2D;
     node.setParent(this.overlay);
     node.addComponent(UITransform).setContentSize(240, 240);
     try {
-      if (node.getComponent(UIRenderer) !== null) {
-        throw new Error("Renderer node was not clean.");
-      }
-      const graphics = node.addComponent(Graphics);
-      if (
-        node.getComponent(UIRenderer) !== graphics ||
-        node.getComponents(UIRenderer).length !== 1
-      ) {
-        throw new Error("Graphics must be the sole UIRenderer.");
-      }
-      const sorting = node.addComponent(Sorting2D);
-      sorting.sortingLayer = 0;
-      sorting.sortingOrder = descriptor.sortingOrder;
-      if (
-        node.getComponents(UIRenderer).length !== 1 ||
-        node.getComponents(Sorting2D).length !== 1
-      ) {
-        throw new Error("Sorting2D must follow one Graphics component.");
-      }
-      this.renderers.set(rendererId, {
+      const recipe = this.createRecipe(node, descriptor, resource);
+      const debugNode = new Node("DebugBounds");
+      debugNode.layer = Layers.Enum.UI_2D;
+      debugNode.setParent(node);
+      debugNode.addComponent(UITransform).setContentSize(240, 240);
+      const debugGraphics = debugNode.addComponent(Graphics);
+      debugNode.addComponent(Sorting2D).sortingOrder =
+        TASK014D2_SORTING.debug;
+      debugNode.active = this.debug;
+      this.bindings.set(ownership.rendererId, {
+        ownership,
         node,
-        graphics,
         descriptor,
         target: this.targets[cueIndex % this.targets.length] as Node,
+        renderers: recipe.renderers,
+        sorting: recipe.sorting,
+        graphics: recipe.graphics,
+        particleSprites: recipe.particleSprites,
+        debugGraphics,
+        localBounds: recipe.localBounds,
       });
+      this.refreshSorting();
     } catch (error) {
+      this.bindings.delete(ownership.rendererId);
+      node.removeFromParent();
       node.destroy();
       throw error;
     }
@@ -121,38 +179,40 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     sample: VfxLayerSample,
     commandElapsedSeconds: number,
   ): void {
-    const binding = this.renderers.get(rendererId);
-    if (binding === undefined) {
-      throw new Error(`TASK_014D2_UNKNOWN_RENDERER: ${rendererId}`);
+    const binding = this.bindings.get(rendererId);
+    if (binding === undefined || binding.descriptor !== descriptor) {
+      throw new Error(`TASK_014D2_UNKNOWN_OR_MISMATCHED_RENDERER: ${rendererId}`);
+    }
+    if (![
+      sample.position.x,
+      sample.position.y,
+      sample.rotationDegrees,
+      sample.scale.x,
+      sample.scale.y,
+      sample.effectiveAlpha,
+      commandElapsedSeconds,
+    ].every(Number.isFinite)) {
+      throw new Error("TASK_014D2_NON_FINITE_SAMPLE");
     }
     const targetTransform = binding.target.getComponent(UITransform);
     const overlayTransform = this.overlay.getComponent(UITransform);
-    if (targetTransform === null || overlayTransform === null) {
+    const rendererTransform = binding.node.getComponent(UITransform);
+    if (targetTransform === null || overlayTransform === null ||
+        rendererTransform === null) {
       throw new Error("TASK_014D2_PROJECTION_TRANSFORM_MISSING");
     }
-    this.authoredLocal.x = sample.position.x;
-    this.authoredLocal.y = sample.position.y;
-    this.authoredLocal.z = 0;
-    targetTransform.convertToWorldSpaceAR(this.authoredLocal, this.world);
+    this.local.x = sample.position.x;
+    this.local.y = sample.position.y;
+    this.local.z = 0;
+    targetTransform.convertToWorldSpaceAR(this.local, this.world);
     overlayTransform.convertToNodeSpaceAR(this.world, this.overlayLocal);
-    const requestedX = this.overlayLocal.x;
-    const requestedY = this.overlayLocal.y;
-    if (!Number.isFinite(requestedX) || !Number.isFinite(requestedY)) {
+    if (![this.overlayLocal.x, this.overlayLocal.y].every(Number.isFinite)) {
       throw new Error("TASK_014D2_NON_FINITE_PROJECTION");
     }
-    binding.node.setPosition(requestedX, requestedY, 0);
+    binding.node.setPosition(this.overlayLocal.x, this.overlayLocal.y, 0);
     binding.target.getWorldRotation(this.targetRotation);
-    Quat.fromEuler(
-      this.localRotation,
-      0,
-      0,
-      sample.rotationDegrees,
-    );
-    Quat.multiply(
-      this.expectedRotation,
-      this.targetRotation,
-      this.localRotation,
-    );
+    Quat.fromEuler(this.localRotation, 0, 0, sample.rotationDegrees);
+    Quat.multiply(this.expectedRotation, this.targetRotation, this.localRotation);
     Quat.normalize(this.expectedRotation, this.expectedRotation);
     binding.node.setWorldRotation(this.expectedRotation);
     binding.target.getWorldScale(this.worldScale);
@@ -161,9 +221,260 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       this.worldScale.y * sample.scale.y,
       1,
     );
+    this.applyVisual(binding, sample);
+    this.measure(binding, sample, targetTransform, overlayTransform);
+  }
+
+  destroyLayer(rendererId: string, _reason: string): void {
+    const binding = this.bindings.get(rendererId);
+    if (binding === undefined) return;
+    this.bindings.delete(rendererId);
+    binding.node.removeFromParent();
+    binding.node.destroy();
+    this.refreshSorting();
+  }
+
+  rendererOwnership(): readonly CocosVfxRendererOwnership[] {
+    return [...this.bindings.values()].map((binding) => binding.ownership);
+  }
+
+  setDebug(value: boolean): void {
+    this.debug = value;
+    for (const binding of this.bindings.values()) {
+      binding.debugGraphics.node.active = value;
+      if (value) this.drawDebugBounds(binding);
+    }
+  }
+
+  activeSummary(): string {
+    const values = [...this.bindings.values()].map((binding) =>
+      `${binding.descriptor.rendererKind}/${binding.descriptor.blendRole}`);
+    return [...new Set(values)].sort(compareCodeUnits).join(", ") || "none";
+  }
+
+  componentCounts(): Readonly<{
+    recipes: Readonly<Record<CocosVfxRendererKind, number>>;
+    sortingOrders: readonly number[];
+  }> {
+    const recipes: Record<CocosVfxRendererKind, number> = {
+      sprite: 0,
+      "graphics-ring": 0,
+      "graphics-ribbon": 0,
+      "sprite-particles": 0,
+    };
+    const sortingOrders: number[] = [];
+    for (const binding of this.bindings.values()) {
+      recipes[binding.descriptor.rendererKind] += 1;
+      sortingOrders.push(
+        binding.sorting[0]?.sortingOrder ?? binding.descriptor.sortingOrder,
+      );
+    }
+    return { recipes, sortingOrders };
+  }
+
+  private createRecipe(
+    node: Node,
+    descriptor: CocosVfxLayerDescriptor,
+    resource: CocosResourceRealization,
+  ): {
+    renderers: readonly UIRenderer[];
+    sorting: readonly Sorting2D[];
+    graphics: Graphics | null;
+    particleSprites: readonly Sprite[];
+    localBounds: Task014D2Bounds;
+  } {
+    switch (descriptor.rendererKind) {
+      case "sprite": {
+        const sprite = node.addComponent(Sprite);
+        if (resource.spriteFrame === null) {
+          throw new Error("TASK_014D2_TEXTURED_SPRITE_FRAME_MISSING");
+        }
+        sprite.spriteFrame = resource.spriteFrame;
+        node.getComponent(UITransform)?.setContentSize(108, 108);
+        this.applyBlend(sprite, descriptor);
+        const sorting = node.addComponent(Sorting2D);
+        sorting.sortingOrder = descriptor.sortingOrder;
+        return {
+          renderers: [sprite],
+          sorting: [sorting],
+          graphics: null,
+          particleSprites: [],
+          localBounds: {
+            minimumX: -54,
+            minimumY: -54,
+            maximumX: 54,
+            maximumY: 54,
+          },
+        };
+      }
+      case "graphics-ring":
+      case "graphics-ribbon": {
+        const graphics = node.addComponent(Graphics);
+        this.applyBlend(graphics, descriptor);
+        const sorting = node.addComponent(Sorting2D);
+        sorting.sortingOrder = descriptor.sortingOrder;
+        return {
+          renderers: [graphics],
+          sorting: [sorting],
+          graphics,
+          particleSprites: [],
+          localBounds: descriptor.rendererKind === "graphics-ring"
+            ? { minimumX: -72, minimumY: -72, maximumX: 72, maximumY: 72 }
+            : { minimumX: -104, minimumY: -58, maximumX: 50, maximumY: 60 },
+        };
+      }
+      case "sprite-particles": {
+        if (resource.spriteFrame === null) {
+          throw new Error("TASK_014D2_PARTICLE_SPRITE_FRAME_MISSING");
+        }
+        const particleSorting: Sorting2D[] = [];
+        const particles = descriptor.layer.emission?.schedule.map((_, index) => {
+          const particleNode = new Node(`Particle_${index}`);
+          particleNode.layer = Layers.Enum.UI_2D;
+          particleNode.setParent(node);
+          particleNode.addComponent(UITransform).setContentSize(14, 14);
+          const sprite = particleNode.addComponent(Sprite);
+          sprite.spriteFrame = resource.spriteFrame;
+          this.applyBlend(sprite, descriptor);
+          const sorting = particleNode.addComponent(Sorting2D);
+          sorting.sortingOrder = descriptor.sortingOrder;
+          particleSorting.push(sorting);
+          particleNode.active = false;
+          return sprite;
+        }) ?? [];
+        return {
+          renderers: particles,
+          sorting: particleSorting,
+          graphics: null,
+          particleSprites: particles,
+          localBounds: { minimumX: 0, minimumY: 0, maximumX: 0, maximumY: 0 },
+        };
+      }
+      default:
+        return assertNever(descriptor.rendererKind);
+    }
+  }
+
+  private applyBlend(
+    renderer: Sprite | Graphics,
+    descriptor: CocosVfxLayerDescriptor,
+  ): void {
+    const mutable = renderer as unknown as BlendMutableRenderer;
+    mutable.srcBlendFactor = blendFactor(descriptor.blendState.source);
+    mutable.dstBlendFactor = blendFactor(descriptor.blendState.destination);
+  }
+
+  private refreshSorting(): void {
+    const bindings = [...this.bindings.values()].sort((left, right) =>
+      left.descriptor.layer.order - right.descriptor.layer.order ||
+      compareCodeUnits(left.descriptor.cueId, right.descriptor.cueId) ||
+      compareCodeUnits(left.descriptor.layerId, right.descriptor.layerId) ||
+      compareCodeUnits(
+        left.ownership.instanceId,
+        right.ownership.instanceId,
+      ));
+    if (
+      bindings.length >
+        TASK014D2_SORTING.vfxMaximum -
+          TASK014D2_SORTING.vfxMinimum + 1
+    ) {
+      throw new Error("TASK_014D2_ACTIVE_SORTING_RANGE_EXCEEDED");
+    }
+    for (const [index, binding] of bindings.entries()) {
+      const order = TASK014D2_SORTING.vfxMinimum + index;
+      for (const sorting of binding.sorting) sorting.sortingOrder = order;
+    }
+  }
+
+  private applyVisual(
+    binding: RendererBinding,
+    sample: VfxLayerSample,
+  ): void {
+    const color = binding.descriptor.layer.color;
+    const cocosColor = new Color(
+      Math.round(color.r * 255),
+      Math.round(color.g * 255),
+      Math.round(color.b * 255),
+      Math.round(Math.max(0, Math.min(1, sample.effectiveAlpha)) * 255),
+    );
+    switch (binding.descriptor.rendererKind) {
+      case "sprite":
+        (binding.renderers[0] as Sprite).color = cocosColor;
+        break;
+      case "graphics-ring": {
+        const graphics = binding.graphics as Graphics;
+        graphics.clear();
+        graphics.strokeColor = cocosColor;
+        graphics.lineWidth = 8;
+        graphics.circle(0, 0, 66);
+        graphics.stroke();
+        break;
+      }
+      case "graphics-ribbon": {
+        const graphics = binding.graphics as Graphics;
+        graphics.clear();
+        graphics.strokeColor = cocosColor;
+        graphics.lineWidth = 16;
+        graphics.moveTo(-96, -24);
+        graphics.bezierCurveTo(-62, 52, -24, -48, 42, 20);
+        graphics.stroke();
+        break;
+      }
+      case "sprite-particles":
+        this.updateParticles(binding, cocosColor, sample);
+        break;
+      default:
+        assertNever(binding.descriptor.rendererKind);
+    }
+    if (this.debug) this.drawDebugBounds(binding);
+  }
+
+  private updateParticles(
+    binding: RendererBinding,
+    color: Color,
+    sample: VfxLayerSample,
+  ): void {
+    let minimumX = 0;
+    let minimumY = 0;
+    let maximumX = 0;
+    let maximumY = 0;
+    let visible = 0;
+    const schedule = binding.descriptor.layer.emission?.schedule ?? [];
+    const timing = binding.descriptor.layer.timing;
+    const sampleTick = canonicalTimeToTicks(timing.delaySeconds) +
+      canonicalTimeToTicks(
+        (sample.phase ?? 0) * timing.durationSeconds,
+      );
+    for (const [index, spawn] of schedule.entries()) {
+      const sprite = binding.particleSprites[index] as Sprite;
+      const active =
+        canonicalTimeToTicks(spawn.spawnTimeSeconds) <= sampleTick;
+      sprite.node.active = active;
+      if (!active) continue;
+      sprite.color = color;
+      const angle = ((spawn.randomUint32 & 0xffff) / 0xffff) * Math.PI * 2;
+      const radius = 20 + ((spawn.randomUint32 >>> 16) / 0xffff) * 68;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      sprite.node.setPosition(x, y, 0);
+      minimumX = visible === 0 ? x - 7 : Math.min(minimumX, x - 7);
+      minimumY = visible === 0 ? y - 7 : Math.min(minimumY, y - 7);
+      maximumX = visible === 0 ? x + 7 : Math.max(maximumX, x + 7);
+      maximumY = visible === 0 ? y + 7 : Math.max(maximumY, y + 7);
+      visible += 1;
+    }
+    binding.localBounds = { minimumX, minimumY, maximumX, maximumY };
+  }
+
+  private measure(
+    binding: RendererBinding,
+    sample: VfxLayerSample,
+    targetTransform: UITransform,
+    overlayTransform: UITransform,
+  ): void {
     const positionError = Math.hypot(
-      binding.node.position.x - requestedX,
-      binding.node.position.y - requestedY,
+      binding.node.position.x - this.overlayLocal.x,
+      binding.node.position.y - this.overlayLocal.y,
     );
     this.maximumPositionErrorPx = Math.max(
       this.maximumPositionErrorPx,
@@ -173,147 +484,84 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     const roundTrip = targetTransform.convertToNodeSpaceAR(this.world);
     this.maximumProjectionErrorPx = Math.max(
       this.maximumProjectionErrorPx,
-      Math.hypot(
-        roundTrip.x - sample.position.x,
-        roundTrip.y - sample.position.y,
-      ),
+      Math.hypot(roundTrip.x - sample.position.x, roundTrip.y - sample.position.y),
     );
     binding.node.getWorldRotation(this.observedRotation);
-    const dot = Math.min(
-      1,
-      Math.abs(
-        this.observedRotation.x * this.expectedRotation.x +
-          this.observedRotation.y * this.expectedRotation.y +
-          this.observedRotation.z * this.expectedRotation.z +
-          this.observedRotation.w * this.expectedRotation.w,
-      ),
-    );
+    const dot = Math.min(1, Math.abs(
+      this.observedRotation.x * this.expectedRotation.x +
+      this.observedRotation.y * this.expectedRotation.y +
+      this.observedRotation.z * this.expectedRotation.z +
+      this.observedRotation.w * this.expectedRotation.w,
+    ));
     this.maximumRotationErrorDegrees = Math.max(
       this.maximumRotationErrorDegrees,
       (2 * Math.acos(dot) * 180) / Math.PI,
     );
-    this.draw(
-      binding.graphics,
-      descriptor,
-      sample,
-      commandElapsedSeconds,
-    );
-    const radius = 120 * Math.max(sample.scale.x, sample.scale.y);
-    const horizontal =
-      Math.abs(requestedX) + radius -
-      (TASK014D2_SPATIAL.designWidth / 2 -
-        TASK014D2_SPATIAL.safeInset);
-    const vertical =
-      Math.abs(requestedY) + radius -
-      (TASK014D2_SPATIAL.designHeight / 2 -
-        TASK014D2_SPATIAL.safeInset);
-    const overflow = Math.max(0, horizontal, vertical);
+    const corners = [
+      [binding.localBounds.minimumX, binding.localBounds.minimumY],
+      [binding.localBounds.minimumX, binding.localBounds.maximumY],
+      [binding.localBounds.maximumX, binding.localBounds.minimumY],
+      [binding.localBounds.maximumX, binding.localBounds.maximumY],
+    ];
+    const projected = corners.map(([x, y]) => {
+      this.local.x = x as number;
+      this.local.y = y as number;
+      this.local.z = 0;
+      binding.node.getComponent(UITransform)?.convertToWorldSpaceAR(
+        this.local,
+        this.world,
+      );
+      overlayTransform.convertToNodeSpaceAR(this.world, this.overlayLocal);
+      return { x: this.overlayLocal.x, y: this.overlayLocal.y };
+    });
+    const bounds = {
+      minimumX: Math.min(...projected.map((point) => point.x)),
+      minimumY: Math.min(...projected.map((point) => point.y)),
+      maximumX: Math.max(...projected.map((point) => point.x)),
+      maximumY: Math.max(...projected.map((point) => point.y)),
+    };
+    const overflow = task014d2BoundsOverflowPx(bounds);
     this.maximumViewportOverflowPx = Math.max(
       this.maximumViewportOverflowPx,
       overflow,
     );
-    if (overflow > 0) {
-      throw new Error(
-        `TASK_014D2_VIEWPORT_OVERFLOW: ${overflow.toFixed(4)}`,
-      );
+    if (!Number.isFinite(overflow) || overflow > 0) {
+      throw new Error(`TASK_014D2_AABB_OVERFLOW: ${overflow.toFixed(4)}`);
     }
   }
 
-  destroyLayer(rendererId: string, _reason: string): void {
-    const binding = this.renderers.get(rendererId);
-    if (binding === undefined) return;
-    binding.node.destroy();
-    this.renderers.delete(rendererId);
-  }
-
-  activeRendererCount(): number {
-    return this.renderers.size;
-  }
-
-  setDebug(value: boolean): void {
-    this.debug = value;
-  }
-
-  componentCounts(): Readonly<{ graphics: number; sorting: number }> {
-    return [...this.renderers.values()].reduce(
-      (total, binding) => ({
-        graphics:
-          total.graphics +
-          binding.node.getComponents(Graphics).length,
-        sorting:
-          total.sorting +
-          binding.node.getComponents(Sorting2D).length,
-      }),
-      { graphics: 0, sorting: 0 },
-    );
-  }
-
-  private draw(
-    graphics: Graphics,
-    descriptor: CocosVfxLayerDescriptor,
-    sample: VfxLayerSample,
-    elapsedSeconds: number,
-  ): void {
+  private drawDebugBounds(binding: RendererBinding): void {
+    const graphics = binding.debugGraphics;
+    const bounds = binding.localBounds;
     graphics.clear();
-    const color = descriptor.layer.color;
-    const alpha = Math.max(
-      0,
-      Math.min(255, Math.round(sample.effectiveAlpha * 255)),
+    graphics.strokeColor = new Color(34, 211, 238, 255);
+    graphics.lineWidth = 3;
+    graphics.rect(
+      bounds.minimumX,
+      bounds.minimumY,
+      Math.max(1, bounds.maximumX - bounds.minimumX),
+      Math.max(1, bounds.maximumY - bounds.minimumY),
     );
-    graphics.fillColor = new Color(
-      Math.round(color.r * 255),
-      Math.round(color.g * 255),
-      Math.round(color.b * 255),
-      alpha,
-    );
-    graphics.strokeColor = graphics.fillColor;
-    switch (descriptor.primitive) {
-      case "sprite-quad":
-        graphics.rect(-54, -54, 108, 108);
-        graphics.fill();
-        break;
-      case "ring":
-        graphics.lineWidth = 8;
-        graphics.circle(0, 0, 66);
-        graphics.stroke();
-        break;
-      case "ribbon":
-        graphics.lineWidth = 16;
-        graphics.moveTo(-96, -24);
-        graphics.bezierCurveTo(-62, 52, -24, -48, 42, 20);
-        graphics.stroke();
-        break;
-      case "burst-particles":
-        for (const particle of descriptor.layer.emission?.schedule ?? []) {
-          if (particle.spawnTimeSeconds > elapsedSeconds) continue;
-          const angle =
-            ((particle.randomUint32 & 0xffff) / 0xffff) *
-            Math.PI *
-            2;
-          const radius =
-            20 + ((particle.randomUint32 >>> 16) / 0xffff) * 68;
-          graphics.circle(
-            Math.cos(angle) * radius,
-            Math.sin(angle) * radius,
-            7,
-          );
+    graphics.stroke();
+  }
+
+  private assertLifecycle(descriptor: CocosVfxLayerDescriptor): void {
+    switch (descriptor.lifecycle) {
+      case "one-shot":
+        if (descriptor.commandMode !== "emit") {
+          throw new Error("TASK_014D2_LIFECYCLE_COMMAND_MISMATCH");
         }
-        graphics.fill();
-        break;
+        return;
+      case "looping":
+      case "persistent":
+        if (descriptor.commandMode !== "start-stop") {
+          throw new Error("TASK_014D2_LIFECYCLE_COMMAND_MISMATCH");
+        }
+        return;
       default:
-        assertNeverPrimitive(descriptor.primitive);
-    }
-    if (this.debug) {
-      graphics.strokeColor = new Color(34, 211, 238, 220);
-      graphics.lineWidth = 2;
-      graphics.rect(-120, -120, 240, 240);
-      graphics.stroke();
+        assertNever(descriptor.lifecycle);
     }
   }
-}
-
-function assertNeverPrimitive(value: never): never {
-  throw new Error(`TASK_014D2_UNREACHABLE_PRIMITIVE: ${String(value)}`);
 }
 
 @ccclass("GameAITask014D2CocosVfxRenderPlanAdapter")
@@ -333,32 +581,19 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private debug = false;
   private elapsedSeconds = 0;
   private commandCounter = 0;
-  private failure = "";
+  private terminal = false;
+  private readonly diagnostics = createTask014D2RuntimeDiagnostics();
   private readonly onKeyDown = (event: EventKeyboard): void => {
-    const key =
-      event.keyCode === KeyCode.SPACE
-        ? "Space"
-        : event.keyCode === KeyCode.ESCAPE
-          ? "Escape"
-          : event.keyCode === KeyCode.DIGIT_1
-            ? "1"
-            : event.keyCode === KeyCode.DIGIT_2
-              ? "2"
-              : event.keyCode === KeyCode.DIGIT_3
-                ? "3"
-                : event.keyCode === KeyCode.DIGIT_4
-                  ? "4"
-                  : event.keyCode === KeyCode.KEY_X
-                    ? "X"
-                    : event.keyCode === KeyCode.KEY_B
-                      ? "B"
-                      : event.keyCode === KeyCode.KEY_D
-                        ? "D"
-                        : "";
+    const key = this.keyName(event.keyCode);
     const binding = TASK014D2_INPUT_REGISTRY.find(
       (candidate) => candidate.key === key,
     );
-    if (binding !== undefined) this.dispatch(binding.action);
+    if (binding === undefined) return;
+    try {
+      this.dispatch(binding.action);
+    } catch (error) {
+      this.enterTerminalFailure(error);
+    }
   };
 
   onEnable(): void {
@@ -366,18 +601,18 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   }
 
   update(deltaSeconds: number): void {
-    if (!this.ready || this.runtime === null) return;
+    if (!this.ready || this.runtime === null || this.terminal) return;
     try {
       if (this.playing) {
         this.elapsedSeconds += deltaSeconds;
         this.runtime.tick(deltaSeconds);
       }
       this.assertRuntime();
+      this.syncDiagnostics();
+      this.updateHud();
     } catch (error) {
-      this.failure = error instanceof Error ? error.message : String(error);
-      console.error(this.failure);
+      this.enterTerminalFailure(error);
     }
-    this.updateHud();
   }
 
   onDisable(): void {
@@ -391,38 +626,64 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private beginSetup(): void {
     const generation = ++this.generation;
     this.ready = false;
-    this.failure = "";
+    this.terminal = false;
+    this.diagnostics.terminalError = "";
     const compiled = compileCocosVfxRenderDescriptors(
       TASK014D2_RENDER_PLAN,
       TASK014D2_RESOURCE_REGISTRY,
     );
     if (!compiled.ok) {
-      this.failure = `TASK_014D2_RESOURCE_RECIPE_GATE_FAILED: ${JSON.stringify(compiled.errors)}`;
-      console.error(this.failure);
+      this.enterTerminalFailure(
+        new Error(`TASK_014D2_RESOURCE_RECIPE_GATE_FAILED: ${JSON.stringify(compiled.errors)}`),
+      );
       return;
     }
-    try {
-      this.descriptorPlan = compiled.value;
-      this.buildRuntime(compiled.value);
-      if (generation !== this.generation) return;
-      this.ready = true;
-      this.exactReset();
-      this.registerInput();
-      console.info("TASK_014D2_RUNTIME_READY", this.snapshot());
-    } catch (error) {
-      this.failure = error instanceof Error ? error.message : String(error);
-      this.teardown("partial-build");
-      console.error(this.failure);
-    }
+    this.descriptorPlan = compiled.value;
+    resources.load(
+      TEXTURE_RESOURCE_PATH,
+      SpriteFrame,
+      (error: Error | null, frame: SpriteFrame | null) => {
+        if (generation !== this.generation) return;
+        if (
+          (error !== null && error !== undefined) ||
+          frame === null ||
+          frame === undefined
+        ) {
+          this.enterTerminalFailure(error ??
+            new Error("TASK_014D2_TEXTURE_RESOURCE_LOAD_FAILED"));
+          return;
+        }
+        try {
+          const realizations = new Map<string, CocosResourceRealization>();
+          for (const resource of TASK014D2_RESOURCE_REGISTRY) {
+            realizations.set(resource.resourceId, {
+              resourceId: resource.resourceId,
+              recipeKind: resource.recipeKind,
+              spriteFrame:
+                resource.recipeKind === "textured-sprite" ? frame : null,
+            });
+          }
+          this.buildRuntime(compiled.value, realizations);
+          if (generation !== this.generation) return;
+          this.ready = true;
+          this.diagnostics.setupCount += 1;
+          this.exactReset("Initial Reset");
+          this.registerInput();
+          this.syncDiagnostics();
+          this.updateHud();
+          console.info("TASK_014D2_RUNTIME_READY", this.snapshot());
+        } catch (caught) {
+          this.enterTerminalFailure(caught);
+        }
+      },
+    );
   }
 
-  private buildRuntime(plan: CocosVfxDescriptorPlan): void {
-    if (
-      this.runtimeRoot !== null ||
-      this.node.children.some(
-        (child) => child.name === "Task014D2RuntimeRoot",
-      )
-    ) {
+  private buildRuntime(
+    plan: CocosVfxDescriptorPlan,
+    resourcesById: ReadonlyMap<string, CocosResourceRealization>,
+  ): void {
+    if (this.runtimeRoot !== null || this.runtimeRootCount() !== 0) {
       throw new Error("TASK_014D2_DUPLICATE_RUNTIME_ROOT");
     }
     const root = new Node("Task014D2RuntimeRoot");
@@ -430,11 +691,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     root.setParent(this.node);
     root.addComponent(UITransform).setContentSize(1280, 720);
     this.runtimeRoot = root;
-
-    const stressRoot = new Node("GenericStressRoot");
-    stressRoot.layer = Layers.Enum.UI_2D;
-    stressRoot.setParent(root);
-    stressRoot.addComponent(UITransform).setContentSize(1280, 720);
+    const stressRoot = this.target("GenericStressRoot", root, 0, 0);
     this.stressRoot = stressRoot;
     const targetA = this.target("GenericTargetA", stressRoot, -210, -40);
     const nested = this.target("GenericNestedParent", stressRoot, 150, 30);
@@ -442,44 +699,30 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     nested.setScale(1.1, 0.85, 1);
     const targetB = this.target("GenericTargetB", nested, 70, 35);
     const targetC = this.target("GenericTargetC", stressRoot, 0, 120);
-
-    const overlay = new Node("VfxOverlayRoot");
-    overlay.layer = Layers.Enum.UI_2D;
-    overlay.setParent(root);
-    overlay.addComponent(UITransform).setContentSize(1280, 720);
+    const overlay = this.target("VfxOverlayRoot", root, 0, 0);
+    overlay.getComponent(UITransform)?.setContentSize(1280, 720);
     this.overlay = overlay;
-    const cueOrder = new Map(
-      plan.cues.map((cue, index) => [cue.cueId, index]),
-    );
+    const cueOrder = new Map(plan.cues.map((cue, index) => [cue.cueId, index]));
     this.host = new CocosRenderPlanHost(
       overlay,
       [targetA, targetB, targetC],
       cueOrder,
+      resourcesById,
     );
     this.runtime = new CocosVfxRuntimeState(plan, this.host);
-
-    const hudNode = new Node("Task014D2Hud");
-    hudNode.layer = Layers.Enum.UI_2D;
-    hudNode.setParent(root);
-    hudNode.setPosition(-620, 340, 0);
-    const hudTransform = hudNode.addComponent(UITransform);
-    hudTransform.setContentSize(1240, 120);
+    const hudNode = this.target("Task014D2Hud", root, -620, 340);
+    const hudTransform = hudNode.getComponent(UITransform) as UITransform;
+    hudTransform.setContentSize(1240, 190);
     hudTransform.setAnchorPoint(0, 1);
     const hud = hudNode.addComponent(Label);
-    hud.fontSize = 16;
-    hud.lineHeight = 20;
+    hud.fontSize = 14;
+    hud.lineHeight = 19;
     hud.color = new Color(226, 232, 240, 255);
-    hudNode.addComponent(Sorting2D).sortingOrder =
-      TASK014D2_SORTING.hud;
+    hudNode.addComponent(Sorting2D).sortingOrder = TASK014D2_SORTING.hud;
     this.hud = hud;
   }
 
-  private target(
-    name: string,
-    parent: Node,
-    x: number,
-    y: number,
-  ): Node {
+  private target(name: string, parent: Node, x: number, y: number): Node {
     const node = new Node(name);
     node.layer = Layers.Enum.UI_2D;
     node.setParent(parent);
@@ -500,6 +743,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     if (!this.ready || this.runtime === null || this.descriptorPlan === null) {
       return;
     }
+    this.diagnostics.lastAction = action;
     if (action === "pause") {
       this.playing = !this.playing;
       this.runtime.setPaused(!this.playing);
@@ -510,10 +754,11 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
       this.debug = !this.debug;
       this.host?.setDebug(this.debug);
     } else if (action === "rebuild") {
+      this.diagnostics.rebuildCount += 1;
       this.rebuild();
       return;
     } else if (action === "reset") {
-      this.exactReset();
+      this.exactReset("Exact Reset");
     } else {
       const cue = this.resolveControlCue(action);
       this.playing = true;
@@ -525,15 +770,22 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
           commandId: `command-${++this.commandCounter}`,
         });
       } else {
-        const instanceId = `${cue.lifecycle}-instance`;
-        this.runtime.dispatch({
+        if (cue.lifecycle === "persistent") {
+          this.diagnostics.persistentStartAttempts += 1;
+        }
+        const result = this.runtime.dispatch({
           command: "start",
           cueId: cue.cueId,
           commandId: `command-${++this.commandCounter}`,
-          instanceId,
+          instanceId: `${cue.lifecycle}-instance`,
         });
+        if (cue.lifecycle === "persistent") {
+          if (result.accepted) this.diagnostics.acceptedPersistentStarts += 1;
+          if (result.coalesced) this.diagnostics.coalescedPersistentStarts += 1;
+        }
       }
     }
+    this.syncDiagnostics();
     this.updateHud();
   }
 
@@ -542,30 +794,20 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   ): CocosVfxCueDescriptor {
     const cues = this.descriptorPlan?.cues ?? [];
     if (action === "looping") {
-      return this.requireCue(
-        cues.find((cue) => cue.lifecycle === "looping"),
-      );
+      return this.requireCue(cues.find((cue) => cue.lifecycle === "looping"));
     }
     if (action === "persistent") {
-      return this.requireCue(
-        cues.find((cue) => cue.lifecycle === "persistent"),
-      );
+      return this.requireCue(cues.find((cue) => cue.lifecycle === "persistent"));
     }
     const oneShots = cues.filter((cue) => cue.lifecycle === "one-shot");
-    return this.requireCue(
+    return this.requireCue([...oneShots].sort((left, right) =>
       action === "combined"
-        ? [...oneShots].sort(
-            (left, right) => right.layers.length - left.layers.length,
-          )[0]
-        : [...oneShots].sort(
-            (left, right) => left.layers.length - right.layers.length,
-          )[0],
-    );
+        ? right.layers.length - left.layers.length
+        : left.layers.length - right.layers.length)[0]);
   }
 
-  private requireCue(
-    cue: CocosVfxCueDescriptor | undefined,
-  ): CocosVfxCueDescriptor {
+  private requireCue(cue: CocosVfxCueDescriptor | undefined):
+  CocosVfxCueDescriptor {
     if (cue === undefined) throw new Error("TASK_014D2_CONTROL_CUE_MISSING");
     return cue;
   }
@@ -583,7 +825,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     }
   }
 
-  private exactReset(): void {
+  private exactReset(action: string): void {
     this.runtime?.cleanup("reset");
     this.runtime?.setPaused(true);
     this.playing = false;
@@ -592,6 +834,8 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.debug = false;
     this.applyStress();
     this.host?.setDebug(false);
+    this.diagnostics.lastAction = action;
+    this.syncDiagnostics();
     this.updateHud();
   }
 
@@ -599,12 +843,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.runtime?.rebuild();
     this.unregisterInput();
     this.destroyRuntimeRoot();
-    this.runtimeRoot = null;
-    this.stressRoot = null;
-    this.overlay = null;
-    this.hud = null;
-    this.host = null;
-    this.runtime = null;
+    this.clearRuntimeReferences();
     this.beginSetup();
   }
 
@@ -614,6 +853,18 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.runtime?.cleanup(reason);
     this.unregisterInput();
     this.destroyRuntimeRoot();
+    this.clearRuntimeReferences();
+  }
+
+  private destroyRuntimeRoot(): void {
+    const root = this.runtimeRoot;
+    if (root === null) return;
+    this.diagnostics.teardownCount += 1;
+    root.removeFromParent();
+    root.destroy();
+  }
+
+  private clearRuntimeReferences(): void {
     this.runtimeRoot = null;
     this.stressRoot = null;
     this.overlay = null;
@@ -622,38 +873,47 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.runtime = null;
   }
 
-  private destroyRuntimeRoot(): void {
-    const root = this.runtimeRoot;
-    if (root === null) return;
-    root.removeFromParent();
-    root.destroy();
-  }
-
   private unregisterInput(): void {
     if (!this.inputRegistered) return;
     input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
     this.inputRegistered = false;
   }
 
+  private enterTerminalFailure(error: unknown): void {
+    if (this.terminal) return;
+    this.terminal = true;
+    this.ready = false;
+    this.playing = false;
+    this.runtime?.cleanup("terminal-failure");
+    this.unregisterInput();
+    this.diagnostics.terminalError =
+      error instanceof Error ? error.message : String(error);
+    this.syncDiagnostics();
+    this.updateHud();
+    console.error(this.diagnostics.terminalError);
+  }
+
   private assertRuntime(): void {
     const snapshot = this.runtime?.snapshot();
     if (
-      this.node.children.filter(
-        (child) => child.name === "Task014D2RuntimeRoot",
-      ).length !== 1 ||
+      this.runtimeRootCount() !== 1 ||
       !this.inputRegistered ||
       snapshot === undefined ||
-      snapshot.staleRendererCount !== 0
+      snapshot.missingRendererIds.length !== 0 ||
+      snapshot.extraRendererIds.length !== 0 ||
+      snapshot.mismatchedRendererIds.length !== 0
     ) {
-      throw new Error("TASK_014D2_RUNTIME_INVARIANT_FAILED");
+      throw new Error("TASK_014D2_RUNTIME_OWNERSHIP_INVARIANT_FAILED");
     }
-    const components = this.host?.componentCounts();
-    if (
-      components !== undefined &&
-      (components.graphics !== snapshot.activeRendererCount ||
-        components.sorting !== snapshot.activeRendererCount)
-    ) {
-      throw new Error("TASK_014D2_RENDERER_COMPONENT_INVARIANT_FAILED");
+    const counts = this.host?.componentCounts();
+    if (counts !== undefined) {
+      const uniqueOrders = new Set(counts.sortingOrders);
+      if (uniqueOrders.size !== counts.sortingOrders.length ||
+          counts.sortingOrders.some((order) =>
+            order < TASK014D2_SORTING.vfxMinimum ||
+            order > TASK014D2_SORTING.vfxMaximum)) {
+        throw new Error("TASK_014D2_SORTING_INVARIANT_FAILED");
+      }
     }
     if (
       (this.host?.maximumProjectionErrorPx ?? 0) >
@@ -668,29 +928,67 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     }
   }
 
+  private syncDiagnostics(): void {
+    const snapshot = this.runtime?.snapshot();
+    this.diagnostics.activeInstances = snapshot?.activeCueKeys.length ?? 0;
+    this.diagnostics.activeRenderers = snapshot?.activeRendererCount ?? 0;
+    this.diagnostics.missingRenderers =
+      snapshot?.missingRendererIds.length ?? 0;
+    this.diagnostics.extraRenderers = snapshot?.extraRendererIds.length ?? 0;
+    this.diagnostics.mismatchedRenderers =
+      snapshot?.mismatchedRendererIds.length ?? 0;
+    this.diagnostics.staleRenderers = snapshot?.staleRendererCount ?? 0;
+    this.diagnostics.runtimeRoots = this.runtimeRootCount();
+    this.diagnostics.inputHandlers = this.inputRegistered ? 1 : 0;
+    this.diagnostics.activeRecipeBlendSummary =
+      this.host?.activeSummary() ?? "none";
+    this.diagnostics.maximumPositionErrorPx = Math.max(
+      this.host?.maximumProjectionErrorPx ?? 0,
+      this.host?.maximumPositionErrorPx ?? 0,
+    );
+    this.diagnostics.maximumRotationErrorDegrees =
+      this.host?.maximumRotationErrorDegrees ?? 0;
+    this.diagnostics.maximumAabbOverflowPx =
+      this.host?.maximumViewportOverflowPx ?? 0;
+  }
+
   private updateHud(): void {
     if (this.hud === null) return;
-    const snapshot = this.runtime?.snapshot();
-    this.hud.string = [
-      "TASK-014D2 · Generic Cocos Render Plan Adapter",
-      `Gate ${this.ready ? "PASS" : "WAIT"} · ${this.playing ? "PLAYING" : "STOPPED"} at ${this.elapsedSeconds.toFixed(2)}s · Stress ${this.stress ? "ON" : "OFF"} · Debug ${this.debug ? "ON" : "OFF"}`,
-      `Instances ${snapshot?.activeCueKeys.length ?? 0} · Renderers ${snapshot?.activeRendererCount ?? 0} · Stale ${snapshot?.staleRendererCount ?? 0} · Root ${this.runtimeRoot === null ? 0 : 1} · Input ${this.inputRegistered ? 1 : 0} · ${this.failure || "No errors"}`,
-      TASK014D2_INPUT_REGISTRY.slice(0, 4).map(
-        (entry) => `${entry.key} ${entry.label}`,
-      ).join("  ·  "),
-      TASK014D2_INPUT_REGISTRY.slice(4).map(
-        (entry) => `${entry.key} ${entry.label}`,
-      ).join("  ·  "),
-    ].join("\n");
+    this.hud.string = formatTask014D2Diagnostics(this.diagnostics, {
+      ready: this.ready,
+      playing: this.playing,
+      elapsedSeconds: this.elapsedSeconds,
+      stress: this.stress,
+      debug: this.debug,
+    });
+  }
+
+  private runtimeRootCount(): number {
+    return this.node.children.filter(
+      (child) => child.name === "Task014D2RuntimeRoot",
+    ).length;
   }
 
   private snapshot(): unknown {
     return {
       generation: this.generation,
-      ready: this.ready,
-      rootCount: this.runtimeRoot === null ? 0 : 1,
-      inputCount: this.inputRegistered ? 1 : 0,
+      diagnostics: { ...this.diagnostics },
       runtime: this.runtime?.snapshot(),
     };
+  }
+
+  private keyName(keyCode: number): string {
+    switch (keyCode) {
+      case KeyCode.SPACE: return "Space";
+      case KeyCode.ESCAPE: return "Escape";
+      case KeyCode.DIGIT_1: return "1";
+      case KeyCode.DIGIT_2: return "2";
+      case KeyCode.DIGIT_3: return "3";
+      case KeyCode.DIGIT_4: return "4";
+      case KeyCode.KEY_X: return "X";
+      case KeyCode.KEY_B: return "B";
+      case KeyCode.KEY_D: return "D";
+      default: return "";
+    }
   }
 }

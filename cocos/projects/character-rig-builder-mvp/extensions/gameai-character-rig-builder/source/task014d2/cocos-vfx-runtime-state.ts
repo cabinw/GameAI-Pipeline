@@ -1,4 +1,5 @@
 import {
+  compareCodeUnits,
   sampleVfxLayerAtTime,
   type VfxLayerSample,
 } from "@gameai/vfx-authoring";
@@ -31,9 +32,15 @@ export type CocosVfxSemanticCommand =
       readonly reason: "semantic-stop" | "reset" | "switch" | "dispose";
     };
 
+export interface CocosVfxRendererOwnership {
+  readonly rendererId: string;
+  readonly instanceId: string;
+  readonly descriptorId: string;
+}
+
 export interface CocosVfxRuntimeHost {
   createLayer(
-    rendererId: string,
+    ownership: CocosVfxRendererOwnership,
     descriptor: CocosVfxLayerDescriptor,
   ): void;
   updateLayer(
@@ -43,22 +50,55 @@ export interface CocosVfxRuntimeHost {
     commandElapsedSeconds: number,
   ): void;
   destroyLayer(rendererId: string, reason: string): void;
-  activeRendererCount(): number;
+  rendererOwnership(): readonly CocosVfxRendererOwnership[];
+}
+
+interface ActiveRenderer {
+  readonly ownership: CocosVfxRendererOwnership;
+  readonly descriptor: CocosVfxLayerDescriptor;
 }
 
 interface ActiveCue {
   readonly key: string;
   readonly cue: CocosVfxCueDescriptor;
-  readonly rendererIds: readonly string[];
+  readonly renderers: readonly ActiveRenderer[];
   elapsedSeconds: number;
+}
+
+export interface CocosVfxDispatchResult {
+  readonly accepted: boolean;
+  readonly coalesced: boolean;
+  readonly instanceId: string | null;
 }
 
 export interface CocosVfxRuntimeSnapshot {
   readonly paused: boolean;
   readonly activeCueKeys: readonly string[];
   readonly activeRendererCount: number;
+  readonly missingRendererIds: readonly string[];
+  readonly extraRendererIds: readonly string[];
+  readonly mismatchedRendererIds: readonly string[];
   readonly staleRendererCount: number;
   readonly generation: number;
+  readonly terminalError: string | null;
+}
+
+function ownershipEqual(
+  left: CocosVfxRendererOwnership,
+  right: CocosVfxRendererOwnership,
+): boolean {
+  return left.rendererId === right.rendererId &&
+    left.instanceId === right.instanceId &&
+    left.descriptorId === right.descriptorId;
+}
+
+function runtimeError(error: unknown): CocosVfxRuntimeError {
+  return error instanceof CocosVfxRuntimeError
+    ? error
+    : new CocosVfxRuntimeError(
+        CocosVfxPlanErrorCode.RUNTIME_BUILD_FAILURE,
+        error instanceof Error ? error.message : "VFX runtime failed.",
+      );
 }
 
 export class CocosVfxRuntimeState {
@@ -66,6 +106,7 @@ export class CocosVfxRuntimeState {
   private readonly active = new Map<string, ActiveCue>();
   private paused = false;
   private generation = 1;
+  private terminalError: CocosVfxRuntimeError | null = null;
 
   public constructor(
     plan: CocosVfxDescriptorPlan,
@@ -74,7 +115,10 @@ export class CocosVfxRuntimeState {
     this.cues = new Map(plan.cues.map((cue) => [cue.cueId, cue]));
   }
 
-  public dispatch(command: CocosVfxSemanticCommand): void {
+  public dispatch(
+    command: CocosVfxSemanticCommand,
+  ): CocosVfxDispatchResult {
+    this.assertOperational();
     if (command.command === "stop") {
       const active = this.active.get(command.instanceId);
       if (active === undefined) {
@@ -83,9 +127,13 @@ export class CocosVfxRuntimeState {
           `Unknown Cocos VFX instance ${command.instanceId}.`,
         );
       }
-      this.destroy(active, command.reason);
       this.active.delete(command.instanceId);
-      return;
+      this.destroy(active, command.reason);
+      return {
+        accepted: true,
+        coalesced: false,
+        instanceId: command.instanceId,
+      };
     }
     const cue = this.cues.get(command.cueId);
     if (cue === undefined) {
@@ -107,55 +155,77 @@ export class CocosVfxRuntimeState {
       command.command === "emit" ? command.commandId : command.instanceId;
     if (this.active.has(key)) {
       if (cue.lifecycle === "persistent" && command.command === "start") {
-        return;
+        return { accepted: false, coalesced: true, instanceId: key };
       }
       throw new CocosVfxRuntimeError(
         CocosVfxPlanErrorCode.DUPLICATE_INSTANCE,
         `Duplicate Cocos VFX instance ${key}.`,
       );
     }
-    const rendererIds = cue.layers.map(
-      (layer) => `${this.generation}:${key}:${layer.layerId}`,
-    );
-    const created: string[] = [];
+
+    const renderers = cue.layers.map((descriptor) => ({
+      descriptor,
+      ownership: {
+        rendererId:
+          `${this.generation}:${key}:${descriptor.descriptorId}`,
+        instanceId: key,
+        descriptorId: descriptor.descriptorId,
+      },
+    }));
+    const candidate: ActiveCue = {
+      key,
+      cue,
+      renderers,
+      elapsedSeconds: 0,
+    };
+    const created: ActiveRenderer[] = [];
+    let inserted = false;
     try {
-      for (const [index, layer] of cue.layers.entries()) {
-        const rendererId = rendererIds[index] as string;
-        this.host.createLayer(rendererId, layer);
-        created.push(rendererId);
+      for (const renderer of renderers) {
+        this.host.createLayer(renderer.ownership, renderer.descriptor);
+        created.push(renderer);
       }
-      const active: ActiveCue = { key, cue, rendererIds, elapsedSeconds: 0 };
-      this.active.set(key, active);
-      this.update(active);
+      this.update(candidate);
+      this.active.set(key, candidate);
+      inserted = true;
+      this.assertOwnership();
     } catch (error) {
-      for (const rendererId of created) {
-        this.host.destroyLayer(rendererId, "partial-build");
-      }
-      throw error instanceof CocosVfxRuntimeError
-        ? error
-        : new CocosVfxRuntimeError(
-            CocosVfxPlanErrorCode.RUNTIME_BUILD_FAILURE,
-            error instanceof Error ? error.message : "VFX build failed.",
-          );
+      if (inserted) this.active.delete(key);
+      this.destroyRenderers(created, "partial-build");
+      throw runtimeError(error);
     }
+    return { accepted: true, coalesced: false, instanceId: key };
   }
 
   public tick(deltaSeconds: number): void {
+    this.assertOperational();
     if (!Number.isFinite(deltaSeconds) || deltaSeconds < 0) {
-      throw new CocosVfxRuntimeError(
+      this.enterTerminalFailure(new CocosVfxRuntimeError(
         CocosVfxPlanErrorCode.INVALID_COMMAND,
         "VFX runtime delta must be finite and non-negative.",
-      );
+      ));
     }
     if (this.paused) return;
-    for (const [key, active] of [...this.active]) {
-      active.elapsedSeconds += deltaSeconds;
-      const removed = this.update(active);
-      if (removed) this.active.delete(key);
+    try {
+      for (const [key, active] of [...this.active]) {
+        active.elapsedSeconds += deltaSeconds;
+        if (!Number.isFinite(active.elapsedSeconds)) {
+          throw new CocosVfxRuntimeError(
+            CocosVfxPlanErrorCode.INVALID_COMMAND,
+            "VFX runtime elapsed time overflowed.",
+          );
+        }
+        const removed = this.update(active);
+        if (removed) this.active.delete(key);
+      }
+      this.assertOwnership();
+    } catch (error) {
+      this.enterTerminalFailure(runtimeError(error));
     }
   }
 
   public setPaused(paused: boolean): void {
+    this.assertOperational();
     this.paused = paused;
   }
 
@@ -163,42 +233,97 @@ export class CocosVfxRuntimeState {
     this.cleanup("rebuild");
     this.generation += 1;
     this.paused = false;
+    this.terminalError = null;
   }
 
   public cleanup(reason: string): void {
-    for (const active of this.active.values()) this.destroy(active, reason);
+    const active = [...this.active.values()];
     this.active.clear();
+    for (const cue of active) this.destroy(cue, reason);
   }
 
   public snapshot(): CocosVfxRuntimeSnapshot {
-    const owned = [...this.active.values()].reduce(
-      (count, cue) => count + cue.rendererIds.length,
-      0,
+    const expected = new Map<string, CocosVfxRendererOwnership>();
+    for (const cue of this.active.values()) {
+      for (const renderer of cue.renderers) {
+        expected.set(renderer.ownership.rendererId, renderer.ownership);
+      }
+    }
+    const actualEntries = this.host.rendererOwnership();
+    const actual = new Map<string, CocosVfxRendererOwnership>(
+      actualEntries.map((ownership) => [ownership.rendererId, ownership]),
     );
+    const duplicateActual = actualEntries.length !== actual.size;
+    const missing = [...expected.keys()]
+      .filter((id) => !actual.has(id))
+      .sort(compareCodeUnits);
+    const extra = [...actual.keys()]
+      .filter((id) => !expected.has(id))
+      .sort(compareCodeUnits);
+    const mismatched = [...expected.entries()]
+      .filter(([id, ownership]) => {
+        const observed = actual.get(id);
+        return observed !== undefined && !ownershipEqual(ownership, observed);
+      })
+      .map(([id]) => id)
+      .sort(compareCodeUnits);
+    if (duplicateActual) mismatched.push("<duplicate-renderer-id>");
     return {
       paused: this.paused,
-      activeCueKeys: [...this.active.keys()].sort(),
-      activeRendererCount: this.host.activeRendererCount(),
-      staleRendererCount: Math.max(
-        0,
-        this.host.activeRendererCount() - owned,
-      ),
+      activeCueKeys: [...this.active.keys()].sort(compareCodeUnits),
+      activeRendererCount: actualEntries.length,
+      missingRendererIds: missing,
+      extraRendererIds: extra,
+      mismatchedRendererIds: mismatched,
+      staleRendererCount: extra.length + mismatched.length,
       generation: this.generation,
+      terminalError: this.terminalError?.message ?? null,
     };
+  }
+
+  private assertOperational(): void {
+    if (this.terminalError !== null) throw this.terminalError;
+  }
+
+  private assertOwnership(): void {
+    const snapshot = this.snapshot();
+    if (
+      snapshot.missingRendererIds.length > 0 ||
+      snapshot.extraRendererIds.length > 0 ||
+      snapshot.mismatchedRendererIds.length > 0
+    ) {
+      throw new CocosVfxRuntimeError(
+        CocosVfxPlanErrorCode.RUNTIME_OWNERSHIP_MISMATCH,
+        `Renderer ownership mismatch: ${JSON.stringify({
+          missing: snapshot.missingRendererIds,
+          extra: snapshot.extraRendererIds,
+          mismatched: snapshot.mismatchedRendererIds,
+        })}`,
+      );
+    }
+  }
+
+  private enterTerminalFailure(error: CocosVfxRuntimeError): never {
+    if (this.terminalError === null) {
+      this.terminalError = error;
+      this.paused = true;
+      this.cleanup("terminal-failure");
+    }
+    throw this.terminalError;
   }
 
   private update(active: ActiveCue): boolean {
     let allRemoved = active.cue.lifecycle === "one-shot";
-    for (const [index, layer] of active.cue.layers.entries()) {
+    for (const renderer of active.renderers) {
       const sample = sampleVfxLayerAtTime(
-        layer.layer,
+        renderer.descriptor.layer,
         active.elapsedSeconds,
       );
       if (!sample.removed) allRemoved = false;
       if (sample.active) {
         this.host.updateLayer(
-          active.rendererIds[index] as string,
-          layer,
+          renderer.ownership.rendererId,
+          renderer.descriptor,
           sample,
           active.elapsedSeconds,
         );
@@ -209,8 +334,15 @@ export class CocosVfxRuntimeState {
   }
 
   private destroy(active: ActiveCue, reason: string): void {
-    for (const rendererId of active.rendererIds) {
-      this.host.destroyLayer(rendererId, reason);
+    this.destroyRenderers(active.renderers, reason);
+  }
+
+  private destroyRenderers(
+    renderers: readonly ActiveRenderer[],
+    reason: string,
+  ): void {
+    for (const renderer of renderers) {
+      this.host.destroyLayer(renderer.ownership.rendererId, reason);
     }
   }
 }

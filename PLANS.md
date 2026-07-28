@@ -3897,6 +3897,41 @@ reference mutation.
 - Feature implementation and temporary evidence are pushed, no MP4 is
   tracked on the feature branch, and no PR exists.
 
+## TASK-014D2 remediation plan (complete; external review pending)
+
+- Preserve `ac5309cb5aa6854d1ad94402f6abdac42619f793` and
+  `8e972215986b2f1d8c4aa381f1feecf4f1bc7ad7` as append-only ancestors.
+- Replace non-atomic instance creation with transactional renderer ownership,
+  exact ownership-set diagnostics, destroy-once cleanup, and one terminal
+  runtime failure path.
+- Validate untrusted Render Plan and resource-registry values completely before
+  descriptor emission, including closed enums, sparse/malformed collections,
+  capability duplicates, sorting, and preflight budgets.
+- Compile globally unique deterministic sorting orders and concrete,
+  exhaustive primitive/recipe/blend/lifecycle realization instructions.
+- Replace radius-only viewport checks with transformed primitive bounds and
+  one typed diagnostics model shared by runtime, HUD, and tests.
+- Regenerate mirrors, run the full automated and Creator 3.8.8 gates, append
+  feature commits within 48 files / 8,000 changed lines, and push without a PR.
+- Record and byte-verify a replacement evidence video while retaining and
+  explicitly marking the original evidence as failed external review.
+
+### Remediation result
+
+- Atomic creation/initial update, exact renderer tuple ownership,
+  destroy-once terminal cleanup, and same-ID retry are enforced.
+- The untrusted descriptor boundary validates every concrete plan/registry
+  value and budget before emitting any descriptor.
+- Runtime factories exhaustively realize typed textured-sprite,
+  procedural-ring, procedural-ribbon, alpha, additive, screen, lifecycle, and
+  particle behavior without cue/resource-name dispatch.
+- Global sorting is unique and activation-order independent; transformed
+  four-corner bounds include nested rotation, non-uniform Stress, and
+  primitive/particle geometry.
+- HUD and tests consume one typed diagnostic model. All automated and Creator
+  3.8.8 gates passed; replacement evidence is pending external code and visual
+  review. No TASK-014D2 PR exists and TASK-014D3 has not started.
+
 ## Acceptance result
 
 - External visual review: PASS.

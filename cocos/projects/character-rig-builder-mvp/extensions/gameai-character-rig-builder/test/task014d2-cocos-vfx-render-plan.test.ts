@@ -21,9 +21,13 @@ import {
   TASK014D2_INPUT_REGISTRY,
   TASK014D2_RESOURCE_REGISTRY,
   TASK014D2_SORTING,
+  createTask014D2RuntimeDiagnostics,
   composeTask014D2Affine,
+  formatTask014D2Diagnostics,
   projectTask014D2WorldToOverlay,
+  task014d2BoundsOverflowPx,
   task014d2PointInsideSafeViewport,
+  transformTask014D2Bounds,
 } from "../source/task014d2/cocos-vfx-harness-contract";
 import {
   COCOS_VFX_PLAN_BUDGETS,
@@ -33,6 +37,7 @@ import {
 } from "../source/task014d2/cocos-vfx-render-descriptor";
 import {
   CocosVfxRuntimeState,
+  type CocosVfxRendererOwnership,
   type CocosVfxRuntimeHost,
 } from "../source/task014d2/cocos-vfx-runtime-state";
 
@@ -119,22 +124,27 @@ function descriptorPlan(
 
 class FakeHost implements CocosVfxRuntimeHost {
   readonly descriptors = new Map<string, CocosVfxLayerDescriptor>();
+  readonly ownership = new Map<string, CocosVfxRendererOwnership>();
   readonly samples = new Map<string, VfxLayerSample>();
   readonly destroyed: Array<readonly [string, string]> = [];
   failAtCreate = Number.POSITIVE_INFINITY;
+  failAtUpdate = Number.POSITIVE_INFINITY;
   createCount = 0;
+  updateCount = 0;
 
   createLayer(
-    rendererId: string,
+    ownership: CocosVfxRendererOwnership,
     descriptor: CocosVfxLayerDescriptor,
   ): void {
     if (this.createCount++ === this.failAtCreate) {
       throw new Error("synthetic partial build failure");
     }
+    const rendererId = ownership.rendererId;
     if (this.descriptors.has(rendererId)) {
       throw new Error(`duplicate renderer ${rendererId}`);
     }
     this.descriptors.set(rendererId, descriptor);
+    this.ownership.set(rendererId, ownership);
   }
 
   updateLayer(
@@ -143,18 +153,26 @@ class FakeHost implements CocosVfxRuntimeHost {
     sample: VfxLayerSample,
     _commandElapsedSeconds: number,
   ): void {
+    if (this.updateCount++ === this.failAtUpdate) {
+      throw new Error("synthetic update failure");
+    }
     assert.ok(this.descriptors.has(rendererId));
     this.samples.set(rendererId, sample);
   }
 
   destroyLayer(rendererId: string, reason: string): void {
     this.descriptors.delete(rendererId);
+    this.ownership.delete(rendererId);
     this.samples.delete(rendererId);
     this.destroyed.push([rendererId, reason]);
   }
 
   activeRendererCount(): number {
     return this.descriptors.size;
+  }
+
+  rendererOwnership(): readonly CocosVfxRendererOwnership[] {
+    return [...this.ownership.values()];
   }
 }
 
@@ -276,6 +294,141 @@ test("descriptor compiler rejects plan, lifecycle, primitive, recipe, blend, and
     CocosVfxPlanErrorCode.UNSUPPORTED_BLEND,
     unsupportedBlend,
   );
+});
+
+test("untrusted plan and registry values fail closed, stably, and without mutation", () => {
+  const malformed: unknown[] = [
+    null,
+    7,
+    "plan",
+    { planVersion: "1.0.0", semantics: {}, cues: [null] },
+    { planVersion: "1.0.0", semantics: {}, cues: [,] },
+  ];
+  for (const value of malformed) {
+    assert.doesNotThrow(() =>
+      compileCocosVfxRenderDescriptors(value, TASK014D2_RESOURCE_REGISTRY));
+    assert.equal(
+      compileCocosVfxRenderDescriptors(
+        value,
+        TASK014D2_RESOURCE_REGISTRY,
+      ).ok,
+      false,
+    );
+  }
+  const mutations: Array<(value: Record<string, unknown>) => void> = [
+    (cue) => { cue.cueId = ""; },
+    (cue) => { cue.lifecycle = "forever"; },
+    (cue) => { cue.commandMode = "toggle"; },
+    (cue) => { cue.deterministicSeed = Number.POSITIVE_INFINITY; },
+  ];
+  for (const mutate of mutations) {
+    const plan = structuredClone(renderPlan()) as unknown as {
+      cues: Record<string, unknown>[];
+    };
+    mutate(plan.cues[0] as Record<string, unknown>);
+    const before = structuredClone(plan);
+    const result = compileCocosVfxRenderDescriptors(
+      plan,
+      TASK014D2_RESOURCE_REGISTRY,
+    );
+    assert.equal(result.ok, false);
+    assert.deepEqual(plan, before);
+    assert.equal("value" in result, false);
+  }
+
+  const badRegistries: unknown[] = [
+    null,
+    [{ ...TASK014D2_RESOURCE_REGISTRY[0], resourceId: "" }],
+    [{
+      ...TASK014D2_RESOURCE_REGISTRY[0],
+      compatiblePrimitives: ["sprite-quad", "sprite-quad"],
+    }],
+    [{
+      ...TASK014D2_RESOURCE_REGISTRY[0],
+      compatibleBlendRoles: ["alpha", "alpha"],
+    }],
+    [{
+      ...TASK014D2_RESOURCE_REGISTRY[0],
+      compatiblePrimitives: ["mesh"],
+    }],
+    [{
+      ...TASK014D2_RESOURCE_REGISTRY[0],
+      compatibleBlendRoles: ["subtract"],
+    }],
+  ];
+  for (const registry of badRegistries) {
+    const result = compileCocosVfxRenderDescriptors(renderPlan(), registry);
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.ok(result.errors.some((error) =>
+        error.code === CocosVfxPlanErrorCode.INVALID_RESOURCE_REGISTRY));
+    }
+  }
+});
+
+test("malformed concrete layer fields and schedules never throw or emit partial descriptors", () => {
+  const mutations: Array<(layer: Record<string, unknown>) => void> = [
+    (layer) => { layer.order = 0.5; },
+    (layer) => { layer.timing = null; },
+    (layer) => { layer.transform = { position: { x: 0, y: 0 } }; },
+    (layer) => { layer.color = { r: 1, g: 1, b: 1, a: Number.NaN }; },
+    (layer) => { layer.opacity = Number.POSITIVE_INFINITY; },
+    (layer) => { layer.scaleCurve = [{ time: 0, value: 1 }]; },
+  ];
+  for (const mutate of mutations) {
+    const plan = structuredClone(renderPlan()) as unknown as {
+      cues: { layers: Record<string, unknown>[] }[];
+    };
+    mutate(plan.cues[0]?.layers[0] as Record<string, unknown>);
+    const result = compileCocosVfxRenderDescriptors(
+      plan,
+      TASK014D2_RESOURCE_REGISTRY,
+    );
+    assert.equal(result.ok, false);
+    assert.equal("value" in result, false);
+  }
+  const plan = structuredClone(renderPlan());
+  const layer = plan.cues.flatMap((cue) => cue.layers)
+    .find((candidate) => candidate.emission !== null);
+  assert.ok(layer?.emission);
+  Object.assign(layer.emission, {
+    count: COCOS_VFX_PLAN_BUDGETS.maxParticles + 1,
+    schedule: new Proxy([], {
+      get() {
+        throw new Error("schedule traversal occurred before budget rejection");
+      },
+    }),
+  });
+  assert.doesNotThrow(() =>
+    expectCode(plan, CocosVfxPlanErrorCode.BUDGET_EXCEEDED));
+});
+
+test("every accepted layer compiles to its typed recipe, component, and real blend state", () => {
+  const descriptors = descriptorPlan().cues.flatMap((cue) => cue.layers);
+  const expected = new Map([
+    ["textured-sprite:sprite-quad", "sprite"],
+    ["textured-sprite:burst-particles", "sprite-particles"],
+    ["procedural-ring:ring", "graphics-ring"],
+    ["procedural-ribbon:ribbon", "graphics-ribbon"],
+  ]);
+  for (const descriptor of descriptors) {
+    assert.equal(
+      descriptor.rendererKind,
+      expected.get(`${descriptor.recipeKind}:${descriptor.primitive}`),
+    );
+    assert.deepEqual(
+      descriptor.blendState,
+      descriptor.blendRole === "alpha"
+        ? { source: "src-alpha", destination: "one-minus-src-alpha" }
+        : descriptor.blendRole === "additive"
+          ? { source: "src-alpha", destination: "one" }
+          : { source: "one", destination: "one-minus-src-color" },
+    );
+  }
+  assert.ok(descriptors.some((descriptor) =>
+    descriptor.rendererKind === "sprite"));
+  assert.ok(descriptors.some((descriptor) =>
+    descriptor.rendererKind === "sprite-particles"));
 });
 
 test("descriptor budgets and concrete particle schedules fail without partial output", () => {
@@ -452,8 +605,12 @@ test("persistent starts coalesce across six loops and cleanup is symmetric", () 
     paused: false,
     activeCueKeys: [],
     activeRendererCount: 0,
+    missingRendererIds: [],
+    extraRendererIds: [],
+    mismatchedRendererIds: [],
     staleRendererCount: 0,
     generation: 2,
+    terminalError: null,
   });
 });
 
@@ -512,6 +669,110 @@ test("partial construction, duplicate commands, unknown stops, reset, switch, an
   );
 });
 
+test("create plus initial update is atomic, destroy-once, and retryable with the same ID", () => {
+  const plan = descriptorPlan();
+  const cue = plan.cues.find((candidate) => candidate.layers.length > 1);
+  assert.ok(cue);
+  for (const failedUpdate of [0, 1]) {
+    const host = new FakeHost();
+    host.failAtUpdate = failedUpdate;
+    const runtime = new CocosVfxRuntimeState(plan, host);
+    const command = {
+      command: "emit" as const,
+      cueId: cue.cueId,
+      commandId: "retryable",
+    };
+    assert.throws(
+      () => runtime.dispatch(command),
+      (error: unknown) =>
+        error instanceof CocosVfxRuntimeError &&
+        error.code === CocosVfxPlanErrorCode.RUNTIME_BUILD_FAILURE,
+    );
+    assert.equal(host.activeRendererCount(), 0);
+    assert.deepEqual(runtime.snapshot().activeCueKeys, []);
+    assert.equal(
+      new Set(host.destroyed.map(([rendererId]) => rendererId)).size,
+      cue.layers.length,
+    );
+    assert.equal(host.destroyed.length, cue.layers.length);
+    host.failAtUpdate = Number.POSITIVE_INFINITY;
+    assert.doesNotThrow(() => runtime.dispatch(command));
+    assert.equal(runtime.snapshot().activeCueKeys.length, 1);
+    runtime.cleanup("reset");
+    const destroyCounts = new Map<string, number>();
+    for (const [rendererId] of host.destroyed) {
+      destroyCounts.set(rendererId, (destroyCounts.get(rendererId) ?? 0) + 1);
+    }
+    assert.ok([...destroyCounts.values()].every((count) => count === 2));
+  }
+});
+
+test("tick-time sampler or host failure enters one terminal cleanup path", () => {
+  const plan = descriptorPlan();
+  const cue = plan.cues.find((candidate) => candidate.lifecycle === "looping");
+  assert.ok(cue);
+  const host = new FakeHost();
+  const runtime = new CocosVfxRuntimeState(plan, host);
+  runtime.dispatch({
+    command: "start",
+    cueId: cue.cueId,
+    commandId: "start",
+    instanceId: "terminal",
+  });
+  host.failAtUpdate = host.updateCount;
+  assert.throws(() => runtime.tick(1 / 60), CocosVfxRuntimeError);
+  assert.equal(host.activeRendererCount(), 0);
+  const snapshot = runtime.snapshot();
+  assert.deepEqual(snapshot.activeCueKeys, []);
+  assert.match(snapshot.terminalError ?? "", /synthetic update failure/u);
+  const destroyCount = host.destroyed.length;
+  assert.throws(() => runtime.tick(1 / 60), CocosVfxRuntimeError);
+  assert.equal(host.destroyed.length, destroyCount);
+
+  const invalidHost = new FakeHost();
+  const invalidRuntime = new CocosVfxRuntimeState(plan, invalidHost);
+  invalidRuntime.dispatch({
+    command: "start",
+    cueId: cue.cueId,
+    commandId: "invalid",
+    instanceId: "invalid-time",
+  });
+  assert.throws(() => invalidRuntime.tick(Number.NaN), CocosVfxRuntimeError);
+  assert.equal(invalidHost.activeRendererCount(), 0);
+  assert.notEqual(invalidRuntime.snapshot().terminalError, null);
+});
+
+test("ownership snapshots detect missing, extra, and mismatched IDs even at equal counts", () => {
+  const plan = descriptorPlan();
+  const host = new FakeHost();
+  const runtime = new CocosVfxRuntimeState(plan, host);
+  runtime.dispatch({
+    command: "emit",
+    cueId: plan.cues[0]?.cueId as string,
+    commandId: "ownership",
+  });
+  const first = host.rendererOwnership()[0];
+  assert.ok(first);
+  host.ownership.delete(first.rendererId);
+  host.ownership.set("extra", {
+    rendererId: "extra",
+    instanceId: "other",
+    descriptorId: "other",
+  });
+  let snapshot = runtime.snapshot();
+  assert.deepEqual(snapshot.missingRendererIds, [first.rendererId]);
+  assert.deepEqual(snapshot.extraRendererIds, ["extra"]);
+  assert.equal(snapshot.activeRendererCount, plan.cues[0]?.layers.length);
+
+  host.ownership.delete("extra");
+  host.ownership.set(first.rendererId, {
+    ...first,
+    instanceId: "wrong-owner",
+  });
+  snapshot = runtime.snapshot();
+  assert.deepEqual(snapshot.mismatchedRendererIds, [first.rendererId]);
+});
+
 test("input, sorting, nested transforms, projection, and viewport contracts are deterministic", () => {
   assert.equal(new Set(TASK014D2_INPUT_REGISTRY.map((entry) => entry.key)).size, 9);
   assert.equal(
@@ -549,6 +810,102 @@ test("input, sorting, nested transforms, projection, and viewport contracts are 
     }),
     false,
   );
+});
+
+test("global sorting is unique, bounded, and independent of cue activation permutations", () => {
+  const plan = descriptorPlan();
+  const all = plan.cues.flatMap((cue) => cue.layers);
+  assert.equal(
+    new Set(all.map((descriptor) => descriptor.sortingOrder)).size,
+    all.length,
+  );
+  assert.ok(all.every((descriptor) =>
+    descriptor.sortingOrder >= TASK014D2_SORTING.vfxMinimum &&
+    descriptor.sortingOrder <= TASK014D2_SORTING.vfxMaximum));
+  const expected = new Map(all.map((descriptor) => [
+    descriptor.descriptorId,
+    descriptor.sortingOrder,
+  ]));
+  for (const cueOrder of [
+    [...renderPlan().cues].reverse(),
+    [...renderPlan().cues].sort((left, right) =>
+      right.cueId < left.cueId ? -1 : 1),
+  ]) {
+    const permuted = { ...renderPlan(), cues: cueOrder };
+    const compiled = descriptorPlan(permuted);
+    assert.deepEqual(
+      new Map(compiled.cues.flatMap((cue) => cue.layers).map((descriptor) => [
+        descriptor.descriptorId,
+        descriptor.sortingOrder,
+      ])),
+      expected,
+    );
+  }
+});
+
+test("transformed primitive bounds include rotation, non-uniform scale, and safe-inset overflow", () => {
+  const transformed = transformTask014D2Bounds(
+    { minimumX: -100, minimumY: -10, maximumX: 100, maximumY: 10 },
+    {
+      x: 0,
+      y: 0,
+      rotationDegrees: 90,
+      scaleX: 1.5,
+      scaleY: 0.5,
+    },
+  );
+  assert.ok(Math.abs(transformed.minimumX + 5) < 1e-9);
+  assert.ok(Math.abs(transformed.maximumY - 150) < 1e-9);
+  assert.equal(task014d2BoundsOverflowPx(transformed), 0);
+  assert.equal(
+    task014d2BoundsOverflowPx({
+      minimumX: -620,
+      minimumY: -10,
+      maximumX: 620,
+      maximumY: 10,
+    }),
+    12,
+  );
+  assert.equal(
+    task014d2BoundsOverflowPx({
+      minimumX: Number.NaN,
+      minimumY: 0,
+      maximumX: 1,
+      maximumY: 1,
+    }),
+    Number.POSITIVE_INFINITY,
+  );
+});
+
+test("HUD and tests consume one typed diagnostic model", () => {
+  const diagnostics = createTask014D2RuntimeDiagnostics();
+  diagnostics.setupCount = 3;
+  diagnostics.teardownCount = 2;
+  diagnostics.rebuildCount = 2;
+  diagnostics.persistentStartAttempts = 6;
+  diagnostics.acceptedPersistentStarts = 1;
+  diagnostics.coalescedPersistentStarts = 5;
+  diagnostics.activeRecipeBlendSummary = "sprite/additive";
+  const hud = formatTask014D2Diagnostics(diagnostics, {
+    ready: true,
+    playing: false,
+    elapsedSeconds: 0,
+    stress: false,
+    debug: false,
+  });
+  for (const text of [
+    "Setup 3",
+    "Teardown 2",
+    "Rebuild 2",
+    "Persistent attempts 6",
+    "accepted 1",
+    "coalesced 5",
+    "sprite/additive",
+    "STOPPED 0.00s",
+    "No errors",
+  ]) {
+    assert.match(hud, new RegExp(text, "u"));
+  }
 });
 
 test("generated D2 mirrors, exact D1 sampler source, and concrete plan data are closed", () => {
@@ -601,15 +958,29 @@ test("generated D2 mirrors, exact D1 sampler source, and concrete plan data are 
 });
 
 test("primitive dispatch is exhaustive and contains no cue-name conditional branch", () => {
+  const actualRuntime = readFileSync(
+    path.join(
+      runtimeRoot,
+      "task014d2-cocos-vfx-render-plan-adapter.ts",
+    ),
+    "utf8",
+  );
   const runtimeSource = [
     ...readdirSync(sourceRoot)
       .filter((name) => name.endsWith(".ts"))
       .map((name) => readFileSync(path.join(sourceRoot, name), "utf8")),
+    actualRuntime,
   ].join("\n");
   assert.doesNotMatch(
     runtimeSource,
     /(?:if|switch)[^{;\n]*(?:dust|trail|aura|hand|foot)/iu,
   );
+  assert.match(actualRuntime, /addComponent\(Sprite\)/u);
+  assert.match(actualRuntime, /srcBlendFactor/u);
+  assert.match(actualRuntime, /dstBlendFactor/u);
+  assert.match(actualRuntime, /rendererKind/u);
+  assert.match(actualRuntime, /recipeKind/u);
+  assert.match(actualRuntime, /descriptor\.lifecycle/u);
   const primitives = descriptorPlan().cues.flatMap((cue) =>
     cue.layers.map((layer) => layer.primitive),
   );
