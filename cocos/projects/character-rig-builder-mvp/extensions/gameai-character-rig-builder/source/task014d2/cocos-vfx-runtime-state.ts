@@ -127,6 +127,7 @@ export class CocosVfxRuntimeState {
     command: CocosVfxSemanticCommand,
   ): CocosVfxDispatchResult {
     this.assertOperational();
+    this.assertOwnershipOrTerminal();
     if (command.command === "stop") {
       const active = this.active.get(command.instanceId);
       if (active === undefined) {
@@ -137,6 +138,7 @@ export class CocosVfxRuntimeState {
       }
       this.active.delete(command.instanceId);
       this.destroy(active, command.reason);
+      this.assertOwnershipOrTerminal();
       return {
         accepted: true,
         coalesced: false,
@@ -188,12 +190,10 @@ export class CocosVfxRuntimeState {
       renderers,
       elapsedSeconds: 0,
     };
-    const created: ActiveRenderer[] = [];
     let inserted = false;
     try {
       for (const renderer of renderers) {
         this.host.createLayer(renderer.ownership, renderer.descriptor);
-        created.push(renderer);
       }
       this.update(candidate);
       this.active.set(key, candidate);
@@ -201,8 +201,19 @@ export class CocosVfxRuntimeState {
       this.assertOwnership();
     } catch (error) {
       if (inserted) this.active.delete(key);
-      this.destroyRenderers(created, "partial-build");
-      throw runtimeError(error);
+      const failure = runtimeError(error);
+      try {
+        this.destroyRenderers(renderers, "partial-build");
+        this.assertOwnership();
+      } catch (cleanupError) {
+        this.enterTerminalFailure(runtimeError(cleanupError));
+      }
+      if (
+        failure.code === CocosVfxPlanErrorCode.RUNTIME_OWNERSHIP_MISMATCH
+      ) {
+        this.enterTerminalFailure(failure);
+      }
+      throw failure;
     }
     return { accepted: true, coalesced: false, instanceId: key };
   }
@@ -217,6 +228,7 @@ export class CocosVfxRuntimeState {
     }
     if (this.paused) return;
     try {
+      this.assertOwnership();
       for (const [key, active] of [...this.active]) {
         active.elapsedSeconds += deltaSeconds;
         if (!Number.isFinite(active.elapsedSeconds)) {
@@ -247,9 +259,19 @@ export class CocosVfxRuntimeState {
   }
 
   public cleanup(reason: string): void {
-    const active = [...this.active.values()];
     this.active.clear();
-    for (const cue of active) this.destroy(cue, reason);
+    const rendererIds = [...new Set(
+      this.host.rendererOwnership().map((ownership) => ownership.rendererId),
+    )].sort(compareCodeUnits);
+    let firstError: unknown = null;
+    for (const rendererId of rendererIds) {
+      try {
+        this.host.destroyLayer(rendererId, reason);
+      } catch (error) {
+        firstError ??= error;
+      }
+    }
+    if (firstError !== null) throw runtimeError(firstError);
   }
 
   public snapshot(): CocosVfxRuntimeSnapshot {
@@ -293,7 +315,11 @@ export class CocosVfxRuntimeState {
       missingRendererIds: missing,
       extraRendererIds: extra,
       mismatchedRendererIds: mismatched,
-      staleRendererCount: extra.length + mismatched.length,
+      staleRendererCount: new Set([
+        ...missing,
+        ...extra,
+        ...mismatched,
+      ]).size,
       generation: this.generation,
       terminalError: this.terminalError?.message ?? null,
     };
@@ -321,11 +347,23 @@ export class CocosVfxRuntimeState {
     }
   }
 
+  private assertOwnershipOrTerminal(): void {
+    try {
+      this.assertOwnership();
+    } catch (error) {
+      this.enterTerminalFailure(runtimeError(error));
+    }
+  }
+
   private enterTerminalFailure(error: CocosVfxRuntimeError): never {
     if (this.terminalError === null) {
       this.terminalError = error;
       this.paused = true;
-      this.cleanup("terminal-failure");
+      try {
+        this.cleanup("terminal-failure");
+      } catch (cleanupError) {
+        this.terminalError = runtimeError(cleanupError);
+      }
     }
     throw this.terminalError;
   }
@@ -365,8 +403,13 @@ export class CocosVfxRuntimeState {
     renderers: readonly ActiveRenderer[],
     reason: string,
   ): void {
+    const actualIds = new Set(
+      this.host.rendererOwnership().map((ownership) => ownership.rendererId),
+    );
     for (const renderer of renderers) {
-      this.host.destroyLayer(renderer.ownership.rendererId, reason);
+      if (actualIds.delete(renderer.ownership.rendererId)) {
+        this.host.destroyLayer(renderer.ownership.rendererId, reason);
+      }
     }
   }
 }

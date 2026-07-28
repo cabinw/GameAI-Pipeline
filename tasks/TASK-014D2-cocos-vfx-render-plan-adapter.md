@@ -73,6 +73,14 @@ historical and is not acceptance proof.
 
 ## Remediation closure
 
+- The final boundary audit closed five residual proof gaps: a host that
+  registered a renderer before throwing is now swept by observed ownership;
+  the Creator host explicitly binds every recipe/primitive pair and derives
+  inspectable material state from the authored blend role; descriptor
+  validation now enforces D1 numeric ranges, unique authored orders, and the
+  exact deterministic particle schedule; live instance sorting is ranked as
+  one global set; and nested bounds preserve affine shear by transforming all
+  corners through every hierarchy level.
 - Creation and first update now form one transaction. Any construction,
   sampling, projection, viewport, or renderer-update failure removes the
   active key, detaches and destroys every owned node exactly once, and permits

@@ -229,20 +229,30 @@ export function transformTask014D2Bounds(
   bounds: Task014D2Bounds,
   transform: Task014D2Affine,
 ): Task014D2Bounds {
-  const radians = (transform.rotationDegrees * Math.PI) / 180;
-  const cosine = Math.cos(radians);
-  const sine = Math.sin(radians);
-  const points = [
+  return transformTask014D2NestedBounds(bounds, [transform]);
+}
+
+export function transformTask014D2NestedBounds(
+  bounds: Task014D2Bounds,
+  childToParentTransforms: readonly Task014D2Affine[],
+): Task014D2Bounds {
+  let points = [
     [bounds.minimumX, bounds.minimumY],
     [bounds.minimumX, bounds.maximumY],
     [bounds.maximumX, bounds.minimumY],
     [bounds.maximumX, bounds.maximumY],
-  ].map(([x, y]) => ({
-    x: transform.x + (x as number) * transform.scaleX * cosine -
-      (y as number) * transform.scaleY * sine,
-    y: transform.y + (x as number) * transform.scaleX * sine +
-      (y as number) * transform.scaleY * cosine,
-  }));
+  ].map(([x, y]) => ({ x: x as number, y: y as number }));
+  for (const transform of childToParentTransforms) {
+    const radians = (transform.rotationDegrees * Math.PI) / 180;
+    const cosine = Math.cos(radians);
+    const sine = Math.sin(radians);
+    points = points.map((point) => ({
+      x: transform.x + point.x * transform.scaleX * cosine -
+        point.y * transform.scaleY * sine,
+      y: transform.y + point.x * transform.scaleX * sine +
+        point.y * transform.scaleY * cosine,
+    }));
+  }
   return {
     minimumX: Math.min(...points.map((point) => point.x)),
     minimumY: Math.min(...points.map((point) => point.y)),

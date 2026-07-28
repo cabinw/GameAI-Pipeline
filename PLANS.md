@@ -3908,6 +3908,10 @@ reference mutation.
 
 - Preserve `ac5309cb5aa6854d1ad94402f6abdac42619f793` and
   `8e972215986b2f1d8c4aa381f1feecf4f1bc7ad7` as append-only ancestors.
+- The final full-boundary audit additionally closes registered-before-throw
+  ownership cleanup, explicit recipe/primitive and blend-role realization,
+  exact D1 range/order/particle-schedule validation, live-set global sorting,
+  and hierarchy-corner AABB evaluation that preserves nested affine shear.
 - Replace non-atomic instance creation with transactional renderer ownership,
   exact ownership-set diagnostics, destroy-once cleanup, and one terminal
   runtime failure path.

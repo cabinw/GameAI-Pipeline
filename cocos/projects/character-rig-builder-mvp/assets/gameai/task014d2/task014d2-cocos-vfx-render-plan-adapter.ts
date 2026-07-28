@@ -38,7 +38,8 @@ import {
 import {
   compileCocosVfxRenderDescriptors,
   cocosVfxBlendState,
-  type CocosVfxBlendState,
+  cocosVfxRendererKind,
+  rankCocosVfxRuntimeSorting,
   type CocosVfxBlendFactor,
   type CocosVfxCueDescriptor,
   type CocosVfxDescriptorPlan,
@@ -127,9 +128,9 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   private readonly bindings = new Map<string, RendererBinding>();
   private readonly verifiedBlendRenderers = new WeakSet<UIRenderer>();
   private readonly world = new Vec3();
+  private readonly observedWorld = new Vec3();
   private readonly local = new Vec3();
   private readonly overlayLocal = new Vec3();
-  private readonly worldScale = new Vec3();
   private readonly targetRotation = new Quat();
   private readonly localRotation = new Quat();
   private readonly expectedRotation = new Quat();
@@ -178,12 +179,12 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           if (renderer instanceof Sprite) renderer.spriteFrame = spriteFrame;
           material = this.applyBlend(
             renderer,
-            cocosVfxBlendState(role),
+            role,
           );
           node.active = true;
           this.verifyRendererBlend(
             renderer,
-            cocosVfxBlendState(role),
+            role,
             `blend-gate:${rendererKind}:${role}`,
           );
         } finally {
@@ -209,10 +210,12 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       throw new Error("TASK_014D2_RESOURCE_REALIZATION_MISSING");
     }
     this.assertLifecycle(descriptor);
+    this.assertRecipePrimitive(descriptor);
+    const target = this.targets[cueIndex % this.targets.length] as Node;
     const node = new Node(`VFX_${ownership.rendererId}`);
     node.active = false;
     node.layer = Layers.Enum.UI_2D;
-    node.setParent(this.overlay);
+    node.setParent(target);
     node.addComponent(UITransform).setContentSize(240, 240);
     const materials: Material[] = [];
     try {
@@ -234,7 +237,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
         ownership,
         node,
         descriptor,
-        target: this.targets[cueIndex % this.targets.length] as Node,
+        target,
         renderers: recipe.renderers,
         sorting: recipe.sorting,
         graphics: recipe.graphics,
@@ -299,18 +302,13 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     if (![this.overlayLocal.x, this.overlayLocal.y].every(Number.isFinite)) {
       throw new Error("TASK_014D2_NON_FINITE_PROJECTION");
     }
-    binding.node.setPosition(this.overlayLocal.x, this.overlayLocal.y, 0);
+    binding.node.setPosition(sample.position.x, sample.position.y, 0);
     binding.target.getWorldRotation(this.targetRotation);
     Quat.fromEuler(this.localRotation, 0, 0, sample.rotationDegrees);
     Quat.multiply(this.expectedRotation, this.targetRotation, this.localRotation);
     Quat.normalize(this.expectedRotation, this.expectedRotation);
-    binding.node.setWorldRotation(this.expectedRotation);
-    binding.target.getWorldScale(this.worldScale);
-    binding.node.setScale(
-      this.worldScale.x * sample.scale.x,
-      this.worldScale.y * sample.scale.y,
-      1,
-    );
+    binding.node.setRotationFromEuler(0, 0, sample.rotationDegrees);
+    binding.node.setScale(sample.scale.x, sample.scale.y, 1);
     this.applyVisual(binding, sample);
     this.verifyActiveRendererBlends(binding);
     this.measure(binding, sample, targetTransform, overlayTransform);
@@ -323,8 +321,8 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       return;
     }
     this.bindings.delete(rendererId);
-    for (const material of binding.materials) material.destroy();
     binding.node.removeFromParent();
+    for (const material of binding.materials) material.destroy();
     binding.node.destroy();
     this.refreshSorting();
   }
@@ -373,6 +371,51 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     return { recipes, sortingOrders };
   }
 
+  private assertRecipePrimitive(
+    descriptor: CocosVfxLayerDescriptor,
+  ): void {
+    if (
+      cocosVfxRendererKind(
+        descriptor.recipeKind,
+        descriptor.primitive,
+      ) !== descriptor.rendererKind
+    ) {
+      throw new Error("TASK_014D2_RECIPE_RENDERER_MISMATCH");
+    }
+    switch (descriptor.recipeKind) {
+      case "textured-sprite":
+        switch (descriptor.primitive) {
+          case "sprite-quad":
+          case "burst-particles": return;
+          case "ring":
+          case "ribbon": break;
+          default: assertNever(descriptor.primitive);
+        }
+        break;
+      case "procedural-ring":
+        switch (descriptor.primitive) {
+          case "ring": return;
+          case "sprite-quad":
+          case "ribbon":
+          case "burst-particles": break;
+          default: assertNever(descriptor.primitive);
+        }
+        break;
+      case "procedural-ribbon":
+        switch (descriptor.primitive) {
+          case "ribbon": return;
+          case "sprite-quad":
+          case "ring":
+          case "burst-particles": break;
+          default: assertNever(descriptor.primitive);
+        }
+        break;
+      default:
+        assertNever(descriptor.recipeKind);
+    }
+    throw new Error("TASK_014D2_RECIPE_PRIMITIVE_MISMATCH");
+  }
+
   private createRecipe(
     node: Node,
     descriptor: CocosVfxLayerDescriptor,
@@ -396,7 +439,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
         node.getComponent(UITransform)?.setContentSize(108, 108);
         const material = this.applyBlend(
           sprite,
-          descriptor.blendState,
+          descriptor.blendRole,
         );
         materials.push(material);
         const sorting = node.addComponent(Sorting2D);
@@ -420,7 +463,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
         const graphics = node.addComponent(Graphics);
         const material = this.applyBlend(
           graphics,
-          descriptor.blendState,
+          descriptor.blendRole,
         );
         materials.push(material);
         const sorting = node.addComponent(Sorting2D);
@@ -450,7 +493,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           sprite.spriteFrame = resource.spriteFrame;
           materials.push(this.applyBlend(
             sprite,
-            descriptor.blendState,
+            descriptor.blendRole,
           ));
           const sorting = particleNode.addComponent(Sorting2D);
           sorting.sortingOrder = descriptor.sortingOrder;
@@ -474,8 +517,9 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
 
   private applyBlend(
     renderer: Sprite | Graphics,
-    blendState: CocosVfxBlendState,
+    blendRole: CocosVfxLayerDescriptor["blendRole"],
   ): Material {
+    const blendState = cocosVfxBlendState(blendRole);
     const materialRenderer =
       renderer as unknown as BlendInspectableRenderer;
     const expectedSource = blendFactor(blendState.source);
@@ -521,7 +565,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       ) {
         this.verifyRendererBlend(
           renderer,
-          binding.descriptor.blendState,
+          binding.descriptor.blendRole,
           `${binding.descriptor.descriptorId}:renderer:${index}`,
         );
       }
@@ -530,9 +574,10 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
 
   private verifyRendererBlend(
     renderer: UIRenderer,
-    blendState: CocosVfxBlendState,
+    blendRole: CocosVfxLayerDescriptor["blendRole"],
     diagnosticId: string,
   ): void {
+    const blendState = cocosVfxBlendState(blendRole);
     const materialRenderer =
       renderer as unknown as BlendInspectableRenderer;
     const expectedSource = blendFactor(blendState.source);
@@ -561,23 +606,20 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   }
 
   private refreshSorting(): void {
-    const bindings = [...this.bindings.values()].sort((left, right) =>
-      left.descriptor.layer.order - right.descriptor.layer.order ||
-      compareCodeUnits(left.descriptor.cueId, right.descriptor.cueId) ||
-      compareCodeUnits(left.descriptor.layerId, right.descriptor.layerId) ||
-      compareCodeUnits(
-        left.ownership.instanceId,
-        right.ownership.instanceId,
-      ));
-    if (
-      bindings.length >
-        TASK014D2_SORTING.vfxMaximum -
-          TASK014D2_SORTING.vfxMinimum + 1
-    ) {
-      throw new Error("TASK_014D2_ACTIVE_SORTING_RANGE_EXCEEDED");
-    }
-    for (const [index, binding] of bindings.entries()) {
-      const order = TASK014D2_SORTING.vfxMinimum + index;
+    const orders = rankCocosVfxRuntimeSorting(
+      [...this.bindings.values()].map((binding) => ({
+        rendererId: binding.ownership.rendererId,
+        cueId: binding.descriptor.cueId,
+        layerId: binding.descriptor.layerId,
+        instanceId: binding.ownership.instanceId,
+        authoredOrder: binding.descriptor.layer.order,
+      })),
+    );
+    for (const binding of this.bindings.values()) {
+      const order = orders.get(binding.ownership.rendererId);
+      if (order === undefined) {
+        throw new Error("TASK_014D2_ACTIVE_SORTING_ASSIGNMENT_MISSING");
+      }
       for (const sorting of binding.sorting) sorting.sortingOrder = order;
     }
   }
@@ -669,16 +711,22 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     targetTransform: UITransform,
     overlayTransform: UITransform,
   ): void {
+    this.local.x = 0;
+    this.local.y = 0;
+    this.local.z = 0;
+    binding.node.getComponent(UITransform)?.convertToWorldSpaceAR(
+      this.local,
+      this.observedWorld,
+    );
     const positionError = Math.hypot(
-      binding.node.position.x - this.overlayLocal.x,
-      binding.node.position.y - this.overlayLocal.y,
+      this.observedWorld.x - this.world.x,
+      this.observedWorld.y - this.world.y,
     );
     this.maximumPositionErrorPx = Math.max(
       this.maximumPositionErrorPx,
       positionError,
     );
-    overlayTransform.convertToWorldSpaceAR(binding.node.position, this.world);
-    const roundTrip = targetTransform.convertToNodeSpaceAR(this.world);
+    const roundTrip = targetTransform.convertToNodeSpaceAR(this.observedWorld);
     this.maximumProjectionErrorPx = Math.max(
       this.maximumProjectionErrorPx,
       Math.hypot(roundTrip.x - sample.position.x, roundTrip.y - sample.position.y),

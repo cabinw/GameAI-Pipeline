@@ -1,6 +1,8 @@
 import {
   VFX_EXECUTABLE_SEMANTICS,
+  canonicalTimeToTicks,
   compareCodeUnits,
+  nextXorshift32,
   type NormalizedVfxLayer,
   type SemanticCommandMode,
   type VfxBlendRole,
@@ -21,6 +23,7 @@ export const COCOS_VFX_PLAN_BUDGETS = Object.freeze({
   maxLayers: 256,
   maxLayersPerCue: 16,
   maxParticles: 4096,
+  maxKeyframesPerCurve: 32,
   maxResources: 128,
   maxCapabilitiesPerResource: 8,
 });
@@ -178,8 +181,17 @@ function validColor(value: unknown): boolean {
   );
 }
 
-function validCurve(value: unknown): boolean {
-  if (!Array.isArray(value) || value.length < 2) return false;
+function validCurve(
+  value: unknown,
+  kind: "scale" | "rotation",
+): boolean {
+  if (
+    !Array.isArray(value) ||
+    value.length < 2 ||
+    value.length > COCOS_VFX_PLAN_BUDGETS.maxKeyframesPerCurve
+  ) {
+    return false;
+  }
   let previous = -1;
   for (const [index, entry] of value.entries()) {
     if (!(index in value)) return false;
@@ -188,6 +200,9 @@ function validCurve(value: unknown): boolean {
       keyframe === null ||
       !finite(keyframe.time) ||
       !finite(keyframe.value) ||
+      (kind === "scale" &&
+        (keyframe.value < 0 || keyframe.value > 1000)) ||
+      (kind === "rotation" && Math.abs(keyframe.value) > 36_000) ||
       keyframe.time < 0 ||
       keyframe.time > 1 ||
       keyframe.time <= previous
@@ -208,15 +223,25 @@ function validLayerShape(layer: Record<string, unknown>): boolean {
     nonEmpty(layer.layerId) &&
     finite(layer.order) &&
     Number.isInteger(layer.order) &&
+    layer.order >= 0 &&
+    layer.order <= 10_000 &&
     timing !== null &&
     finite(timing.delaySeconds) &&
     timing.delaySeconds >= 0 &&
+    timing.delaySeconds <= 60 &&
     finite(timing.durationSeconds) &&
     timing.durationSeconds > 0 &&
+    timing.durationSeconds <= 60 &&
+    canonicalDurationIsPositive(timing.durationSeconds) &&
     transform !== null &&
     validVector(transform.position, false) &&
+    Math.abs((record(transform.position)?.x as number)) <= 100_000 &&
+    Math.abs((record(transform.position)?.y as number)) <= 100_000 &&
     finite(transform.rotationDegrees) &&
+    Math.abs(transform.rotationDegrees) <= 36_000 &&
     validVector(transform.scale, true) &&
+    (record(transform.scale)?.x as number) <= 1000 &&
+    (record(transform.scale)?.y as number) <= 1000 &&
     validColor(layer.color) &&
     finite(layer.opacity) &&
     layer.opacity >= 0 &&
@@ -228,27 +253,128 @@ function validLayerShape(layer: Record<string, unknown>): boolean {
     layer.effectiveAlpha === Math.round(
       (color.a as number) * (layer.opacity as number) * 1e12,
     ) / 1e12 &&
-    validCurve(layer.scaleCurve) &&
-    validCurve(layer.rotationCurve)
+    validCurve(layer.scaleCurve, "scale") &&
+    validCurve(layer.rotationCurve, "rotation")
   );
 }
 
-function rendererKind(
+function canonicalDurationIsPositive(value: number): boolean {
+  try {
+    return canonicalTimeToTicks(value) > 0;
+  } catch {
+    return false;
+  }
+}
+
+function validParticleSchedule(
+  emitted: Record<string, unknown>,
+  schedule: readonly unknown[],
+  prng: Record<string, unknown>,
+  deterministicSeed: number,
+  order: number,
+  delaySeconds: number,
+  durationSeconds: number,
+): boolean {
+  const count = emitted.count as number;
+  const rate = emitted.ratePerSecond as number;
+  const initialSeed = (deterministicSeed ^ order) >>> 0;
+  const expectedSeed = initialSeed === 0 ? 1831565813 : initialSeed;
+  if (prng.streamSeed !== expectedSeed) return false;
+  try {
+    const delayTick = canonicalTimeToTicks(delaySeconds);
+    const endTick = delayTick + canonicalTimeToTicks(durationSeconds);
+    let state = expectedSeed;
+    for (let index = 0; index < count; index += 1) {
+      if (!(index in schedule)) return false;
+      const spawn = record(schedule[index]);
+      state = nextXorshift32(state);
+      if (
+        spawn === null ||
+        spawn.particleIndex !== index ||
+        spawn.randomUint32 !== state ||
+        !finite(spawn.spawnTimeSeconds)
+      ) {
+        return false;
+      }
+      const expectedTick = delayTick +
+        (rate === 0 ? 0 : canonicalTimeToTicks(index / rate));
+      if (
+        expectedTick > endTick ||
+        canonicalTimeToTicks(spawn.spawnTimeSeconds) !== expectedTick
+      ) {
+        return false;
+      }
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function cocosVfxRendererKind(
   recipe: VfxResourceRecipeKind,
   primitive: VfxPrimitive,
 ): CocosVfxRendererKind | null {
-  if (recipe === "textured-sprite") {
-    if (primitive === "sprite-quad") return "sprite";
-    if (primitive === "burst-particles") return "sprite-particles";
-    return null;
+  switch (recipe) {
+    case "textured-sprite":
+      switch (primitive) {
+        case "sprite-quad": return "sprite";
+        case "burst-particles": return "sprite-particles";
+        case "ring":
+        case "ribbon": return null;
+        default: return assertNever(primitive);
+      }
+    case "procedural-ring":
+      switch (primitive) {
+        case "ring": return "graphics-ring";
+        case "sprite-quad":
+        case "ribbon":
+        case "burst-particles": return null;
+        default: return assertNever(primitive);
+      }
+    case "procedural-ribbon":
+      switch (primitive) {
+        case "ribbon": return "graphics-ribbon";
+        case "sprite-quad":
+        case "ring":
+        case "burst-particles": return null;
+        default: return assertNever(primitive);
+      }
+    default:
+      return assertNever(recipe);
   }
-  if (recipe === "procedural-ring") {
-    return primitive === "ring" ? "graphics-ring" : null;
+}
+
+export interface CocosVfxRuntimeSortingEntry {
+  readonly rendererId: string;
+  readonly cueId: string;
+  readonly layerId: string;
+  readonly instanceId: string;
+  readonly authoredOrder: number;
+}
+
+export function rankCocosVfxRuntimeSorting(
+  entries: readonly CocosVfxRuntimeSortingEntry[],
+): ReadonlyMap<string, number> {
+  const rendererIds = new Set(entries.map((entry) => entry.rendererId));
+  const capacity =
+    COCOS_VFX_SORTING.vfxMaximum - COCOS_VFX_SORTING.vfxMinimum + 1;
+  if (rendererIds.size !== entries.length || entries.length > capacity) {
+    throw new Error(CocosVfxPlanErrorCode.SORTING_RANGE_EXCEEDED);
   }
-  if (recipe === "procedural-ribbon") {
-    return primitive === "ribbon" ? "graphics-ribbon" : null;
-  }
-  return null;
+  return new Map(
+    [...entries]
+      .sort((left, right) =>
+        left.authoredOrder - right.authoredOrder ||
+        compareCodeUnits(left.cueId, right.cueId) ||
+        compareCodeUnits(left.layerId, right.layerId) ||
+        compareCodeUnits(left.instanceId, right.instanceId) ||
+        compareCodeUnits(left.rendererId, right.rendererId))
+      .map((entry, index) => [
+        entry.rendererId,
+        COCOS_VFX_SORTING.vfxMinimum + index,
+      ]),
+  );
 }
 
 export function cocosVfxBlendState(
@@ -309,6 +435,15 @@ export function compileCocosVfxRenderDescriptors(
         CocosVfxPlanErrorCode.INVALID_PLAN,
         "/semantics",
         "Render Plan semantics must be an acyclic JSON value.",
+      ),
+    );
+  }
+  if (!nonEmpty(plan.sourceSchemaVersion)) {
+    errors.push(
+      diagnostic(
+        CocosVfxPlanErrorCode.INVALID_PLAN,
+        "/sourceSchemaVersion",
+        "Render Plan source schema version must be a non-empty string.",
       ),
     );
   }
@@ -410,7 +545,7 @@ export function compileCocosVfxRenderDescriptors(
     for (const [capabilityIndex, primitive] of
       primitiveCapabilities.entries()) {
       if (
-        rendererKind(
+        cocosVfxRendererKind(
           resource.recipeKind as VfxResourceRecipeKind,
           primitive as VfxPrimitive,
         ) === null
@@ -493,6 +628,7 @@ export function compileCocosVfxRenderDescriptors(
     }
     const validLayers: NormalizedVfxLayer[] = [];
     const layerIds = new Set<string>();
+    const layerOrders = new Set<number>();
     for (let layerIndex = 0; layerIndex < layers.length; layerIndex += 1) {
       const path = `${cuePath}/layers/${layerIndex}`;
       if (!(layerIndex in layers)) {
@@ -512,6 +648,15 @@ export function compileCocosVfxRenderDescriptors(
           `${path}/layerId`, `Duplicate Render Plan layer ${layerId}.`));
       }
       layerIds.add(layerId);
+      const layerOrder = layer.order as number;
+      if (layerOrders.has(layerOrder)) {
+        errors.push(diagnostic(
+          CocosVfxPlanErrorCode.INVALID_PLAN,
+          `${path}/order`,
+          `Duplicate Render Plan layer order ${layerOrder}.`,
+        ));
+      }
+      layerOrders.add(layerOrder);
       if (typeof layer.primitive !== "string" ||
           !primitiveValues.has(layer.primitive)) {
         errors.push(diagnostic(CocosVfxPlanErrorCode.UNSUPPORTED_PRIMITIVE,
@@ -556,6 +701,7 @@ export function compileCocosVfxRenderDescriptors(
           (emitted.count as number) > COCOS_VFX_PLAN_BUDGETS.maxParticles ||
           !finite(emitted.ratePerSecond) ||
           emitted.ratePerSecond < 0 ||
+          emitted.ratePerSecond > 10_000 ||
           prng === null ||
           prng.algorithm !== "xorshift32-v1" ||
           !Number.isInteger(prng.streamSeed) ||
@@ -563,7 +709,8 @@ export function compileCocosVfxRenderDescriptors(
           (prng.streamSeed as number) > 0xffff_ffff ||
           prng.zeroSeedFallback !== 1831565813 ||
           !Array.isArray(schedule) ||
-          schedule.length !== emitted.count
+          schedule.length !== emitted.count ||
+          lifecycle !== "one-shot"
         ) {
           errors.push(diagnostic(
             (emitted?.count as number) > COCOS_VFX_PLAN_BUDGETS.maxParticles
@@ -576,24 +723,20 @@ export function compileCocosVfxRenderDescriptors(
             errors.push(diagnostic(CocosVfxPlanErrorCode.BUDGET_EXCEEDED,
               "/cues", "Cocos VFX particle budget exceeded."));
           } else {
-            const delay = timing.delaySeconds as number;
-            const end = delay + (timing.durationSeconds as number);
-            for (let particleIndex = 0; particleIndex < schedule.length;
-              particleIndex += 1) {
-              const spawn = record(schedule[particleIndex]);
-              if (!(particleIndex in schedule) || spawn === null ||
-                  spawn.particleIndex !== particleIndex ||
-                  !finite(spawn.spawnTimeSeconds) ||
-                  spawn.spawnTimeSeconds < delay ||
-                  spawn.spawnTimeSeconds > end ||
-                  !Number.isInteger(spawn.randomUint32) ||
-                  (spawn.randomUint32 as number) < 0 ||
-                  (spawn.randomUint32 as number) > 0xffff_ffff) {
-                errors.push(diagnostic(CocosVfxPlanErrorCode.INVALID_PLAN,
-                  `${path}/emission/schedule/${particleIndex}`,
-                  "Particle spawn must be finite, indexed and inside layer lifetime."));
-                break;
-              }
+            if (!validParticleSchedule(
+              emitted,
+              schedule,
+              prng,
+              cue.deterministicSeed as number,
+              layerOrder,
+              timing.delaySeconds as number,
+              timing.durationSeconds as number,
+            )) {
+              errors.push(diagnostic(
+                CocosVfxPlanErrorCode.INVALID_PLAN,
+                `${path}/emission/schedule`,
+                "Particle schedule must exactly match D1 timing and xorshift32 semantics.",
+              ));
             }
           }
         }
@@ -613,7 +756,7 @@ export function compileCocosVfxRenderDescriptors(
         if (
           resource.recipeKind !== recipe ||
           resource.compatiblePrimitives.indexOf(primitive) === -1 ||
-          rendererKind(recipe, primitive) === null
+          cocosVfxRendererKind(recipe, primitive) === null
         ) {
           errors.push(diagnostic(CocosVfxPlanErrorCode.UNSUPPORTED_RECIPE,
             `${path}/resource`,
@@ -677,7 +820,10 @@ export function compileCocosVfxRenderDescriptors(
         .sort((left, right) => left.order - right.order ||
           compareCodeUnits(left.layerId, right.layerId))
         .map((layer): CocosVfxLayerDescriptor => {
-          const kind = rendererKind(layer.resource.recipeKind, layer.primitive);
+          const kind = cocosVfxRendererKind(
+            layer.resource.recipeKind,
+            layer.primitive,
+          );
           const order = sorting.get(`${cue.cueId}\u0000${layer.layerId}`);
           if (kind === null || order === undefined) {
             throw new Error("Validated Cocos VFX descriptor realization missing.");
