@@ -61,6 +61,10 @@ Cocos, Unity, and Godot compilers.
 7. Remediate executable semantics append-only on the same branch, update
    existing Draft PR #17, repeat every verification gate, and preserve the
    reviewed `a3bd2ed` commit as an ancestor.
+8. Close final external-review counterexamples with canonical integer-tick
+   sampling, canonical particle lifetime validation, and exact semantic
+   lifecycle descriptors; publish portable sampling vectors and repeat all
+   clean/frozen/remote gates before acceptance.
 
 ### Done when
 

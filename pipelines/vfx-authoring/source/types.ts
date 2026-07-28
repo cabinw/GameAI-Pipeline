@@ -90,6 +90,7 @@ export interface VfxAuthoringDocument {
 export interface SemanticCueDescriptor {
   readonly cueId: string;
   readonly commandMode: SemanticCommandMode;
+  readonly lifecycle: VfxLifecycle;
 }
 
 export interface VfxResourceDescriptor {
@@ -170,6 +171,11 @@ export interface VfxExecutableSemantics {
   };
   readonly alphaComposition: "color-a-times-opacity";
   readonly timeOrigin: "semantic-command-start";
+  readonly canonicalTime: {
+    readonly ticksPerSecond: 1_000_000_000_000;
+    readonly maximumTick: 9_007_199_254_740_990;
+    readonly rounding: "nearest-tick-ties-up";
+  };
   readonly exactDurationBoundary: "ending-cycle-phase-one";
   readonly cleanupAuthority: "semantic-stop-reset-switch-dispose";
   readonly particleSchedule: "index-zero-based-delay-plus-index-over-rate";

@@ -19,7 +19,7 @@
     ]
   },
   "semanticCues": [
-    { "cueId": "footstep-dust", "commandMode": "emit" },
-    { "cueId": "footstep-dust", "commandMode": "start-stop" }
+    { "cueId": "footstep-dust", "commandMode": "emit", "lifecycle": "one-shot" },
+    { "cueId": "footstep-dust", "commandMode": "start-stop", "lifecycle": "persistent" }
   ]
 }

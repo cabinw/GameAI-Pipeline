@@ -81,15 +81,18 @@ The reference bindings are:
 
 ## Typed semantic cue descriptors
 
-Compilation context contains `{ cueId, commandMode }` descriptors.
-`commandMode` is exactly:
+Compilation context contains `{ cueId, commandMode, lifecycle }` descriptors.
+Both fields form one exact pair:
 
-- `emit`: authoring lifecycle must be `one-shot`;
-- `start-stop`: authoring lifecycle must be `looping` or `persistent`.
+- `one-shot` requires `emit`;
+- `looping` requires `start-stop`; and
+- `persistent` requires `start-stop`.
 
-Unknown cue IDs, duplicate IDs, contradictory modes, and lifecycle mismatches
-fail closed. These descriptors consume existing semantic metadata only; this
-package does not change or reproduce evaluator behavior.
+The descriptor lifecycle must exactly equal the authored lifecycle. Looping
+and persistent are not interchangeable even though both use `start-stop`.
+Unknown cue IDs, duplicate IDs, contradictory lifecycle/mode pairs, and exact
+lifecycle mismatches fail closed. These descriptors consume existing semantic
+metadata only; this package does not change or reproduce evaluator behavior.
 
 ## Typed resource capabilities
 
@@ -146,11 +149,28 @@ decimal places. These rules and their fixed enum values are embedded at
 Render Plan top level, while each layer contains concrete base transform,
 color, opacity, effective alpha, and endpoint-complete curves.
 
-## Layer-time and lifecycle semantics
+## Canonical time, layer-time, and lifecycle semantics
 
 Time zero is the semantic command start.
 
+Every public sample time, authored duration/delay, and particle spawn time is
+converted to integer canonical ticks before boundary comparison:
+
+- `1 second = 1,000,000,000,000 ticks`;
+- conversion rounds to the nearest tick, with non-negative exact ties rounded
+  upward;
+- the maximum portable tick is `9,007,199,254,740,990`;
+- `-0` becomes zero; and
+- negative, non-finite, or range-overflowing sample times fail closed.
+
+This is the 12-decimal time contract. Raw floating-point quotient equality,
+epsilon comparisons, and locale/runtime-specific rounding are forbidden.
+Phase division happens only after integer tick ownership of a boundary has
+been decided.
+
 For every layer, `t < delay` is inactive. At `t = delay`, phase `0` is active.
+One tick before, exactly at, and one tick after delay/end boundaries therefore
+have distinct portable results.
 
 For a one-shot layer:
 
@@ -169,16 +189,21 @@ For looping and persistent layers:
 - semantic stop, Reset, track switch, or disposal remains authoritative for
   instance cleanup.
 
-The plan encodes phase mode, exact-end rule, and removal authority per layer.
-The package exports a reference sampler implementing the same rules.
+The plan encodes the tick model, phase mode, exact-end rule, and removal
+authority. The package exports the normative reference sampler. Golden
+sampling vectors cover decimal counterexamples (`0.2 + 0.6`, `0.1 + 0.2`),
+equivalent expressions, repeated `1/60` accumulation, every adjacent boundary
+tick, invalid inputs, and the maximum canonical time.
 
 ## Deterministic burst particles
 
 Burst particle indices are zero-based from `0` through `count - 1`.
 
-- For positive rate, particle `i` spawns at
-  `delay + i / ratePerSecond`.
+- For positive rate, particle `i` spawns at `delay + i / ratePerSecond`, with
+  its relative time rounded to canonical ticks before delay is added.
 - For rate `0`, every particle spawns instantaneously at `delay`.
+- Canonical duration and final relative spawn ticks are compared before plan
+  construction. The serialized schedule is exactly the validated schedule.
 - The final scheduled spawn must be no later than `delay + duration`.
 - Count and rate are compile-time bounded; non-particle layers forbid
   emission.
@@ -199,7 +224,10 @@ sample = uint32(x)
 ```
 
 One sample is advanced per particle in index order. Golden vectors and all
-four golden serialized plans lock this behavior.
+four golden serialized plans lock this behavior. In particular, count `2`,
+rate `1.2469134`, and raw duration `0.8019803139498147` compile to equal
+canonical final-spawn and duration values of `0.80198031395`; shortening the
+duration by one canonical tick rejects the document without partial output.
 
 ## Fail-closed limits
 

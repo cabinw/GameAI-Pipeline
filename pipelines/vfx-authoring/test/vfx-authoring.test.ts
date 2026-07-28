@@ -6,7 +6,12 @@ import test from "node:test";
 import {
   VFX_AUTHORING_BUDGETS,
   VFX_EXECUTABLE_SEMANTICS,
+  VFX_MAX_CANONICAL_TIME_SECONDS,
+  VFX_TIME_TICKS_PER_SECOND,
   VfxAuthoringErrorCode,
+  VfxSamplingError,
+  VfxSamplingErrorCode,
+  canonicalTimeToTicks,
   compareCodeUnits,
   compileVfxAuthoring,
   nextXorshift32,
@@ -18,6 +23,7 @@ import {
   vfxCueAuthoringSchema,
   type VfxAuthoringDocument,
   type VfxCompileContext,
+  type NormalizedVfxLayer,
   type VfxRenderPlan,
 } from "../source";
 
@@ -37,10 +43,26 @@ const builtSchemaPath = path.join(
 
 const context: VfxCompileContext = {
   semanticCues: [
-    { cueId: "combined-reference", commandMode: "emit" },
-    { cueId: "footstep-dust", commandMode: "emit" },
-    { cueId: "hand-tool-trail", commandMode: "start-stop" },
-    { cueId: "persistent-aura", commandMode: "start-stop" },
+    {
+      cueId: "combined-reference",
+      commandMode: "emit",
+      lifecycle: "one-shot",
+    },
+    {
+      cueId: "footstep-dust",
+      commandMode: "emit",
+      lifecycle: "one-shot",
+    },
+    {
+      cueId: "hand-tool-trail",
+      commandMode: "start-stop",
+      lifecycle: "looping",
+    },
+    {
+      cueId: "persistent-aura",
+      commandMode: "start-stop",
+      lifecycle: "persistent",
+    },
   ],
   resources: [
     {
@@ -348,7 +370,11 @@ test("semantic descriptors enforce command/lifecycle compatibility and registry 
     ...context,
     semanticCues: context.semanticCues.map((descriptor) =>
       descriptor.cueId === "footstep-dust"
-        ? { ...descriptor, commandMode: "start-stop" as const }
+        ? {
+            ...descriptor,
+            commandMode: "start-stop" as const,
+            lifecycle: "persistent" as const,
+          }
         : descriptor,
     ),
   });
@@ -366,6 +392,34 @@ test("semantic descriptors enforce command/lifecycle compatibility and registry 
     "invalid-semantic-cue-registry.case.json",
   );
   assert.equal(duplicate.ok, false);
+
+  for (const [fixtureName, lifecycle] of [
+    ["hand-trail.json", "persistent"],
+    ["persistent-aura.json", "looping"],
+  ] as const) {
+    const cueId =
+      fixtureName === "hand-trail.json"
+        ? "hand-tool-trail"
+        : "persistent-aura";
+    const exactMismatch = compileVfxAuthoring(parseFixture(fixtureName), {
+      ...context,
+      semanticCues: context.semanticCues.map((descriptor) =>
+        descriptor.cueId === cueId
+          ? { ...descriptor, lifecycle }
+          : descriptor,
+      ),
+    });
+    assert.equal(exactMismatch.ok, false);
+    if (!exactMismatch.ok) {
+      assert.ok(
+        exactMismatch.errors.some(
+          (error) =>
+            error.code ===
+            VfxAuthoringErrorCode.INCOMPATIBLE_SEMANTIC_LIFECYCLE,
+        ),
+      );
+    }
+  }
 });
 
 test("typed resource descriptors reject unknown, duplicate, contradictory, and incompatible capabilities", () => {
@@ -463,6 +517,140 @@ test("layer activation, exact duration, repetition, and removal boundaries are e
   );
 });
 
+test("canonical tick sampling matches the portable golden boundary vectors", () => {
+  const base = requirePlan(
+    compileVfxAuthoring(parseFixture("combined-reference.json"), context),
+  ).cues[0]?.layers[0];
+  assert.ok(base);
+  const goldenText = readFileSync(
+    path.join(goldenRoot, "sampling-vectors.json"),
+    "utf8",
+  );
+  assert.equal(`${JSON.stringify(JSON.parse(goldenText))}\n`, goldenText);
+  const golden = JSON.parse(goldenText) as {
+    canonicalTime: typeof VFX_EXECUTABLE_SEMANTICS.canonicalTime;
+    vectors: readonly {
+      active: boolean;
+      cycleIndex: number | null;
+      delaySeconds: number;
+      durationSeconds: number;
+      name: string;
+      phase: number | null;
+      phaseMode: NormalizedVfxLayer["timing"]["phaseMode"];
+      removed: boolean;
+      timeSeconds: number;
+    }[];
+  };
+  assert.deepEqual(
+    golden.canonicalTime,
+    VFX_EXECUTABLE_SEMANTICS.canonicalTime,
+  );
+  for (const vector of golden.vectors) {
+    const layer: NormalizedVfxLayer = {
+      ...base,
+      timing: {
+        ...base.timing,
+        delaySeconds: vector.delaySeconds,
+        durationSeconds: vector.durationSeconds,
+        phaseMode: vector.phaseMode,
+      },
+    };
+    const sampled = sampleVfxLayerAtTime(layer, vector.timeSeconds);
+    for (const numeric of [
+      sampled.phase,
+      sampled.cycleIndex,
+      sampled.position.x,
+      sampled.position.y,
+      sampled.scale.x,
+      sampled.scale.y,
+      sampled.rotationDegrees,
+      sampled.effectiveAlpha,
+    ]) {
+      assert.equal(
+        numeric === null || Number.isFinite(numeric),
+        true,
+        vector.name,
+      );
+    }
+    assert.deepEqual(
+      {
+        active: sampled.active,
+        cycleIndex: sampled.cycleIndex,
+        phase: sampled.phase,
+        removed: sampled.removed,
+      },
+      {
+        active: vector.active,
+        cycleIndex: vector.cycleIndex,
+        phase: vector.phase,
+        removed: vector.removed,
+      },
+      vector.name,
+    );
+  }
+
+  const boundaryLayer: NormalizedVfxLayer = {
+    ...base,
+    timing: {
+      ...base.timing,
+      delaySeconds: 0.1,
+      durationSeconds: 0.2,
+      phaseMode: "once",
+    },
+  };
+  assert.equal(
+    sampleVfxLayerAtTime(boundaryLayer, 0.1 - 1 / VFX_TIME_TICKS_PER_SECOND)
+      .active,
+    false,
+  );
+  assert.equal(sampleVfxLayerAtTime(boundaryLayer, 0.1).phase, 0);
+  assert.equal(
+    sampleVfxLayerAtTime(boundaryLayer, 0.1 + 1 / VFX_TIME_TICKS_PER_SECOND)
+      .active,
+    true,
+  );
+  let accumulated = 0;
+  for (let index = 0; index < 48; index += 1) accumulated += 1 / 60;
+  assert.equal(canonicalTimeToTicks(accumulated), 800_000_000_000);
+  assert.equal(canonicalTimeToTicks(-0), 0);
+  assert.equal(
+    canonicalTimeToTicks(VFX_MAX_CANONICAL_TIME_SECONDS),
+    VFX_EXECUTABLE_SEMANTICS.canonicalTime.maximumTick,
+  );
+
+  for (const [value, code] of [
+    [Number.NaN, VfxSamplingErrorCode.INVALID_TIME],
+    [Number.POSITIVE_INFINITY, VfxSamplingErrorCode.INVALID_TIME],
+    [Number.NEGATIVE_INFINITY, VfxSamplingErrorCode.INVALID_TIME],
+    [-1, VfxSamplingErrorCode.INVALID_TIME],
+    [
+      VFX_MAX_CANONICAL_TIME_SECONDS +
+        2 / VFX_TIME_TICKS_PER_SECOND,
+      VfxSamplingErrorCode.TIME_RANGE_EXCEEDED,
+    ],
+  ] as const) {
+    assert.throws(
+      () => sampleVfxLayerAtTime(boundaryLayer, value),
+      (error: unknown) =>
+        error instanceof VfxSamplingError && error.code === code,
+    );
+  }
+  const corrupted = structuredClone(boundaryLayer) as {
+    transform: { scale: { x: number } };
+  };
+  corrupted.transform.scale.x = Number.NaN;
+  assert.throws(
+    () =>
+      sampleVfxLayerAtTime(
+        corrupted as unknown as NormalizedVfxLayer,
+        0.1,
+      ),
+    (error: unknown) =>
+      error instanceof VfxSamplingError &&
+      error.code === VfxSamplingErrorCode.INVALID_LAYER,
+  );
+});
+
 test("particle schedule, zero rate, lifetime fit, and xorshift32 vectors are fixed", () => {
   const dust = requirePlan(
     compileVfxAuthoring(parseFixture("footstep-dust.json"), context),
@@ -514,6 +702,48 @@ test("particle schedule, zero rate, lifetime fit, and xorshift32 vectors are fix
       ),
     );
   }
+
+  const roundingRegression = parseFixture("footstep-dust.json");
+  const regressionLayer = roundingRegression.cues[0]?.layers[0] as {
+    durationSeconds: number;
+    emission: { count: number; ratePerSecond: number };
+  };
+  regressionLayer.emission.count = 2;
+  regressionLayer.emission.ratePerSecond = 1.2469134;
+  regressionLayer.durationSeconds = 0.8019803139498147;
+  const canonicalRegression = compileVfxAuthoring(
+    roundingRegression,
+    context,
+  );
+  assert.equal(canonicalRegression.ok, true);
+  if (canonicalRegression.ok) {
+    const layer = canonicalRegression.value.plan.cues[0]?.layers[0];
+    assert.equal(layer?.timing.durationSeconds, 0.80198031395);
+    assert.equal(
+      layer?.emission?.schedule[1]?.spawnTimeSeconds,
+      0.80198031395,
+    );
+  }
+
+  const oneTickOverflow = structuredClone(roundingRegression);
+  (
+    oneTickOverflow.cues[0]?.layers[0] as {
+      durationSeconds: number;
+    }
+  ).durationSeconds = 0.801980313949;
+  const overflow = compileVfxAuthoring(oneTickOverflow, context);
+  assert.equal(overflow.ok, false);
+  assert.equal("value" in overflow, false);
+
+  const maximum = parseFixture("footstep-dust.json");
+  const maximumEmission = maximum.cues[0]?.layers[0]?.emission as {
+    count: number;
+    ratePerSecond: number;
+  };
+  maximumEmission.count = VFX_AUTHORING_BUDGETS.maxEmittedParticles;
+  maximumEmission.ratePerSecond = 10_000;
+  const maximumResult = compileVfxAuthoring(maximum, context);
+  assert.equal(maximumResult.ok, true);
 });
 
 test("input permutations, locale replacement, and repeated compilation preserve bytes", () => {
@@ -573,6 +803,114 @@ test("input remains immutable and failures never expose partial output", () => {
   assert.equal("value" in failed, false);
 });
 
+test("adversarial parser, compiler, curve, key, overflow, and preflight inputs fail closed", () => {
+  const nonString = parseAndCompileVfxAuthoring(
+    42 as unknown as string,
+    context,
+  );
+  assert.equal(nonString.ok, false);
+  if (!nonString.ok) {
+    assert.equal(
+      nonString.errors[0]?.code,
+      VfxAuthoringErrorCode.JSON_PARSE_ERROR,
+    );
+  }
+
+  const nonFinite = parseFixture("footstep-dust.json");
+  (
+    nonFinite.cues[0]?.layers[0] as { durationSeconds: number }
+  ).durationSeconds = Number.POSITIVE_INFINITY;
+  const nonFiniteResult = compileVfxAuthoring(nonFinite, context);
+  assert.equal(nonFiniteResult.ok, false);
+  assert.equal("value" in nonFiniteResult, false);
+
+  const unknownKey = {
+    ...parseFixture("footstep-dust.json"),
+    undeclared: true,
+  };
+  const unknownKeyResult = compileVfxAuthoring(unknownKey, context);
+  assert.equal(unknownKeyResult.ok, false);
+  if (!unknownKeyResult.ok) {
+    assert.ok(
+      unknownKeyResult.errors.some(
+        (error) =>
+          error.code === VfxAuthoringErrorCode.SCHEMA_VALIDATION_ERROR,
+      ),
+    );
+  }
+
+  const bindingOverflow = parseFixture("hand-trail.json");
+  const parameter = bindingOverflow.cues[0]?.parameters?.[0] as {
+    default: number;
+    maximum: number;
+  };
+  parameter.default = 1e308;
+  parameter.maximum = 1e308;
+  const bindingOverflowResult = compileVfxAuthoring(
+    bindingOverflow,
+    context,
+  );
+  assert.equal(bindingOverflowResult.ok, false);
+  assert.equal("value" in bindingOverflowResult, false);
+
+  const curveCollision = parseFixture("persistent-aura.json");
+  const curve = curveCollision.cues[0]?.layers[0]?.scaleCurve as {
+    time: number;
+    value: number;
+  }[];
+  curve.splice(
+    1,
+    0,
+    { time: 0.0000000000001, value: 1 },
+    { time: 0.0000000000002, value: 1 },
+  );
+  const curveCollisionResult = compileVfxAuthoring(
+    curveCollision,
+    context,
+  );
+  assert.equal(curveCollisionResult.ok, false);
+  assert.equal("value" in curveCollisionResult, false);
+
+  assert.throws(
+    () =>
+      sampleLinearCurve(
+        [{ time: 0, value: 1 }, { time: 1, value: 2 }],
+        Number.NaN,
+      ),
+    (error: unknown) =>
+      error instanceof VfxSamplingError &&
+      error.code === VfxSamplingErrorCode.INVALID_TIME,
+  );
+  assert.throws(
+    () =>
+      sampleLinearCurve(
+        [{ time: 0, value: 1 }, { time: 0, value: 2 }],
+        0,
+      ),
+    (error: unknown) =>
+      error instanceof VfxSamplingError &&
+      error.code === VfxSamplingErrorCode.INVALID_CURVE,
+  );
+
+  const preflight = compileVfxAuthoring(
+    {
+      schemaVersion: "1.0.0",
+      cues: Array.from(
+        { length: VFX_AUTHORING_BUDGETS.maxCues + 1 },
+        () => null,
+      ),
+    },
+    context,
+  );
+  assert.equal(preflight.ok, false);
+  if (!preflight.ok) {
+    assert.deepEqual(
+      [...new Set(preflight.errors.map((error) => error.code))],
+      [VfxAuthoringErrorCode.COMPILATION_BUDGET_EXCEEDED],
+    );
+  }
+});
+
 test("all parameter, binding, override, registry, curve, particle, and byte budgets are explicit", () => {
   assert.deepEqual(VFX_AUTHORING_BUDGETS, {
     maxCues: 64,
@@ -591,6 +929,7 @@ test("all parameter, binding, override, registry, curve, particle, and byte budg
   const tooManyDescriptors = Array.from({ length: 129 }, (_, index) => ({
     cueId: `cue-${index}`,
     commandMode: "emit" as const,
+    lifecycle: "one-shot" as const,
   }));
   const descriptorBudget = compileVfxAuthoring(
     parseFixture("footstep-dust.json"),
@@ -629,6 +968,7 @@ test("all parameter, binding, override, registry, curve, particle, and byte budg
       semanticCues: cues.map((cue) => ({
         cueId: cue.cueId,
         commandMode: "start-stop",
+        lifecycle: "persistent",
       })),
       resources: context.resources,
     },

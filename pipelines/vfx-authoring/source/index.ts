@@ -16,6 +16,13 @@ export type {
 export { parseAndCompileVfxAuthoring } from "./parser";
 export {
   VFX_EXECUTABLE_SEMANTICS,
+  VFX_MAX_CANONICAL_TIME_SECONDS,
+  VFX_MAX_CANONICAL_TIME_TICK,
+  VFX_TIME_TICKS_PER_SECOND,
+  VfxSamplingError,
+  VfxSamplingErrorCode,
+  canonicalTicksToSeconds,
+  canonicalTimeToTicks,
   compareCodeUnits,
   nextXorshift32,
   sampleLinearCurve,

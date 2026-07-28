@@ -12,6 +12,18 @@ export function parseAndCompileVfxAuthoring(
   readonly plan: VfxRenderPlan;
   readonly serialized: string;
 }> {
+  if (typeof text !== "string") {
+    return {
+      ok: false,
+      errors: [
+        {
+          code: VfxAuthoringErrorCode.JSON_PARSE_ERROR,
+          path: "",
+          message: "VFX authoring input must be a JSON string.",
+        },
+      ],
+    };
+  }
   let value: unknown;
   try {
     value = JSON.parse(text) as unknown;

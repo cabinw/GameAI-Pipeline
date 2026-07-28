@@ -24,16 +24,17 @@ canonical `schemas/vfx-cue-authoring.schema.json`.
 The authoring document references existing semantic cue IDs and logical
 resource IDs. It describes bounded typed layers, deterministic properties,
 parameter defaults, and closed typed bindings. Validation receives semantic
-cue descriptors with `emit`/`start-stop` command mode and resource descriptors
-with portable recipe kind and compatible primitives.
+cue descriptors with exact lifecycle plus `emit`/`start-stop` command mode and
+resource descriptors with portable recipe kind and compatible primitives.
 
 The package validates and normalizes the document, resolves every parameter
 into concrete layer values, and produces a byte-deterministic executable VFX
-Render Plan containing no engine types. The plan fixes linear/clamped curve
-sampling, relative transform composition, alpha composition, phase and exact
-boundary behavior, cleanup authority, particle spawn schedule, and compiled
-`xorshift32-v1` samples. Engine-specific compilers only map typed recipes into
-Cocos, Unity, or Godot resources and runtime objects.
+Render Plan containing no engine types. The plan fixes a 12-decimal integer
+tick model, linear/clamped curve sampling, relative transform composition,
+alpha composition, phase and exact boundary behavior, cleanup authority,
+canonical particle spawn schedule, and compiled `xorshift32-v1` samples.
+Engine-specific compilers only map typed recipes into Cocos, Unity, or Godot
+resources and runtime objects.
 
 Character Semantic Events schema and evaluator semantics remain unchanged.
 Their command output selects a cue; it does not compile or render the cue.
@@ -44,8 +45,11 @@ Their command output selects a cue; it does not compile or render the cue.
 - A cue can be composed once and compiled by independent future engines.
 - Registry validation catches missing semantic/resource bindings before an
   engine compiler runs.
-- Semantic `emit` cannot compile as looping/persistent, and semantic
-  `start-stop` cannot compile as one-shot.
+- Semantic descriptors require exact lifecycle equality: one-shot/emit,
+  looping/start-stop, or persistent/start-stop. Looping and persistent cannot
+  substitute for each other.
+- Decimal boundary ownership and particle lifetime validation use canonical
+  integer ticks, never floating-point quotient equality or an epsilon.
 - Engine compilers do not interpret parameter or resource names and do not
   choose curve, timing, emission, or random semantics.
 - Explicit limits prevent unbounded layer, curve, particle, and serialized

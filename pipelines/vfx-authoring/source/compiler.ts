@@ -11,6 +11,8 @@ import {
 } from "./diagnostics";
 import {
   VFX_EXECUTABLE_SEMANTICS,
+  canonicalTicksToSeconds,
+  canonicalTimeToTicks,
   compareCodeUnits,
   nextXorshift32,
 } from "./semantics";
@@ -54,6 +56,7 @@ const primitives = new Set<VfxPrimitive>([
   "burst-particles",
 ]);
 const commandModes = new Set(["emit", "start-stop"]);
+const lifecycles = new Set(["one-shot", "looping", "persistent"]);
 const recipeKinds = new Set<VfxResourceRecipeKind>([
   "textured-sprite",
   "procedural-ring",
@@ -83,6 +86,77 @@ const ajv = new Ajv({ allErrors: true, strict: true });
 const validateShape = ajv.compile<VfxAuthoringDocument>(
   vfxCueAuthoringSchema,
 ) as ValidateFunction<VfxAuthoringDocument>;
+
+function preflightBudgetDiagnostics(
+  value: unknown,
+): VfxAuthoringDiagnostic[] {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    !Array.isArray((value as { cues?: unknown }).cues)
+  ) {
+    return [];
+  }
+  const cues = (value as { cues: unknown[] }).cues;
+  if (cues.length > VFX_AUTHORING_BUDGETS.maxCues) {
+    return [
+      diagnostic(
+        VfxAuthoringErrorCode.COMPILATION_BUDGET_EXCEEDED,
+        "/cues",
+        `Document exceeds ${VFX_AUTHORING_BUDGETS.maxCues} cues.`,
+      ),
+    ];
+  }
+  const errors: VfxAuthoringDiagnostic[] = [];
+  for (const [cueIndex, cue] of cues.entries()) {
+    if (typeof cue !== "object" || cue === null) continue;
+    const candidate = cue as {
+      parameters?: unknown;
+      bindings?: unknown;
+      layers?: unknown;
+    };
+    for (const [key, limit] of [
+      ["parameters", VFX_AUTHORING_BUDGETS.maxParametersPerCue],
+      ["bindings", VFX_AUTHORING_BUDGETS.maxBindingsPerCue],
+      ["layers", VFX_AUTHORING_BUDGETS.maxLayersPerCue],
+    ] as const) {
+      const collection = candidate[key];
+      if (Array.isArray(collection) && collection.length > limit) {
+        errors.push(
+          diagnostic(
+            VfxAuthoringErrorCode.COMPILATION_BUDGET_EXCEEDED,
+            `/cues/${cueIndex}/${key}`,
+            `Cue ${key} exceeds ${limit} entries.`,
+          ),
+        );
+      }
+    }
+    if (!Array.isArray(candidate.layers)) continue;
+    for (const [layerIndex, layer] of candidate.layers.entries()) {
+      if (typeof layer !== "object" || layer === null) continue;
+      const layerCandidate = layer as {
+        scaleCurve?: unknown;
+        rotationCurve?: unknown;
+      };
+      for (const key of ["scaleCurve", "rotationCurve"] as const) {
+        const curve = layerCandidate[key];
+        if (
+          Array.isArray(curve) &&
+          curve.length > VFX_AUTHORING_BUDGETS.maxKeyframesPerCurve
+        ) {
+          errors.push(
+            diagnostic(
+              VfxAuthoringErrorCode.COMPILATION_BUDGET_EXCEEDED,
+              `/cues/${cueIndex}/layers/${layerIndex}/${key}`,
+              `Curve exceeds ${VFX_AUTHORING_BUDGETS.maxKeyframesPerCurve} keyframes.`,
+            ),
+          );
+        }
+      }
+    }
+  }
+  return sortVfxAuthoringDiagnostics(errors);
+}
 
 function diagnostic(
   code: VfxAuthoringDiagnostic["code"],
@@ -158,11 +232,25 @@ function validColor(value: unknown): value is VfxColor {
 }
 
 function normalizedColor(value: VfxColor): VfxColor {
-  return { r: value.r, g: value.g, b: value.b, a: value.a };
+  return {
+    r: canonicalDecimal(value.r),
+    g: canonicalDecimal(value.g),
+    b: canonicalDecimal(value.b),
+    a: canonicalDecimal(value.a),
+  };
 }
 
 function canonicalDecimal(value: number): number {
-  return Number(value.toFixed(12));
+  const normalized = Number(value.toFixed(12));
+  return Object.is(normalized, -0) ? 0 : normalized;
+}
+
+function canonicalTimeTicks(value: number): number | null {
+  try {
+    return canonicalTimeToTicks(value);
+  } catch {
+    return null;
+  }
 }
 
 function validCurve(
@@ -213,7 +301,10 @@ function validCurve(
         ),
       );
     }
-    if (finite(keyframe.time) && keyframe.time <= previous) {
+    const canonicalTime = finite(keyframe.time)
+      ? canonicalDecimal(keyframe.time)
+      : null;
+    if (canonicalTime !== null && canonicalTime <= previous) {
       errors.push(
         diagnostic(
           VfxAuthoringErrorCode.INVALID_CURVE_TIME,
@@ -222,7 +313,7 @@ function validCurve(
         ),
       );
     }
-    if (finite(keyframe.time)) previous = keyframe.time;
+    if (canonicalTime !== null) previous = canonicalTime;
   }
   return errors;
 }
@@ -302,17 +393,21 @@ function validateContext(
     if (
       typeof descriptor !== "object" ||
       descriptor === null ||
-      !exactObjectKeys(descriptor, ["cueId", "commandMode"]) ||
+      !exactObjectKeys(descriptor, ["cueId", "commandMode", "lifecycle"]) ||
       typeof descriptor.cueId !== "string" ||
       descriptor.cueId.length > 80 ||
       !identifierPattern.test(descriptor.cueId) ||
-      !commandModes.has(descriptor.commandMode)
+      !commandModes.has(descriptor.commandMode) ||
+      !lifecycles.has(descriptor.lifecycle) ||
+      (descriptor.lifecycle === "one-shot"
+        ? descriptor.commandMode !== "emit"
+        : descriptor.commandMode !== "start-stop")
     ) {
       errors.push(
         diagnostic(
           VfxAuthoringErrorCode.INVALID_SEMANTIC_CUE_REGISTRY,
           path,
-          "Semantic cue descriptor must contain only a valid cueId and commandMode.",
+          "Semantic cue descriptor must contain a valid cueId and a non-contradictory exact lifecycle/commandMode pair.",
         ),
       );
       continue;
@@ -614,17 +709,12 @@ function validateCue(
         `Semantic cue ${cue.cueId} is not in the descriptor registry.`,
       ),
     );
-  } else if (
-    (semanticDescriptor.commandMode === "emit" &&
-      cue.lifecycle !== "one-shot") ||
-    (semanticDescriptor.commandMode === "start-stop" &&
-      cue.lifecycle === "one-shot")
-  ) {
+  } else if (semanticDescriptor.lifecycle !== cue.lifecycle) {
     errors.push(
       diagnostic(
         VfxAuthoringErrorCode.INCOMPATIBLE_SEMANTIC_LIFECYCLE,
         `${cuePath}/lifecycle`,
-        `Semantic ${semanticDescriptor.commandMode} mode is incompatible with ${cue.lifecycle}.`,
+        `Semantic lifecycle ${semanticDescriptor.lifecycle} does not exactly match authored lifecycle ${cue.lifecycle}.`,
       ),
     );
   }
@@ -727,14 +817,26 @@ function validateCue(
         ),
       );
     }
+    const durationTicks = finite(layer.durationSeconds)
+      ? canonicalTimeTicks(layer.durationSeconds)
+      : null;
+    const delayTicks =
+      layer.delaySeconds === undefined
+        ? 0
+        : finite(layer.delaySeconds)
+          ? canonicalTimeTicks(layer.delaySeconds)
+          : null;
     if (
       !finite(layer.durationSeconds) ||
       layer.durationSeconds <= 0 ||
       layer.durationSeconds > 60 ||
+      durationTicks === null ||
+      durationTicks === 0 ||
       (layer.delaySeconds !== undefined &&
         (!finite(layer.delaySeconds) ||
           layer.delaySeconds < 0 ||
-          layer.delaySeconds > 60))
+          layer.delaySeconds > 60 ||
+          delayTicks === null))
     ) {
       errors.push(
         diagnostic(
@@ -799,19 +901,28 @@ function validateCue(
       );
     }
     const isParticles = layer.primitive === "burst-particles";
+    const emission = layer.emission;
+    const emissionShapeValid =
+      emission !== undefined &&
+      finite(emission.count) &&
+      Number.isInteger(emission.count) &&
+      emission.count > 0 &&
+      emission.count <= 4096 &&
+      finite(emission.ratePerSecond) &&
+      emission.ratePerSecond >= 0 &&
+      emission.ratePerSecond <= 10_000;
+    const finalRelativeSpawnTicks =
+      emissionShapeValid && emission.ratePerSecond > 0
+        ? canonicalTimeTicks(
+            (emission.count - 1) / emission.ratePerSecond,
+          )
+        : 0;
     if (
       (isParticles &&
-        (layer.emission === undefined ||
-          !finite(layer.emission.count) ||
-          !Number.isInteger(layer.emission.count) ||
-          layer.emission.count <= 0 ||
-          layer.emission.count > 4096 ||
-          !finite(layer.emission.ratePerSecond) ||
-          layer.emission.ratePerSecond < 0 ||
-          layer.emission.ratePerSecond > 10_000 ||
-          (layer.emission.ratePerSecond > 0 &&
-            (layer.emission.count - 1) / layer.emission.ratePerSecond >
-              layer.durationSeconds))) ||
+        (!emissionShapeValid ||
+          finalRelativeSpawnTicks === null ||
+          durationTicks === null ||
+          finalRelativeSpawnTicks > durationTicks)) ||
       (!isParticles && layer.emission !== undefined)
     ) {
       errors.push(
@@ -953,6 +1064,7 @@ function normalizedEmission(
   delaySeconds: number,
 ): NormalizedVfxEmission | null {
   if (layer.emission === undefined) return null;
+  const delayTick = canonicalTimeToTicks(delaySeconds);
   const initialSeed = (cue.deterministicSeed ^ layer.order) >>> 0;
   const streamSeed = initialSeed === 0 ? 1831565813 : initialSeed;
   let state = streamSeed;
@@ -962,20 +1074,22 @@ function normalizedEmission(
       state = nextXorshift32(state);
       return {
         particleIndex,
-        spawnTimeSeconds:
-          layer.emission?.ratePerSecond === 0
-            ? delaySeconds
-            : canonicalDecimal(
-                delaySeconds +
-                  particleIndex / (layer.emission?.ratePerSecond ?? 1),
-              ),
+        spawnTimeSeconds: canonicalTicksToSeconds(
+          delayTick +
+            (layer.emission?.ratePerSecond === 0
+              ? 0
+              : canonicalTimeToTicks(
+                  particleIndex /
+                    (layer.emission?.ratePerSecond ?? 1),
+                )),
+        ),
         randomUint32: state,
       };
     },
   );
   return {
     count: layer.emission.count,
-    ratePerSecond: layer.emission.ratePerSecond,
+    ratePerSecond: canonicalDecimal(layer.emission.ratePerSecond),
     schedule,
     prng: {
       algorithm: "xorshift32-v1",
@@ -993,20 +1107,22 @@ function normalizeLayer(
 ): NormalizedVfxLayer {
   const transform = {
     position: {
-      x: layer.transform?.position?.x ?? 0,
-      y: layer.transform?.position?.y ?? 0,
+      x: canonicalDecimal(layer.transform?.position?.x ?? 0),
+      y: canonicalDecimal(layer.transform?.position?.y ?? 0),
     },
-    rotationDegrees: layer.transform?.rotationDegrees ?? 0,
+    rotationDegrees: canonicalDecimal(
+      layer.transform?.rotationDegrees ?? 0,
+    ),
     scale: {
-      x: layer.transform?.scale?.x ?? 1,
-      y: layer.transform?.scale?.y ?? 1,
+      x: canonicalDecimal(layer.transform?.scale?.x ?? 1),
+      y: canonicalDecimal(layer.transform?.scale?.y ?? 1),
     },
   };
   let color: VfxColor =
     layer.color === undefined
       ? { r: 1, g: 1, b: 1, a: 1 }
       : normalizedColor(layer.color);
-  let opacity = layer.opacity ?? 1;
+  let opacity = canonicalDecimal(layer.opacity ?? 1);
   for (const binding of [...(cue.bindings ?? [])]
     .filter((candidate) => candidate.layerId === layer.layerId)
     .sort(
@@ -1029,7 +1145,12 @@ function normalizeLayer(
       );
     }
   }
-  const delaySeconds = layer.delaySeconds ?? 0;
+  const delaySeconds = canonicalTicksToSeconds(
+    canonicalTimeToTicks(layer.delaySeconds ?? 0),
+  );
+  const durationSeconds = canonicalTicksToSeconds(
+    canonicalTimeToTicks(layer.durationSeconds),
+  );
   return {
     layerId: layer.layerId,
     order: layer.order,
@@ -1040,7 +1161,7 @@ function normalizeLayer(
     },
     timing: {
       delaySeconds,
-      durationSeconds: layer.durationSeconds,
+      durationSeconds,
       phaseMode:
         cue.lifecycle === "one-shot"
           ? "once"
@@ -1056,10 +1177,16 @@ function normalizeLayer(
     opacity,
     effectiveAlpha: canonicalDecimal(color.a * opacity),
     scaleCurve:
-      layer.scaleCurve?.map((keyframe) => ({ ...keyframe })) ??
+      layer.scaleCurve?.map((keyframe) => ({
+        time: canonicalDecimal(keyframe.time),
+        value: canonicalDecimal(keyframe.value),
+      })) ??
       [{ time: 0, value: 1 }, { time: 1, value: 1 }],
     rotationCurve:
-      layer.rotationCurve?.map((keyframe) => ({ ...keyframe })) ??
+      layer.rotationCurve?.map((keyframe) => ({
+        time: canonicalDecimal(keyframe.time),
+        value: canonicalDecimal(keyframe.value),
+      })) ??
       [{ time: 0, value: 0 }, { time: 1, value: 0 }],
     emission: normalizedEmission(cue, layer, delaySeconds),
     blendRole: layer.blendRole ?? "alpha",
@@ -1152,6 +1279,10 @@ export function compileVfxAuthoring(
   readonly plan: VfxRenderPlan;
   readonly serialized: string;
 }> {
+  const preflightErrors = preflightBudgetDiagnostics(value);
+  if (preflightErrors.length > 0) {
+    return { ok: false, errors: preflightErrors };
+  }
   if (!validateShape(value)) {
     return { ok: false, errors: schemaDiagnostics() };
   }

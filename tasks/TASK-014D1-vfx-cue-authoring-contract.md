@@ -36,6 +36,13 @@ Render Plans without changing Character Semantic Events semantics.
       semantic cleanup authority are executable and tested.
 - [x] Burst schedules, zero-rate behavior, lifetime fit, `xorshift32-v1`, and
       compiled random samples have golden vectors.
+- [x] Canonical integer-tick sampling closes decimal, equivalent-expression,
+      repeated-`1/60`, adjacent-boundary, invalid-time, and range-overflow
+      counterexamples without epsilon or quotient-equality tests.
+- [x] Particle duration and the serialized spawn schedule use the same
+      canonical tick validation, including the `1.2469134` regression.
+- [x] Semantic descriptors carry exact lifecycle; looping and persistent
+      mismatches fail even though both use `start-stop`.
 - [x] Every public diagnostic has one focused invalid textual fixture and is
       asserted by tests.
 - [x] Unknown semantic cue/resource IDs, unsupported primitives, non-finite
