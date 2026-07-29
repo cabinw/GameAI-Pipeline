@@ -136,7 +136,7 @@ fault-safe compensation. None of those semantics may be forked in D3.
 
 ### Focused transaction cleanup closeout
 
-- Automated real-component matrix: seven entry paths by ten component
+- Automated synthetic coordinator closure matrix: seven entry paths by ten
   cleanup steps (`70` cases), plus target-rebind atomic-publication coverage.
 - Creator 3.8.8 component matrix: all ten teardown steps under terminal
   failure, plus setup failure, target invalidation, Exact Reset, rebuild,

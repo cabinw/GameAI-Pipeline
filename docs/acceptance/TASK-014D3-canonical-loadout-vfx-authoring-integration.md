@@ -92,12 +92,12 @@ parent lifecycle. Setup failure, terminal failure, rebuild, disable and
 destroy use that boundary. Target invalidation and Exact Reset use the same
 accepted coordinator as scoped VFX cleanup transactions.
 
-The automated real-component/parent fault matrix covers seven entry paths by
-all ten component cleanup steps (`70` cases). It verifies the first business
-error by object identity, ordered cleanup errors, continuation after every
-fault, retained compensation ownership and exactly-once successful steps.
-Component compensation reaches root/input/owner/material/node
-`0/0/0/0/0`; the same instance then reaches READY `1/1/0/0/0`.
+The automated synthetic coordinator closure matrix covers seven entry paths
+by all ten cleanup steps (`70` cases). It verifies the first business error by
+object identity, ordered cleanup errors, continuation after every fault,
+retained compensation ownership and exactly-once successful steps. Synthetic
+compensation reaches root/input/owner/material/node `0/0/0/0/0`; retry reaches
+READY `1/1/0/0/0`.
 
 Creator 3.8.8 repeated all ten terminal teardown faults and the six additional
 entry cases (`16` cases). Setup, terminal, rebuild and disable recovered to
