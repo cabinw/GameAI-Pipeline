@@ -173,6 +173,15 @@ TASK-014C now deliver its commands through the Cocos Semantic VFX Adapter,
 canonical target registry, and renderer/cue registry; the accepted visible
 effects are Footstep Dust, Wave/Prop Trail, and Persistent Aura.
 
+TASK-014D1 subsequently added a separate engine-neutral VFX authoring
+compiler without changing Rig Animation or Character Semantic Events timing.
+It compiles cue documents to concrete Render Plans with canonical integer
+ticks, curves, resolved parameters, deterministic randomness, and budgets.
+TASK-014D2 reuses the exact sampler in the shared Cocos runtime, and
+TASK-014D3 connects that runtime to the canonical loadout targets. Animation
+still supplies evaluated poses and semantic clip time; it does not parse VFX
+authoring data or own renderer lifecycle.
+
 ## Current limitations
 
 - One animation plays at a time; there is no blending, state machine, IK,
@@ -183,10 +192,14 @@ effects are Footstep Dust, Wave/Prop Trail, and Persistent Aura.
 - Runtime validation assumes Main supplied normalized, already validated data;
   Scene Script does not duplicate JSON-contract parsing.
 - Semantic command delivery remains separate from `RigAnimationPlayer`.
-  TASK-014B/TASK-014C add the canonical Cocos VFX consumer, while
+  TASK-014D2/TASK-014D3 add the canonical data-driven Cocos VFX consumer, while
   gameplay-triggered injection, audio/gameplay execution, reverse playback,
   arbitrary seek, networking, and non-Cocos runtime adapters remain
   unimplemented.
+- Current Dust, Trail, Aura, and Combined effects are procedural/reference
+  VFX. Production art, a complete authoring UI, AI asset generation,
+  Unity/Godot adapters, Windows verification, Red Cap reconstruction, and
+  TASK-014D4 remain outside this baseline.
 - The TASK-007 walk cycle is a minimal in-place articulation reference, not a
   production locomotion system; it adds no root motion, foot locking, IK,
   blending, or state machine.

@@ -25,6 +25,8 @@
 - [Minimal runtime adapter boundaries](adr/ADR-0013-minimal-cocos-runtime-adapter-boundaries.md)
 - [Recovered canonical loadout adapter](adr/ADR-0014-recovered-cocos-loadout-release-candidate.md)
 - [Engine-neutral character semantic events](adr/ADR-0015-engine-neutral-character-semantic-events.md)
+- [Engine-neutral VFX authoring and compilation](adr/ADR-0016-engine-neutral-vfx-authoring-compilation.md)
+- [Canonical loadout VFX over the shared Cocos runtime](adr/ADR-0017-canonical-loadout-vfx-authoring-integration.md)
 
 ## Acceptance and learning
 
@@ -32,12 +34,14 @@
 - [TASK-013R7 canonical Cocos acceptance](acceptance/TASK-013R7-full-loadout-release-candidate.md)
 - [TASK-014B Cocos Semantic VFX Adapter acceptance](acceptance/TASK-014B-cocos-semantic-vfx-adapter.md)
 - [TASK-014C canonical full-loadout Semantic VFX acceptance](acceptance/TASK-014C-canonical-loadout-semantic-vfx.md)
+- [TASK-014D3 canonical full-loadout data-driven VFX acceptance](acceptance/TASK-014D3-canonical-loadout-vfx-authoring-integration.md)
 - [TASK-013 Cocos runtime postmortem](postmortems/TASK-013-cocos-runtime-integration.md)
 
 ## Release and roadmap
 
 - [v0.2.0 Character Loadout Baseline](releases/v0.2.0-character-loadout-baseline.md)
 - [v0.3.0 Character Semantic Events & VFX Baseline](releases/v0.3.0-character-semantic-events-vfx-baseline.md)
+- [v0.4.0 Data-Driven VFX Authoring Baseline](releases/v0.4.0-data-driven-vfx-authoring-baseline.md)
 - [Compatibility matrix](compatibility.md)
 - [Changelog](../CHANGELOG.md)
 - [Roadmap](../ROADMAP.md)

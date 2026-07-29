@@ -44,23 +44,33 @@ engine-neutral contracts without playback, hitbox, damage, or signal
 consumers. v0.3.0 is a prerelease framework baseline with procedural
 placeholder VFX, not production-ready final art or complete tooling.
 
+## v0.4.0 — Data-Driven VFX Authoring Baseline — Completed
+
+- TASK-014D1: engine-neutral VFX authoring schema, deterministic compiler,
+  concrete Render Plans, canonical integer ticks, curves, parameters,
+  randomness, and budgets
+- TASK-014D2: shared Cocos Render Plan adapter/runtime with typed
+  primitive/recipe/blend dispatch and exact sampler reuse
+- Transactional ownership/cleanup, deterministic sorting, transformed
+  viewport bounds, rebuild, compensation retry, and Exact Reset
+- TASK-014D3: canonical 12-state loadout integration with atomic
+  prop/clip/target rebind
+- Procedural/reference Dust, Hand/Tool Trail, Aura, and Combined
+- Real Creator `onDisable → onDestroy`, eight early partial-build fault
+  gates, 25/25 Creator fault matrix, and visual acceptance
+- Working-copy and frozen tracked-files-only 491/491 verification
+- Zero tracked evidence media
+
+v0.4.0 remains a prerelease framework baseline. The accepted procedural
+effects prove data and runtime contracts but do not represent production art.
+
 ## Next roadmap
 
-### TASK-014D — Data-Driven Production VFX Cue Authoring
+### TASK-014D4 — Not started
 
-Proposed future goal:
-
-- replace hard-coded procedural effect construction with a validated,
-  engine-neutral authoring description;
-- allow AI to generate or modify VFX cue data;
-- support reusable cue presets;
-- preview cue timing, socket binding, transforms, color, duration, and layers;
-- compile engine-neutral cue descriptions into Cocos renderer plans;
-- retain Unity/Godot adapter compatibility; and
-- keep production-quality asset generation separate from runtime logic.
-
-TASK-014D is not implemented or started by the v0.3.0 documentation
-closeout.
+TASK-014D4 has no accepted implementation scope and is not started by the
+v0.4.0 documentation closeout. Any next VFX capability requires a separate
+task, plan, acceptance criteria, and scope decision.
 
 ### Audio consumer
 
