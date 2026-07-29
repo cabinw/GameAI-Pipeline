@@ -56,7 +56,12 @@ import {
   type CocosVfxRendererOwnership,
   type CocosVfxRuntimeHost,
 } from "./cocos-vfx-runtime-state";
-import { Task014D2CleanupCoordinator } from "./cocos-vfx-cleanup-coordinator";
+import {
+  Task014D2CleanupCoordinator,
+  executeTask014D2FaultCase,
+  type Task014D2FaultCaseArtifact,
+  type Task014D2FaultCounts,
+} from "./cocos-vfx-cleanup-coordinator";
 import type { VfxLayerSample } from "./d1/types";
 import {
   canonicalTimeToTicks,
@@ -135,6 +140,9 @@ function assertNever(value: never): never {
 class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   private readonly bindings = new Map<string, RendererBinding>();
   private readonly owners = new Map<string, RendererOwner>();
+  private readonly transientOwners =
+    new Map<string, Task014D2CleanupCoordinator>();
+  private readonly cleanupHistory: string[] = [];
   private readonly verifiedBlendRenderers = new WeakSet<UIRenderer>();
   private readonly world = new Vec3();
   private readonly observedWorld = new Vec3();
@@ -174,16 +182,23 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     ] as const;
     for (const role of roles) {
       for (const rendererKind of rendererKinds) {
+        const ownerId = `blend-gate:${rendererKind}:${role}`;
         const node = new Node(`BlendGate_${rendererKind}_${role}`);
         const cleanup = new Task014D2CleanupCoordinator();
+        this.transientOwners.set(ownerId, cleanup);
         cleanup.own({
           id: "node-detach",
           order: 20,
-          run: () => node.removeFromParent(),
+          ownerKind: "node",
+          run: () => {
+            this.injectCleanupFault("blend-gate-node-detach");
+            node.removeFromParent();
+          },
         });
         cleanup.own({
           id: "node-destroy",
           order: 40,
+          ownerKind: "node",
           run: () => node.destroy(),
         });
         node.active = false;
@@ -212,13 +227,13 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
           firstError = error;
         } finally {
           const report = cleanup.cleanup(firstError);
+          this.recordCleanupErrors(ownerId, report);
+          if (cleanup.complete) this.transientOwners.delete(ownerId);
           if (firstError !== null) throw firstError;
           if (!cleanup.complete) {
-            throw new Error(
-              `TASK_014D2_BLEND_GATE_CLEANUP_FAILED:${
-                report.cleanupErrors.map((entry) =>
-                  `${entry.stepId}:${entry.message}`).join("|")
-              }`,
+            throw new CocosVfxRuntimeError(
+              CocosVfxPlanErrorCode.RUNTIME_BUILD_FAILURE,
+              `TASK_014D2_BLEND_GATE_CLEANUP_INCOMPLETE:${ownerId}`,
             );
           }
         }
@@ -247,6 +262,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     cleanup.own({
       id: "node-detach",
       order: 20,
+      ownerKind: "node",
       run: () => {
         this.injectCleanupFault("renderer-node-detach");
         node.removeFromParent();
@@ -255,6 +271,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     cleanup.own({
       id: "node-destroy",
       order: 40,
+      ownerKind: "node",
       run: () => {
         this.injectCleanupFault("renderer-node-destroy");
         node.destroy();
@@ -302,13 +319,8 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     } catch (error) {
       this.bindings.delete(ownership.rendererId);
       const report = cleanup.cleanup(error);
+      this.recordCleanupErrors(`renderer:${ownership.rendererId}`, report);
       if (cleanup.complete) this.owners.delete(ownership.rendererId);
-      if (report.cleanupErrors.length > 0) {
-        throw new Error(
-          `${report.firstError}; cleanup=${report.cleanupErrors
-            .map((entry) => `${entry.stepId}:${entry.message}`).join("|")}`,
-        );
-      }
       throw error;
     }
   }
@@ -375,6 +387,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       return;
     }
     const report = owner.cleanup.cleanup();
+    this.recordCleanupErrors(`renderer:${rendererId}`, report);
     if (!owner.cleanup.complete) {
       throw new Error(
         `TASK_014D2_RENDERER_CLEANUP_FAILED:${rendererId}:${
@@ -390,6 +403,19 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
 
   destroyAll(reason: string): void {
     let firstError: unknown = null;
+    for (const [ownerId, cleanup] of this.transientOwners) {
+      const report = cleanup.cleanup();
+      this.recordCleanupErrors(ownerId, report);
+      if (cleanup.complete) {
+        this.transientOwners.delete(ownerId);
+      } else {
+        firstError ??= new Error(
+          `TASK_014D2_TRANSIENT_CLEANUP_INCOMPLETE:${ownerId}:${
+            report.pendingStepIds.join("|")
+          }`,
+        );
+      }
+    }
     for (const rendererId of [...this.owners.keys()]) {
       try {
         this.destroyLayer(rendererId, reason);
@@ -398,6 +424,64 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
       }
     }
     if (firstError !== null) throw firstError;
+  }
+
+  cleanupDiagnostics(): Readonly<{
+    cleanupErrors: readonly string[];
+    pendingStepIds: readonly string[];
+    ownerCount: number;
+    materialCount: number;
+    nodeCount: number;
+  }> {
+    const coordinators = [
+      ...this.transientOwners.entries(),
+      ...[...this.owners.entries()].map(
+        ([id, owner]) => [`renderer:${id}`, owner.cleanup] as const,
+      ),
+    ] as const;
+    const cleanupErrors: string[] = [];
+    const pendingStepIds: string[] = [];
+    let materialCount = 0;
+    let nodeCount = 0;
+    let ownerCount = 0;
+    for (const [ownerId, cleanup] of coordinators) {
+      const report = cleanup.report();
+      for (const entry of report.cleanupErrors) {
+        cleanupErrors.push(
+          `${ownerId}/${entry.stepId}:${entry.message}`,
+        );
+      }
+      for (const stepId of report.pendingStepIds) {
+        pendingStepIds.push(`${ownerId}/${stepId}`);
+      }
+      if (report.pendingStepIds.length > 0) ownerCount += 1;
+      materialCount += report.pendingOwnerCounts.material ?? 0;
+      nodeCount += report.pendingOwnerCounts.node ?? 0;
+    }
+    return {
+      cleanupErrors,
+      pendingStepIds,
+      ownerCount,
+      materialCount,
+      nodeCount,
+    };
+  }
+
+  cleanupFaultHistory(): readonly string[] {
+    return [...this.cleanupHistory];
+  }
+
+  private recordCleanupErrors(
+    ownerId: string,
+    report: ReturnType<Task014D2CleanupCoordinator["report"]>,
+  ): void {
+    for (const entry of report.cleanupErrors) {
+      const diagnostic =
+        `${ownerId}/${entry.stepId}:${entry.message}`;
+      if (!this.cleanupHistory.includes(diagnostic)) {
+        this.cleanupHistory.push(diagnostic);
+      }
+    }
   }
 
   rendererOwnership(): readonly CocosVfxRendererOwnership[] {
@@ -609,6 +693,7 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     cleanup.own({
       id: `material-${++this.materialOwnershipCounter}`,
       order: 30,
+      ownerKind: "material",
       run: () => {
         this.injectCleanupFault("material-destroy");
         material.destroy();
@@ -931,6 +1016,18 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private commandCounter = 0;
   private terminal = false;
   private lifecycle = new Task014D2CleanupCoordinator();
+  private rootOwnership: {
+    readonly node: Node;
+    detached: boolean;
+    destroyed: boolean;
+  } | null = null;
+  private primaryError: unknown | null = null;
+  private readonly retainedCleanupErrors: string[] = [];
+  private readonly retainedRuntimeCleanupErrors: string[] = [];
+  private readonly retainedHostCleanupHistory: string[] = [];
+  private faultMatrixExecuted = false;
+  private readonly actualFaultRecords: unknown[] = [];
+  private retryScheduled = false;
   private readonly injectedFaults = new Set<string>();
   private activeStartStop: {
     cueId: string;
@@ -957,6 +1054,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   update(deltaSeconds: number): void {
     if (!this.ready || this.runtime === null || this.terminal) return;
     try {
+      this.runCreatorFaultMatrixIfRequested();
       if (this.playing) {
         this.elapsedSeconds += deltaSeconds;
         this.runtime.tick(deltaSeconds);
@@ -993,6 +1091,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.lifecycle.own({
       id: "generation-invalidate",
       order: 0,
+      ownerKind: "generation",
       run: () => {
         if (this.generation === generation) this.generation += 1;
       },
@@ -1000,10 +1099,30 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.lifecycle.own({
       id: "references-clear",
       order: 100,
-      run: () => this.clearRuntimeReferences(),
+      ownerKind: "references",
+      run: () => {
+        this.captureCleanupDiagnostics();
+        const pending = this.lifecycle.report().pendingStepIds.filter(
+          (stepId) => stepId !== "references-clear",
+        );
+        if (pending.length > 0) {
+          throw new Error(
+            `TASK_014D2_REFERENCES_RETAINED_FOR_COMPENSATION:${pending.join("|")}`,
+          );
+        }
+        const root = this.rootOwnership;
+        if (root !== null && (!root.detached || !root.destroyed)) {
+          throw new Error("TASK_014D2_REFERENCES_RETAINED_FOR_ROOT_COMPENSATION");
+        }
+        this.clearRuntimeReferences();
+      },
     });
     this.ready = false;
     this.terminal = false;
+    this.primaryError = null;
+    this.retainedCleanupErrors.length = 0;
+    this.retainedRuntimeCleanupErrors.length = 0;
+    this.retainedHostCleanupHistory.length = 0;
     this.diagnostics.terminalError = "";
     this.diagnostics.cleanupErrors = "";
     const compiled = compileCocosVfxRenderDescriptors(
@@ -1048,12 +1167,14 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
           this.ready = true;
           this.diagnostics.setupCount += 1;
           this.exactReset("Initial Reset");
+          this.prepareRendererCleanupFault();
           this.injectSetupFault("initial-sample");
           this.registerInput();
           this.injectSetupFault("registered-before-throw");
           this.injectSetupFault("hud-input-setup");
           this.syncDiagnostics();
           this.updateHud();
+          this.publishActualFaultRecord("retry-ready");
           console.info("TASK_014D2_RUNTIME_READY", this.snapshot());
         } catch (caught) {
           this.enterTerminalFailure(caught);
@@ -1071,20 +1192,29 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     }
     const root = new Node("Task014D2RuntimeRoot");
     this.runtimeRoot = root;
+    const rootOwnership = { node: root, detached: false, destroyed: false };
+    this.rootOwnership = rootOwnership;
     this.lifecycle.own({
       id: "root-detach",
       order: 70,
+      ownerKind: "root",
       run: () => {
         this.injectSetupFault("root-detach");
         root.removeFromParent();
+        rootOwnership.detached = true;
       },
     });
     this.lifecycle.own({
       id: "root-destroy",
       order: 80,
+      ownerKind: "root",
       run: () => {
+        if (!rootOwnership.detached) {
+          throw new Error("TASK_014D2_ROOT_DESTROY_WAITING_FOR_DETACH");
+        }
         this.injectSetupFault("root-destroy");
         root.destroy();
+        rootOwnership.destroyed = true;
         this.diagnostics.teardownCount += 1;
       },
     });
@@ -1117,6 +1247,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.lifecycle.own({
       id: "host-renderers",
       order: 40,
+      ownerKind: "host",
       run: () => ownedHost.destroyAll("lifecycle-cleanup"),
     });
     const spriteFrame = [...resourcesById.values()].find(
@@ -1132,11 +1263,15 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.lifecycle.own({
       id: "runtime-state",
       order: 20,
-      run: () => ownedRuntime.cleanup("lifecycle-cleanup"),
+      ownerKind: "runtime",
+      run: () => {
+        this.injectSetupFault("runtime-cleanup");
+        ownedRuntime.cleanup("lifecycle-cleanup");
+      },
     });
     const hudNode = this.target("Task014D2Hud", root, -620, 340);
     const hudTransform = hudNode.getComponent(UITransform) as UITransform;
-    hudTransform.setContentSize(1240, 190);
+    hudTransform.setContentSize(1240, 220);
     hudTransform.setAnchorPoint(0, 1);
     const hud = hudNode.addComponent(Label);
     hud.fontSize = 14;
@@ -1165,6 +1300,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.lifecycle.own({
       id: "input-handler",
       order: 30,
+      ownerKind: "input",
       run: () => this.unregisterInput(),
     });
   }
@@ -1317,6 +1453,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
     this.host = null;
     this.runtime = null;
     this.activeStartStop = null;
+    this.rootOwnership = null;
   }
 
   private unregisterInput(): void {
@@ -1331,6 +1468,7 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   private enterTerminalFailure(error: unknown): void {
     if (this.terminal && this.lifecycle.complete) return;
     this.terminal = true;
+    this.primaryError ??= error;
     this.ready = false;
     this.playing = false;
     if (this.injectedFaults.has("cleanup-trigger")) {
@@ -1342,31 +1480,44 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
         });
       } catch {}
     }
-    let result = this.cleanupLifecycle("terminal-failure", error);
+    let result = this.cleanupLifecycle("terminal-failure", this.primaryError);
     if (!this.lifecycle.complete) {
       result = this.cleanupLifecycle("terminal-compensation");
     }
-    this.diagnostics.terminalError =
-      result.firstError ?? (error instanceof Error ? error.message : String(error));
-    this.diagnostics.cleanupErrors = result.cleanupErrors
-      .map((entry) => `${entry.stepId}:${entry.message}`).join(" | ");
     this.syncDiagnostics();
     this.showFailureHud();
     console.error(this.diagnostics.terminalError);
+    if (
+      this.lifecycle.complete &&
+      this.actualFaultRetryRequested() &&
+      !this.retryScheduled
+    ) {
+      this.retryScheduled = true;
+      void Promise.resolve().then(() => {
+        this.retryScheduled = false;
+        this.beginSetup();
+      });
+    }
   }
 
   private cleanupLifecycle(
-    _reason: string,
+    reason: string,
     error: unknown = null,
   ): ReturnType<Task014D2CleanupCoordinator["cleanup"]> {
-    return this.lifecycle.cleanup(error);
+    const report = this.lifecycle.cleanup(error);
+    this.publishActualFaultRecord(reason, report);
+    if (report.cleanupErrors.length > 0) {
+      this.syncDiagnostics();
+      this.showFailureHud();
+    }
+    return report;
   }
 
   private showFailureHud(): void {
     this.destroyFailureHud();
     const node = this.target("Task014D2FailureHud", this.node, -620, 340);
     const transform = node.getComponent(UITransform) as UITransform;
-    transform.setContentSize(1240, 190);
+    transform.setContentSize(1240, 220);
     transform.setAnchorPoint(0, 1);
     const label = node.addComponent(Label);
     label.fontSize = 14;
@@ -1406,9 +1557,118 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
         ),
       ])
       .find((value) => value !== null);
-    if (requested !== requestedStage || this.injectedFaults.has(stage)) return;
+    const requestedStages = new Set(
+      (requested ?? "").split(",").map((value) => value.trim()).filter(Boolean),
+    );
+    if (
+      !requestedStages.has(requestedStage) ||
+      this.injectedFaults.has(stage)
+    ) return;
     this.injectedFaults.add(stage);
     throw new Error(`TASK_014D2_INJECTED_SETUP_FAULT:${stage}`);
+  }
+
+  private prepareRendererCleanupFault(): void {
+    if (!this.actualFaultStages().has("renderer-cleanup")) return;
+    const cue = this.descriptorPlan?.cues.find(
+      (candidate) => candidate.lifecycle === "one-shot",
+    );
+    if (cue === undefined || this.runtime === null) {
+      throw new Error("TASK_014D2_FAULT_RENDERER_CUE_MISSING");
+    }
+    this.runtime.dispatch({
+      command: "emit",
+      cueId: cue.cueId,
+      commandId: "fault-renderer-cleanup",
+    });
+    this.injectSetupFault("renderer-cleanup");
+  }
+
+  private actualFaultStages(): ReadonlySet<string> {
+    const locations = [globalThis.location];
+    try {
+      if (globalThis.parent?.location !== globalThis.location) {
+        locations.push(globalThis.parent.location);
+      }
+    } catch {}
+    const requested = locations
+      .map((location) =>
+        new URLSearchParams(location?.search ?? "").get("task014d2Fault"))
+      .find((value) => value !== null) ?? "";
+    return new Set(
+      requested.split(",").map((value) => value.trim()).filter(Boolean),
+    );
+  }
+
+  private actualFaultRetryRequested(): boolean {
+    const locations = [globalThis.location];
+    try {
+      if (globalThis.parent?.location !== globalThis.location) {
+        locations.push(globalThis.parent.location);
+      }
+    } catch {}
+    return locations.some((location) =>
+      new URLSearchParams(location?.search ?? "").get("task014d2Retry") ===
+        "1");
+  }
+
+  private publishActualFaultRecord(
+    phase: string,
+    report = this.lifecycle.report(),
+  ): void {
+    const stages = [...this.actualFaultStages()];
+    if (stages.length === 0 || typeof document === "undefined") return;
+    const host = this.host?.cleanupDiagnostics();
+    const record = {
+      phase,
+      injectedOperations: stages,
+      primaryError: report.primaryErrorMessage,
+      orderedCleanupErrors: report.cleanupErrors.map(
+        (entry) => `${entry.stepId}:${entry.message}`,
+      ).concat(this.retainedHostCleanupHistory),
+      pendingCleanupSteps: [
+        ...report.pendingStepIds,
+        ...(host?.pendingStepIds ?? []),
+      ],
+      counts: {
+        root: this.runtimeRootCount(),
+        input: this.inputRegistered ? 1 : 0,
+        owner:
+          Object.values(report.pendingOwnerCounts)
+            .reduce((sum, count) => sum + count, 0) +
+          (host?.ownerCount ?? 0),
+        material:
+          (report.pendingOwnerCounts.material ?? 0) +
+          (host?.materialCount ?? 0),
+        node:
+          (report.pendingOwnerCounts.node ?? 0) +
+          (report.pendingOwnerCounts.root ?? 0) +
+          (host?.nodeCount ?? 0),
+      },
+      terminalState: this.terminal ? "FAILED" : this.ready ? "READY" : "SETUP",
+      lifecycleComplete: this.lifecycle.complete,
+    };
+    this.actualFaultRecords.push(record);
+    let output = document.getElementById(
+      "task014d2-actual-transaction-fault-record",
+    );
+    if (output === null) {
+      output = document.createElement("script");
+      output.id = "task014d2-actual-transaction-fault-record";
+      output.setAttribute("type", "application/json");
+      document.body.appendChild(output);
+    }
+    output.textContent = JSON.stringify({
+      schemaVersion: "1.0.0",
+      taskId: "TASK-014D2",
+      creatorVersion: "3.8.8",
+      injectedOperations: stages,
+      records: this.actualFaultRecords,
+    });
+    console.info(
+      "TASK_014D2_ACTUAL_TRANSACTION_FAULT",
+      JSON.stringify(record),
+    );
   }
 
   private assertRuntime(): void {
@@ -1452,6 +1712,8 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
 
   private syncDiagnostics(): void {
     const snapshot = this.runtime?.snapshot();
+    const lifecycle = this.lifecycle.report();
+    const hostCleanup = this.host?.cleanupDiagnostics();
     this.diagnostics.activeInstances = snapshot?.activeCueKeys.length ?? 0;
     this.diagnostics.activeRenderers = snapshot?.activeRendererCount ?? 0;
     this.diagnostics.pendingRenderers =
@@ -1486,6 +1748,35 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
       this.host?.maximumRotationErrorDegrees ?? 0;
     this.diagnostics.maximumAabbOverflowPx =
       this.host?.maximumViewportOverflowPx ?? 0;
+    const primary = this.primaryError ?? lifecycle.primaryError;
+    this.diagnostics.terminalError = primary === null
+      ? (snapshot?.terminalError ?? "")
+      : primary instanceof Error ? primary.message : String(primary);
+    const cleanupErrors = [
+      ...this.retainedRuntimeCleanupErrors,
+      ...(snapshot?.cleanupErrors ?? []),
+      ...this.retainedCleanupErrors,
+      ...lifecycle.cleanupErrors.map(
+        (entry) => `${entry.stepId}:${entry.message}`,
+      ),
+      ...(hostCleanup?.cleanupErrors ?? []),
+    ];
+    this.diagnostics.cleanupErrors = [...new Set(cleanupErrors)].join(" | ");
+    this.diagnostics.pendingCleanupSteps = [
+      ...lifecycle.pendingStepIds,
+      ...(hostCleanup?.pendingStepIds ?? []),
+    ].join(" | ");
+    this.diagnostics.pendingCleanupOwners =
+      Object.values(lifecycle.pendingOwnerCounts)
+        .reduce((sum, count) => sum + count, 0) +
+      (hostCleanup?.ownerCount ?? 0);
+    this.diagnostics.pendingCleanupMaterials =
+      (lifecycle.pendingOwnerCounts.material ?? 0) +
+      (hostCleanup?.materialCount ?? 0);
+    this.diagnostics.pendingCleanupNodes =
+      (lifecycle.pendingOwnerCounts.node ?? 0) +
+      (lifecycle.pendingOwnerCounts.root ?? 0) +
+      (hostCleanup?.nodeCount ?? 0);
   }
 
   private updateHud(): void {
@@ -1500,7 +1791,218 @@ export class GameAITask014D2CocosVfxRenderPlanAdapter extends Component {
   }
 
   private runtimeRootCount(): number {
+    const ownership = this.rootOwnership;
+    if (ownership !== null && !ownership.destroyed) return 1;
     return this.runtimeRoot === null ? 0 : 1;
+  }
+
+  private captureCleanupDiagnostics(): void {
+    const runtime = this.runtime?.snapshot();
+    for (const error of runtime?.cleanupErrors ?? []) {
+      if (!this.retainedRuntimeCleanupErrors.includes(error)) {
+        this.retainedRuntimeCleanupErrors.push(error);
+      }
+    }
+    const host = this.host?.cleanupDiagnostics();
+    for (const error of host?.cleanupErrors ?? []) {
+      if (!this.retainedCleanupErrors.includes(error)) {
+        this.retainedCleanupErrors.push(error);
+      }
+    }
+    for (const error of this.host?.cleanupFaultHistory() ?? []) {
+      if (!this.retainedHostCleanupHistory.includes(error)) {
+        this.retainedHostCleanupHistory.push(error);
+      }
+    }
+  }
+
+  private runCreatorFaultMatrixIfRequested(): void {
+    if (
+      this.faultMatrixExecuted ||
+      typeof document === "undefined" ||
+      !this.creatorFaultMatrixRequested()
+    ) {
+      return;
+    }
+    this.faultMatrixExecuted = true;
+    const cases = [
+      ["blend-gate-node-detach", "node-detach", true, false, false],
+      ["blend-gate-material-destroy", "material-destroy", false, true, false],
+      ["renderer-cleanup", "node-destroy", true, true, false],
+      ["root-destroy", "root-destroy", true, false, false],
+      ["runtime-cleanup-propagation", "runtime-cleanup", false, false, false],
+      ["input-registered-after-failure", "none", false, false, true],
+    ] as const;
+    const artifacts = cases.map(
+      ([caseId, injectedOperation, ownsNode, ownsMaterial, ownsInput]) =>
+        this.runCreatorFaultCase(
+          caseId,
+          injectedOperation,
+          ownsNode,
+          ownsMaterial,
+          ownsInput,
+        ),
+    );
+    const artifact = {
+      schemaVersion: "1.0.0",
+      taskId: "TASK-014D2",
+      creatorVersion: "3.8.8",
+      boundary: "default-off-production-component-transaction",
+      normalRuntimeReadyDuringMatrix: this.ready,
+      cases: artifacts,
+    };
+    let output = document.getElementById(
+      "task014d2-creator-transaction-fault-matrix",
+    );
+    if (output === null) {
+      output = document.createElement("script");
+      output.id = "task014d2-creator-transaction-fault-matrix";
+      output.setAttribute("type", "application/json");
+      document.body.appendChild(output);
+    }
+    output.textContent = JSON.stringify(artifact);
+    console.info(
+      "TASK_014D2_CREATOR_TRANSACTION_FAULT_MATRIX",
+      JSON.stringify(artifact),
+    );
+  }
+
+  private creatorFaultMatrixRequested(): boolean {
+    const locations = [globalThis.location];
+    try {
+      if (globalThis.parent?.location !== globalThis.location) {
+        locations.push(globalThis.parent.location);
+      }
+    } catch {}
+    return document.documentElement.dataset.task014d2FaultMatrix === "run" ||
+      locations.some((location) =>
+        new URLSearchParams(location?.search ?? "").get(
+          "task014d2FaultMatrix",
+        ) === "run");
+  }
+
+  private runCreatorFaultCase(
+    caseId: string,
+    injectedOperation: string,
+    ownsNode: boolean,
+    ownsMaterial: boolean,
+    ownsInput: boolean,
+  ): Task014D2FaultCaseArtifact {
+    const cleanup = new Task014D2CleanupCoordinator();
+    const node = ownsNode ? new Node(`Task014D2Fault_${caseId}`) : null;
+    const material = ownsMaterial ? new Material() : null;
+    const inputHandler = (): void => {};
+    let attached = false;
+    let destroyed = false;
+    let materialDestroyed = false;
+    let inputOwned = false;
+    const attempts = new Map<string, number>();
+    const destroys: Record<string, number> = {};
+    const injectOnce = (operation: string): void => {
+      const attempt = (attempts.get(operation) ?? 0) + 1;
+      attempts.set(operation, attempt);
+      if (operation === injectedOperation && attempt === 1) {
+        throw new Error(`TASK_014D2_INJECTED_CLEANUP_FAULT:${operation}`);
+      }
+    };
+    if (node !== null) {
+      node.setParent(this.node);
+      attached = true;
+      cleanup.own({
+        id: "node-detach",
+        order: 20,
+        ownerKind: caseId.startsWith("root") ? "root" : "node",
+        run: () => {
+          injectOnce("node-detach");
+          node.removeFromParent();
+          attached = false;
+          destroys["node-detach"] = (destroys["node-detach"] ?? 0) + 1;
+        },
+      });
+      cleanup.own({
+        id: "node-destroy",
+        order: 40,
+        ownerKind: caseId.startsWith("root") ? "root" : "node",
+        run: () => {
+          if (attached) {
+            throw new Error("TASK_014D2_ROOT_DESTROY_WAITING_FOR_DETACH");
+          }
+          injectOnce(
+            injectedOperation === "root-destroy"
+              ? "root-destroy"
+              : "node-destroy",
+          );
+          node.destroy();
+          destroyed = true;
+          destroys["node-destroy"] = (destroys["node-destroy"] ?? 0) + 1;
+        },
+      });
+    }
+    if (material !== null) {
+      cleanup.own({
+        id: "material-destroy",
+        order: 30,
+        ownerKind: "material",
+        run: () => {
+          injectOnce("material-destroy");
+          material.destroy();
+          materialDestroyed = true;
+          destroys["material-destroy"] =
+            (destroys["material-destroy"] ?? 0) + 1;
+        },
+      });
+    }
+    if (ownsInput) {
+      input.on(Input.EventType.KEY_DOWN, inputHandler, this);
+      inputOwned = true;
+      cleanup.own({
+        id: "input-off",
+        order: 10,
+        ownerKind: "input",
+        run: () => {
+          input.off(Input.EventType.KEY_DOWN, inputHandler, this);
+          inputOwned = false;
+          destroys["input-off"] = (destroys["input-off"] ?? 0) + 1;
+        },
+      });
+    }
+    if (injectedOperation === "runtime-cleanup") {
+      cleanup.own({
+        id: "runtime-cleanup",
+        order: 10,
+        ownerKind: "runtime",
+        run: () => {
+          injectOnce("runtime-cleanup");
+          destroys["runtime-cleanup"] =
+            (destroys["runtime-cleanup"] ?? 0) + 1;
+        },
+      });
+    }
+    const measure = (): Task014D2FaultCounts => {
+      const report = cleanup.report();
+      return {
+        root: node !== null && !destroyed ? 1 : 0,
+        input: inputOwned ? 1 : 0,
+        owner: report.pendingStepIds.length,
+        material: material !== null && !materialDestroyed ? 1 : 0,
+        node: node !== null && !destroyed ? 1 : 0,
+      };
+    };
+    return executeTask014D2FaultCase({
+      caseId,
+      injectedOperation,
+      primaryError: new Error(`TASK_014D2_FAULT_PRIMARY:${caseId}`),
+      coordinator: cleanup,
+      measure,
+      destroyCounts: () => ({ ...destroys }),
+      retry: () => ({
+        root: this.runtimeRootCount(),
+        input: this.inputRegistered ? 1 : 0,
+        owner: 0,
+        material: 0,
+        node: 0,
+      }),
+    });
   }
 
   private snapshot(): unknown {

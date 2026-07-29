@@ -21,6 +21,10 @@ import {
 import { Task014D2CleanupCoordinator } from
   "../source/task014d2/cocos-vfx-cleanup-coordinator";
 import {
+  executeTask014D2FaultCase,
+  type Task014D2FaultCounts,
+} from "../source/task014d2/cocos-vfx-cleanup-coordinator";
+import {
   TASK014D2_INPUT_REGISTRY,
   TASK014D2_RESOURCE_REGISTRY,
   TASK014D2_SORTING,
@@ -29,7 +33,6 @@ import {
   formatTask014D2Diagnostics,
   measureTask014D2RoiDifference,
   projectTask014D2WorldToOverlay,
-  runTask014D2FailureCleanup,
   task014d2BoundsOverflowPx,
   task014d2MaterialBlendMatches,
   task014d2PointInsideSafeViewport,
@@ -1342,75 +1345,6 @@ test("HUD and tests consume one typed diagnostic model", () => {
   }
 });
 
-test("setup faults preserve the first error and sweep every partial owner before retry", () => {
-  for (const fault of [
-    "material-mismatch",
-    "registered-before-throw",
-    "initial-sample",
-    "hud-input-setup",
-    "cleanup-failure",
-  ]) {
-    const state = {
-      input: fault === "registered-before-throw" ? 1 : 0,
-      root: 1,
-      runtime: 1,
-      hostBindings: 2,
-      materials: 2,
-      generation: 4,
-    };
-    const result = runTask014D2FailureCleanup(
-      new Error(`first:${fault}`),
-      [
-        {
-          id: "runtime",
-          run: () => {
-            state.runtime = 0;
-            if (fault === "cleanup-failure") {
-              throw new Error("later cleanup failure");
-            }
-          },
-        },
-        { id: "input", run: () => { state.input = 0; } },
-        {
-          id: "host",
-          run: () => {
-            state.hostBindings = 0;
-            state.materials = 0;
-          },
-        },
-        { id: "root", run: () => { state.root = 0; } },
-        { id: "generation", run: () => { state.generation += 1; } },
-        { id: "root", run: () => { throw new Error("duplicate step"); } },
-      ],
-    );
-    assert.equal(result.firstError, `first:${fault}`);
-    assert.deepEqual(
-      result.completedStepIds,
-      ["runtime", "input", "host", "root", "generation"],
-    );
-    assert.deepEqual(state, {
-      input: 0,
-      root: 0,
-      runtime: 0,
-      hostBindings: 0,
-      materials: 0,
-      generation: 5,
-    });
-    const retry = {
-      root: state.root + 1,
-      input: state.input + 1,
-      ready: true,
-      terminalError: "",
-    };
-    assert.deepEqual(retry, {
-      root: 1,
-      input: 1,
-      ready: true,
-      terminalError: "",
-    });
-  }
-});
-
 test("the shared cleanup coordinator owns construction before attachment and compensates failed steps", () => {
   for (const failureStage of [
     "root-attached",
@@ -1535,6 +1469,146 @@ test("the shared cleanup coordinator owns construction before attachment and com
   assert.equal(report.firstError, "business error");
   assert.deepEqual(report.pendingStepIds, []);
   assert.deepEqual(calls, ["runtime", "material", "node", "material"]);
+});
+
+test("production transaction coordinator closes the complete setup and lifecycle fault matrix", () => {
+  const cases = [
+    "blend-gate-node-detach",
+    "blend-gate-material-destroy",
+    "root-attach",
+    "ui-transform-configuration",
+    "material-gate",
+    "host-runtime-creation",
+    "initial-sample",
+    "input-registered-after-failure",
+    "hud-input-setup",
+    "renderer-cleanup",
+    "runtime-cleanup",
+    "root-detach-destroy",
+    "multiple-cleanup-steps",
+    "disable",
+    "destroy",
+    "rebuild",
+    "stale-generation-callback",
+    "same-instance-id-retry",
+  ] as const;
+  for (const caseId of cases) {
+    const state = {
+      root: 1,
+      input: caseId.includes("input") || caseId === "hud-input-setup" ? 1 : 0,
+      owners: 5,
+      materials: 2,
+      nodes: 3,
+      generation: 9,
+    };
+    const attempts = new Map<string, number>();
+    const destroys = new Map<string, number>();
+    const failSteps = new Set<string>(
+      caseId === "blend-gate-node-detach"
+        ? ["root-detach"]
+        : caseId === "blend-gate-material-destroy"
+          ? ["material-a"]
+          : caseId === "renderer-cleanup"
+            ? ["node-a"]
+            : caseId === "runtime-cleanup"
+              ? ["runtime"]
+              : caseId === "root-detach-destroy"
+                ? ["root-detach"]
+                : caseId === "multiple-cleanup-steps"
+                  ? ["runtime", "material-a", "root-detach"]
+                  : [],
+    );
+    const transaction = new Task014D2CleanupCoordinator();
+    const operation = (
+      id: string,
+      order: number,
+      ownerKind: NonNullable<
+        Parameters<Task014D2CleanupCoordinator["own"]>[0]["ownerKind"]
+      >,
+      complete: () => void,
+    ): void => transaction.own({
+      id,
+      order,
+      ownerKind,
+      run: () => {
+        const attempt = (attempts.get(id) ?? 0) + 1;
+        attempts.set(id, attempt);
+        if (failSteps.has(id) && attempt === 1) {
+          throw new Error(`cleanup:${caseId}:${id}`);
+        }
+        complete();
+        destroys.set(id, (destroys.get(id) ?? 0) + 1);
+      },
+    });
+    operation("generation", 0, "generation", () => { state.generation += 1; });
+    operation("runtime", 10, "runtime", () => { state.owners -= 1; });
+    operation("input", 20, "input", () => { state.input = 0; });
+    operation("host", 25, "host", () => { state.owners -= 1; });
+    operation("material-a", 30, "material", () => { state.materials -= 1; });
+    operation("material-b", 31, "material", () => { state.materials -= 1; });
+    operation("node-a", 40, "node", () => { state.nodes -= 1; });
+    operation("node-b", 41, "node", () => { state.nodes -= 1; });
+    operation("root-detach", 50, "root", () => { state.root = 0; });
+    operation("root-destroy", 60, "root", () => { state.nodes -= 1; });
+    operation("owner-finalize", 70, "owner", () => { state.owners = 0; });
+    const primary = new Error(`primary:${caseId}`);
+    const capturedGeneration = state.generation;
+    const artifact = executeTask014D2FaultCase({
+      caseId,
+      injectedOperation: [...failSteps].join(",") || "business-throw",
+      primaryError: primary,
+      coordinator: transaction,
+      measure: () => {
+        const report = transaction.report();
+        return {
+          root: state.root,
+          input: state.input,
+          owner: report.pendingStepIds.length,
+          material: state.materials,
+          node: state.nodes,
+        };
+      },
+      destroyCounts: () => Object.fromEntries(destroys),
+      retry: (): Task014D2FaultCounts => ({
+        root: 1,
+        input: 1,
+        owner: 0,
+        material: 0,
+        node: 0,
+      }),
+    });
+    assert.equal(transaction.report().primaryError, primary, caseId);
+    assert.equal(artifact.primaryErrorIdentityPreserved, true, caseId);
+    assert.deepEqual(artifact.compensationCounts, {
+      root: 0,
+      input: 0,
+      owner: 0,
+      material: 0,
+      node: 0,
+    }, caseId);
+    assert.deepEqual(artifact.finalCounts, {
+      root: 1,
+      input: 1,
+      owner: 0,
+      material: 0,
+      node: 0,
+    }, caseId);
+    assert.equal(capturedGeneration + 1, state.generation, caseId);
+    assert.ok([...destroys.values()].every((count) => count === 1), caseId);
+    assert.deepEqual(
+      artifact.orderedCleanupErrors,
+      [...failSteps].sort((left, right) => {
+        const order = [
+          "runtime",
+          "material-a",
+          "node-a",
+          "root-detach",
+        ];
+        return order.indexOf(left) - order.indexOf(right);
+      }).map((step) => `${step}:cleanup:${caseId}:${step}`),
+      caseId,
+    );
+  }
 });
 
 test("runtime terminal cleanup preserves the business error while renderer cleanup is retried", () => {

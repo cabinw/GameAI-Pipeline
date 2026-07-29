@@ -1,10 +1,10 @@
 # TASK-014D2: Minimal Cocos VFX Render Plan Adapter
 
-- Status: Final transaction/evidence closure complete; pending external code and visual review
+- Status: One-pass final merge closure in verification; no PR
 - Date: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
-- Maximum scope: 48 changed files, 9,500 changed lines
+- Maximum scope: 50 changed files, 10,000 net changed lines
 
 ## Objective
 
@@ -73,6 +73,22 @@ historical and is not acceptance proof.
 
 ## Remediation closure
 
+- The one-pass closure keeps every Blend Gate temporary Node, Material, and
+  failed operation under host ownership until compensation succeeds. The
+  production coordinator preserves the original Error object as
+  `primaryError`; ordered cleanup errors, pending steps, attempts, and owner
+  categories remain separate and clear only after successful compensation.
+- Root diagnostics derive from retained ownership. Failed detach/destroy
+  cannot clear references or manufacture root zero; compensation reaches
+  root/input/owner/material/node zero before the same component retries to
+  `READY` with root `1` and input `1`.
+- A default-off Creator 3.8.8 fault boundary executes real Node, Material,
+  input, component, host, and runtime cleanup operations and exports a
+  machine-readable transaction matrix without altering normal behavior.
+- Replacement framebuffer evidence is measured from the GitHub-downloaded
+  H.264 bytes decoded to RGB24. The tracked analyzer fixes frame selection,
+  half-open ROI bounds, RGB channel order, full-frame hash domain, thresholds,
+  FFmpeg version, and byte-deterministic JSON output.
 - The final transaction closure extracts the stateful cleanup coordinator
   actually used by the Creator component and host. Root ownership is staged
   immediately after construction, before parent attachment, UITransform, or

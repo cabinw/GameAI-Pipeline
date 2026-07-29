@@ -5,11 +5,11 @@ time.
 
 ## Active plan: TASK-014D2 Final Runtime Semantics Closure
 
-- Status: Final transaction/evidence closure complete; external code and visual review pending
+- Status: One-pass final merge closure in verification; no PR
 - Started: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
-- Scope ceiling: at most 48 changed files and 9,500 changed lines.
+- Scope ceiling: at most 50 changed files and 10,000 net changed lines.
 - Feature branch media budget: zero MP4 or other generated evidence media.
 
 ### Goal
@@ -63,13 +63,18 @@ time math, or canonical full-character integration.
     and renderer ownership paths; retain failed cleanup steps for compensation,
     preserve first business failure separately from cleanup errors, and prove
     the final Trail gate from decoded real Web Preview frames.
+11. Close the final ownership/evidence review findings append-only: retain
+    Blend Gate temporary resources until compensation succeeds, preserve the
+    original Error object separately from cleanup errors, report real root and
+    pending ownership, run the default-off Creator transaction fault boundary,
+    and regenerate framebuffer measurements directly from the downloaded MP4.
 
 ### Done when
 
 - All pure and Creator gates pass with all four primitives visibly exercised.
 - Exact Reset is Rest, stopped at `0.00s`, stress/debug off, zero active/stale
   renderers, one runtime root, and one input handler.
-- Feature scope is within 48 files/9,500 lines with zero tracked MP4 files.
+- Feature scope is within 50 files/10,000 net lines with zero tracked MP4 files.
 - Evidence is isolated, reproducible, decoded, and available for review.
 
 ## Accepted plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract

@@ -115,43 +115,10 @@ export interface Task014D2RuntimeDiagnostics {
   maximumAabbOverflowPx: number;
   terminalError: string;
   cleanupErrors: string;
-}
-
-export interface Task014D2CleanupStep {
-  readonly id: string;
-  readonly run: () => void;
-}
-
-export interface Task014D2CleanupResult {
-  readonly firstError: string;
-  readonly cleanupErrors: readonly string[];
-  readonly completedStepIds: readonly string[];
-}
-
-export function runTask014D2FailureCleanup(
-  error: unknown,
-  steps: readonly Task014D2CleanupStep[],
-): Task014D2CleanupResult {
-  const firstError = error instanceof Error ? error.message : String(error);
-  const cleanupErrors: string[] = [];
-  const completedStepIds: string[] = [];
-  const seen = new Set<string>();
-  for (const step of steps) {
-    if (seen.has(step.id)) continue;
-    seen.add(step.id);
-    try {
-      step.run();
-    } catch (cleanupError) {
-      cleanupErrors.push(
-        cleanupError instanceof Error
-          ? cleanupError.message
-          : String(cleanupError),
-      );
-    } finally {
-      completedStepIds.push(step.id);
-    }
-  }
-  return { firstError, cleanupErrors, completedStepIds };
+  pendingCleanupSteps: string;
+  pendingCleanupOwners: number;
+  pendingCleanupMaterials: number;
+  pendingCleanupNodes: number;
 }
 
 export function measureTask014D2RoiDifference(
@@ -209,6 +176,10 @@ Task014D2RuntimeDiagnostics {
     maximumAabbOverflowPx: 0,
     terminalError: "",
     cleanupErrors: "",
+    pendingCleanupSteps: "",
+    pendingCleanupOwners: 0,
+    pendingCleanupMaterials: 0,
+    pendingCleanupNodes: 0,
   };
 }
 
@@ -236,6 +207,7 @@ export function formatTask014D2Diagnostics(
     diagnostics.cleanupErrors
       ? `Cleanup errors ${diagnostics.cleanupErrors}`
       : "Cleanup errors none",
+    `Pending cleanup ${diagnostics.pendingCleanupSteps || "none"} · owners ${diagnostics.pendingCleanupOwners} · materials ${diagnostics.pendingCleanupMaterials} · nodes ${diagnostics.pendingCleanupNodes}`,
   ].join("\n");
 }
 

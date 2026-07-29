@@ -116,7 +116,7 @@ export class CocosVfxRuntimeState {
   private paused = false;
   private generation = 1;
   private terminalError: CocosVfxRuntimeError | null = null;
-  private readonly cleanupErrors: string[] = [];
+  private readonly cleanupErrors = new Map<string, string>();
 
   public constructor(
     plan: CocosVfxDescriptorPlan,
@@ -208,7 +208,10 @@ export class CocosVfxRuntimeState {
         this.destroyRenderers(renderers, "partial-build");
         this.assertOwnership();
       } catch (cleanupError) {
-        this.cleanupErrors.push(runtimeError(cleanupError).message);
+        this.cleanupErrors.set(
+          "partial-build",
+          runtimeError(cleanupError).message,
+        );
         this.enterTerminalFailure(failure);
       }
       if (
@@ -259,7 +262,7 @@ export class CocosVfxRuntimeState {
     this.generation += 1;
     this.paused = false;
     this.terminalError = null;
-    this.cleanupErrors.length = 0;
+    this.cleanupErrors.clear();
   }
 
   public cleanup(reason: string): void {
@@ -271,9 +274,18 @@ export class CocosVfxRuntimeState {
     for (const rendererId of rendererIds) {
       try {
         this.host.destroyLayer(rendererId, reason);
+        this.cleanupErrors.delete(`renderer:${rendererId}`);
       } catch (error) {
         firstError ??= error;
+        this.cleanupErrors.set(
+          `renderer:${rendererId}`,
+          runtimeError(error).message,
+        );
       }
+    }
+    if (firstError === null) {
+      this.cleanupErrors.delete("partial-build");
+      this.cleanupErrors.delete("terminal-failure");
     }
     if (firstError !== null) throw runtimeError(firstError);
   }
@@ -326,7 +338,9 @@ export class CocosVfxRuntimeState {
       ]).size,
       generation: this.generation,
       terminalError: this.terminalError?.message ?? null,
-      cleanupErrors: [...this.cleanupErrors],
+      cleanupErrors: [...this.cleanupErrors.entries()]
+        .sort(([left], [right]) => compareCodeUnits(left, right))
+        .map(([stepId, message]) => `${stepId}:${message}`),
     };
   }
 
@@ -367,7 +381,10 @@ export class CocosVfxRuntimeState {
       try {
         this.cleanup("terminal-failure");
       } catch (cleanupError) {
-        this.cleanupErrors.push(runtimeError(cleanupError).message);
+        this.cleanupErrors.set(
+          "terminal-failure",
+          runtimeError(cleanupError).message,
+        );
       }
     }
     throw this.terminalError;
