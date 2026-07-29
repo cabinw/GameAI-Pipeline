@@ -5,8 +5,8 @@ time.
 
 ## Active plan: TASK-014D3 Focused Transaction Cleanup Closeout
 
-- Status: Final lifecycle and partial-build ownership complete; supplemental
-  evidence publication pending
+- Status: Accepted after external code and visual review; Draft PR publication
+  pending
 - Started: 2026-07-29
 - Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
 - Baseline `main`: `dc6dad52d4a40714d6e3f12352d5593763655c55`
@@ -135,9 +135,12 @@ canonical 12-state loadout contract/resolver
   Aura reaches attempts/accepted/coalesced `6/1/5` with instances `1/1/1`;
   Reset returns to root/input `1/1` and zero ownership, cleanup and spatial
   failures.
-- Feature publication is append-only without a PR. The final supplemental
-  evidence commit remains pending; external code and visual review remain
-  pending and TASK-014D4 remains unstarted.
+- External code, Creator, transaction, media/decode and visual review passed
+  for feature `6d43609d099b9a4909b92c7edb288afe615e7615` and reviewed evidence
+  `9cdf32003ed654b619acb6a7cf4b4808eed719ac`. Append-only acceptance evidence
+  is recorded at `118003e6e8dc85d7bb86900f5f252e856461e0e9`.
+- Draft PR publication is the only remaining closeout action. TASK-014D4
+  remains unstarted.
 
 ## Completed plan: TASK-014D2 Final Runtime Semantics Closure
 

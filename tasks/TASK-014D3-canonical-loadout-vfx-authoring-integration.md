@@ -1,6 +1,6 @@
 # TASK-014D3: Canonical Full-Loadout Data-Driven VFX Integration
 
-- Status: Implemented; external code and visual review pending
+- Status: Accepted after external code and visual review
 - Date: 2026-07-29
 - Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
 - Baseline: `dc6dad52d4a40714d6e3f12352d5593763655c55`
@@ -131,8 +131,11 @@ fault-safe compensation. None of those semantics may be forked in D3.
 - Normal, Transform Stress, Debug, two consecutive Rebuilds, post-rebuild
   effects and Exact Reset ended with root/input `1/1`, no active/stale/leaked
   ownership, no cleanup error and no spatial/non-finite/viewport failure.
-- Evidence is isolated on `evidence/task-014d3`; its status remains
-  `pending-external-code-and-visual-review`.
+- External review passed for feature
+  `6d43609d099b9a4909b92c7edb288afe615e7615` and reviewed evidence
+  `9cdf32003ed654b619acb6a7cf4b4808eed719ac`. The append-only evidence
+  acceptance commit is `118003e6e8dc85d7bb86900f5f252e856461e0e9`;
+  its manifest status is `passed-external-code-and-visual-review`.
 
 ### Focused transaction cleanup closeout
 

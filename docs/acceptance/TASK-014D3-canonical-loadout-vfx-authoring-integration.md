@@ -4,11 +4,19 @@
 
 Implementation acceptance gate: **PASS**.
 Creator 3.8.8 live gate: **PASS**.
-Evidence publication and replay gate: **PASS; external review pending**.
-External review status: `pending-external-code-and-visual-review`.
+Evidence publication and replay gate: **PASS**.
+External code and visual review: **PASS**.
+External review status: `passed-external-code-and-visual-review`.
 
 Baseline `main`:
 `dc6dad52d4a40714d6e3f12352d5593763655c55`.
+
+Reviewed feature:
+`6d43609d099b9a4909b92c7edb288afe615e7615`.
+Reviewed evidence:
+`9cdf32003ed654b619acb6a7cf4b4808eed719ac`.
+Append-only evidence acceptance:
+`118003e6e8dc85d7bb86900f5f252e856461e0e9`.
 
 ## Required evidence
 
