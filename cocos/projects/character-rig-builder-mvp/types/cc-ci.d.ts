@@ -49,12 +49,25 @@ declare module "cc" {
     readonly node: Node;
   }
 
-  export class UIRenderer extends Component {}
+  export class UIRenderer extends Component {
+    color: Color;
+  }
+
+  export namespace gfx {
+    enum BlendFactor {
+      ONE,
+      SRC_ALPHA,
+      DST_COLOR,
+      ONE_MINUS_SRC_ALPHA,
+      ONE_MINUS_SRC_COLOR,
+    }
+  }
 
   export class Node {
     name: string;
     layer: number;
     active: boolean;
+    readonly activeInHierarchy: boolean;
     readonly children: readonly Node[];
     readonly position: Vec3;
     readonly eulerAngles: Vec3;
@@ -132,6 +145,12 @@ declare module "cc" {
   }
 
   export class SpriteFrame {}
+
+  export class Material {
+    copy(material: Material, overrides?: unknown): void;
+    recompileShaders(defines: Readonly<Record<string, boolean>>): void;
+    destroy(): boolean;
+  }
 
   export class JsonAsset {
     readonly json: unknown;

@@ -3,6 +3,87 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Completed plan: TASK-014D2 Final Runtime Semantics Closure
+
+- Status: Accepted; Draft PR published pending integration review.
+- Started: 2026-07-28
+- Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
+- Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
+- Scope ceiling: at most 50 changed files and 10,000 net changed lines.
+- Feature branch media budget: zero MP4 or other generated evidence media.
+
+### Goal
+
+Prove that the accepted TASK-014D1 concrete Render Plan drives a generic
+Cocos Creator 3.8.8 runtime through typed primitive/recipe/lifecycle dispatch,
+without authoring parsing, parameter resolution, cue-name matching, duplicated
+time math, or canonical full-character integration.
+
+### Boundaries
+
+- Compile the four accepted D1 fixtures before runtime and feed only concrete
+  normalized plans into a pure Cocos render-descriptor compiler.
+- Consume the exact D1 sampler through a generated source mirror; never
+  reimplement phase, curve, delay, repetition, or final-boundary behavior.
+- Dispatch exhaustively by primitive, portable recipe, blend capability, and
+  exact lifecycle.
+- Add one minimal Creator-owned Scene with generic nested targets, procedural
+  Graphics recipes, centralized sorting, projection and viewport guards,
+  readiness gating, generation ownership, symmetric teardown, and one shared
+  HUD/input registry.
+- Keep TASK-014D3, canonical loadouts, authoring UI, Unity/Godot, Red Cap,
+  Windows, tags, Releases, and D1 semantics out of scope.
+
+### Execution
+
+1. Add the bounded TASK-014D2 specification and declare scope before code.
+2. Add pure descriptor compilation, runtime lifecycle state, typed resources,
+   sorting/spatial/input contracts, stable failures, and focused tests.
+3. Generate stale-checked concrete plan data and exact D1 sampler/type mirrors.
+4. Add the Creator runtime host, stable metadata, and minimal acceptance Scene.
+5. Run direct, workspace, frozen, closure, metadata, binary/media, scope, and
+   Creator 3.8.8 clean-open/reopen/restart/Preview acceptance gates.
+6. Commit and push the feature branch without a PR, publish video evidence
+   only on `evidence/task-014d2`, verify its bytes and decode, and stop for
+   external visual review without starting TASK-014D3.
+7. Close the final runtime findings append-only: inspect actual Cocos material
+   pass blend targets after `updateMaterial()`, propagate pending/active/removed
+   samples to the host with destroy-once ownership, and reject every
+   unrealizable registry recipe/primitive capability even when unused.
+8. Repeat all automated and Creator 3.8.8 gates, publish a third provenance-bound
+   evidence video while retaining both predecessors, and stop for final external
+   code and visual review.
+9. Close the external-review findings append-only: make setup failure cleanup
+   transactional with a root-independent terminal HUD and retry, preserve the
+   first failure across cleanup faults, retain the built-in Graphics material
+   so ribbon vertices honor node transforms, and add framebuffer ROI gates for
+   standalone, paused/resumed, stressed, and post-rebuild Trail.
+10. Close the final transaction findings append-only with one shared,
+    stateful cleanup coordinator used by the Creator component, runtime host,
+    and renderer ownership paths; retain failed cleanup steps for compensation,
+    preserve first business failure separately from cleanup errors, and prove
+    the final Trail gate from decoded real Web Preview frames.
+11. Close the final ownership/evidence review findings append-only: retain
+    Blend Gate temporary resources until compensation succeeds, preserve the
+    original Error object separately from cleanup errors, report real root and
+    pending ownership, run the default-off Creator transaction fault boundary,
+    and regenerate framebuffer measurements directly from the downloaded MP4.
+12. Record external code, Creator runtime, transaction, framebuffer, and visual
+    review PASS for feature `70283b2a43adc57949dcf37cbe2632d44fee2386`,
+    reviewed evidence `508a83b75ef3d0b2ca50ec6cc8242d3317d741c8`
+    (manifest closeout `27f2ce1bf246cb361c57c0b4ef29935985e47432`), and video
+    `22997a9d040bfbdf43bfe2ea9e4488e7b9d57a51ef7253099a627e65d37bec64`;
+    publish the documentation-only acceptance commit and Draft PR without
+    starting TASK-014D3.
+
+### Done when
+
+- All pure and Creator gates pass with all four primitives visibly exercised.
+- Exact Reset is Rest, stopped at `0.00s`, stress/debug off, zero active/stale
+  renderers, one runtime root, and one input handler.
+- Feature scope is within 50 files/10,000 net lines with zero tracked MP4 files.
+- Evidence is isolated, reproducible, decoded, and available for review.
+
 ## Accepted plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
 
 - Status: Accepted
@@ -3844,6 +3925,50 @@ reference mutation.
   self-review passes, and its uploaded copy is byte-identical.
 - Feature implementation and temporary evidence are pushed, no MP4 is
   tracked on the feature branch, and no PR exists.
+
+## TASK-014D2 remediation plan (complete; external review pending)
+
+- Preserve `ac5309cb5aa6854d1ad94402f6abdac42619f793` and
+  `8e972215986b2f1d8c4aa381f1feecf4f1bc7ad7` as append-only ancestors.
+- The final full-boundary audit additionally closes registered-before-throw
+  ownership cleanup, explicit recipe/primitive and blend-role realization,
+  exact D1 range/order/particle-schedule validation, live-set global sorting,
+  and hierarchy-corner AABB evaluation that preserves nested affine shear.
+- Creator regating additionally replaces shear-sensitive world-quaternion
+  decomposition with an exact world-axis-to-target-local round-trip guard.
+- Replace non-atomic instance creation with transactional renderer ownership,
+  exact ownership-set diagnostics, destroy-once cleanup, and one terminal
+  runtime failure path.
+- Validate untrusted Render Plan and resource-registry values completely before
+  descriptor emission, including closed enums, sparse/malformed collections,
+  capability duplicates, sorting, and preflight budgets.
+- Compile globally unique deterministic sorting orders and concrete,
+  exhaustive primitive/recipe/blend/lifecycle realization instructions.
+- Replace radius-only viewport checks with transformed primitive bounds and
+  one typed diagnostics model shared by runtime, HUD, and tests.
+- Regenerate mirrors, run the full automated and Creator 3.8.8 gates, append
+  feature commits within 48 files / 8,000 changed lines, and push without a PR.
+- Record and byte-verify a replacement evidence video while retaining and
+  explicitly marking the original evidence as failed external review.
+
+### Remediation result
+
+- Atomic creation/initial update, exact renderer tuple ownership,
+  destroy-once terminal cleanup, and same-ID retry are enforced.
+- The untrusted descriptor boundary validates every concrete plan/registry
+  value and budget before emitting any descriptor.
+- Runtime factories exhaustively realize typed textured-sprite,
+  procedural-ring, procedural-ribbon, alpha, additive, screen, lifecycle, and
+  particle behavior without cue/resource-name dispatch.
+- Switching between looping and persistent references sends an authoritative
+  stop before the new start, while repeated starts of the same persistent
+  reference coalesce to one active instance.
+- Global sorting is unique and activation-order independent; transformed
+  four-corner bounds include nested rotation, non-uniform Stress, and
+  primitive/particle geometry.
+- HUD and tests consume one typed diagnostic model. All automated and Creator
+  3.8.8 gates passed; replacement evidence is pending external code and visual
+  review. No TASK-014D2 PR exists and TASK-014D3 has not started.
 
 ## Acceptance result
 

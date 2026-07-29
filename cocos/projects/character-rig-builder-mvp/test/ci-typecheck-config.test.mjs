@@ -21,9 +21,10 @@ const expectedCcImports = [
   "Input",
   "JsonAsset",
   "KeyCode",
-  "Label",
-  "Layers",
-  "Node",
+    "Label",
+    "Layers",
+    "Material",
+    "Node",
   "Quat",
   "Sorting2D",
   "Sprite",
@@ -35,6 +36,7 @@ const expectedCcImports = [
   "VerticalTextAlignment",
   "_decorator",
   "director",
+  "gfx",
   "input",
   "resources",
 ];
@@ -104,7 +106,9 @@ test("keeps the checked-in cc surface strict and synchronized with asset imports
   for (const importedName of expectedCcImports) {
     assert.match(
       declaration,
-      new RegExp(`export (?:class|interface|const) ${importedName}\\b`),
+      new RegExp(
+        `export (?:class|interface|const|namespace) ${importedName}\\b`,
+      ),
     );
   }
 });
