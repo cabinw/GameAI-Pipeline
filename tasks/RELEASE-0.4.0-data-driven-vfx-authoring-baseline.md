@@ -1,6 +1,6 @@
 # RELEASE-0.4.0: Data-Driven VFX Authoring Baseline
 
-- Status: Implemented — Draft PR pending review
+- Status: Published and complete
 - Date: 2026-07-30
 - Branch: `docs/release-v0.4.0-data-driven-vfx-authoring`
 - Baseline `main`: `9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`
@@ -22,8 +22,10 @@ VFX Authoring Document
 → Creator lifecycle/spatial/visual acceptance
 ```
 
-This task records accepted behavior. It does not create the `v0.4.0` tag or a
-GitHub Release, change prior tags/releases, or start TASK-014D4.
+This task recorded accepted behavior without creating publication objects.
+The accepted documentation was subsequently integrated and the annotated
+`v0.4.0` prerelease was published without changing the capability baseline or
+starting TASK-014D4.
 
 ## Accepted inputs
 
@@ -91,3 +93,12 @@ docs: establish v0.4.0 data-driven VFX authoring baseline
 Publish only a Draft PR into `main`. Do not mark it Ready, merge it, create or
 move a tag, publish a GitHub Release, delete protected references, or start
 TASK-014D4.
+
+## Publication closeout
+
+- Integrated `main` and peeled tag target:
+  `68444551b9b160a2455a97a2d8bf611aea608c6e`.
+- Annotated tag object:
+  `cdd3035c78ff8c062f7df795df9095515fd57ba6`.
+- The prerelease publication is complete.
+- TASK-014D4 remains unstarted.

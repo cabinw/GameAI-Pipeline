@@ -3,9 +3,65 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: v0.4.0 Data-Driven VFX Authoring Baseline
+## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: Implemented; Draft PR pending review
+- Status: Phase 0 hard stop — source readiness failed
+- Started: 2026-07-30
+- Branch: `feat/task-015-red-cap-production-vertical-slice`
+- Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
+- Expected complete Program scope: at most 96 changed files and 24,000
+  changed lines; at most 42 touched PNG files, 3 Scene/`.meta` pairs, 1
+  feature manifest, zero feature MP4 files, and at most 3 evidence MP4 files
+  isolated on `evidence/task-015`.
+- Phase 0 scope: at most 12 Markdown files and 3,500 changed lines; zero
+  runtime, schema, fixture, generated, Scene, `.meta`, package, lockfile,
+  binary, image, audio, or video changes.
+
+### Goal
+
+Deliver one deterministic production vertical slice from accepted Red Cap
+source through a static character, bounded rigid-sprite motion and semantic
+events, and a two-character production-lite showcase with scene-specific
+data-driven VFX.
+
+### Phase boundaries
+
+- TASK-015A: at most 45 changed files and 8,000 changed lines; at most 38
+  touched PNGs and 2 Scene/`.meta` pairs; zero feature media.
+- TASK-015B: at most 24 changed files and 6,000 changed lines; zero new PNGs,
+  at most 1 modified Scene/`.meta` pair, and zero feature media.
+- TASK-015C: at most 35 changed files and 9,000 changed lines; at most 4 new
+  production-intent PNG resources, 1 new Scene/`.meta` pair, and zero feature
+  media.
+- Evidence: one isolated branch with at most 3 MP4 files, 12 PNG frames, 8
+  JSON reports/manifests, and 1 deterministic analyzer.
+
+The aggregate ceiling, not the sum of phase ceilings, is authoritative.
+Crossing 100 files or 25,000 changed lines requires an explicit split decision
+before implementation.
+
+### Phase 0 result
+
+The repository passes the neutral visible-pixel reconstruction gate, but it
+does not pass Program source readiness:
+
+- no repository document establishes the Red Cap source's author, origin,
+  license, or permitted production/republication use;
+- the accepted articulation extensions synthesize 31,593 hidden texels from
+  nearest opaque child pixels because the canonical neutral composite does
+  not reveal the covered joint regions; and
+- no qualified, provenance- and license-locked scene background or style
+  board exists for TASK-015C.
+
+These are explicit Program hard-stop conditions. No runtime, fixture,
+generator, Scene, VFX, or evidence implementation may start until replacement
+inputs or adequate provenance are supplied and the Phase 0 matrix passes.
+See `tasks/PROGRAM-015-red-cap-production-vertical-slice.md` and
+`docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md`.
+
+## Completed plan: v0.4.0 Data-Driven VFX Authoring Baseline
+
+- Status: Published and complete
 - Started: 2026-07-30
 - Branch: `docs/release-v0.4.0-data-driven-vfx-authoring`
 - Baseline `main`: `9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`
@@ -57,7 +113,8 @@ VFX Authoring Document
 4. Run working-copy and fresh frozen tracked-files-only `CI=true pnpm verify`,
    generated-output closure, and post-verify clean/content closure.
 5. Commit and push the documentation branch, create a Draft PR to `main`,
-   wait for Actions PASS, and leave it Draft and unmerged.
+   wait for Actions PASS, merge the accepted documentation, and publish the
+   annotated `v0.4.0` prerelease from the peeled target.
 
 ### Done when
 
@@ -65,9 +122,9 @@ VFX Authoring Document
   task boundaries or overstating production readiness.
 - Working-copy, frozen tracked-only, Markdown/link, generated closure,
   diff/content, scope/media/code, and protected-reference gates pass.
-- One Draft PR targets the exact main baseline and Actions passes.
-- No tag or GitHub Release is created or moved, and TASK-014D4 remains
-  unstarted.
+- The documentation PR targets the exact main baseline and Actions passes.
+- The annotated `v0.4.0` tag and prerelease are published from
+  `68444551b9b160a2455a97a2d8bf611aea608c6e`; TASK-014D4 remains unstarted.
 
 ## Completed plan: TASK-014D3 Focused Transaction Cleanup Closeout
 

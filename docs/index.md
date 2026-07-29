@@ -35,6 +35,9 @@
 - [TASK-014B Cocos Semantic VFX Adapter acceptance](acceptance/TASK-014B-cocos-semantic-vfx-adapter.md)
 - [TASK-014C canonical full-loadout Semantic VFX acceptance](acceptance/TASK-014C-canonical-loadout-semantic-vfx.md)
 - [TASK-014D3 canonical full-loadout data-driven VFX acceptance](acceptance/TASK-014D3-canonical-loadout-vfx-authoring-integration.md)
+- [PROGRAM-015 Red Cap production vertical slice acceptance](acceptance/PROGRAM-015-red-cap-production-vertical-slice.md)
+- [PROGRAM-015 Phase 0 source-readiness report](reports/PROGRAM-015-phase-0-source-readiness.md)
+- [ADR-0018 production-slice source readiness](adr/ADR-0018-production-slice-source-readiness.md)
 - [TASK-013 Cocos runtime postmortem](postmortems/TASK-013-cocos-runtime-integration.md)
 
 ## Release and roadmap

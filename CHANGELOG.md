@@ -6,8 +6,9 @@ separate publication actions.
 
 ## v0.4.0 — Data-Driven VFX Authoring Baseline
 
-Baseline source: `main` at
-`9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`.
+Published source and peeled tag target: `main` at
+`68444551b9b160a2455a97a2d8bf611aea608c6e`; annotated tag object
+`cdd3035c78ff8c062f7df795df9095515fd57ba6`.
 
 ### Added
 
@@ -47,8 +48,8 @@ Baseline source: `main` at
   and a complete production editor UI remain incomplete.
 - TASK-014D4 is not started.
 
-This documentation closeout does not create the `v0.4.0` tag or a GitHub
-Release and does not move the existing `v0.2.0` or `v0.3.0` tags.
+The annotated `v0.4.0` tag and prerelease were published after the
+documentation closeout. Existing `v0.2.0` and `v0.3.0` tags were not moved.
 
 ## v0.3.0 — Character Semantic Events & VFX Baseline
 
