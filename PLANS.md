@@ -3,9 +3,9 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014D2 Final Runtime Semantics Closure
+## Completed plan: TASK-014D2 Final Runtime Semantics Closure
 
-- Status: One-pass final merge closure in verification; no PR
+- Status: Accepted; Draft PR published pending integration review.
 - Started: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
@@ -68,6 +68,13 @@ time math, or canonical full-character integration.
     original Error object separately from cleanup errors, report real root and
     pending ownership, run the default-off Creator transaction fault boundary,
     and regenerate framebuffer measurements directly from the downloaded MP4.
+12. Record external code, Creator runtime, transaction, framebuffer, and visual
+    review PASS for feature `70283b2a43adc57949dcf37cbe2632d44fee2386`,
+    reviewed evidence `508a83b75ef3d0b2ca50ec6cc8242d3317d741c8`
+    (manifest closeout `27f2ce1bf246cb361c57c0b4ef29935985e47432`), and video
+    `22997a9d040bfbdf43bfe2ea9e4488e7b9d57a51ef7253099a627e65d37bec64`;
+    publish the documentation-only acceptance commit and Draft PR without
+    starting TASK-014D3.
 
 ### Done when
 

@@ -1,6 +1,6 @@
 # TASK-014D2: Minimal Cocos VFX Render Plan Adapter
 
-- Status: One-pass final merge closure in verification; no PR
+- Status: Accepted; Draft PR published pending integration review.
 - Date: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
@@ -190,18 +190,19 @@ historical and is not acceptance proof.
 
 ## Verification record
 
-- Focused TASK-014D2: 33/33 tests passed; complete adapter extension:
+- Focused TASK-014D2: 29/29 tests passed; complete adapter extension:
   265/265 tests passed; Creator CI contract:
   3/3 tests passed; direct `@gameai/vfx-authoring`: 16/16 tests passed.
 - Working-copy and frozen tracked-files-only `CI=true pnpm verify` each passed
   the 463/463 workspace baseline. Schema and
   D1 vector identity, generated closure, metadata/atomic publication,
   Markdown links, diff/byte/clean-tree closure, and media audits passed.
-- Creator 3.8.8 passed clean import/open, alternate-Scene reopen, second
+- Creator 3.8.8 passed clean import/open, alternate-Scene switch/reopen, second
   startup, all four fixtures with typed recipes/blends, pause/resume, Normal
-  and Transform Stress, six persistent starts with one accepted instance,
+  and Transform Stress, Debug, six persistent starts with one accepted
+  instance and five coalesced attempts,
   two consecutive rebuilds, post-rebuild playback, Exact Reset, and a clean
-  hold longer than two seconds.
+  hold of seven seconds.
 - Final Creator HUD measured one root, one input handler, zero active
   instances/renderers and zero stale/missing/extra/mismatched ownership,
   `0.000 px` maximum position/AABB overflow, and `0.000°` rotation error.
@@ -212,15 +213,40 @@ historical and is not acceptance proof.
   delayed Sprite remaining pending, Footstep ring removal before its longer
   particle sibling, and Combined layer exits at 0.5, 0.65, and 0.8 seconds
   with exact following-tick removal.
-- The final 63-second real Web Preview capture is H.264 High, 1280×720,
+- The accepted 58-second real Web Preview capture is H.264 High, 1280×720,
   30 fps, `yuv420p`, and fully decodes. Its decoded Trail ROI
-  `[540,120,240,240]` uses a maximum-channel threshold of 20: Reset→Active
-  measures `250` / `2,790` changed pixels, Pause→Pause measures `0` / `0`,
-  Pause→Resume measures `249` / `2,742`, and Reset→post-rebuild Trail measures
-  `249` / `2,739`. The final Reset hold remains root `1`, input `1`, with no
+  `[500,820) × [150,390)` uses a maximum-channel threshold of 20:
+  Reset→Active measures `255` / `1,676` changed pixels, Pause→Pause measures
+  `0` / `0`, Pause→Resume measures `252` / `718`, and
+  Reset→post-rebuild Trail measures `255` / `1,662`. Exact RGB24 frame hashes
+  are scoped to FFmpeg 8.1.2; another FFmpeg version may produce different
+  decoded hashes without changing the visual threshold result. The final
+  Reset hold remains root `1`, input `1`, with no
   active renderer, ownership mismatch, terminal error, or cleanup error.
 - Replacement evidence is retained on `evidence/task-014d2`; the original is
   retained and marked `failed-external-review-incomplete-runtime-and-visual-coverage`.
+
+## Acceptance closeout
+
+- External code review, Creator runtime review, visual review, transaction
+  fault matrix, Aura coalescing, final video, and reproducible framebuffer
+  threshold analysis: PASS.
+- Reviewed feature:
+  `70283b2a43adc57949dcf37cbe2632d44fee2386`; reviewed evidence:
+  `508a83b75ef3d0b2ca50ec6cc8242d3317d741c8`; manifest closeout:
+  `27f2ce1bf246cb361c57c0b4ef29935985e47432`; reviewed video SHA-256:
+  `22997a9d040bfbdf43bfe2ea9e4488e7b9d57a51ef7253099a627e65d37bec64`.
+- Final feature scope is 40 files, 9,469 insertions, 6 deletions, and 9,475
+  changed lines relative to `origin/main`. The feature tracks zero MP4 files,
+  and no evidence payload entered the feature branch or `main`.
+- Blend Gate ownership, primary/cleanup error separation, merged
+  runtime/host/component diagnostics, retained-root truth, compensation,
+  same-component retry to READY `1/1`, and actual Creator fault cases passed.
+- Creator 3.8.8 passed clean open, Scene switch/reopen, second startup, all
+  four effects, Trail and Aura Pause/Resume, Stress, Debug, two rebuilds,
+  post-rebuild Trail, Exact Reset, and the seven-second final clean hold.
+  Aura measured attempts `6`, accepted `1`, and coalesced `5`.
+- TASK-014D3 remains unstarted.
 
 ## Explicit non-goals
 
