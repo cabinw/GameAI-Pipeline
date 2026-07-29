@@ -3,9 +3,106 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Active plan: TASK-014D3 Canonical Full-Loadout Data-Driven VFX Integration
+
+- Status: Implementation and evidence complete; external review pending
+- Started: 2026-07-29
+- Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
+- Baseline `main`: `dc6dad52d4a40714d6e3f12352d5593763655c55`
+- Expected scope: at most 55 changed files and 12,000 net changed lines.
+- Hand-authored code, generated mirrors, PNG assets, and Scene/`.meta` pairs
+  are reported separately. Feature tracked MP4 budget is zero.
+
+### Goal
+
+Replace the canonical full-loadout runtime's hard-coded procedural effect
+construction with one deterministic D1 authoring document compiled before
+runtime into a concrete Render Plan and executed by the accepted D2 Cocos
+adapter boundary.
+
+### Authoritative composition
+
+```text
+canonical 12-state loadout contract/resolver
+→ canonical pose and semantic target resolution
+→ Character Semantic Events evaluator
+→ canonical D1 authoring document/compiler
+→ concrete Render Plan
+→ shared D2 descriptor/runtime/renderer adapter
+→ independent D3 Creator Scene
+```
+
+### Boundaries
+
+- Preserve TASK-014C, TASK-014D1, and TASK-014D2 accepted Scenes, schemas,
+  evaluator behavior, canonical tick/sampler/lifecycle semantics, and
+  protected references.
+- Combine and reuse the four accepted D1 fixtures. Resolve parameter
+  overrides at compile time; runtime consumes only the concrete plan.
+- Extract the D2 production implementation into a shared runtime consumed by
+  both the D2 minimal Scene and D3 canonical Scene. Do not duplicate renderer,
+  sampling, time, cleanup, sorting, projection, material, or ownership logic.
+- Add one Creator-owned D3 Scene covering all 12 loadout states, no/left/right
+  prop, five canonical clips, Aura, Combined, Pause/Resume, Transform Stress,
+  Debug, two rebuilds, post-rebuild effects, and Exact Reset.
+- Keep feature evidence media out of the feature branch. Publish only the
+  manifest, one MP4, RGB24 analyzer, and analysis JSON on
+  `evidence/task-014d3`.
+- Do not create a PR, merge main, move a tag/release or start TASK-014D4.
+
+### Execution
+
+1. Record the architecture audit, task acceptance criteria, ADR, scope, and
+   protected-reference baseline before implementation.
+2. Add the canonical textual D1 document, deterministic compile/serialization
+   closure, resource context, and generated concrete Render Plan.
+3. Make the D2 descriptor, sampler mirror, runtime state, cleanup coordinator,
+   renderer host/factories, sorting, spatial and diagnostics code a shared
+   production boundary; retain byte and behavioral parity in the D2 Scene.
+4. Compose the shared adapter with canonical loadout pose/target resolution
+   and semantic evaluator in an independent D3 Creator component and Scene.
+5. Add focused positive, negative, parity, generated closure, runtime
+   prohibition, target-rebinding, lifecycle, fault and Exact Reset tests.
+6. Run direct, extension, D1, semantic-event, clean-CI, working-copy, frozen
+   tracked-only, schema/vector/parity/closure, metadata, links, diff,
+   binary/media, scope, protected-reference and clean-tree gates.
+7. Run the complete Creator 3.8.8 clean-import/open/switch/reopen/restart and
+   Web Preview matrix from Gate 1 after every task-scope runtime correction.
+8. Commit and push the feature branch, publish reproducible evidence on the
+   isolated evidence branch, download and reverify bytes/decode/analysis, and
+   stop with both worktrees clean.
+
+### Done when
+
+- Canonical authoring and concrete plan bytes are deterministic and closed,
+  and no runtime code parses authoring JSON or resolves parameters.
+- D2 and D3 use the same production runtime/renderer implementation and D2
+  parity passes.
+- All 12 loadout states and three prop states resolve real runtime targets;
+  Dust, Trail, Aura and Combined satisfy lifecycle, ownership, spatial and
+  visibility invariants through stress, switching, pause, rebuild and reset.
+- Working-copy and frozen tracked-only verification, complete Creator 3.8.8
+  acceptance, evidence decode/RGB24 analysis, scope/media/reference audits,
+  remote SHA parity and clean trees all pass.
+
+### Closeout
+
+- Focused D3/Scene `25/25`, extension `290/290`, D1 `16/16`, semantic events
+  `24/24`, Cocos CI `3/3`, and working/tracked-only verification `488/488`
+  pass.
+- Creator 3.8.8 clean open/switch/reopen/second-startup and the complete live
+  matrix pass with zero relevant Creator/Preview warnings or errors.
+- All 12 loadouts and three prop modes resolve evaluated runtime targets.
+  Aura reaches attempts/accepted/coalesced `15/1/13` with instances `1/1/1`;
+  Reset returns to root/input `1/1` and zero ownership, cleanup and spatial
+  failures.
+- Feature and evidence are published append-only without a PR. External code
+  and visual review remain pending; TASK-014D4 remains unstarted.
+
 ## Completed plan: TASK-014D2 Final Runtime Semantics Closure
 
-- Status: Accepted; Draft PR published pending integration review.
+- Status: Integrated through PR #18 at
+  `dc6dad52d4a40714d6e3f12352d5593763655c55`.
 - Started: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`

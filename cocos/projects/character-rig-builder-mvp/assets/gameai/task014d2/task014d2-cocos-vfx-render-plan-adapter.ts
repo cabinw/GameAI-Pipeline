@@ -94,7 +94,7 @@ interface RendererOwner {
   visibility: CocosVfxLayerVisibility;
 }
 
-interface CocosResourceRealization {
+export interface CocosResourceRealization {
   readonly resourceId: string;
   readonly recipeKind: CocosVfxLayerDescriptor["recipeKind"];
   readonly spriteFrame: SpriteFrame | null;
@@ -137,7 +137,7 @@ function assertNever(value: never): never {
   throw new Error(`TASK_014D2_UNREACHABLE_ENUM: ${String(value)}`);
 }
 
-class CocosRenderPlanHost implements CocosVfxRuntimeHost {
+export class CocosRenderPlanHost implements CocosVfxRuntimeHost {
   private readonly bindings = new Map<string, RendererBinding>();
   private readonly owners = new Map<string, RendererOwner>();
   private readonly transientOwners =
@@ -162,7 +162,9 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
 
   constructor(
     private readonly overlay: Node,
-    private readonly targets: readonly Node[],
+    private readonly targets:
+      | readonly Node[]
+      | ((targetId: string) => Node | undefined),
     private readonly cueOrder: ReadonlyMap<string, number>,
     private readonly resources: ReadonlyMap<string, CocosResourceRealization>,
     private readonly injectCleanupFault: (stage: string) => void,
@@ -256,7 +258,18 @@ class CocosRenderPlanHost implements CocosVfxRuntimeHost {
     }
     this.assertLifecycle(descriptor);
     this.assertRecipePrimitive(descriptor);
-    const target = this.targets[cueIndex % this.targets.length] as Node;
+    const target = typeof this.targets === "function"
+      ? ownership.targetId === undefined
+        ? undefined
+        : this.targets(ownership.targetId)
+      : this.targets[cueIndex % this.targets.length];
+    if (target === undefined) {
+      throw new Error(
+        `TASK_014D2_TARGET_REALIZATION_MISSING:${
+          ownership.targetId ?? descriptor.cueId
+        }`,
+      );
+    }
     const node = new Node(`VFX_${ownership.rendererId}`);
     const cleanup = new Task014D2CleanupCoordinator();
     cleanup.own({
