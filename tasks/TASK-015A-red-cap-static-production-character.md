@@ -1,6 +1,6 @@
 # TASK-015A: Red Cap Static Production Character
 
-- Status: Blocked by PROGRAM-015 Phase 0
+- Status: In progress
 - Parent: PROGRAM-015
 - Budget: 45 files, 8,000 changed lines, 38 touched PNGs, 2
   Scene/`.meta` pairs, zero feature media

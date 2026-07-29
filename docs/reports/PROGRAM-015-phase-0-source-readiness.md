@@ -2,84 +2,106 @@
 
 - Audit date: 2026-07-30
 - Baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
-- Result: `FAIL — PROGRAM HARD STOP`
+- Phase 0 specification checkpoint:
+  `21580cf407bc69d9cb95176eb77d8ed9ce89fc4a`
+- Result: `PASS`
 
-## Red Cap fingerprint
+## Approved production fingerprint
 
 | Input | SHA-256 | Dimensions/mode | Result |
 | --- | --- | --- | --- |
-| `reference/full_character.png` | `d2e1f2be09ecf606ad6987e55af39b40fd415ca98d71dbaa26f6b2d1d07b68d7` | 326×892, 8-bit RGBA PNG | decoded |
-| `reference/character_sheet.png` | `84aca8e3252d4fd82b2c99d2d31dcf6d7102afa0b00f8a517a81be5c8a777d07` | 1448×1086, 8-bit RGBA PNG | decoded |
-| `reference/reconstructed-neutral.png` | `2283c8dc8bd85eea5cf5f92bee1c3960701baf38a5f1087fa6a12cb6d8ff8c71` | 326×892, 8-bit RGBA PNG | decoded |
+| `red-cap-character-master.png` | `7a4cf6a690aa6532a51c209d839d7d71b28396e40e021973c0f35fb0f828f3a1` | 1254×1254 RGBA | PASS |
+| `red-cap-parts-sheet.png` | `83bae1e794339b453a316eb4a9540968a1c7ec4e1bc5d7c3b50a43c76c709e79` | 1254×1254 RGBA | PASS |
+| `red-cap-joint-parts-supplement.png` | `7f22200a57992b66257e32670b0c5eacfd0f9a47073a758d74efb63b38bed96e` | 1536×1024 RGBA | PASS |
+| `training-ground-background.png` | `9f985dfad9218fd88f915a861aa5fbb016a5de1e138c5f2000e2fd5a45fb7b58` | 1672×941 RGB | PASS |
+| `style-board.png` | `9f4c4fd1a6a176fa72ffd54e0509435de972051e8e930f24366722935f43ca5e` | 1672×941 RGB | PASS |
 
-The canonical full-character image has 162,968 visible pixels on a
-290,792-pixel canvas, alpha coverage 0.560428072. Existing extraction assigns
-all 162,968 visible pixels to 19 nonempty semantic parts. Neutral silhouette
-and visible RGBA mismatch are both zero.
+All five PNGs decode completely. RGBA inputs have transparent corners,
+nonempty visible bounds and no detected green chroma-key residue. The master
+has 282,476 visible pixels, 276,682 opaque pixels, 5,794 partial-alpha pixels,
+alpha coverage 0.17963315 and visible bounds `(309,44)–(941,1195)`.
+
+## Rights and provenance
+
+- Generation source: OpenAI ImageGen in ChatGPT.
+- Human requester/project owner: KB / cabinw.
+- Rights-review status: `confirmed-by-project-owner`.
+- Commercial use, modification and redistribution: `true`.
+- Public repository inclusion is explicitly confirmed in the review note.
+- Project-owner assertion checks all five required confirmations.
+- Confirmation date: 2026-07-29.
+- Assertion-bound provenance SHA:
+  `55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+
+The tracked `provenance.json`, governed image hashes and assertion binding
+match the reviewed ignored intake bytes exactly. Codex did not alter or infer
+any authorization field.
 
 ## Readiness matrix
 
 | Gate | Evidence | Result |
 | --- | --- | --- |
-| Decode and dimensions | PNG headers and existing deterministic audit | PASS |
-| Alpha channel and coverage | RGBA; 162,968 visible pixels | PASS |
-| Neutral visible-pixel ownership | 162,968 assigned once across 19 parts | PASS |
-| Neutral reconstruction | silhouette mismatch 0; visible RGBA mismatch 0 | PASS |
-| Part taxonomy | 19 IDs in segmentation/provenance/rig inputs | PASS |
-| Rect/pivot/hierarchy/draw-order candidate | versioned annotation and rig layout present | PASS for legacy neutral candidate |
-| Hidden/occluded body areas | flattened neutral source; covered joint pixels not directly observable | FAIL |
-| Production overlap provenance | 31,593 ignored hidden texels synthesized by nearest-child-pixel copying | FAIL |
-| Author/source provenance | no repository record identifies author or original source/tool | FAIL |
-| License/production rights | no license identifier/text or production/republication permission | FAIL |
-| Scene background | no qualified background input found | FAIL |
-| Style board | no locked showcase style board found | FAIL |
-| Camera/ROI lock | cannot finalize without background/style board | BLOCKED |
+| Decode/dimensions/mode | complete PNG decode and recorded metadata | PASS |
+| Alpha/corners/bounds | RGBA sources have transparent corners and nonempty bounds | PASS |
+| Chroma-key residue | zero dominant-green visible pixels in all RGBA inputs | PASS |
+| Rights/provenance | SHA-bound project-owner confirmation | PASS |
+| Part taxonomy | 19 locked production parts | PASS |
+| Source authority | master visible authority plus declared hidden candidates | PASS |
+| Left/right identity | character-relative and viewer-relative identity recorded | PASS |
+| Joint coverage | shoulder/elbow/wrist/hip/knee/ankle source regions mapped | PASS |
+| Duplicate authority | resolved in favor of master visible pixels | PASS |
+| Ambiguous connector | rejected from accepted mapping | PASS |
+| Background/style | rights-bound source and style board decode | PASS |
+| 16:9 derivative | centered 1664×936 crop, exact 10/13 scale | PASS |
+| Camera/safe area/ROIs | locked before implementation | PASS |
+| Intake isolation | ignored intake; no staged/untracked candidate | PASS |
 
-## Existing annotation/layout summary
+## Source authority
 
-The candidate taxonomy is:
+The locked 19-part taxonomy is:
 
-`briefcase`, `cap`, `foot-left`, `foot-right`, `forearm-left`,
-`forearm-right`, `hair`, `hand-left`, `hand-right`, `head`, `pelvis`,
-`shin-left`, `shin-right`, `sunglasses`, `thigh-left`, `thigh-right`,
-`torso`, `upper-arm-left`, and `upper-arm-right`.
+`pelvis`, `torso`, `head`, `hair`, `cap`, `bandana`, `pouch`,
+`upper-arm-left`, `upper-arm-right`, `forearm-left`, `forearm-right`,
+`hand-left`, `hand-right`, `thigh-left`, `thigh-right`, `shin-left`,
+`shin-right`, `foot-left`, and `foot-right`.
 
-Current machine-readable candidate authorities:
+`examples/red-cap-production-v1/source-authority-map.json` records every part
+ID, parent, pivot candidate, draw order, character-relative side, source
+rectangle, visible region, hidden-overlap region, conflict, resolution,
+confidence and rejection reason.
 
-- `examples/red-cap-target-remade/canonical-part-segmentation.json`;
-- `examples/red-cap-target-remade/source-annotation.json`;
-- `examples/red-cap-target-remade/rig-layout.json`;
-- `examples/red-cap-target-remade/asset-provenance.json`; and
-- `examples/red-cap-target-remade/articulation-safety.json`.
+The character master is the sole neutral visible authority. The parts sheet
+and joint supplement may supply only declared hidden coverage. Integrated
+sleeves, combined hand/forearm and combined pelvis candidates are explicitly
+resolved. An ambiguous generic connector and duplicate supplement pelvis are
+rejected. No nearest-pixel copying, generative completion, mirroring,
+repainting or Creator compensation is authorized.
 
-They prove a deterministic legacy neutral reconstruction and bounded
-acceptance stress. They do not establish copyright/license or reveal all
-pixels hidden by the neutral composite.
+## Background and framebuffer authority
 
-## Root cause
+`examples/red-cap-production-v1/showcase-layout.json` locks:
 
-This is missing source authority, not a runtime defect:
+- source crop `(4,2,1664,936)`;
+- exact 10/13 scale to 1280×720;
+- ground contact line `y=646`;
+- production-lite center `x=380`;
+- Red Cap center `x=900`;
+- 64-pixel safe inset;
+- disjoint sorting bands; and
+- silhouette, face/cap/hair, limbs, ground, Dust, Trail, Aura, safe-area and
+  final-beauty framebuffer ROIs.
 
-1. Repository history shows when the files were committed, not who created
-   them, which source/tool produced them, or which license permits production
-   and redistribution.
-2. The current animation-safe sprites fill occluded joint regions using a
-   deterministic nearest-opaque-texel algorithm. That is a generated
-   approximation, not traceable layered source art.
-3. TASK-015C requires a locked production background and style board, but the
-   repository has neither.
+The central ground is unobstructed, the foreground does not cover either
+locked silhouette, and the background leaves sufficient Dust, Trail and Aura
+space.
 
-## Required inputs to resume
+## Promotion boundary
 
-- A provenance record naming the Red Cap author/source/tool and SHA-256-bound
-  license or explicit grant covering production use and redistribution.
-- Layered or otherwise directly traceable source pixels for shoulders,
-  elbows, wrists, hips, knees, and ankles, sufficient for the locked Walk and
-  Wave ranges without texture synthesis.
-- One production-quality 1280×720-or-larger scene background with SHA-256,
-  author/source, license/grant, and a style board defining camera, palette,
-  foreground/midground bands, and character placement.
+The approved source files were copied byte-for-byte into
+`examples/red-cap-production-v1/source/`. The ZIP, ignored intake, chroma-key
+intermediates, caches and quarantine files are not promoted. Runtime
+derivatives must be generated deterministically, and Creator UUIDs remain
+Creator-owned.
 
-After those inputs are tracked, rerun Phase 0 and lock exact source
-rectangles, final pivots, camera coordinates, framebuffer ROIs, and evidence
-frames before viewing a final composition.
+Phase 0A rights/integrity, Phase 0B visual/source authority and Phase 0C
+background/style readiness pass. TASK-015A may begin.

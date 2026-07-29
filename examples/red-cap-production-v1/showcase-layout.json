@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0.0",
+  "layoutId": "program-015-showcase-layout",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "safeInset": 64
+  },
+  "background": {
+    "source": "source/training-ground-background.png",
+    "sha256": "9f985dfad9218fd88f915a861aa5fbb016a5de1e138c5f2000e2fd5a45fb7b58",
+    "sourceCrop": {
+      "x": 4,
+      "y": 2,
+      "width": 1664,
+      "height": 936
+    },
+    "runtimeSize": {
+      "width": 1280,
+      "height": 720
+    },
+    "scale": {
+      "numerator": 10,
+      "denominator": 13
+    },
+    "groundContactY": 646
+  },
+  "styleBoard": {
+    "source": "source/style-board.png",
+    "sha256": "9f4c4fd1a6a176fa72ffd54e0509435de972051e8e930f24366722935f43ca5e",
+    "runtimeAuthority": false
+  },
+  "characters": [
+    {
+      "namespace": "showcase.production-lite",
+      "centerX": 380,
+      "footY": 646,
+      "maximumSilhouette": {
+        "x": 220,
+        "y": 170,
+        "width": 320,
+        "height": 480
+      }
+    },
+    {
+      "namespace": "showcase.red-cap",
+      "centerX": 900,
+      "footY": 646,
+      "maximumSilhouette": {
+        "x": 730,
+        "y": 150,
+        "width": 340,
+        "height": 500
+      }
+    }
+  ],
+  "framebufferRois": {
+    "productionLiteSilhouette": [220, 150, 340, 510],
+    "redCapSilhouette": [710, 130, 380, 530],
+    "redCapFaceCapHair": [790, 145, 220, 190],
+    "redCapLeftArm": [880, 300, 220, 270],
+    "redCapRightArm": [690, 300, 220, 270],
+    "redCapHipsLegs": [760, 430, 290, 225],
+    "groundContact": [180, 610, 930, 60],
+    "dust": [180, 570, 930, 110],
+    "trail": [680, 250, 430, 340],
+    "aura": [690, 160, 420, 480],
+    "safeArea": [64, 64, 1152, 592],
+    "finalBeauty": [0, 0, 1280, 720]
+  },
+  "sortingBands": {
+    "background": [-10000, -9001],
+    "productionLite": [-2000, -1001],
+    "redCap": [-1000, -1],
+    "vfx": [1000, 2999],
+    "debug": [5000, 5999],
+    "hud": [9000, 9999]
+  },
+  "status": "locked-before-implementation"
+}

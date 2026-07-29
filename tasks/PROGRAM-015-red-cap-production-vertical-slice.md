@@ -1,6 +1,6 @@
 # PROGRAM-015: Red Cap Production Vertical Slice
 
-- Status: `HARD_STOP_SOURCE_READINESS`
+- Status: Phase 0 accepted; TASK-015A in progress
 - Date: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -54,23 +54,22 @@ Red Cap Scenes remain provenance-only and cannot silently become canonical.
 
 ## Locked Red Cap taxonomy and authority
 
-The initial 19-part taxonomy is:
+The locked 19-part taxonomy is:
 
-`briefcase`, `cap`, `foot-left`, `foot-right`, `forearm-left`,
-`forearm-right`, `hair`, `hand-left`, `hand-right`, `head`, `pelvis`,
-`shin-left`, `shin-right`, `sunglasses`, `thigh-left`, `thigh-right`,
-`torso`, `upper-arm-left`, and `upper-arm-right`.
+`pelvis`, `torso`, `head`, `hair`, `cap`, `bandana`, `pouch`,
+`upper-arm-left`, `upper-arm-right`, `forearm-left`, `forearm-right`,
+`hand-left`, `hand-right`, `thigh-left`, `thigh-right`, `shin-left`,
+`shin-right`, `foot-left`, and `foot-right`.
 
 Source rectangles, pivots, hierarchy, draw order, sockets, and neutral fitting
-must be machine-readable and versioned. The current candidates are
-`source-annotation.json`, `rig-layout.json`,
-`canonical-part-segmentation.json`, and `asset-provenance.json` under
-`examples/red-cap-target-remade/`. They are not promoted to production
-authority while source readiness is blocked.
+must be machine-readable and versioned. The accepted authority is
+`examples/red-cap-production-v1/source-authority-map.json`; approved source
+bytes and project-owner-reviewed provenance live under that fixture's
+`source/` directory.
 
-Every nontransparent canonical pixel must have exactly one semantic owner.
-Hidden overlap pixels require traceable layered source pixels; nearest-color
-texture synthesis is not accepted as production source.
+Every nontransparent canonical pixel must have exactly one visible semantic
+owner. Hidden overlap pixels must remain directly traceable to an approved
+source rectangle; nearest-color texture synthesis is not accepted.
 
 ## Locked motion and controls
 
@@ -113,10 +112,9 @@ neutral silhouette AABBs must not overlap. Background, midground,
 production-lite, Red Cap, VFX, debug, and HUD use centralized nonoverlapping
 sorting bands.
 
-The background asset, style board, exact camera framing, final character
-scales, and color treatment are intentionally **not locked**: no qualifying
-background/style input exists. Inventing those values would violate the
-Phase 0 source gate.
+The background crop, scale, style board, camera composition, ground line,
+character bounds, sorting bands, safe area and framebuffer ROIs are locked in
+`examples/red-cap-production-v1/showcase-layout.json`.
 
 ## Lifecycle fault points
 
@@ -173,7 +171,8 @@ MP4 files.
 ## Budgets
 
 - Aggregate: at most 96 changed files and 24,000 changed lines.
-- Phase 0: 12 Markdown files and 3,500 changed lines.
+- Phase 0 resumed: 20 files and 5,000 changed lines, including exactly 5
+  approved source PNGs.
 - TASK-015A: 45 files, 8,000 lines, 38 touched PNGs, 2 Scene/`.meta` pairs.
 - TASK-015B: 24 files, 6,000 lines, no new PNG, 1 modified Scene/`.meta` pair.
 - TASK-015C: 35 files, 9,000 lines, 4 new PNG resources, 1 Scene/`.meta` pair.
@@ -182,16 +181,16 @@ MP4 files.
 The aggregate ceiling is authoritative. Exceeding 100 files or 25,000 lines
 requires an explicit split decision before coding.
 
-## Current hard stop
+## Phase 0 closeout
 
-Phase 0 found two independently sufficient blockers:
+The replacement ImageGen source pack is project-owner approved for commercial
+use, modification, public repository inclusion and redistribution. The final
+rights assertion is bound to provenance SHA
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+All governed hashes and integrity checks pass.
 
-1. The Red Cap PNGs have no repository-backed author/origin/license record,
-   and current hidden joint extensions synthesize texture for regions absent
-   from the canonical flattened neutral image.
-2. No qualified scene background or style board exists for TASK-015C.
-
-No TASK-015A/B/C implementation, Creator acceptance, evidence production, or
-checkpoint commit may proceed. Resumption requires user-supplied or
-repository-added source files with explicit provenance/license and a
-production background/style board, followed by a fresh Phase 0 audit.
+The source-authority map resolves 19/19 required parts, assigns master-only
+neutral visible authority, records sheet/supplement conflicts, and rejects
+ambiguous or duplicate components. The background/style inputs support the
+predeclared 1280×720 framebuffer oracle. Phase 0 is accepted and TASK-015A
+may proceed.

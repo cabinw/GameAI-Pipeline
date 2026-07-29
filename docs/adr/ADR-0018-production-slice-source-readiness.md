@@ -33,10 +33,11 @@ surface.
 
 ## Consequences
 
-PROGRAM-015 stops in Phase 0. TASK-015A/B/C do not start, public schemas and
-runtimes remain unchanged, no Creator Scene or media is produced, and no
-visual threshold is relaxed.
+The original legacy source correctly stopped PROGRAM-015. The replacement
+`red-cap-production-v1` pack now supplies SHA-bound project-owner rights,
+traceable master/parts/supplement authority and a qualified background/style
+board. Its machine-readable authority map rejects ambiguous or duplicate
+components instead of silently choosing them.
 
-The Program may resume after SHA-bound provenance/license, traceable layered
-joint source pixels, and a qualified background/style board are supplied and
-the source-readiness matrix passes.
+Phase 0 passes without changing public schemas or runtimes and without
+relaxing a visual threshold. TASK-015A may proceed.

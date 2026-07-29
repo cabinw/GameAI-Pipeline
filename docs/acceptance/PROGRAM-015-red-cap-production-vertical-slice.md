@@ -2,10 +2,8 @@
 
 ## Current decision
 
-`HARD_STOP_SOURCE_READINESS` on 2026-07-30.
-
-No A/B/C checkpoint is accepted. The branch contains Phase 0 specification
-and audit documentation only.
+Phase 0 source readiness accepted on 2026-07-30. TASK-015A is in progress;
+no A/B/C checkpoint is accepted yet.
 
 ## Required acceptance chain
 
@@ -45,39 +43,25 @@ All rows in
 - Both characters and required background visible at 1280×720.
 - Relevant Creator and Preview warnings/errors: zero.
 
-## Current evidence
+## Phase 0 accepted evidence
 
-The neutral legacy audit reports:
+- Source pack: `red-cap-production-v1`.
+- Generation provenance: OpenAI ImageGen in ChatGPT with recorded chroma-key
+  alpha extraction.
+- Project-owner rights review: commercial use, modification, public
+  repository inclusion and redistribution confirmed.
+- Rights binding: provenance SHA
+  `55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+- Master: 1254×1254 RGBA, transparent corners, 282,476 visible pixels,
+  SHA `7a4cf6a690aa6532a51c209d839d7d71b28396e40e021973c0f35fb0f828f3a1`.
+- Parts sheet: 19 independent alpha components; 19/19 required parts resolve
+  through the authority map.
+- Joint supplement: accepted only for declared hidden connectors; ambiguous
+  generic connector and duplicate combined pelvis are rejected.
+- Background/style: 1672×941 RGB inputs with a locked 1664×936 crop,
+  10/13 scale, 1280×720 output, ground line, safe area and framebuffer ROIs.
+- Working tree contained no untracked/staged intake file at promotion.
 
-- canonical source: 326×892 RGBA PNG;
-- SHA-256:
-  `d2e1f2be09ecf606ad6987e55af39b40fd415ca98d71dbaa26f6b2d1d07b68d7`;
-- canonical visible pixels: 162,968 of 290,792 (coverage 0.560428072);
-- assigned visible pixels: 162,968;
-- neutral silhouette mismatch: 0;
-- neutral visible RGBA mismatch: 0;
-- 19/19 canonical visible part fragments match exactly; and
-- 31,593 hidden extension pixels are ignored by the neutral provenance audit.
-
-These metrics prove neutral reconstruction only. They do not prove asset
-license, layered hidden-source provenance, production motion readiness, or
-showcase background readiness.
-
-Phase 0 documentation verification completed with `CI=true pnpm verify`:
-491/491 tests passed, including build and TypeScript typecheck. Generated
-outputs and tracked content remained closed.
-
-## Hard-stop findings
-
-- No author, originating tool/source, license identifier/text, or production
-  and redistribution permission is recorded for the Red Cap canonical PNGs.
-- The canonical authority is a flattened neutral composite. Existing
-  articulation extensions copy the nearest opaque child texel into hidden
-  regions; those pixels are deterministic but not observed layered source.
-- Repository raster inventory contains character fixtures, VFX resources,
-  tests, and historical evidence, but no qualified scene background or style
-  board for TASK-015C.
-
-Because the Program explicitly forbids inferred provenance, generated
-completion, and an improvised background, the result cannot be judged against
-the complete predeclared framebuffer oracle. Implementation is stopped.
+The accepted machine-readable inputs are
+`../../examples/red-cap-production-v1/source-authority-map.json` and
+`../../examples/red-cap-production-v1/showcase-layout.json`.

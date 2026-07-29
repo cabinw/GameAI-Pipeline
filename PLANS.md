@@ -5,7 +5,7 @@ time.
 
 ## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: Phase 0 hard stop — source readiness failed
+- Status: Phase 0 accepted; TASK-015A in progress
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -13,9 +13,11 @@ time.
   changed lines; at most 42 touched PNG files, 3 Scene/`.meta` pairs, 1
   feature manifest, zero feature MP4 files, and at most 3 evidence MP4 files
   isolated on `evidence/task-015`.
-- Phase 0 scope: at most 12 Markdown files and 3,500 changed lines; zero
-  runtime, schema, fixture, generated, Scene, `.meta`, package, lockfile,
-  binary, image, audio, or video changes.
+- Phase 0 resumed scope: at most 20 files and 5,000 changed lines, including
+  exactly 5 approved source PNGs plus the project-owner-reviewed provenance,
+  rights assertion, source-authority map, layout lock, and documentation;
+  zero runtime, schema, generated, Scene, `.meta`, package, lockfile, audio,
+  or video changes.
 
 ### Goal
 
@@ -42,20 +44,18 @@ before implementation.
 
 ### Phase 0 result
 
-The repository passes the neutral visible-pixel reconstruction gate, but it
-does not pass Program source readiness:
+The replacement `red-cap-production-v1` source pack passes resumed Phase
+0A–0C. The project-owner-reviewed rights assertion is bound to provenance SHA
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`;
+all governed image hashes and integrity checks pass. A machine-readable
+19-part map assigns neutral visible authority to the character master,
+restricts sheet/supplement pixels to declared hidden coverage, and rejects
+ambiguous or duplicate components. The background deterministically crops to
+1664×936 and scales by 10/13 to the locked 1280×720 composition and ROIs.
 
-- no repository document establishes the Red Cap source's author, origin,
-  license, or permitted production/republication use;
-- the accepted articulation extensions synthesize 31,593 hidden texels from
-  nearest opaque child pixels because the canonical neutral composite does
-  not reveal the covered joint regions; and
-- no qualified, provenance- and license-locked scene background or style
-  board exists for TASK-015C.
-
-These are explicit Program hard-stop conditions. No runtime, fixture,
-generator, Scene, VFX, or evidence implementation may start until replacement
-inputs or adequate provenance are supplied and the Phase 0 matrix passes.
+Approved source bytes are promoted under
+`examples/red-cap-production-v1/source/`; ignored intake and ZIP files remain
+untracked. TASK-015A may proceed.
 See `tasks/PROGRAM-015-red-cap-production-vertical-slice.md` and
 `docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md`.
 
