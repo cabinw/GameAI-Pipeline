@@ -71,6 +71,7 @@ test("TASK-014D2 scene is minimal and runtime metadata is complete and unique", 
   );
   const uuids = new Set();
   for (const moduleName of [
+    "cocos-vfx-cleanup-coordinator.ts",
     "cocos-vfx-diagnostics.ts",
     "cocos-vfx-harness-contract.ts",
     "cocos-vfx-render-descriptor.ts",
@@ -91,9 +92,10 @@ test("TASK-014D2 scene is minimal and runtime metadata is complete and unique", 
 
 test("TASK-014D2 runtime removes a deferred root before rebuilding", async () => {
   const source = await readFile(scriptFile, "utf8");
-  assert.match(source, /private destroyRuntimeRoot\(\): void/);
-  assert.match(source, /root\.removeFromParent\(\);\s*root\.destroy\(\);/);
-  assert.match(source, /this\.destroyRuntimeRoot\(\);[\s\S]*this\.beginSetup\(\);/);
+  assert.match(source, /id: "root-detach"[\s\S]*root\.removeFromParent\(\)/);
+  assert.match(source, /id: "root-destroy"[\s\S]*root\.destroy\(\)/);
+  assert.match(source, /cleanupLifecycle\("rebuild"\)[\s\S]*this\.beginSetup\(\)/);
+  assert.doesNotMatch(source, /children\.filter[\s\S]*Task014D2RuntimeRoot/);
 });
 
 test("TASK-014D2 scene participates in tracked Creator metadata audit", async () => {

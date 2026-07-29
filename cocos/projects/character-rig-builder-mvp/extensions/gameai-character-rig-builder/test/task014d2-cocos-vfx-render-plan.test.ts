@@ -18,6 +18,8 @@ import {
   CocosVfxPlanErrorCode,
   CocosVfxRuntimeError,
 } from "../source/task014d2/cocos-vfx-diagnostics";
+import { Task014D2CleanupCoordinator } from
+  "../source/task014d2/cocos-vfx-cleanup-coordinator";
 import {
   TASK014D2_INPUT_REGISTRY,
   TASK014D2_RESOURCE_REGISTRY,
@@ -141,6 +143,7 @@ class FakeHost implements CocosVfxRuntimeHost {
   failAtCreate = Number.POSITIVE_INFINITY;
   failAfterCreate = Number.POSITIVE_INFINITY;
   failAtUpdate = Number.POSITIVE_INFINITY;
+  failDestroyIds = new Set<string>();
   createCount = 0;
   updateCount = 0;
 
@@ -180,6 +183,9 @@ class FakeHost implements CocosVfxRuntimeHost {
   }
 
   destroyLayer(rendererId: string, reason: string): void {
+    if (this.failDestroyIds.delete(rendererId)) {
+      throw new Error(`synthetic destroy failure:${rendererId}`);
+    }
     this.descriptors.delete(rendererId);
     this.ownership.delete(rendererId);
     this.samples.delete(rendererId);
@@ -914,6 +920,7 @@ test("persistent starts coalesce across six loops and cleanup is symmetric", () 
     staleRendererCount: 0,
     generation: 2,
     terminalError: null,
+    cleanupErrors: [],
   });
 });
 
@@ -1404,6 +1411,207 @@ test("setup faults preserve the first error and sweep every partial owner before
   }
 });
 
+test("the shared cleanup coordinator owns construction before attachment and compensates failed steps", () => {
+  for (const failureStage of [
+    "root-attached",
+    "ui-transform",
+    "material-gate",
+    "host",
+    "runtime",
+    "initial-sample",
+    "input-registered",
+    "hud",
+  ]) {
+    const state = {
+      generation: 7,
+      root: 0,
+      input: 0,
+      host: 0,
+      runtime: 0,
+      materials: 0,
+      nodes: 0,
+      ready: false,
+    };
+    const transaction = new Task014D2CleanupCoordinator();
+    const setup = (): void => {
+      state.root = 1;
+      state.nodes = 1;
+      transaction.own({
+        id: "generation",
+        order: 0,
+        run: () => { state.generation += 1; },
+      });
+      transaction.own({
+        id: "root-detach",
+        order: 70,
+        run: () => { state.root = 0; },
+      });
+      transaction.own({
+        id: "root-destroy",
+        order: 80,
+        run: () => { state.nodes = 0; },
+      });
+      if (failureStage === "root-attached") throw new Error(failureStage);
+      if (failureStage === "ui-transform") throw new Error(failureStage);
+      state.materials = 2;
+      transaction.own({
+        id: "materials",
+        order: 40,
+        run: () => { state.materials = 0; },
+      });
+      if (failureStage === "material-gate") throw new Error(failureStage);
+      state.host = 1;
+      transaction.own({
+        id: "host",
+        order: 30,
+        run: () => { state.host = 0; },
+      });
+      if (failureStage === "host") throw new Error(failureStage);
+      state.runtime = 1;
+      transaction.own({
+        id: "runtime",
+        order: 20,
+        run: () => { state.runtime = 0; },
+      });
+      if (failureStage === "runtime") throw new Error(failureStage);
+      if (failureStage === "initial-sample") throw new Error(failureStage);
+      state.input = 1;
+      transaction.own({
+        id: "input",
+        order: 10,
+        run: () => { state.input = 0; },
+      });
+      if (failureStage === "input-registered") throw new Error(failureStage);
+      if (failureStage === "hud") throw new Error(failureStage);
+      state.ready = true;
+    };
+    assert.throws(setup, new RegExp(failureStage, "u"));
+    const report = transaction.cleanup(new Error(`first:${failureStage}`));
+    assert.equal(report.firstError, `first:${failureStage}`);
+    assert.deepEqual(report.cleanupErrors, []);
+    assert.equal(transaction.complete, true);
+    assert.deepEqual(state, {
+      generation: 8,
+      root: 0,
+      input: 0,
+      host: 0,
+      runtime: 0,
+      materials: 0,
+      nodes: 0,
+      ready: false,
+    });
+    assert.deepEqual(
+      { root: state.root + 1, input: state.input + 1, ready: true },
+      { root: 1, input: 1, ready: true },
+    );
+  }
+
+  const calls: string[] = [];
+  let materialAttempts = 0;
+  const compensation = new Task014D2CleanupCoordinator();
+  compensation.own({
+    id: "runtime",
+    order: 10,
+    run: () => calls.push("runtime"),
+  });
+  compensation.own({
+    id: "material",
+    order: 20,
+    run: () => {
+      calls.push("material");
+      if (materialAttempts++ === 0) throw new Error("material destroy failed");
+    },
+  });
+  compensation.own({
+    id: "node",
+    order: 30,
+    run: () => calls.push("node"),
+  });
+  let report = compensation.cleanup(new Error("business error"));
+  assert.equal(report.firstError, "business error");
+  assert.deepEqual(report.pendingStepIds, ["material"]);
+  assert.deepEqual(calls, ["runtime", "material", "node"]);
+  report = compensation.cleanup();
+  assert.equal(report.firstError, "business error");
+  assert.deepEqual(report.pendingStepIds, []);
+  assert.deepEqual(calls, ["runtime", "material", "node", "material"]);
+});
+
+test("runtime terminal cleanup preserves the business error while renderer cleanup is retried", () => {
+  const plan = descriptorPlan();
+  const cue = plan.cues.find((candidate) => candidate.lifecycle === "looping");
+  assert.ok(cue);
+  const host = new FakeHost();
+  const runtime = new CocosVfxRuntimeState(plan, host);
+  runtime.dispatch({
+    command: "start",
+    cueId: cue.cueId,
+    commandId: "cleanup-first-error",
+    instanceId: "cleanup-first-error",
+  });
+  const rendererId = host.rendererOwnership()[0]?.rendererId;
+  assert.ok(rendererId);
+  host.failDestroyIds.add(rendererId);
+  host.failAtUpdate = host.updateCount;
+  assert.throws(() => runtime.tick(1 / 60), /synthetic update failure/u);
+  let snapshot = runtime.snapshot();
+  assert.match(snapshot.terminalError ?? "", /synthetic update failure/u);
+  assert.ok(snapshot.cleanupErrors.some((error) =>
+    error.includes("synthetic destroy failure")));
+  assert.ok(host.rendererOwnership().length > 0);
+  runtime.cleanup("compensation");
+  snapshot = runtime.snapshot();
+  assert.match(snapshot.terminalError ?? "", /synthetic update failure/u);
+  assert.equal(host.rendererOwnership().length, 0);
+});
+
+test("disable, destroy, rebuild, and stale callbacks share the same retryable lifecycle transaction", () => {
+  for (const reason of ["disable", "destroy", "rebuild"]) {
+    const counts = {
+      generation: 1,
+      runtime: 1,
+      input: 1,
+      owners: 2,
+      materials: 3,
+      nodes: 3,
+      roots: 1,
+    };
+    const transaction = new Task014D2CleanupCoordinator();
+    const operations = [
+      ["generation", 0, () => { counts.generation += 1; }],
+      ["runtime", 10, () => { counts.runtime = 0; }],
+      ["input", 20, () => { counts.input = 0; }],
+      ["owners", 30, () => { counts.owners = 0; }],
+      ["materials", 40, () => { counts.materials = 0; }],
+      ["nodes", 50, () => { counts.nodes = 0; }],
+      ["root", 60, () => { counts.roots = 0; }],
+    ] as const;
+    for (const [id, order, run] of operations) {
+      transaction.own({ id, order, run });
+    }
+    const capturedGeneration = counts.generation;
+    const callback = (): boolean => capturedGeneration === counts.generation;
+    assert.equal(callback(), true);
+    const report = transaction.cleanup();
+    assert.deepEqual(report.pendingStepIds, [], reason);
+    assert.deepEqual(counts, {
+      generation: 2,
+      runtime: 0,
+      input: 0,
+      owners: 0,
+      materials: 0,
+      nodes: 0,
+      roots: 0,
+    });
+    assert.equal(callback(), false, `${reason} invalidates stale callback`);
+    assert.deepEqual(
+      { roots: counts.roots + 1, input: counts.input + 1, ready: true },
+      { roots: 1, input: 1, ready: true },
+      `${reason} permits same-component retry`,
+    );
+  }
+});
+
 test("Trail ROI gate requires visible pixels, stable Pause, and changing Resume", () => {
   const reset = new Uint8Array(4_000);
   const active = new Uint8Array(reset);
@@ -1514,15 +1722,36 @@ test("primitive dispatch is exhaustive and contains no cue-name conditional bran
   );
   assert.match(actualRuntime, /addComponent\(Graphics\);\s*graphics\.stroke\(\)/u);
   assert.match(actualRuntime, /showFailureHud/u);
-  assert.match(actualRuntime, /destroyAll\("terminal-failure"\)/u);
+  assert.match(actualRuntime, /ownedHost\.destroyAll\("lifecycle-cleanup"\)/u);
+  assert.match(
+    actualRuntime,
+    /globalThis\.parent\?\.location[\s\S]*location\?\.hash[\s\S]*replace\(\/\^#\/, ""\)[\s\S]*task014d2Fault/u,
+  );
   for (const fault of [
+    "root-attached",
+    "ui-transform",
+    "host-created",
+    "runtime-created",
+    "hud-created",
     "material-mismatch",
     "registered-before-throw",
     "initial-sample",
     "hud-input-setup",
     "cleanup-failure",
+    "root-detach",
+    "root-destroy",
   ]) {
     assert.match(actualRuntime, new RegExp(`injectSetupFault\\("${fault}"\\)`, "u"));
+  }
+  for (const fault of [
+    "material-destroy",
+    "renderer-node-detach",
+    "renderer-node-destroy",
+  ]) {
+    assert.match(
+      actualRuntime,
+      new RegExp(`injectCleanupFault\\("${fault}"\\)`, "u"),
+    );
   }
   assert.doesNotMatch(actualRuntime, /getWorldRotation/u);
   assert.match(actualRuntime, /activeStartStop/u);

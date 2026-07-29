@@ -16,6 +16,7 @@ const runtimeRoot = path.resolve(
 );
 const d1RuntimeRoot = path.join(runtimeRoot, "d1");
 const modules = [
+  "cocos-vfx-cleanup-coordinator.ts",
   "cocos-vfx-diagnostics.ts",
   "cocos-vfx-harness-contract.ts",
   "cocos-vfx-render-descriptor.ts",

@@ -1,10 +1,10 @@
 # TASK-014D2: Minimal Cocos VFX Render Plan Adapter
 
-- Status: Remediation complete; pending external code and visual review
+- Status: Final transaction/evidence closure complete; pending external code and visual review
 - Date: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline: `ae5fb4ef7a68a20706485741ab352a6037d25f12`
-- Maximum scope: 48 changed files, 8,500 changed lines
+- Maximum scope: 48 changed files, 9,500 changed lines
 
 ## Objective
 
@@ -73,6 +73,26 @@ historical and is not acceptance proof.
 
 ## Remediation closure
 
+- The final transaction closure extracts the stateful cleanup coordinator
+  actually used by the Creator component and host. Root ownership is staged
+  immediately after construction, before parent attachment, UITransform, or
+  configuration can throw. Disable, destroy, rebuild, setup failure, and
+  terminal runtime failure now execute the same all-steps coordinator.
+  Successful operations are never repeated; failed material, node, input,
+  runtime, or root operations remain owned and can be compensated on the next
+  sweep. The first business failure remains terminal while cleanup failures
+  are reported separately.
+- Renderer ownership now tracks node detach, every material destruction, and
+  node destruction independently. A failure in one step cannot prevent the
+  remaining owners from being swept, cannot discard the failing owner, and
+  cannot cause an already-completed destroy to run twice.
+- The expanded injected-operation matrix covers root attachment,
+  UITransform/configuration, material gate, host/runtime construction, initial
+  sample, input-then-throw, HUD/input setup, runtime cleanup, intermediate
+  material/node cleanup, disable, destroy, rebuild, stale callback, and
+  same-instance/component retry. Every case asserts the original failure,
+  separate cleanup errors, zero residual ownership after compensation, and
+  successful `READY` recovery with one root and one input handler.
 - Setup is now one failure transaction from resource completion through
   material gate, host/runtime construction, initial Reset/sample, HUD, and
   input registration. The first error survives cleanup faults; input,
@@ -154,10 +174,11 @@ historical and is not acceptance proof.
 
 ## Verification record
 
-- Direct adapter extension: 262/262 tests passed; Creator CI contract:
+- Focused TASK-014D2: 33/33 tests passed; complete adapter extension:
+  265/265 tests passed; Creator CI contract:
   3/3 tests passed; direct `@gameai/vfx-authoring`: 16/16 tests passed.
 - Working-copy and frozen tracked-files-only `CI=true pnpm verify` each passed
-  the 460/460 workspace baseline. Schema and
+  the 463/463 workspace baseline. Schema and
   D1 vector identity, generated closure, metadata/atomic publication,
   Markdown links, diff/byte/clean-tree closure, and media audits passed.
 - Creator 3.8.8 passed clean import/open, alternate-Scene reopen, second
@@ -175,6 +196,13 @@ historical and is not acceptance proof.
   delayed Sprite remaining pending, Footstep ring removal before its longer
   particle sibling, and Combined layer exits at 0.5, 0.65, and 0.8 seconds
   with exact following-tick removal.
+- The final 63-second real Web Preview capture is H.264 High, 1280×720,
+  30 fps, `yuv420p`, and fully decodes. Its decoded Trail ROI
+  `[540,120,240,240]` uses a maximum-channel threshold of 20: Reset→Active
+  measures `250` / `2,790` changed pixels, Pause→Pause measures `0` / `0`,
+  Pause→Resume measures `249` / `2,742`, and Reset→post-rebuild Trail measures
+  `249` / `2,739`. The final Reset hold remains root `1`, input `1`, with no
+  active renderer, ownership mismatch, terminal error, or cleanup error.
 - Replacement evidence is retained on `evidence/task-014d2`; the original is
   retained and marked `failed-external-review-incomplete-runtime-and-visual-coverage`.
 

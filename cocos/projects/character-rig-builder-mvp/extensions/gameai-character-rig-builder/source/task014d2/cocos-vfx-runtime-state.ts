@@ -88,6 +88,7 @@ export interface CocosVfxRuntimeSnapshot {
   readonly staleRendererCount: number;
   readonly generation: number;
   readonly terminalError: string | null;
+  readonly cleanupErrors: readonly string[];
 }
 
 function ownershipEqual(
@@ -115,6 +116,7 @@ export class CocosVfxRuntimeState {
   private paused = false;
   private generation = 1;
   private terminalError: CocosVfxRuntimeError | null = null;
+  private readonly cleanupErrors: string[] = [];
 
   public constructor(
     plan: CocosVfxDescriptorPlan,
@@ -206,7 +208,8 @@ export class CocosVfxRuntimeState {
         this.destroyRenderers(renderers, "partial-build");
         this.assertOwnership();
       } catch (cleanupError) {
-        this.enterTerminalFailure(runtimeError(cleanupError));
+        this.cleanupErrors.push(runtimeError(cleanupError).message);
+        this.enterTerminalFailure(failure);
       }
       if (
         failure.code === CocosVfxPlanErrorCode.RUNTIME_OWNERSHIP_MISMATCH
@@ -256,6 +259,7 @@ export class CocosVfxRuntimeState {
     this.generation += 1;
     this.paused = false;
     this.terminalError = null;
+    this.cleanupErrors.length = 0;
   }
 
   public cleanup(reason: string): void {
@@ -322,6 +326,7 @@ export class CocosVfxRuntimeState {
       ]).size,
       generation: this.generation,
       terminalError: this.terminalError?.message ?? null,
+      cleanupErrors: [...this.cleanupErrors],
     };
   }
 
@@ -362,7 +367,7 @@ export class CocosVfxRuntimeState {
       try {
         this.cleanup("terminal-failure");
       } catch (cleanupError) {
-        this.terminalError = runtimeError(cleanupError);
+        this.cleanupErrors.push(runtimeError(cleanupError).message);
       }
     }
     throw this.terminalError;

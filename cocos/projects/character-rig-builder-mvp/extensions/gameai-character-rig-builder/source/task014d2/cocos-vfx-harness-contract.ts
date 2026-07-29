@@ -113,6 +113,7 @@ export interface Task014D2RuntimeDiagnostics {
   maximumRotationErrorDegrees: number;
   maximumAabbOverflowPx: number;
   terminalError: string;
+  cleanupErrors: string;
 }
 
 export interface Task014D2CleanupStep {
@@ -206,6 +207,7 @@ Task014D2RuntimeDiagnostics {
     maximumRotationErrorDegrees: 0,
     maximumAabbOverflowPx: 0,
     terminalError: "",
+    cleanupErrors: "",
   };
 }
 
@@ -230,6 +232,9 @@ export function formatTask014D2Diagnostics(
     `Root ${diagnostics.runtimeRoots} · Input ${diagnostics.inputHandlers} · Active ${diagnostics.activeRecipeBlendSummary}`,
     `Max position ${diagnostics.maximumPositionErrorPx.toFixed(3)}px · rotation ${diagnostics.maximumRotationErrorDegrees.toFixed(3)}° · AABB overflow ${diagnostics.maximumAabbOverflowPx.toFixed(3)}px`,
     diagnostics.terminalError || "No errors",
+    diagnostics.cleanupErrors
+      ? `Cleanup errors ${diagnostics.cleanupErrors}`
+      : "Cleanup errors none",
   ].join("\n");
 }
 
