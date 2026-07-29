@@ -47,6 +47,8 @@ declare module "cc" {
 
   export class Component {
     readonly node: Node;
+    enabled: boolean;
+    destroy(): boolean;
   }
 
   export class UIRenderer extends Component {

@@ -1,0 +1,223 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "combined-reference",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 1618033,
+      "layers": [
+        {
+          "layerId": "back-glow",
+          "order": 0,
+          "primitive": "sprite-quad",
+          "logicalResourceId": "vfx.aura-glow",
+          "durationSeconds": 0.8,
+          "color": { "r": 0.2, "g": 0.5, "b": 1, "a": 1 },
+          "opacity": 0.35,
+          "blendRole": "additive"
+        },
+        {
+          "layerId": "middle-ring",
+          "order": 10,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 0.6,
+          "delaySeconds": 0.05,
+          "scaleCurve": [
+            { "time": 0, "value": 0.25 },
+            { "time": 1, "value": 1.5 }
+          ]
+        },
+        {
+          "layerId": "front-ribbon",
+          "order": 20,
+          "primitive": "ribbon",
+          "logicalResourceId": "vfx.ribbon-core",
+          "durationSeconds": 0.4,
+          "delaySeconds": 0.1,
+          "rotationCurve": [
+            { "time": 0, "value": 0 },
+            { "time": 1, "value": 90 }
+          ],
+          "blendRole": "screen"
+        },
+        {
+          "layerId": "spark-burst",
+          "order": 30,
+          "primitive": "burst-particles",
+          "logicalResourceId": "vfx.spark",
+          "durationSeconds": 0.5,
+          "emission": { "count": 12, "ratePerSecond": 48 },
+          "blendRole": "additive"
+        }
+      ]
+    },
+    {
+      "cueId": "footstep-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 104729,
+      "parameters": [
+        {
+          "parameterId": "intensity",
+          "type": "number",
+          "default": 0.8,
+          "minimum": 0,
+          "maximum": 1
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "intensity",
+          "layerId": "dust-burst",
+          "target": "opacity",
+          "operation": "multiply"
+        },
+        {
+          "parameterId": "intensity",
+          "layerId": "ground-ring",
+          "target": "opacity",
+          "operation": "multiply"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "dust-burst",
+          "order": 10,
+          "primitive": "burst-particles",
+          "logicalResourceId": "vfx.dust-soft",
+          "durationSeconds": 0.45,
+          "delaySeconds": 0,
+          "transform": {
+            "position": { "x": 0, "y": 2 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 0.65 }
+          },
+          "color": { "r": 0.72, "g": 0.5, "b": 0.28, "a": 1 },
+          "opacity": 0.9,
+          "scaleCurve": [
+            { "time": 0, "value": 0.35 },
+            { "time": 1, "value": 1.4 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": -8 },
+            { "time": 1, "value": 12 }
+          ],
+          "emission": { "count": 8, "ratePerSecond": 32 },
+          "blendRole": "alpha"
+        },
+        {
+          "layerId": "ground-ring",
+          "order": 20,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.ring-soft",
+          "durationSeconds": 0.3,
+          "color": { "r": 0.85, "g": 0.65, "b": 0.38, "a": 1 },
+          "opacity": 0.65,
+          "scaleCurve": [
+            { "time": 0, "value": 0.2 },
+            { "time": 1, "value": 1.25 }
+          ]
+        }
+      ]
+    },
+    {
+      "cueId": "hand-tool-trail",
+      "lifecycle": "looping",
+      "deterministicSeed": 271828,
+      "parameters": [
+        {
+          "parameterId": "trail-width",
+          "type": "number",
+          "default": 1,
+          "minimum": 0.25,
+          "maximum": 3
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "trail-width",
+          "layerId": "core-ribbon",
+          "target": "scale-y",
+          "operation": "multiply"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "core-ribbon",
+          "order": 0,
+          "primitive": "ribbon",
+          "logicalResourceId": "vfx.ribbon-core",
+          "durationSeconds": 0.24,
+          "transform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1, "y": 1 }
+          },
+          "color": { "r": 0.35, "g": 1, "b": 0.62, "a": 1 },
+          "opacity": 0.92,
+          "scaleCurve": [
+            { "time": 0, "value": 1 },
+            { "time": 1, "value": 0 }
+          ],
+          "blendRole": "additive"
+        }
+      ]
+    },
+    {
+      "cueId": "persistent-aura",
+      "lifecycle": "persistent",
+      "deterministicSeed": 314159,
+      "parameters": [
+        {
+          "parameterId": "tint",
+          "type": "color",
+          "default": { "r": 0.3, "g": 0.65, "b": 1, "a": 1 }
+        }
+      ],
+      "bindings": [
+        {
+          "parameterId": "tint",
+          "layerId": "inner-glow",
+          "target": "color",
+          "operation": "replace"
+        },
+        {
+          "parameterId": "tint",
+          "layerId": "outer-ring",
+          "target": "color",
+          "operation": "replace"
+        }
+      ],
+      "layers": [
+        {
+          "layerId": "outer-ring",
+          "order": 10,
+          "primitive": "ring",
+          "logicalResourceId": "vfx.aura-ring",
+          "durationSeconds": 1.5,
+          "color": { "r": 0.3, "g": 0.65, "b": 1, "a": 1 },
+          "opacity": 0.72,
+          "scaleCurve": [
+            { "time": 0, "value": 0.9 },
+            { "time": 0.5, "value": 1.05 },
+            { "time": 1, "value": 0.9 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": 0 },
+            { "time": 1, "value": 360 }
+          ],
+          "blendRole": "screen"
+        },
+        {
+          "layerId": "inner-glow",
+          "order": 0,
+          "primitive": "sprite-quad",
+          "logicalResourceId": "vfx.aura-glow",
+          "durationSeconds": 1.5,
+          "opacity": 0.4,
+          "blendRole": "additive"
+        }
+      ]
+    }
+  ]
+}

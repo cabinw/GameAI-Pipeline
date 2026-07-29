@@ -3,9 +3,149 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
+## Active plan: TASK-014D3 Focused Transaction Cleanup Closeout
+
+- Status: Accepted after external code and visual review; Draft PR publication
+  pending
+- Started: 2026-07-29
+- Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
+- Baseline `main`: `dc6dad52d4a40714d6e3f12352d5593763655c55`
+- Expected scope: at most 55 changed files and 12,000 net changed lines.
+- Closeout increment: at most 14 feature files and 3,000 net changed lines.
+- Final closeout increment: at most 12 feature files and 2,500 net changed
+  lines; one short supplemental evidence video is allowed only on the
+  evidence branch.
+- Hand-authored code, generated mirrors, PNG assets, and Scene/`.meta` pairs
+  are reported separately. Feature tracked MP4 budget is zero.
+
+### Goal
+
+Replace the canonical full-loadout runtime's hard-coded procedural effect
+construction with one deterministic D1 authoring document compiled before
+runtime into a concrete Render Plan and executed by the accepted D2 Cocos
+adapter boundary.
+
+The focused closeout routes real D3 setup failure, terminal failure, target
+invalidation, Exact Reset, rebuild, disable, and destroy through the accepted
+D2 all-steps cleanup coordinator. It preserves the first business error,
+orders cleanup errors independently, retains failed-step compensation
+ownership, and permits same-component retry after complete compensation.
+
+### Authoritative composition
+
+```text
+canonical 12-state loadout contract/resolver
+→ canonical pose and semantic target resolution
+→ Character Semantic Events evaluator
+→ canonical D1 authoring document/compiler
+→ concrete Render Plan
+→ shared D2 descriptor/runtime/renderer adapter
+→ independent D3 Creator Scene
+```
+
+### Boundaries
+
+- Preserve TASK-014C, TASK-014D1, and TASK-014D2 accepted Scenes, schemas,
+  evaluator behavior, canonical tick/sampler/lifecycle semantics, and
+  protected references.
+- Combine and reuse the four accepted D1 fixtures. Resolve parameter
+  overrides at compile time; runtime consumes only the concrete plan.
+- Extract the D2 production implementation into a shared runtime consumed by
+  both the D2 minimal Scene and D3 canonical Scene. Do not duplicate renderer,
+  sampling, time, cleanup, sorting, projection, material, or ownership logic.
+- Add one Creator-owned D3 Scene covering all 12 loadout states, no/left/right
+  prop, five canonical clips, Aura, Combined, Pause/Resume, Transform Stress,
+  Debug, two rebuilds, post-rebuild effects, and Exact Reset.
+- Keep feature evidence media out of the feature branch. Publish only the
+  manifest, one MP4, RGB24 analyzer, and analysis JSON on
+  `evidence/task-014d3`.
+- Do not create a PR, merge main, move a tag/release or start TASK-014D4.
+- Do not change D1, Character Semantic Events, or D2 public semantics. Parent
+  runtime changes are limited to protected, default-no-op failure and teardown
+  seams whose existing behavior remains unchanged for non-D3 consumers.
+
+### Execution
+
+1. Record the architecture audit, task acceptance criteria, ADR, scope, and
+   protected-reference baseline before implementation.
+2. Add the canonical textual D1 document, deterministic compile/serialization
+   closure, resource context, and generated concrete Render Plan.
+3. Make the D2 descriptor, sampler mirror, runtime state, cleanup coordinator,
+   renderer host/factories, sorting, spatial and diagnostics code a shared
+   production boundary; retain byte and behavioral parity in the D2 Scene.
+4. Compose the shared adapter with canonical loadout pose/target resolution
+   and semantic evaluator in an independent D3 Creator component and Scene.
+5. Add focused positive, negative, parity, generated closure, runtime
+   prohibition, target-rebinding, lifecycle, fault and Exact Reset tests.
+6. Run direct, extension, D1, semantic-event, clean-CI, working-copy, frozen
+   tracked-only, schema/vector/parity/closure, metadata, links, diff,
+   binary/media, scope, protected-reference and clean-tree gates.
+7. Run the complete Creator 3.8.8 clean-import/open/switch/reopen/restart and
+   Web Preview matrix from Gate 1 after every task-scope runtime correction.
+8. Commit and push the feature branch, publish reproducible evidence on the
+   isolated evidence branch, download and reverify bytes/decode/analysis, and
+   stop with both worktrees clean.
+9. Add the focused real-component transaction boundary and a failure matrix
+   that exercises D3 callbacks plus parent teardown order rather than only a
+   fake renderer host or low-level runtime.
+10. Re-run working-copy and tracked-only verification plus Creator normal and
+    fault matrices, then append replacement evidence pinned to the new feature
+    SHA.
+11. Close the final real-Creator gaps: preserve dispose-only finalization
+    across the actual `onDisable` then `onDestroy` callback sequence; publish
+    generated and overlay root ownership immediately after attachment; inject
+    pre-`runtime` build faults across base, attachment, prop, overlay,
+    Graphics, HUD, and Sorting2D construction; and rename synthetic
+    coordinator tests honestly.
+12. Re-run working-copy, frozen tracked-only, generated-closure, complete
+    Creator normal and fault gates. Append one final feature commit, then
+    publish a short SHA-bound supplemental video, updated fault matrix, and
+    manifest in one append-only evidence commit. Do not create a PR.
+
+### Done when
+
+- Canonical authoring and concrete plan bytes are deterministic and closed,
+  and no runtime code parses authoring JSON or resolves parameters.
+- D2 and D3 use the same production runtime/renderer implementation and D2
+  parity passes.
+- All 12 loadout states and three prop states resolve real runtime targets;
+  Dust, Trail, Aura and Combined satisfy lifecycle, ownership, spatial and
+  visibility invariants through stress, switching, pause, rebuild and reset.
+- Working-copy and frozen tracked-only verification, complete Creator 3.8.8
+  acceptance, evidence decode/RGB24 analysis, scope/media/reference audits,
+  remote SHA parity and clean trees all pass.
+
+### Closeout
+
+- Focused D3/Scene `28/28`, extension `293/293`, D1 `16/16`, semantic events
+  `24/24`, Cocos CI `3/3`, and working-copy verification `491/491` pass.
+- The actual Creator `onDisable` then `onDestroy` sequence performs ordinary
+  teardown once, completes only dispose finalization on destroy, leaves both
+  readiness and lifecycle DISPOSED, and never repeats a successful cleanup
+  step.
+- Eight pre-runtime parent build faults cover base, attachment, prop, overlay,
+  Graphics, Graphics Sorting2D, HUD, and HUD Sorting2D. Each compensates
+  root/input/owner/material/node to `0/0/0/0/0`; retrying the same component
+  reaches READY `1/1/0/0/0` without a duplicate root.
+- Creator 3.8.8 clean open/switch/reopen/second-startup and the complete live
+  normal matrix plus the 16 existing transaction faults and nine final
+  lifecycle/partial-build gates pass with zero relevant Preview warning or
+  error.
+- All 12 loadouts and three prop modes resolve evaluated runtime targets.
+  Aura reaches attempts/accepted/coalesced `6/1/5` with instances `1/1/1`;
+  Reset returns to root/input `1/1` and zero ownership, cleanup and spatial
+  failures.
+- External code, Creator, transaction, media/decode and visual review passed
+  for feature `6d43609d099b9a4909b92c7edb288afe615e7615` and reviewed evidence
+  `9cdf32003ed654b619acb6a7cf4b4808eed719ac`. Append-only acceptance evidence
+  is recorded at `118003e6e8dc85d7bb86900f5f252e856461e0e9`.
+- Draft PR publication is the only remaining closeout action. TASK-014D4
+  remains unstarted.
+
 ## Completed plan: TASK-014D2 Final Runtime Semantics Closure
 
-- Status: Accepted; Draft PR published pending integration review.
+- Status: Integrated through PR #18 at
+  `dc6dad52d4a40714d6e3f12352d5593763655c55`.
 - Started: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline `main`: `ae5fb4ef7a68a20706485741ab352a6037d25f12`

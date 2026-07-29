@@ -20,12 +20,14 @@ export type CocosVfxSemanticCommand =
       readonly command: "emit";
       readonly cueId: string;
       readonly commandId: string;
+      readonly targetId?: string;
     }
   | {
       readonly command: "start";
       readonly cueId: string;
       readonly commandId: string;
       readonly instanceId: string;
+      readonly targetId?: string;
     }
   | {
       readonly command: "stop";
@@ -38,6 +40,7 @@ export interface CocosVfxRendererOwnership {
   readonly instanceId: string;
   readonly descriptorId: string;
   readonly visibility: CocosVfxLayerVisibility;
+  readonly targetId?: string;
 }
 
 export type CocosVfxLayerVisibility = "pending" | "active" | "removed";
@@ -99,7 +102,8 @@ function ownershipEqual(
   return left.rendererId === right.rendererId &&
     left.instanceId === right.instanceId &&
     left.descriptorId === right.descriptorId &&
-    left.visibility === right.visibility;
+    left.visibility === right.visibility &&
+    left.targetId === right.targetId;
 }
 
 function runtimeError(error: unknown): CocosVfxRuntimeError {
@@ -184,6 +188,9 @@ export class CocosVfxRuntimeState {
         instanceId: key,
         descriptorId: descriptor.descriptorId,
         visibility: "pending" as const,
+        ...(command.targetId === undefined
+          ? {}
+          : { targetId: command.targetId }),
       },
       visibility: "pending" as CocosVfxLayerVisibility,
     }));
