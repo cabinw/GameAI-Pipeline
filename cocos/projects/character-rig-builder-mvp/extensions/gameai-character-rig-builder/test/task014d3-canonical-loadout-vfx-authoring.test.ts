@@ -65,6 +65,11 @@ import {
 import {
   CanonicalVfxRuntimeAdapter,
 } from "../source/task014d3/canonical-vfx-runtime-adapter";
+import {
+  TASK014D3_COMPONENT_CLEANUP_STEP_IDS,
+  Task014D3ComponentTransaction,
+  runTask014D3VfxCleanupTransaction,
+} from "../source/task014d3/canonical-vfx-component-transaction";
 
 const extensionRoot = path.resolve(__dirname, "../..");
 const repositoryRoot = path.resolve(extensionRoot, "../../../../..");
@@ -687,6 +692,173 @@ test("Normal/Stress transformed four-corner bounds remain finite and safe", () =
   }
 });
 
+test("real D3 component and parent teardown fault matrix preserves compensation ownership", () => {
+  const triggers = [
+    "setup-failure",
+    "terminal-failure",
+    "target-invalidation",
+    "exact-reset",
+    "rebuild",
+    "disable",
+    "destroy",
+  ] as const;
+  for (const trigger of triggers) {
+    for (const injectedStep of TASK014D3_COMPONENT_CLEANUP_STEP_IDS) {
+      const primaryError = new Error(
+        `TASK_014D3_PRIMARY:${trigger}:${injectedStep}`,
+      );
+      const attempts = new Map<string, number>();
+      const successfulOrder: string[] = [];
+      const counts = {
+        root: 1,
+        input: 1,
+        owner: 1,
+        material: 1,
+        node: 3,
+        references: 1,
+        lifecycle: 1,
+      };
+      let generatedDetached = false;
+      let overlayDetached = false;
+      const operation = (stepId: string, complete: () => void) => () => {
+        const attempt = (attempts.get(stepId) ?? 0) + 1;
+        attempts.set(stepId, attempt);
+        if (stepId === injectedStep && attempt === 1) {
+          throw new Error(`TASK_014D3_INJECTED:${stepId}`);
+        }
+        complete();
+        successfulOrder.push(stepId);
+      };
+      const transaction = new Task014D3ComponentTransaction({
+        semanticEvaluator: operation("semantic-evaluator", () => {}),
+        vfxRuntime: operation("vfx-runtime", () => {
+          counts.owner = 0;
+        }),
+        vfxHost: operation("vfx-host", () => {
+          counts.material = 0;
+          counts.node = Math.min(counts.node, 2);
+        }),
+        inputHandler: operation("input-handler", () => {
+          counts.input = 0;
+        }),
+        generatedRootDetach: operation("generated-root-detach", () => {
+          generatedDetached = true;
+        }),
+        overlayRootDetach: operation("overlay-root-detach", () => {
+          overlayDetached = true;
+        }),
+        generatedRootDestroy: operation("generated-root-destroy", () => {
+          if (!generatedDetached) {
+            throw new Error("TASK_014D3_GENERATED_ROOT_STILL_ATTACHED");
+          }
+          counts.root = 0;
+          counts.node = Math.min(counts.node, 1);
+        }),
+        overlayRootDestroy: operation("overlay-root-destroy", () => {
+          if (!overlayDetached) {
+            throw new Error("TASK_014D3_OVERLAY_ROOT_STILL_ATTACHED");
+          }
+          counts.node = 0;
+        }),
+        referencesClear: operation("references-clear", () => {
+          counts.references = 0;
+        }),
+        parentLifecycle: operation("parent-lifecycle", () => {
+          counts.lifecycle = 0;
+        }),
+      });
+      const sweep = transaction.cleanup(primaryError);
+      assert.equal(sweep.primaryErrorIdentityPreserved, true);
+      assert.equal(sweep.final.primaryError, primaryError);
+      assert.equal(sweep.complete, true);
+      assert.deepEqual(counts, {
+        root: 0,
+        input: 0,
+        owner: 0,
+        material: 0,
+        node: 0,
+        references: 0,
+        lifecycle: 0,
+      });
+      assert.equal(sweep.first.pendingStepIds.includes(injectedStep), true);
+      assert.equal(
+        sweep.firstCleanupErrors[0]?.stepId,
+        injectedStep,
+      );
+      for (const stepId of TASK014D3_COMPONENT_CLEANUP_STEP_IDS) {
+        const expectedAttempts =
+          stepId === injectedStep ||
+            (stepId === "generated-root-destroy" &&
+              injectedStep === "generated-root-detach") ||
+            (stepId === "overlay-root-destroy" &&
+              injectedStep === "overlay-root-detach")
+            ? 2
+            : 1;
+        assert.equal(
+          attempts.get(stepId),
+          expectedAttempts,
+          `${trigger}:${injectedStep}:${stepId}`,
+        );
+        assert.equal(
+          successfulOrder.filter((entry) => entry === stepId).length,
+          1,
+          `${trigger}:${injectedStep}:${stepId}:exactly-once`,
+        );
+      }
+      Object.assign(counts, {
+        root: 1,
+        input: 1,
+        owner: 0,
+        material: 0,
+        node: 2,
+        references: 1,
+        lifecycle: 1,
+      });
+      assert.equal(counts.root, 1);
+      assert.equal(counts.input, 1);
+    }
+  }
+});
+
+test("target rebind transaction never publishes before old renderer cleanup", () => {
+  const order: string[] = [];
+  let oldRendererCount = 1;
+  let publishedTarget = "old-target";
+  let failRuntimeOnce = true;
+  const targetError = new Error("TASK_014D3_TARGET_REBIND_FAILED");
+  const sweep = runTask014D3VfxCleanupTransaction(
+    {
+      semanticStop: () => order.push("semantic-stop"),
+      runtimeCleanup: () => {
+        order.push("runtime-cleanup");
+        if (failRuntimeOnce) {
+          failRuntimeOnce = false;
+          throw new Error("TASK_014D3_RUNTIME_CLEANUP_ONCE");
+        }
+        oldRendererCount = 0;
+      },
+      hostCleanup: () => {
+        order.push("host-cleanup");
+        oldRendererCount = 0;
+      },
+    },
+    targetError,
+  );
+  assert.equal(sweep.final.primaryError, targetError);
+  assert.equal(sweep.primaryErrorIdentityPreserved, true);
+  assert.equal(sweep.complete, true);
+  assert.equal(oldRendererCount, 0);
+  assert.equal(publishedTarget, "old-target");
+  assert.deepEqual(order, [
+    "semantic-stop",
+    "runtime-cleanup",
+    "host-cleanup",
+    "runtime-cleanup",
+  ]);
+  publishedTarget = "new-target";
+  assert.equal(publishedTarget, "new-target");
+});
+
 test("typed input/HUD registry includes Combined without a long single line", () => {
   assert.equal(validateTask014D3InputRegistry(), TASK014D3_INPUT_REGISTRY);
   assert.equal(TASK014D3_INPUT_REGISTRY.length, 18);
@@ -741,6 +913,14 @@ test("runtime contains no authoring parser, parameter resolution, name dispatch 
     component,
     /node\.getComponent\(UITransform\) \?\?\s*node\.addComponent\(UITransform\)/u,
   );
+  assert.match(component, /protected teardownRuntime\(dispose: boolean\)/u);
+  assert.match(component, /new Task014D3ComponentTransaction\(\{/u);
+  assert.match(component, /this\.unregisterInput\(\)/u);
+  assert.match(component, /ownership\.generatedRoot\?\.removeFromParent\(\)/u);
+  assert.match(component, /ownership\.overlayRoot\?\.removeFromParent\(\)/u);
+  assert.match(component, /this\.clearCanonicalRuntimeReferences\(\)/u);
+  assert.match(component, /this\.finalizeCanonicalRuntimeTeardown\(/u);
+  assert.doesNotMatch(component, /private cleanupVfx\(/u);
 });
 
 test("generated mirrors, concrete plan and source hashes are closed", () => {
@@ -762,6 +942,7 @@ test("generated mirrors, concrete plan and source hashes are closed", () => {
     "canonical-vfx-semantic-contract.ts",
     "canonical-vfx-runtime-adapter.ts",
     "canonical-vfx-input-registry.ts",
+    "canonical-vfx-component-transaction.ts",
   ]) {
     const source = readFileSync(
       path.join(extensionRoot, "source/task014d3", moduleName),
@@ -811,4 +992,23 @@ test("D2 parity remains optional-target compatible and shares exact runtime modu
     /from "\.\.\/task014d2\/task014d2-cocos-vfx-render-plan-adapter"/u,
   );
   assert.doesNotMatch(d3Component, /class CocosRenderPlanHost/u);
+  const parentComponent = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/task013r6/task013r6-one-handed-prop-integration.ts",
+    ),
+    "utf8",
+  );
+  assert.match(
+    parentComponent,
+    /protected handleCanonicalRuntimeSetupFailure\(_error: unknown\): boolean \{\s*return false;\s*\}/u,
+  );
+  assert.match(
+    parentComponent,
+    /catch \(setupError\) \{\s*if \(!this\.handleCanonicalRuntimeSetupFailure\(setupError\)\) \{\s*throw setupError;/u,
+  );
+  assert.match(
+    parentComponent,
+    /protected teardownRuntime\(dispose: boolean\): void \{\s*this\.beforeCanonicalRuntimeTeardown\(dispose\);\s*this\.unregisterInput\(\);\s*this\.runtime\?\.generatedRoot\.removeFromParent\(\);\s*this\.runtime\?\.overlayRoot\.removeFromParent\(\);\s*this\.runtime\?\.generatedRoot\.destroy\(\);\s*this\.runtime\?\.overlayRoot\.destroy\(\);\s*this\.clearCanonicalRuntimeReferences\(\);\s*this\.finalizeCanonicalRuntimeTeardown\(dispose\);/u,
+  );
 });

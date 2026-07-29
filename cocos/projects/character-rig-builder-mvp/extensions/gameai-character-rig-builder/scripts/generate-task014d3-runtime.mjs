@@ -25,6 +25,7 @@ const modules = [
   "canonical-vfx-semantic-contract.ts",
   "canonical-vfx-runtime-adapter.ts",
   "canonical-vfx-input-registry.ts",
+  "canonical-vfx-component-transaction.ts",
 ];
 
 await mkdir(runtimeRoot, { recursive: true });

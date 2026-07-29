@@ -238,6 +238,10 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
 
   protected beforeCanonicalRuntimeTeardown(_dispose: boolean): void {}
 
+  protected handleCanonicalRuntimeSetupFailure(_error: unknown): boolean {
+    return false;
+  }
+
   onEnable(): void {
     this.beginRuntimeSetup();
   }
@@ -292,30 +296,36 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
         this.coordinator?.succeed(entry.logicalId);
         const snapshot = this.coordinator?.snapshot();
         if (snapshot?.terminal === "passed") {
-          this.readiness.resourcesPassed(generation);
-          this.buildRuntime();
-          this.readiness.nodesBuilt(generation);
-          this.exactReset();
-          this.readiness.resetComplete(
-            generation,
-            this.playback !== null,
-          );
-          this.lifecycle.ready(generation);
-          this.readiness.lifecycleReady(generation);
-          this.registerInput(generation);
-          this.afterCanonicalRuntimeReady();
-          this.updateHud();
-          const identity = this.runtimeDisplayIdentity();
-          console.info(
-            `${identity.diagnosticsId}_RUNTIME_READY ${JSON.stringify({
-              displayIdentity: identity,
-              lifecycle: this.lifecycle.snapshot(),
-              resources: snapshot,
-              plan: PLAN_VALIDATION,
-              sorting: SORTING_POLICY,
-              spatial: this.lastSpatial,
-            })}`,
-          );
+          try {
+            this.readiness.resourcesPassed(generation);
+            this.buildRuntime();
+            this.readiness.nodesBuilt(generation);
+            this.exactReset();
+            this.readiness.resetComplete(
+              generation,
+              this.playback !== null,
+            );
+            this.lifecycle.ready(generation);
+            this.readiness.lifecycleReady(generation);
+            this.registerInput(generation);
+            this.afterCanonicalRuntimeReady();
+            this.updateHud();
+            const identity = this.runtimeDisplayIdentity();
+            console.info(
+              `${identity.diagnosticsId}_RUNTIME_READY ${JSON.stringify({
+                displayIdentity: identity,
+                lifecycle: this.lifecycle.snapshot(),
+                resources: snapshot,
+                plan: PLAN_VALIDATION,
+                sorting: SORTING_POLICY,
+                spatial: this.lastSpatial,
+              })}`,
+            );
+          } catch (setupError) {
+            if (!this.handleCanonicalRuntimeSetupFailure(setupError)) {
+              throw setupError;
+            }
+          }
         }
       });
     }
@@ -326,9 +336,11 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     logicalId: string,
     diagnostic: string,
   ): void {
-    this.unregisterInput();
     this.coordinator?.reject(logicalId);
     this.coordinator?.rejectPending();
+    const setupError = new Error(diagnostic);
+    if (this.handleCanonicalRuntimeSetupFailure(setupError)) return;
+    this.unregisterInput();
     this.runtime?.generatedRoot.removeFromParent();
     this.runtime?.overlayRoot.removeFromParent();
     this.runtime?.generatedRoot.destroy();
@@ -1138,7 +1150,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.readiness.activateInput(generation);
   }
 
-  private unregisterInput(): void {
+  protected unregisterInput(): void {
     if (!this.inputRegistered) return;
     input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
     this.inputRegistered = false;
@@ -1265,10 +1277,18 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     this.runtime?.overlayRoot.removeFromParent();
     this.runtime?.generatedRoot.destroy();
     this.runtime?.overlayRoot.destroy();
+    this.clearCanonicalRuntimeReferences();
+    this.finalizeCanonicalRuntimeTeardown(dispose);
+  }
+
+  protected clearCanonicalRuntimeReferences(): void {
     this.runtime = null;
     this.playback = null;
     this.coordinator = null;
     this.spriteFrames.clear();
+  }
+
+  protected finalizeCanonicalRuntimeTeardown(dispose: boolean): void {
     this.readiness.teardown(dispose);
     this.lifecycle.teardown(dispose);
   }

@@ -56,6 +56,11 @@ import {
   CanonicalVfxRuntimeAdapter,
 } from "./canonical-vfx-runtime-adapter";
 import {
+  Task014D3ComponentTransaction,
+  runTask014D3VfxCleanupTransaction,
+  type Task014D3CleanupSweep,
+} from "./canonical-vfx-component-transaction";
+import {
   TASK014D3_AUTHORING_SHA256,
   TASK014D3_RENDER_PLAN,
   TASK014D3_RENDER_PLAN_SHA256,
@@ -69,6 +74,48 @@ const BINDING_BY_KEY = new Map(
     binding,
   ]),
 );
+
+type Task014D3CleanupReason =
+  | "exact-reset"
+  | "track-switch"
+  | "dispose"
+  | "rebuild"
+  | "target-invalidation";
+
+interface Task014D3ComponentOwnership {
+  evaluator: CharacterSemanticEventEvaluator | null;
+  adapter: CanonicalVfxRuntimeAdapter | null;
+  runtime: CocosVfxRuntimeState | null;
+  host: CocosRenderPlanHost | null;
+  generatedRoot: Node | null;
+  overlayRoot: Node | null;
+  generatedRootDetached: boolean;
+  overlayRootDetached: boolean;
+  generatedRootDestroyed: boolean;
+  overlayRootDestroyed: boolean;
+}
+
+interface Task014D3TransactionCounts {
+  readonly root: number;
+  readonly input: number;
+  readonly owner: number;
+  readonly material: number;
+  readonly node: number;
+}
+
+type Task014D3CreatorFaultTrigger =
+  | "setup-failure"
+  | "terminal-failure"
+  | "target-invalidation"
+  | "exact-reset"
+  | "rebuild"
+  | "disable"
+  | "destroy";
+
+interface Task014D3CreatorFaultCase {
+  readonly trigger: Task014D3CreatorFaultTrigger;
+  readonly stepId: string;
+}
 
 @ccclass("GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration")
 export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
@@ -90,6 +137,21 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
   private staleTargetCount = 0;
   private targetRebindCount = 0;
   private terminalError = "";
+  private primaryError: unknown | null = null;
+  private terminal = false;
+  private componentTransaction: Task014D3ComponentTransaction | null = null;
+  private componentOwnership: Task014D3ComponentOwnership | null = null;
+  private componentCleanupReason: Task014D3CleanupReason = "rebuild";
+  private readonly retainedCleanupErrors: string[] = [];
+  private lastCleanupSweep: Task014D3CleanupSweep | null = null;
+  private faultScopedSweep: Task014D3CleanupSweep | null = null;
+  private faultCaseExecuted = false;
+  private faultCaseActive = false;
+  private faultRetryPending = false;
+  private faultTargetRebindPrimary = false;
+  private readonly injectedFaultAttempts = new Set<string>();
+  private faultFailureCounts: Task014D3TransactionCounts | null = null;
+  private faultCloseoutRecord: Readonly<Record<string, unknown>> | null = null;
   private lastAction = "Initial Reset";
 
   protected runtimeDisplayIdentity() {
@@ -110,9 +172,53 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
     ]);
   }
 
+  protected beginRuntimeSetup(): void {
+    if (
+      this.componentTransaction !== null &&
+      !this.componentTransaction.complete
+    ) {
+      const compensation = this.componentTransaction.cleanup();
+      this.recordCleanupSweep(compensation);
+      if (!compensation.complete) {
+        this.terminal = true;
+        this.terminalError =
+          this.formatTerminalError("TASK_014D3_PREVIOUS_CLEANUP_INCOMPLETE");
+        return;
+      }
+    }
+    this.primaryError = null;
+    this.terminal = false;
+    this.terminalError = "";
+    this.retainedCleanupErrors.length = 0;
+    this.componentCleanupReason = "rebuild";
+    this.componentOwnership = this.createEmptyOwnership();
+    this.componentTransaction = this.createComponentTransaction(
+      this.componentOwnership,
+    );
+    super.beginRuntimeSetup();
+  }
+
+  update(deltaSeconds: number): void {
+    if (this.terminal) return;
+    try {
+      super.update(deltaSeconds);
+    } catch (error) {
+      this.enterTerminalFailure(error, "rebuild");
+    }
+  }
+
+  protected handleCanonicalRuntimeSetupFailure(error: unknown): boolean {
+    this.enterTerminalFailure(error, "rebuild");
+    if (this.requestedFaultCase()?.trigger === "setup-failure") {
+      this.scheduleFaultRetry();
+    }
+    return true;
+  }
+
   protected afterCanonicalRuntimeBuilt(): void {
     const runtime = this.runtime;
     if (runtime === null) throw new Error("TASK_014D3_CANONICAL_RUNTIME_MISSING");
+    this.captureParentOwnership();
     try {
       const compiled = compileCocosVfxRenderDescriptors(
         TASK014D3_RENDER_PLAN,
@@ -152,25 +258,56 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
         resources,
         () => {},
       );
+      if (this.componentOwnership !== null) {
+        this.componentOwnership.host = this.vfxHost;
+      }
       this.vfxHost.verifyMaterialBlendGate(spriteFrame);
       this.vfxRuntime = new CocosVfxRuntimeState(
         compiled.value,
         this.vfxHost,
       );
+      if (this.componentOwnership !== null) {
+        this.componentOwnership.runtime = this.vfxRuntime;
+      }
       this.vfxAdapter = new CanonicalVfxRuntimeAdapter(this.vfxRuntime);
+      if (this.componentOwnership !== null) {
+        this.componentOwnership.adapter = this.vfxAdapter;
+      }
       this.semanticEvaluator =
         createPrevalidatedCharacterSemanticEventEvaluator(
           TASK014D3_SEMANTIC_EVENT_CONTRACT,
           TASK014D3_SEMANTIC_EVENT_CONTEXT,
           TASK014D3_INITIAL_TRACK_ID,
         );
+      if (this.componentOwnership !== null) {
+        this.componentOwnership.evaluator = this.semanticEvaluator;
+      }
       this.previousEvaluatorCycles = 0;
       this.setupCount += 1;
+      if (
+        this.requestedFaultCase()?.trigger === "setup-failure" &&
+        !this.faultCaseExecuted
+      ) {
+        this.faultCaseExecuted = true;
+        this.faultCaseActive = true;
+        throw new Error("TASK_014D3_CREATOR_SETUP_FAILURE");
+      }
     } catch (error) {
-      this.terminalError =
-        error instanceof Error ? error.message : String(error);
-      this.cleanupVfx("rebuild");
       throw error;
+    }
+  }
+
+  protected afterCanonicalRuntimeReady(): void {
+    const faultCase = this.requestedFaultCase();
+    if (faultCase === null) return;
+    if (this.faultRetryPending) {
+      this.faultRetryPending = false;
+      this.publishCreatorFaultResult("READY");
+      return;
+    }
+    if (!this.faultCaseExecuted) {
+      this.faultCaseExecuted = true;
+      void Promise.resolve().then(() => this.runCreatorFaultCase(faultCase));
     }
   }
 
@@ -205,33 +342,54 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       this.canonicalPlan(),
       this.semanticState.snapshot().propStateId,
     );
-    if (
-      this.targetBindings.size > 0 &&
-      targetSignature(next) !== targetSignature(this.targetBindings)
-    ) {
-      const evaluator = this.semanticEvaluator;
-      if (evaluator !== null) {
-        this.dispatchSemanticCommands(
-          evaluator.switchTrack(evaluator.snapshot.trackId),
-        );
+    if (this.targetBindings.size === 0) {
+      this.assertSemanticTargetNodes(next);
+      this.targetBindings = next;
+      return;
+    }
+    if (targetSignature(next) !== targetSignature(this.targetBindings)) {
+      let primaryError: unknown = null;
+      try {
+        if (this.faultTargetRebindPrimary) {
+          this.faultTargetRebindPrimary = false;
+          throw new Error("TASK_014D3_CREATOR_TARGET_REBIND_FAILURE");
+        }
+        this.assertSemanticTargetNodes(next);
+      } catch (error) {
+        primaryError = error;
       }
-      this.vfxAdapter?.cleanup("target-invalidation");
+      const evaluator = this.semanticEvaluator;
+      const sweep = this.cleanupActiveVfx(
+        "target-invalidation",
+        primaryError,
+        () => {
+          if (evaluator !== null) {
+            this.dispatchSemanticCommands(
+              evaluator.switchTrack(evaluator.snapshot.trackId),
+            );
+          }
+        },
+      );
+      this.requireCleanupSuccess(sweep, primaryError);
       this.targetRebindCount += 1;
       this.activeSemanticTarget = "none";
       this.previousEvaluatorCycles = 0;
     }
     this.targetBindings = next;
-    this.assertSemanticTargetNodes();
+    this.assertSemanticTargetNodes(this.targetBindings);
   }
 
   protected afterCanonicalExactReset(): void {
-    if (this.semanticEvaluator !== null) {
-      this.dispatchSemanticCommands(this.semanticEvaluator.exactReset());
-      this.dispatchSemanticCommands(
-        this.semanticEvaluator.switchTrack(TASK014D3_INITIAL_TRACK_ID),
-      );
-    }
-    this.vfxAdapter?.cleanup("exact-reset");
+    const evaluator = this.semanticEvaluator;
+    const sweep = this.cleanupActiveVfx("exact-reset", null, () => {
+      if (evaluator !== null) {
+        this.dispatchSemanticCommands(evaluator.exactReset());
+        this.dispatchSemanticCommands(
+          evaluator.switchTrack(TASK014D3_INITIAL_TRACK_ID),
+        );
+      }
+    });
+    this.requireCleanupSuccess(sweep);
     this.vfxAdapter?.setPaused(false);
     this.vfxDebugEnabled = false;
     this.targetDebugEnabled = false;
@@ -243,19 +401,17 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
     this.resolveSemanticTargets(false);
   }
 
-  protected beforeCanonicalRuntimeTeardown(dispose: boolean): void {
-    if (this.semanticEvaluator !== null) {
-      this.dispatchSemanticCommands(this.semanticEvaluator.dispose());
+  protected teardownRuntime(dispose: boolean): void {
+    this.componentCleanupReason = dispose ? "dispose" : "rebuild";
+    this.captureParentOwnership();
+    const transaction = this.requireComponentTransaction();
+    const sweep = transaction.cleanup();
+    this.recordCleanupSweep(sweep);
+    if (!sweep.complete) {
+      this.terminal = true;
+      this.terminalError =
+        this.formatTerminalError("TASK_014D3_COMPONENT_CLEANUP_INCOMPLETE");
     }
-    this.cleanupVfx(dispose ? "dispose" : "rebuild");
-    this.semanticEvaluator = null;
-    this.vfxAdapter = null;
-    this.vfxRuntime = null;
-    this.vfxHost = null;
-    this.descriptorPlan = null;
-    this.targetBindings = new Map();
-    this.activeSemanticTarget = "none";
-    this.teardownCount += 1;
   }
 
   protected onKeyDown(event: EventKeyboard): void {
@@ -266,9 +422,7 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
     try {
       this.executeTask014D3Action(binding);
     } catch (error) {
-      this.terminalError =
-        error instanceof Error ? error.message : String(error);
-      throw error;
+      this.enterTerminalFailure(error, "rebuild");
     }
   }
 
@@ -299,7 +453,7 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       `OWNERS missing ${vfx?.missingRendererIds.length ?? 0} · extra ${vfx?.extraRendererIds.length ?? 0} · mismatch ${vfx?.mismatchedRendererIds.length ?? 0} · stale ${vfx?.staleRendererCount ?? 0} · total ${ownership.length}`,
       `ROOT ${runtimeRootCount} · INPUT ${this.inputRegistered ? 1 : 0} · SETUP ${this.setupCount} · TEARDOWN ${this.teardownCount} · REBUILDS ${this.rebuildCount} · REBINDS ${this.targetRebindCount}`,
       `SPATIAL position ${(Math.max(this.vfxHost?.maximumProjectionErrorPx ?? 0, this.vfxHost?.maximumPositionErrorPx ?? 0)).toFixed(3)}px · rotation ${(this.vfxHost?.maximumRotationErrorDegrees ?? 0).toFixed(3)}deg · AABB ${(this.vfxHost?.maximumViewportOverflowPx ?? 0).toFixed(3)}px`,
-      `CLEANUP ${hostCleanup?.cleanupErrors.join(" | ") || "none"} · pending ${hostCleanup?.pendingStepIds.join(" | ") || "none"} · stale-target ${this.staleTargetCount}`,
+      `CLEANUP ${[...this.retainedCleanupErrors, ...(hostCleanup?.cleanupErrors ?? [])].join(" | ") || "none"} · pending ${this.componentTransaction?.report().pendingStepIds.join(" | ") || hostCleanup?.pendingStepIds.join(" | ") || "none"} · stale-target ${this.staleTargetCount}`,
       `RESOURCES ${TASK014D2_RESOURCE_REGISTRY.length}/6 PASS · PLAN ${this.descriptorPlan?.cues.length ?? 0}/4 PASS · AUTHOR ${TASK014D3_AUTHORING_SHA256.slice(0, 8)} · PLAN ${TASK014D3_RENDER_PLAN_SHA256.slice(0, 8)}`,
       `STATE ${state.garmentStateId} · PROP ${state.propStateId} · Stress ${state.stressEnabled ? "ON" : "OFF"} · Debug VFX ${this.vfxDebugEnabled ? "ON" : "OFF"} / Target ${this.targetDebugEnabled ? "ON" : "OFF"}`,
       this.terminalError || "DIAGNOSTICS PASS · no primary or cleanup error",
@@ -340,7 +494,7 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       this.lifecycleRebuildCount += 1;
       this.rebuildCount += 1;
       this.teardownRuntime(false);
-      this.beginRuntimeSetup();
+      if (this.componentTransaction?.complete) this.beginRuntimeSetup();
       return;
     } else if (action.kind === "toggle-garment") {
       this.semanticState.toggleGarment();
@@ -370,8 +524,10 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
   private switchSemanticTrack(trackId: string): void {
     const evaluator = this.semanticEvaluator;
     if (evaluator === null) throw new Error("TASK_014D3_EVENTS_NOT_READY");
-    this.dispatchSemanticCommands(evaluator.switchTrack(trackId));
-    this.vfxAdapter?.cleanup("track-switch");
+    const sweep = this.cleanupActiveVfx("track-switch", null, () => {
+      this.dispatchSemanticCommands(evaluator.switchTrack(trackId));
+    });
+    this.requireCleanupSuccess(sweep);
     this.previousEvaluatorCycles = 0;
     this.activeSemanticTarget = "none";
   }
@@ -404,26 +560,34 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       targetSignature(next) !== targetSignature(this.targetBindings)
     ) {
       const evaluator = this.semanticEvaluator;
-      if (evaluator !== null) {
-        this.dispatchSemanticCommands(
-          evaluator.switchTrack(evaluator.snapshot.trackId),
-        );
-      }
-      this.vfxAdapter?.cleanup("target-invalidation");
+      const sweep = this.cleanupActiveVfx(
+        "target-invalidation",
+        null,
+        () => {
+          if (evaluator !== null) {
+            this.dispatchSemanticCommands(
+              evaluator.switchTrack(evaluator.snapshot.trackId),
+            );
+          }
+        },
+      );
+      this.requireCleanupSuccess(sweep);
       this.targetRebindCount += 1;
     }
+    this.assertSemanticTargetNodes(next);
     this.targetBindings = next;
-    this.assertSemanticTargetNodes();
   }
 
-  private assertSemanticTargetNodes(): void {
+  private assertSemanticTargetNodes(
+    bindings = this.targetBindings,
+  ): void {
     for (const targetId of [
       "left-foot",
       "right-foot",
       "body-center",
       "active-hand-tool",
     ] as const) {
-      if (this.resolveSemanticTargetNode(targetId) === undefined) {
+      if (this.resolveSemanticTargetNode(targetId, bindings) === undefined) {
         this.staleTargetCount += 1;
         throw new Task014CTargetError(
           Task014CTargetErrorCode.TARGET_SOURCE_UNAVAILABLE,
@@ -433,11 +597,14 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
     }
   }
 
-  private resolveSemanticTargetNode(targetId: string): Node | undefined {
+  private resolveSemanticTargetNode(
+    targetId: string,
+    bindings = this.targetBindings,
+  ): Node | undefined {
     const runtime = this.runtime;
     if (runtime === null) return undefined;
     const binding = requireTask014CTargetBinding(
-      this.targetBindings,
+      bindings,
       targetId,
     );
     if (binding.sourceKind === "joint") {
@@ -450,22 +617,356 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
     return node === undefined ? undefined : ensureProjectionTransform(node);
   }
 
-  private cleanupVfx(
-    reason: "exact-reset" | "track-switch" | "dispose" | "rebuild" |
-      "target-invalidation",
+  private createEmptyOwnership(): Task014D3ComponentOwnership {
+    return {
+      evaluator: null,
+      adapter: null,
+      runtime: null,
+      host: null,
+      generatedRoot: null,
+      overlayRoot: null,
+      generatedRootDetached: false,
+      overlayRootDetached: false,
+      generatedRootDestroyed: false,
+      overlayRootDestroyed: false,
+    };
+  }
+
+  private captureParentOwnership(): void {
+    const ownership = this.componentOwnership;
+    const runtime = this.runtime;
+    if (ownership === null || runtime === null) return;
+    ownership.generatedRoot ??= runtime.generatedRoot;
+    ownership.overlayRoot ??= runtime.overlayRoot;
+  }
+
+  private requireComponentTransaction(): Task014D3ComponentTransaction {
+    if (this.componentOwnership === null) {
+      this.componentOwnership = this.createEmptyOwnership();
+      this.captureParentOwnership();
+    }
+    this.componentTransaction ??= this.createComponentTransaction(
+      this.componentOwnership,
+    );
+    return this.componentTransaction;
+  }
+
+  private createComponentTransaction(
+    ownership: Task014D3ComponentOwnership,
+  ): Task014D3ComponentTransaction {
+    return new Task014D3ComponentTransaction({
+      semanticEvaluator: () => {
+        this.injectCleanupFault("semantic-evaluator");
+        const evaluator = ownership.evaluator;
+        const adapter = ownership.adapter;
+        if (evaluator === null) return;
+        for (const command of evaluator.dispose()) adapter?.dispatch(command);
+      },
+      vfxRuntime: () => {
+        this.injectCleanupFault("vfx-runtime");
+        ownership.adapter?.cleanup(this.componentCleanupReason);
+      },
+      vfxHost: () => {
+        this.injectCleanupFault("vfx-host");
+        ownership.host?.destroyAll(this.componentCleanupReason);
+      },
+      inputHandler: () => {
+        this.injectCleanupFault("input-handler");
+        this.unregisterInput();
+      },
+      generatedRootDetach: () => {
+        this.injectCleanupFault("generated-root-detach");
+        ownership.generatedRoot?.removeFromParent();
+        ownership.generatedRootDetached = true;
+      },
+      overlayRootDetach: () => {
+        this.injectCleanupFault("overlay-root-detach");
+        ownership.overlayRoot?.removeFromParent();
+        ownership.overlayRootDetached = true;
+      },
+      generatedRootDestroy: () => {
+        this.injectCleanupFault("generated-root-destroy");
+        if (
+          ownership.generatedRoot !== null &&
+          !ownership.generatedRootDetached
+        ) {
+          throw new Error("TASK_014D3_GENERATED_ROOT_DESTROY_WAITING_FOR_DETACH");
+        }
+        ownership.generatedRoot?.destroy();
+        ownership.generatedRootDestroyed = true;
+      },
+      overlayRootDestroy: () => {
+        this.injectCleanupFault("overlay-root-destroy");
+        if (
+          ownership.overlayRoot !== null &&
+          !ownership.overlayRootDetached
+        ) {
+          throw new Error("TASK_014D3_OVERLAY_ROOT_DESTROY_WAITING_FOR_DETACH");
+        }
+        ownership.overlayRoot?.destroy();
+        ownership.overlayRootDestroyed = true;
+      },
+      referencesClear: () => {
+        this.injectCleanupFault("references-clear");
+        this.semanticEvaluator = null;
+        this.vfxAdapter = null;
+        this.vfxRuntime = null;
+        this.vfxHost = null;
+        this.descriptorPlan = null;
+        this.targetBindings = new Map();
+        this.activeSemanticTarget = "none";
+        this.clearCanonicalRuntimeReferences();
+      },
+      parentLifecycle: () => {
+        this.injectCleanupFault("parent-lifecycle");
+        this.finalizeCanonicalRuntimeTeardown(
+          this.componentCleanupReason === "dispose",
+        );
+        this.teardownCount += 1;
+      },
+    });
+  }
+
+  private cleanupActiveVfx(
+    reason: Task014D3CleanupReason,
+    primaryError: unknown,
+    semanticStop: () => void,
+  ): Task014D3CleanupSweep {
+    const adapter = this.vfxAdapter;
+    const host = this.vfxHost;
+    const sweep = runTask014D3VfxCleanupTransaction(
+      {
+        semanticStop: () => {
+          this.injectCleanupFault("semantic-stop");
+          semanticStop();
+        },
+        runtimeCleanup: () => {
+          this.injectCleanupFault("runtime-cleanup");
+          adapter?.cleanup(reason);
+        },
+        hostCleanup: () => {
+          this.injectCleanupFault("host-cleanup");
+          host?.destroyAll(reason);
+        },
+      },
+      primaryError,
+    );
+    if (this.faultCaseActive) this.faultScopedSweep = sweep;
+    this.recordCleanupSweep(sweep);
+    return sweep;
+  }
+
+  private requireCleanupSuccess(
+    sweep: Task014D3CleanupSweep,
+    primaryError: unknown = null,
   ): void {
-    let firstError: unknown = null;
-    try {
-      this.vfxAdapter?.cleanup(reason);
-    } catch (error) {
-      firstError = error;
+    if (!sweep.primaryErrorIdentityPreserved) {
+      throw new Error("TASK_014D3_PRIMARY_ERROR_IDENTITY_LOST");
     }
-    try {
-      this.vfxHost?.destroyAll(reason);
-    } catch (error) {
-      firstError ??= error;
+    if (primaryError !== null && primaryError !== undefined) {
+      throw primaryError;
     }
-    if (firstError !== null) throw firstError;
+    if (!sweep.complete) {
+      throw new Error(
+        `TASK_014D3_CLEANUP_INCOMPLETE:${
+          sweep.final.pendingStepIds.join("|")
+        }`,
+      );
+    }
+  }
+
+  private enterTerminalFailure(
+    error: unknown,
+    reason: Task014D3CleanupReason,
+  ): void {
+    if (this.terminal && this.componentTransaction?.complete) return;
+    this.primaryError ??= error;
+    this.terminal = true;
+    this.componentCleanupReason = reason;
+    this.captureParentOwnership();
+    const sweep = this.requireComponentTransaction().cleanup(
+      this.primaryError,
+    );
+    this.recordCleanupSweep(sweep);
+    this.terminalError = this.formatTerminalError(
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+
+  private recordCleanupSweep(sweep: Task014D3CleanupSweep): void {
+    this.lastCleanupSweep = sweep;
+    for (const entry of sweep.firstCleanupErrors) {
+      const formatted = `${entry.stepId}:${entry.message}@${entry.attempt}`;
+      if (!this.retainedCleanupErrors.includes(formatted)) {
+        this.retainedCleanupErrors.push(formatted);
+      }
+    }
+  }
+
+  private formatTerminalError(fallback: string): string {
+    const primary = this.primaryError === null
+      ? fallback
+      : this.primaryError instanceof Error
+      ? this.primaryError.message
+      : String(this.primaryError);
+    return this.retainedCleanupErrors.length === 0
+      ? primary
+      : `${primary} · cleanup ${this.retainedCleanupErrors.join(" | ")}`;
+  }
+
+  private requestedFaultCase(): Task014D3CreatorFaultCase | null {
+    const location = (globalThis as {
+      readonly location?: { readonly search?: string };
+    }).location;
+    const parameters = new URLSearchParams(location?.search ?? "");
+    const trigger = parameters.get("task014d3FaultTrigger");
+    const stepId = parameters.get("task014d3CleanupFault");
+    if (
+      stepId === null ||
+      ![
+        "setup-failure",
+        "terminal-failure",
+        "target-invalidation",
+        "exact-reset",
+        "rebuild",
+        "disable",
+        "destroy",
+      ].includes(trigger ?? "")
+    ) {
+      return null;
+    }
+    return {
+      trigger: trigger as Task014D3CreatorFaultTrigger,
+      stepId,
+    };
+  }
+
+  private injectCleanupFault(stepId: string): void {
+    const faultCase = this.requestedFaultCase();
+    if (
+      !this.faultCaseActive ||
+      faultCase?.stepId !== stepId ||
+      this.injectedFaultAttempts.has(stepId)
+    ) {
+      return;
+    }
+    this.injectedFaultAttempts.add(stepId);
+    throw new Error(`TASK_014D3_CREATOR_CLEANUP_FAULT:${stepId}`);
+  }
+
+  private runCreatorFaultCase(faultCase: Task014D3CreatorFaultCase): void {
+    this.faultCaseActive = true;
+    this.faultScopedSweep = null;
+    try {
+      if (faultCase.trigger === "terminal-failure") {
+        this.enterTerminalFailure(
+          new Error("TASK_014D3_CREATOR_TERMINAL_FAILURE"),
+          "rebuild",
+        );
+      } else if (faultCase.trigger === "target-invalidation") {
+        this.faultTargetRebindPrimary = true;
+        const nextPropState = this.semanticState.snapshot().propStateId ===
+            "left-hand-prop"
+          ? "no-prop"
+          : "left-hand-prop";
+        this.semanticState.selectPropState(nextPropState);
+        this.applyLoadoutState();
+      } else if (faultCase.trigger === "exact-reset") {
+        this.exactReset();
+      } else if (faultCase.trigger === "rebuild") {
+        this.teardownRuntime(false);
+      } else if (faultCase.trigger === "disable") {
+        this.teardownRuntime(false);
+      } else if (faultCase.trigger === "destroy") {
+        this.teardownRuntime(true);
+      }
+    } catch (error) {
+      this.enterTerminalFailure(error, "rebuild");
+    } finally {
+      this.faultFailureCounts = this.measureTransactionCounts();
+      this.captureFaultCloseout();
+      this.faultCaseActive = false;
+    }
+    if (faultCase.trigger === "exact-reset") {
+      this.publishCreatorFaultResult("READY");
+    } else if (faultCase.trigger === "destroy") {
+      this.publishCreatorFaultResult("DISPOSED");
+    } else {
+      this.scheduleFaultRetry();
+    }
+  }
+
+  private scheduleFaultRetry(): void {
+    this.faultFailureCounts ??= this.measureTransactionCounts();
+    this.captureFaultCloseout();
+    if (!this.componentTransaction?.complete) {
+      this.publishCreatorFaultResult("FAILED");
+      return;
+    }
+    this.faultCaseActive = false;
+    this.faultRetryPending = true;
+    void Promise.resolve().then(() => this.beginRuntimeSetup());
+  }
+
+  private captureFaultCloseout(): void {
+    const faultCase = this.requestedFaultCase();
+    const sweep = this.faultScopedSweep ?? this.lastCleanupSweep;
+    this.faultCloseoutRecord = Object.freeze({
+      trigger: faultCase?.trigger ?? "none",
+      injectedStep: faultCase?.stepId ?? "none",
+      primaryError:
+        sweep?.final.primaryErrorMessage ??
+        (this.primaryError instanceof Error
+          ? this.primaryError.message
+          : this.primaryError === null ? null : String(this.primaryError)),
+      primaryErrorIdentityPreserved:
+        sweep?.primaryErrorIdentityPreserved ?? true,
+      orderedCleanupErrors: Object.freeze([...this.retainedCleanupErrors]),
+      firstPendingStepIds: Object.freeze([
+        ...(sweep?.first.pendingStepIds ?? []),
+      ]),
+      attemptsByStepId: Object.freeze({
+        ...(sweep?.final.attemptsByStepId ?? {}),
+      }),
+      compensationCounts: this.measureTransactionCounts(),
+    });
+  }
+
+  private publishCreatorFaultResult(
+    retryState: "READY" | "DISPOSED" | "FAILED",
+  ): void {
+    const result = Object.freeze({
+      id: "task014d3-real-component-transaction-fault",
+      ...(this.faultCloseoutRecord ?? {}),
+      failureCounts: this.faultFailureCounts,
+      retryState,
+      finalCounts: this.measureTransactionCounts(),
+    });
+    (globalThis as {
+      __TASK014D3_TRANSACTION_FAULT_RESULT__?: unknown;
+    }).__TASK014D3_TRANSACTION_FAULT_RESULT__ = result;
+    console.info(
+      "TASK_014D3_TRANSACTION_FAULT_RESULT",
+      JSON.stringify(result),
+    );
+  }
+
+  private measureTransactionCounts(): Task014D3TransactionCounts {
+    const ownership = this.componentOwnership;
+    const hostOwnership = ownership?.host?.rendererOwnership().length ?? 0;
+    const rootCount = ownership === null
+      ? (this.runtime === null ? 0 : 1)
+      : Number(
+        ownership.generatedRoot !== null &&
+        !ownership.generatedRootDestroyed,
+      );
+    return Object.freeze({
+      root: rootCount,
+      input: this.inputRegistered ? 1 : 0,
+      owner: ownership?.runtime?.snapshot().activeRendererCount ?? 0,
+      material: hostOwnership,
+      node: hostOwnership,
+    });
   }
 
   private validateRuntimeMeasurements(): void {

@@ -48,14 +48,14 @@ single-instance Aura visibility.
 
 | Gate | Result |
 | --- | --- |
-| Focused D3 and Scene integrity | `25/25 PASS` |
-| Complete extension | `290/290 PASS` |
+| Focused D3 and Scene integrity | `27/27 PASS` |
+| Complete extension | `292/292 PASS` |
 | D1 VFX authoring | `16/16 PASS` |
 | Character Semantic Events | `24/24 PASS` |
 | Cocos CI | `3/3 PASS` |
 | Cocos clean-CI typecheck | PASS |
-| Working-copy verification | `488/488 PASS` |
-| Frozen tracked-files-only verification | `488/488 PASS` |
+| Working-copy verification | `490/490 PASS` |
+| Frozen tracked-files-only verification | `490/490 PASS` |
 
 Schema identity, D1 vectors, D2 parity, generated plan/runtime/Scene closure,
 metadata/atomic publication, Markdown links, diff/byte closure, binary/media
@@ -82,3 +82,27 @@ counts remained zero; position/rotation/four-corner AABB, viewport overflow
 and non-finite diagnostics remained zero.
 
 The isolated-browser capture contains no pointer or camera-selection glyph.
+
+## Focused transaction cleanup closeout
+
+The real TASK-014D3 component now owns one D2-coordinated teardown
+transaction spanning semantic evaluator, VFX runtime, VFX host, input
+unregistration, both root detach/destroy pairs, reference clearing and the
+parent lifecycle. Setup failure, terminal failure, rebuild, disable and
+destroy use that boundary. Target invalidation and Exact Reset use the same
+accepted coordinator as scoped VFX cleanup transactions.
+
+The automated real-component/parent fault matrix covers seven entry paths by
+all ten component cleanup steps (`70` cases). It verifies the first business
+error by object identity, ordered cleanup errors, continuation after every
+fault, retained compensation ownership and exactly-once successful steps.
+Component compensation reaches root/input/owner/material/node
+`0/0/0/0/0`; the same instance then reaches READY `1/1/0/0/0`.
+
+Creator 3.8.8 repeated all ten terminal teardown faults and the six additional
+entry cases (`16` cases). Setup, terminal, rebuild and disable recovered to
+READY after zero-count compensation; destroy ended DISPOSED with all counts
+zero. Target invalidation retried only `runtime-cleanup`, ran old-host cleanup
+once and published no replacement map on failure. Exact Reset kept the live
+component root/input `1/1` while VFX ownership reached zero. The final normal
+Preview reported no warnings or errors.

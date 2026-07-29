@@ -87,15 +87,31 @@ fault-safe compensation. None of those semantics may be forked in D3.
       byte/decode/RGB24-analysis verified.
 - [x] No PR or merge is created, protected references remain unchanged, and
       TASK-014D4 is not started.
+- [x] Real D3 setup and terminal failure, target invalidation, Exact Reset,
+      rebuild, disable and destroy enter the accepted D2 all-steps cleanup
+      coordinator boundary.
+- [x] The first business error object keeps stable identity while ordered
+      cleanup errors remain independent; every cleanup step runs, failed
+      steps retain compensation ownership and completed steps run exactly
+      once.
+- [x] Component compensation reaches root/input/owner/material/node
+      `0/0/0/0/0`, then the same component retries to READY with root/input
+      `1/1`. Exact Reset remains a live-component VFX subtransaction, so its
+      root/input stay `1/1` while VFX owner/material/node reach zero.
+- [x] Failed target rebind publishes no new target map and removes the old
+      target renderer before retry.
+- [x] The focused fault matrix covers all ten real D3 component/parent
+      teardown steps across all seven entry paths; it does not rely only on a
+      fake host or low-level runtime.
 
 ## Verification closeout
 
-- Focused D3 and Scene integrity: `25/25`.
-- Complete extension: `290/290`.
+- Focused D3 and Scene integrity: `27/27`.
+- Complete extension: `292/292`.
 - D1 VFX authoring: `16/16`.
 - Character Semantic Events: `24/24`.
 - Cocos CI: `3/3`; clean-CI typecheck passed.
-- Working-copy and frozen tracked-files-only verification: `488/488` each.
+- Working-copy and frozen tracked-files-only verification: `490/490` each.
 - Creator 3.8.8 completed clean D2 open, D3 switch/reopen, alternate accepted
   Scene, second startup directly into D3, and the complete 20-gate Preview
   matrix with zero relevant Creator/Preview warning or error.
@@ -106,6 +122,25 @@ fault-safe compensation. None of those semantics may be forked in D3.
   ownership, no cleanup error and no spatial/non-finite/viewport failure.
 - Evidence is isolated on `evidence/task-014d3`; its status remains
   `pending-external-code-and-visual-review`.
+
+### Focused transaction cleanup closeout
+
+- Automated real-component matrix: seven entry paths by ten component
+  cleanup steps (`70` cases), plus target-rebind atomic-publication coverage.
+- Creator 3.8.8 component matrix: all ten teardown steps under terminal
+  failure, plus setup failure, target invalidation, Exact Reset, rebuild,
+  disable and destroy (`16` cases).
+- Every Creator case preserved primary error identity and ordered cleanup
+  errors. Failed or detach-dependent steps attempted twice; successful
+  independent steps attempted once.
+- Setup, terminal, rebuild and disable compensation reached
+  root/input/owner/material/node `0/0/0/0/0`; same-component retry reached
+  READY `1/1/0/0/0`. Destroy ended DISPOSED `0/0/0/0/0`.
+- Target invalidation retained `runtime-cleanup` ownership for its second
+  attempt while `semantic-stop` and `host-cleanup` each ran once. Exact Reset
+  retained the live root/input `1/1` and cleared VFX ownership to zero.
+- The restarted normal Preview emitted zero warnings/errors after the
+  transaction fault matrix.
 
 ## Stop conditions
 

@@ -3,13 +3,14 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014D3 Canonical Full-Loadout Data-Driven VFX Integration
+## Active plan: TASK-014D3 Focused Transaction Cleanup Closeout
 
-- Status: Implementation and evidence complete; external review pending
+- Status: Focused transaction cleanup complete; external review pending
 - Started: 2026-07-29
 - Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
 - Baseline `main`: `dc6dad52d4a40714d6e3f12352d5593763655c55`
 - Expected scope: at most 55 changed files and 12,000 net changed lines.
+- Closeout increment: at most 14 feature files and 3,000 net changed lines.
 - Hand-authored code, generated mirrors, PNG assets, and Scene/`.meta` pairs
   are reported separately. Feature tracked MP4 budget is zero.
 
@@ -19,6 +20,12 @@ Replace the canonical full-loadout runtime's hard-coded procedural effect
 construction with one deterministic D1 authoring document compiled before
 runtime into a concrete Render Plan and executed by the accepted D2 Cocos
 adapter boundary.
+
+The focused closeout routes real D3 setup failure, terminal failure, target
+invalidation, Exact Reset, rebuild, disable, and destroy through the accepted
+D2 all-steps cleanup coordinator. It preserves the first business error,
+orders cleanup errors independently, retains failed-step compensation
+ownership, and permits same-component retry after complete compensation.
 
 ### Authoritative composition
 
@@ -49,6 +56,9 @@ canonical 12-state loadout contract/resolver
   manifest, one MP4, RGB24 analyzer, and analysis JSON on
   `evidence/task-014d3`.
 - Do not create a PR, merge main, move a tag/release or start TASK-014D4.
+- Do not change D1, Character Semantic Events, or D2 public semantics. Parent
+  runtime changes are limited to protected, default-no-op failure and teardown
+  seams whose existing behavior remains unchanged for non-D3 consumers.
 
 ### Execution
 
@@ -71,6 +81,12 @@ canonical 12-state loadout contract/resolver
 8. Commit and push the feature branch, publish reproducible evidence on the
    isolated evidence branch, download and reverify bytes/decode/analysis, and
    stop with both worktrees clean.
+9. Add the focused real-component transaction boundary and a failure matrix
+   that exercises D3 callbacks plus parent teardown order rather than only a
+   fake renderer host or low-level runtime.
+10. Re-run working-copy and tracked-only verification plus Creator normal and
+    fault matrices, then append replacement evidence pinned to the new feature
+    SHA.
 
 ### Done when
 
