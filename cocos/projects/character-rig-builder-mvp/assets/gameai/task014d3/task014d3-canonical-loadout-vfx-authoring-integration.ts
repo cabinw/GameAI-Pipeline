@@ -105,12 +105,14 @@ interface Task014D3TransactionCounts {
 
 type Task014D3CreatorFaultTrigger =
   | "setup-failure"
+  | "partial-build"
   | "terminal-failure"
   | "target-invalidation"
   | "exact-reset"
   | "rebuild"
   | "disable"
-  | "destroy";
+  | "destroy"
+  | "disable-destroy";
 
 interface Task014D3CreatorFaultCase {
   readonly trigger: Task014D3CreatorFaultTrigger;
@@ -152,6 +154,10 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
   private readonly injectedFaultAttempts = new Set<string>();
   private faultFailureCounts: Task014D3TransactionCounts | null = null;
   private faultCloseoutRecord: Readonly<Record<string, unknown>> | null = null;
+  private disposeFinalized = false;
+  private readonly actualLifecycleCallbackOrder: string[] = [];
+  private afterDisableLifecycleSnapshot:
+    Readonly<Record<string, unknown>> | null = null;
   private lastAction = "Initial Reset";
 
   protected runtimeDisplayIdentity() {
@@ -191,6 +197,7 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
     this.terminalError = "";
     this.retainedCleanupErrors.length = 0;
     this.componentCleanupReason = "rebuild";
+    this.disposeFinalized = false;
     this.componentOwnership = this.createEmptyOwnership();
     this.componentTransaction = this.createComponentTransaction(
       this.componentOwnership,
@@ -209,10 +216,40 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
 
   protected handleCanonicalRuntimeSetupFailure(error: unknown): boolean {
     this.enterTerminalFailure(error, "rebuild");
-    if (this.requestedFaultCase()?.trigger === "setup-failure") {
+    if (
+      ["setup-failure", "partial-build"].includes(
+        this.requestedFaultCase()?.trigger ?? "",
+      )
+    ) {
       this.scheduleFaultRetry();
     }
     return true;
+  }
+
+  protected publishCanonicalRuntimeRootOwnership(
+    kind: "generated" | "overlay",
+    root: Node,
+  ): void {
+    const ownership = this.componentOwnership;
+    if (ownership === null) return;
+    if (kind === "generated") ownership.generatedRoot = root;
+    else ownership.overlayRoot = root;
+  }
+
+  protected beforeCanonicalRuntimeBuildStep(stepId: string): void {
+    const faultCase = this.requestedFaultCase();
+    const attemptId = `partial-build:${stepId}`;
+    if (
+      faultCase?.trigger !== "partial-build" ||
+      faultCase.stepId !== stepId ||
+      this.injectedFaultAttempts.has(attemptId)
+    ) {
+      return;
+    }
+    this.injectedFaultAttempts.add(attemptId);
+    this.faultCaseExecuted = true;
+    this.faultCaseActive = true;
+    throw new Error(`TASK_014D3_CREATOR_PARTIAL_BUILD_FAULT:${stepId}`);
   }
 
   protected afterCanonicalRuntimeBuilt(): void {
@@ -402,6 +439,13 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
   }
 
   protected teardownRuntime(dispose: boolean): void {
+    if (this.componentTransaction?.complete) {
+      if (dispose && !this.disposeFinalized) {
+        this.finalizeCanonicalRuntimeTeardown(true);
+        this.disposeFinalized = true;
+      }
+      return;
+    }
     this.componentCleanupReason = dispose ? "dispose" : "rebuild";
     this.captureParentOwnership();
     const transaction = this.requireComponentTransaction();
@@ -411,6 +455,47 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       this.terminal = true;
       this.terminalError =
         this.formatTerminalError("TASK_014D3_COMPONENT_CLEANUP_INCOMPLETE");
+    }
+  }
+
+  onDisable(): void {
+    this.actualLifecycleCallbackOrder.push("onDisable");
+    super.onDisable();
+    if (this.requestedFaultCase()?.trigger === "disable-destroy") {
+      this.afterDisableLifecycleSnapshot = Object.freeze({
+        readiness: this.readiness.snapshot(),
+        lifecycle: this.lifecycle.snapshot(),
+        counts: this.measureTransactionCounts(),
+        attemptsByStepId: Object.freeze({
+          ...(this.componentTransaction?.report().attemptsByStepId ?? {}),
+        }),
+      });
+    }
+  }
+
+  onDestroy(): void {
+    this.actualLifecycleCallbackOrder.push("onDestroy");
+    super.onDestroy();
+    if (this.requestedFaultCase()?.trigger === "disable-destroy") {
+      const result = Object.freeze({
+        id: "task014d3-real-on-disable-on-destroy",
+        trigger: "disable-destroy",
+        callbackOrder: Object.freeze([...this.actualLifecycleCallbackOrder]),
+        afterDisable: this.afterDisableLifecycleSnapshot,
+        finalReadiness: this.readiness.snapshot(),
+        finalLifecycle: this.lifecycle.snapshot(),
+        finalCounts: this.measureTransactionCounts(),
+        attemptsByStepId: Object.freeze({
+          ...(this.componentTransaction?.report().attemptsByStepId ?? {}),
+        }),
+      });
+      (globalThis as {
+        __TASK014D3_DISABLE_DESTROY_RESULT__?: unknown;
+      }).__TASK014D3_DISABLE_DESTROY_RESULT__ = result;
+      console.info(
+        "TASK_014D3_DISABLE_DESTROY_RESULT",
+        JSON.stringify(result),
+      );
     }
   }
 
@@ -719,9 +804,9 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       },
       parentLifecycle: () => {
         this.injectCleanupFault("parent-lifecycle");
-        this.finalizeCanonicalRuntimeTeardown(
-          this.componentCleanupReason === "dispose",
-        );
+        const dispose = this.componentCleanupReason === "dispose";
+        this.finalizeCanonicalRuntimeTeardown(dispose);
+        this.disposeFinalized = dispose;
         this.teardownCount += 1;
       },
     });
@@ -825,12 +910,14 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
       stepId === null ||
       ![
         "setup-failure",
+        "partial-build",
         "terminal-failure",
         "target-invalidation",
         "exact-reset",
         "rebuild",
         "disable",
         "destroy",
+        "disable-destroy",
       ].includes(trigger ?? "")
     ) {
       return null;
@@ -855,6 +942,12 @@ export class GameAITask014D3CanonicalLoadoutVfxAuthoringIntegration
   }
 
   private runCreatorFaultCase(faultCase: Task014D3CreatorFaultCase): void {
+    if (faultCase.trigger === "disable-destroy") {
+      this.faultCaseActive = true;
+      this.enabled = false;
+      this.destroy();
+      return;
+    }
     this.faultCaseActive = true;
     this.faultScopedSweep = null;
     try {

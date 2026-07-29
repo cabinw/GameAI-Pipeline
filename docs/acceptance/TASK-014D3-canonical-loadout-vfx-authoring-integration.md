@@ -48,14 +48,14 @@ single-instance Aura visibility.
 
 | Gate | Result |
 | --- | --- |
-| Focused D3 and Scene integrity | `27/27 PASS` |
-| Complete extension | `292/292 PASS` |
+| Focused D3 and Scene integrity | `28/28 PASS` |
+| Complete extension | `293/293 PASS` |
 | D1 VFX authoring | `16/16 PASS` |
 | Character Semantic Events | `24/24 PASS` |
 | Cocos CI | `3/3 PASS` |
 | Cocos clean-CI typecheck | PASS |
-| Working-copy verification | `490/490 PASS` |
-| Frozen tracked-files-only verification | `490/490 PASS` |
+| Working-copy verification | `491/491 PASS` |
+| Frozen tracked-files-only verification | `491/491 PASS` |
 
 Schema identity, D1 vectors, D2 parity, generated plan/runtime/Scene closure,
 metadata/atomic publication, Markdown links, diff/byte closure, binary/media
@@ -106,3 +106,23 @@ zero. Target invalidation retried only `runtime-cleanup`, ran old-host cleanup
 once and published no replacement map on failure. Exact Reset kept the live
 component root/input `1/1` while VFX ownership reached zero. The final normal
 Preview reported no warnings or errors.
+
+## Final lifecycle and partial-build ownership closeout
+
+Creator invoked the same component's actual `onDisable` and `onDestroy`
+callbacks in sequence by disabling and destroying it. `onDisable` completed
+ordinary teardown and left readiness/lifecycle inactive/idle with
+root/input/owner/material/node `0/0/0/0/0`. `onDestroy` performed only the
+remaining dispose finalization. Both phases ended DISPOSED, while all ten
+transaction step attempt counts remained exactly one.
+
+The parent publishes generated-root ownership immediately after attachment
+and does the same for the overlay root. Eight Creator faults before
+`this.runtime` assignment cover base, attachment, prop, overlay, Graphics,
+Graphics Sorting2D, HUD and HUD Sorting2D. Every case preserves the primary
+failure, compensates to `0/0/0/0/0`, and retries the same component to READY
+`1/1/0/0/0` without a duplicate-root failure.
+
+The `70`-case pure transaction test is explicitly named a synthetic
+coordinator closure matrix. Real component and parent claims are supported by
+the Creator callback and early-build gates above.

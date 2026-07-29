@@ -242,6 +242,13 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     return false;
   }
 
+  protected publishCanonicalRuntimeRootOwnership(
+    _kind: "generated" | "overlay",
+    _root: Node,
+  ): void {}
+
+  protected beforeCanonicalRuntimeBuildStep(_stepId: string): void {}
+
   onEnable(): void {
     this.beginRuntimeSetup();
   }
@@ -373,18 +380,22 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       GENERATED_ROOT_NAME,
       this.node,
     );
+    this.publishCanonicalRuntimeRootOwnership("generated", generatedRoot);
+    this.beforeCanonicalRuntimeBuildStep("base");
     const base = buildBaseRigRuntime(
       generatedRoot,
       PLAN.garment.base,
       this.spriteFrames,
       PLAN.garment.baseSortingOrders,
     );
+    this.beforeCanonicalRuntimeBuildStep("attachment");
     const attachments = buildGarmentRuntime(
       PLAN.garment.slots,
       PLAN.garment.attachments,
       base.joints,
       this.spriteFrames,
     );
+    this.beforeCanonicalRuntimeBuildStep("prop");
     const props = buildPropRuntime(
       PLAN.slots,
       PLAN.attachments,
@@ -395,6 +406,8 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       OVERLAY_ROOT_NAME,
       this.node,
     );
+    this.publishCanonicalRuntimeRootOwnership("overlay", overlayRoot);
+    this.beforeCanonicalRuntimeBuildStep("overlay");
     const overlayTransform = overlayRoot.addComponent(UITransform);
     overlayTransform.setAnchorPoint(0.5, 0.5);
     overlayTransform.setContentSize(1280, 720);
@@ -402,9 +415,12 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
       "PropIntegrationSpatialDebugGraphics",
       overlayRoot,
     );
+    this.beforeCanonicalRuntimeBuildStep("graphics");
     const debugGraphics = debugGraphicsNode.addComponent(Graphics);
+    this.beforeCanonicalRuntimeBuildStep("graphics-sorting");
     debugGraphicsNode.addComponent(Sorting2D).sortingOrder =
       harnessSortingOrder("debug-geometry");
+    this.beforeCanonicalRuntimeBuildStep("hud");
     const hudNode = this.nodeWithLayer(HUD_NAME, overlayRoot);
     const hudLabel = hudNode.addComponent(Label);
     hudLabel.fontSize = 13;
@@ -414,6 +430,7 @@ export class GameAITask013R6OneHandedPropIntegration extends Component {
     hudLabel.enableWrapText = false;
     hudLabel.overflow = Label.Overflow.CLAMP;
     hudLabel.color = new Color().fromHEX("#ffffff");
+    this.beforeCanonicalRuntimeBuildStep("hud-sorting");
     hudNode.addComponent(Sorting2D).sortingOrder =
       harnessSortingOrder("hud");
     const hudTransform = hudNode.getComponent(UITransform);

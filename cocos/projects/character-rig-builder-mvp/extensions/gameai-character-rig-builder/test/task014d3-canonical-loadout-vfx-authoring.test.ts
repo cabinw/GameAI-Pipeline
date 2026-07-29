@@ -692,7 +692,7 @@ test("Normal/Stress transformed four-corner bounds remain finite and safe", () =
   }
 });
 
-test("real D3 component and parent teardown fault matrix preserves compensation ownership", () => {
+test("coordinator synthetic closure matrix preserves compensation ownership", () => {
   const triggers = [
     "setup-failure",
     "terminal-failure",
@@ -818,6 +818,77 @@ test("real D3 component and parent teardown fault matrix preserves compensation 
       assert.equal(counts.input, 1);
     }
   }
+});
+
+test("Creator component closure exposes actual callbacks and early parent ownership seams", () => {
+  const component = readFileSync(
+    path.join(
+      runtimeRoot,
+      "task014d3-canonical-loadout-vfx-authoring-integration.ts",
+    ),
+    "utf8",
+  );
+  const parent = readFileSync(
+    path.join(
+      repositoryRoot,
+      "cocos/projects/character-rig-builder-mvp/assets/gameai/task013r6/task013r6-one-handed-prop-integration.ts",
+    ),
+    "utf8",
+  );
+  assert.match(
+    component,
+    /onDisable\(\): void \{\s*this\.actualLifecycleCallbackOrder\.push\("onDisable"\);\s*super\.onDisable\(\);/u,
+  );
+  assert.match(
+    component,
+    /onDestroy\(\): void \{\s*this\.actualLifecycleCallbackOrder\.push\("onDestroy"\);\s*super\.onDestroy\(\);/u,
+  );
+  assert.match(
+    component,
+    /this\.enabled = false;\s*this\.destroy\(\);/u,
+  );
+  assert.match(
+    component,
+    /if \(this\.componentTransaction\?\.complete\) \{\s*if \(dispose && !this\.disposeFinalized\) \{\s*this\.finalizeCanonicalRuntimeTeardown\(true\);/u,
+  );
+  assert.match(
+    component,
+    /protected publishCanonicalRuntimeRootOwnership\(\s*kind: "generated" \| "overlay",\s*root: Node,/u,
+  );
+  assert.match(
+    component,
+    /TASK_014D3_CREATOR_PARTIAL_BUILD_FAULT:\$\{stepId\}/u,
+  );
+  assert.match(
+    parent,
+    /const generatedRoot = this\.nodeWithLayer\([\s\S]*?this\.publishCanonicalRuntimeRootOwnership\("generated", generatedRoot\);\s*this\.beforeCanonicalRuntimeBuildStep\("base"\);/u,
+  );
+  assert.match(
+    parent,
+    /const overlayRoot = this\.nodeWithLayer\([\s\S]*?this\.publishCanonicalRuntimeRootOwnership\("overlay", overlayRoot\);\s*this\.beforeCanonicalRuntimeBuildStep\("overlay"\);/u,
+  );
+  for (const stepId of [
+    "base",
+    "attachment",
+    "prop",
+    "overlay",
+    "graphics",
+    "graphics-sorting",
+    "hud",
+    "hud-sorting",
+  ]) {
+    assert.match(
+      parent,
+      new RegExp(
+        `this\\.beforeCanonicalRuntimeBuildStep\\("${stepId}"\\)`,
+        "u",
+      ),
+    );
+  }
+  assert.ok(
+    parent.indexOf('this.beforeCanonicalRuntimeBuildStep("hud-sorting")') <
+      parent.indexOf("this.runtime = {"),
+  );
 });
 
 test("target rebind transaction never publishes before old renderer cleanup", () => {

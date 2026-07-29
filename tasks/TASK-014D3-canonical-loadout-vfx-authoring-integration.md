@@ -103,15 +103,26 @@ fault-safe compensation. None of those semantics may be forked in D3.
 - [x] The focused fault matrix covers all ten real D3 component/parent
       teardown steps across all seven entry paths; it does not rely only on a
       fake host or low-level runtime.
+- [x] The real Creator callback sequence disables and then destroys the same
+      component. Ordinary teardown runs once on disable; destroy performs only
+      the remaining dispose finalization, leaving readiness and lifecycle
+      DISPOSED without repeating detach/destroy.
+- [x] Generated and overlay roots publish ownership immediately after
+      attachment. Creator faults before base, attachment, prop, overlay,
+      Graphics, both Sorting2D sites and HUD runtime publication compensate to
+      zero and retry the same component to READY `1/1` without duplicate roots.
+- [x] Synthetic coordinator/counter coverage is named synthetic. Real
+      component and parent lifecycle claims are reserved for Creator gates
+      that execute the actual callbacks and build path.
 
 ## Verification closeout
 
-- Focused D3 and Scene integrity: `27/27`.
-- Complete extension: `292/292`.
+- Focused D3 and Scene integrity: `28/28`.
+- Complete extension: `293/293`.
 - D1 VFX authoring: `16/16`.
 - Character Semantic Events: `24/24`.
 - Cocos CI: `3/3`; clean-CI typecheck passed.
-- Working-copy and frozen tracked-files-only verification: `490/490` each.
+- Working-copy and frozen tracked-files-only verification: `491/491` each.
 - Creator 3.8.8 completed clean D2 open, D3 switch/reopen, alternate accepted
   Scene, second startup directly into D3, and the complete 20-gate Preview
   matrix with zero relevant Creator/Preview warning or error.
@@ -141,6 +152,22 @@ fault-safe compensation. None of those semantics may be forked in D3.
   retained the live root/input `1/1` and cleared VFX ownership to zero.
 - The restarted normal Preview emitted zero warnings/errors after the
   transaction fault matrix.
+
+### Final lifecycle and partial-build ownership closeout
+
+- Creator invoked the actual callback order `onDisable` then `onDestroy` by
+  disabling and destroying the component. After disable, readiness/lifecycle
+  were inactive/idle and root/input/owner/material/node were all zero. After
+  destroy, both phases were DISPOSED.
+- Every component cleanup step had exactly one attempt across the consecutive
+  callbacks. Destroy performed dispose-only lifecycle finalization and did
+  not repeat either root detach/destroy pair.
+- Eight pre-publication Creator build faults covered base, attachment, prop,
+  overlay, Graphics, Graphics Sorting2D, HUD and HUD Sorting2D. Each preserved
+  the primary error, compensated to `0/0/0/0/0`, then retried the same
+  component to READY `1/1/0/0/0` without duplicate-root diagnostics.
+- The complete prior 16-case Creator cleanup matrix and full normal matrix
+  were repeated after the final correction.
 
 ## Stop conditions
 
