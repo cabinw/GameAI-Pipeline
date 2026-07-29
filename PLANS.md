@@ -93,7 +93,7 @@ canonical 12-state loadout contract/resolver
 - Creator 3.8.8 clean open/switch/reopen/second-startup and the complete live
   matrix pass with zero relevant Creator/Preview warnings or errors.
 - All 12 loadouts and three prop modes resolve evaluated runtime targets.
-  Aura reaches attempts/accepted/coalesced `15/1/13` with instances `1/1/1`;
+  Aura reaches attempts/accepted/coalesced `6/1/5` with instances `1/1/1`;
   Reset returns to root/input `1/1` and zero ownership, cleanup and spatial
   failures.
 - Feature and evidence are published append-only without a PR. External code
