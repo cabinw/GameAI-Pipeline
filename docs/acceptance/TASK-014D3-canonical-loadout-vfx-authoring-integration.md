@@ -75,11 +75,10 @@ Integration Stress, Pause/Resume, Combined, Transform Stress, Debug, two
 consecutive Rebuilds, post-rebuild Dust/Trail/Aura, Exact Reset and a final
 clean hold longer than five seconds.
 
-Aura reached `attempts 15`, `accepted 1`, `coalesced 13` with
+Aura reached `attempts 6`, `accepted 1`, `coalesced 5` with
 evaluator/adapter/visible `1/1/1`. Throughout stable states root/input remained
 `1/1`; duplicate, missing, extra, mismatched, stale, leaked and cleanup-error
 counts remained zero; position/rotation/four-corner AABB, viewport overflow
 and non-finite diagnostics remained zero.
 
-The published capture discloses stationary pointer/camera-selection artifacts
-in unused blank viewport space. They do not overlap the HUD, character or VFX.
+The isolated-browser capture contains no pointer or camera-selection glyph.

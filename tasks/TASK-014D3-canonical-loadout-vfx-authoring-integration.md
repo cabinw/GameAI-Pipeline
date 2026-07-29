@@ -99,7 +99,7 @@ fault-safe compensation. None of those semantics may be forked in D3.
 - Creator 3.8.8 completed clean D2 open, D3 switch/reopen, alternate accepted
   Scene, second startup directly into D3, and the complete 20-gate Preview
   matrix with zero relevant Creator/Preview warning or error.
-- The live Aura run reached `attempts 15`, `accepted 1`, `coalesced 13` while
+- The live Aura run reached `attempts 6`, `accepted 1`, `coalesced 5` while
   evaluator/adapter/visible instances remained `1/1/1`.
 - Normal, Transform Stress, Debug, two consecutive Rebuilds, post-rebuild
   effects and Exact Reset ended with root/input `1/1`, no active/stale/leaked
