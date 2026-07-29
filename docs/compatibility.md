@@ -10,23 +10,40 @@ architecture that remains portable in principle.
 | Engine-neutral audio event contract | Implemented and verified; no playback consumer |
 | Engine-neutral gameplay event contract | Implemented and verified; no gameplay consumer |
 | Canonical 12-state semantic target registry | Implemented and verified |
-| Cocos Creator 3.8.8 VFX runtime on validated macOS environment | Implemented and verified |
+| Engine-neutral VFX authoring schema/compiler | Implemented and verified |
+| Deterministic concrete Render Plan and exact sampler | Implemented and verified |
+| Shared Cocos typed primitive/recipe/blend adapter/runtime | Implemented and verified |
+| Canonical 12-state data-driven VFX integration | Implemented and verified |
+| Cocos Creator 3.8.8 VFX runtime on validated macOS environment | Implemented and verified, including lifecycle/fault/visual gates |
 | Clean tracked-files-only CI | Verified |
 | Windows development environment | Not yet verified |
 | Unity runtime adapter | Not implemented |
 | Godot runtime adapter | Not implemented |
 | Reverse playback and arbitrary seek | Explicitly unsupported |
 | Network synchronization | Not implemented |
-| VFX authoring/editor UI | Not implemented |
+| Textual data-driven VFX authoring | Implemented and verified |
+| Complete VFX authoring/editor UI | Not implemented |
+| Production VFX art | Not provided; current effects are procedural/reference |
+| Audio playback and gameplay execution | Not implemented |
+| AI asset generation and automatic fitting | Not implemented |
 | Original Red Cap production reconstruction | Deferred |
+| TASK-014D4 | Not started |
 
 ## Interpretation
 
 The engine-neutral contracts, evaluator, deterministic resolvers, semantic
-IDs, cue intent, and serializable resolved outputs are designed to support
-independent engine adapters. That architectural boundary does not count as
-runtime verification for Unity or Godot. Only Cocos VFX execution is
-implemented; typed audio and gameplay events are not runtime execution.
+IDs, cue intent, authoring schema, concrete Render Plans, and serializable
+resolved outputs are designed to support independent engine adapters. That
+architectural boundary does not count as runtime verification for Unity or
+Godot. Only Cocos VFX execution is implemented; typed audio and gameplay
+events are not runtime execution.
+
+The accepted Cocos runtime consumes compiled plans only. It reuses the exact
+engine-neutral sampler and dispatches typed primitives, recipes, and blend
+roles without authoring parsing or cue/resource-name behavior. The canonical
+integration covers all 12 loadout states, target rebind, rebuild, retry, Exact
+Reset, the actual disable/destroy sequence, early partial-build compensation,
+and Creator spatial/visual acceptance.
 
 The accepted live runtime baseline is specifically Cocos Creator 3.8.8 in the
 recorded macOS environment. CI verifies tracked-file reproducibility without
@@ -40,5 +57,5 @@ loadout runtime.
 
 See [Development Environment](environment.md),
 [Cocos Scene Rig Builder](cocos-scene-rig-builder.md), and
-[v0.3.0 Character Semantic Events & VFX
-Baseline](releases/v0.3.0-character-semantic-events-vfx-baseline.md).
+[v0.4.0 Data-Driven VFX Authoring
+Baseline](releases/v0.4.0-data-driven-vfx-authoring-baseline.md).

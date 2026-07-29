@@ -141,47 +141,48 @@ historical provenance and deterministic regression. Its generators are not
 part of the normal build and run only through the explicit
 `legacy:verify-task013-provenance` command.
 
-## Current status — v0.3.0 Character Semantic Events & VFX Baseline
+## Current status — v0.4.0 Data-Driven VFX Authoring Baseline
 
-The accepted Character Pipeline combines the v0.2.0 canonical 12-state
-loadout with Character Semantic Events 1.0, deterministic persistent
-lifecycle coalescing, a Cocos Semantic VFX Adapter, and canonical full-loadout
-semantic target resolution.
-
-The authoritative flow is:
+The accepted Character Pipeline now connects portable visual authoring to the
+canonical 12-state full-loadout Cocos runtime:
 
 ```text
-Character Semantic Events contract
-→ deterministic evaluator
-→ canonical resolved character loadout
-→ evaluated semantic target/socket registry
-→ Cocos Semantic VFX Adapter
-→ renderer/cue registry
-→ Creator runtime
+VFX Authoring Document
+→ deterministic compiler
+→ concrete Render Plan
+→ shared Cocos adapter/runtime
+→ canonical full-loadout integration
+→ Creator lifecycle/spatial/visual acceptance
 ```
 
-Engine-neutral event kinds are `vfx`, `audio`, and `gameplay`. The implemented
-runtime consumer is Cocos VFX only: validated audio and gameplay commands are
-not played or executed.
+TASK-014D1 owns the engine-neutral authoring schema, fail-closed deterministic
+compiler, canonical integer-tick sampling, curves, concrete parameter
+resolution, particle randomness, and explicit budgets. TASK-014D2 consumes
+only the concrete plan through typed primitive, recipe, and blend dispatch,
+exact sampler reuse, deterministic sorting/spatial guards, and transactional
+ownership/cleanup. TASK-014D3 composes that shared runtime with all 12
+canonical loadout states and actual feet, torso, hand, and prop-grip targets.
 
-The Cocos Creator 3.8.8 macOS baseline drives alternating Footstep Dust,
-Wave/Prop Trail, and one coalesced Persistent Aura across all 12 canonical
-loadout states, no/left/right prop states, Transform Stress, Pause/Resume,
-track switching, rebuild, disposal, and Exact Reset. Stable states retain one
-runtime root and one input handler with zero duplicate starts, unknown stops,
-leaks, stale targets, non-finite transforms, or viewport overflow.
+The Cocos Creator 3.8.8 macOS acceptance covers prop/clip/target rebind,
+Footstep Dust, Hand/Tool Trail, Persistent Aura, Combined, Transform Stress,
+two rebuilds, post-rebuild effects, Exact Reset, real
+`onDisable → onDestroy`, early partial-build compensation, and a 25/25
+Creator fault matrix. Stable states retain one runtime root and one input
+handler with zero duplicate, stale, leaked, non-finite, viewport, ownership,
+or cleanup failures.
 
-Working-copy and tracked-files-only verification each pass 414/414 tests.
-Creator runtime acceptance and external visual review pass, while feature and
-documentation branches track zero evidence media.
+Working-copy and tracked-files-only verification each pass 491/491 tests.
+Creator lifecycle/spatial/visual acceptance and external review pass, while
+feature and documentation branches track zero evidence media.
 
-v0.3.0 is a prerelease framework baseline, not a finished commercial tool.
-Its VFX are procedural placeholders. Audio/gameplay consumers, reverse/seek,
-networking, VFX authoring UI, automatic effect fitting, Unity/Godot adapters,
-Windows verification, and original Red Cap reconstruction remain future work.
+v0.4.0 remains a prerelease framework baseline. Its effects are
+procedural/reference VFX, not production art. Audio/gameplay execution,
+Unity/Godot adapters, Windows verification, original Red Cap reconstruction,
+AI asset generation, automatic fitting, and a complete production editor UI
+remain unimplemented or unverified. TASK-014D4 has not started.
 
-See the [v0.3.0 release
+See the [v0.4.0 release
+baseline](docs/releases/v0.4.0-data-driven-vfx-authoring-baseline.md),
+[v0.3.0 semantic events
 baseline](docs/releases/v0.3.0-character-semantic-events-vfx-baseline.md),
-[v0.2.0 loadout
-baseline](docs/releases/v0.2.0-character-loadout-baseline.md), and
-[compatibility matrix](docs/compatibility.md).
+and [compatibility matrix](docs/compatibility.md).

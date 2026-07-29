@@ -1,6 +1,7 @@
 # TASK-014D2: Minimal Cocos VFX Render Plan Adapter
 
-- Status: Accepted; Draft PR published pending integration review.
+- Status: Accepted and integrated through PR #18 at
+  `dc6dad52d4a40714d6e3f12352d5593763655c55`.
 - Date: 2026-07-28
 - Branch: `feat/task-014d2-cocos-vfx-render-plan-adapter`
 - Baseline: `ae5fb4ef7a68a20706485741ab352a6037d25f12`

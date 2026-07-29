@@ -1,6 +1,7 @@
 # TASK-014D1: Engine-Neutral Data-Driven VFX Cue Authoring Contract
 
-- Status: Accepted
+- Status: Accepted and integrated through PR #17 at
+  `ae5fb4ef7a68a20706485741ab352a6037d25f12`
 - Date: 2026-07-28
 - Branch: `feat/task-014d1-vfx-cue-authoring-contract`
 - Baseline: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`

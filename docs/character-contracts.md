@@ -307,6 +307,32 @@ rendered Footstep Dust, Wave/Prop Trail, and Persistent Aura on the canonical
 loadout. Runtime execution remains Cocos VFX only: the audio and gameplay event
 kinds are contracts without playback, hitbox, or damage consumers.
 
+## Data-driven VFX authoring boundary
+
+TASK-014D1 keeps visual authoring separate from Character Semantic Events.
+`schemas/vfx-cue-authoring.schema.json` and `@gameai/vfx-authoring` consume
+stable semantic cue IDs plus logical resource descriptors, then validate,
+normalize, and compile a complete engine-neutral Render Plan. Character
+Semantic Events continues to own event timing, command mode, and lifecycle;
+the VFX authoring compiler owns layers, concrete parameters, canonical ticks,
+curves, particle schedules, randomness, and compilation budgets.
+
+All parameter defaults and overrides resolve before plan publication. The
+plan contains no authoring bindings or Cocos, Unity, Godot, node, material, or
+Scene data. Invalid input returns diagnostics without a partial plan.
+
+TASK-014D2 consumes the concrete plan through one shared Cocos adapter/runtime
+with exact sampler reuse and typed primitive, recipe, and blend dispatch.
+TASK-014D3 composes that runtime with all 12 canonical loadout states and the
+evaluated foot, torso, hand, and prop-grip targets. Loadout, prop, clip, and
+target changes clean old renderer ownership before atomically publishing new
+targets.
+
+See [ADR-0016](adr/ADR-0016-engine-neutral-vfx-authoring-compilation.md),
+[ADR-0017](adr/ADR-0017-canonical-loadout-vfx-authoring-integration.md), and
+the [v0.4.0
+baseline](releases/v0.4.0-data-driven-vfx-authoring-baseline.md).
+
 ## Deliberate limitations
 
 - Referenced image and JSON files are not opened or checked for existence in TASK-001.
@@ -314,7 +340,11 @@ kinds are contracts without playback, hitbox, or damage consumers.
   `docs/rig-animation.md`; Character Rig retains only stable target bindings.
 - Gameplay-triggered semantic-event injection, audio/gameplay execution,
   networking, and non-Cocos adapters remain unimplemented. Cocos VFX target
-  resolution and rendering are provided by the later TASK-014B/TASK-014C
+  resolution and rendering are provided by the later TASK-014D2/TASK-014D3
   integration rather than by TASK-014A itself.
+- The current VFX are procedural/reference effects, not production art.
+  Unity/Godot adapters, Windows verification, Red Cap reconstruction, AI
+  asset generation, a complete editor UI, and TASK-014D4 remain unavailable
+  or unstarted.
 - No Cocos-specific UUID, `Node`, `Sprite`, prefab, scene, or component data is allowed in these schemas.
 - Mesh deformation, IK, Spine, and DragonBones remain outside the MVP contract.

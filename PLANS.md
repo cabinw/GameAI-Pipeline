@@ -3,10 +3,76 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: TASK-014D3 Focused Transaction Cleanup Closeout
+## Active plan: v0.4.0 Data-Driven VFX Authoring Baseline
 
-- Status: Accepted after external code and visual review; Draft PR publication
-  pending
+- Status: Implemented; Draft PR pending review
+- Started: 2026-07-30
+- Branch: `docs/release-v0.4.0-data-driven-vfx-authoring`
+- Baseline `main`: `9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`
+- Expected scope: at most 13 Markdown files and 3,000 changed lines; zero
+  runtime, schema, compiler, sampler, test, fixture, generated, Scene,
+  `.meta`, package, lockfile, binary, media, or evidence changes.
+
+### Goal
+
+Establish the prerelease documentation baseline for the complete accepted
+TASK-014D1–D3 chain:
+
+```text
+VFX Authoring Document
+→ deterministic compiler
+→ concrete Render Plan
+→ shared Cocos adapter/runtime
+→ canonical full-loadout integration
+→ Creator lifecycle/spatial/visual acceptance
+```
+
+### Boundaries
+
+- Update only current-facing release, roadmap, compatibility, index,
+  contract, animation, plan, changelog, README, and D1–D3 integration-status
+  documentation.
+- Record D1 schema/compiler/tick/curve/parameter/randomness/budget semantics,
+  D2 typed adapter/runtime and transactional ownership semantics, and D3
+  canonical loadout/target/lifecycle/fault/visual acceptance.
+- Position v0.4.0 as a prerelease framework baseline with
+  procedural/reference VFX rather than production art.
+- Keep audio/gameplay execution, Unity/Godot/Windows, Red Cap, AI asset
+  generation, complete editor UI, and TASK-014D4 explicitly outside the
+  accepted baseline.
+- Preserve implementation bytes, generated outputs, all protected references,
+  existing tags/releases, and ignored local evidence.
+- Do not create or move `v0.4.0`, publish a GitHub Release, mark the
+  documentation PR Ready, or merge it.
+
+### Execution
+
+1. Audit exact main, v0.2.0/v0.3.0 tags, D1–D3 merge SHAs, protected refs,
+   working-tree state, and current release documentation.
+2. Add the v0.4.0 baseline and release task; update only the declared Markdown
+   surfaces and current D1–D3 integration status.
+3. Validate relative links, stale/current status, release consistency,
+   allowed paths, changed lines, binary/media/evidence/code absence, tracked
+   MP4 count, diff whitespace, and protected references.
+4. Run working-copy and fresh frozen tracked-files-only `CI=true pnpm verify`,
+   generated-output closure, and post-verify clean/content closure.
+5. Commit and push the documentation branch, create a Draft PR to `main`,
+   wait for Actions PASS, and leave it Draft and unmerged.
+
+### Done when
+
+- D1–D3 capabilities and limitations are stated without changing historical
+  task boundaries or overstating production readiness.
+- Working-copy, frozen tracked-only, Markdown/link, generated closure,
+  diff/content, scope/media/code, and protected-reference gates pass.
+- One Draft PR targets the exact main baseline and Actions passes.
+- No tag or GitHub Release is created or moved, and TASK-014D4 remains
+  unstarted.
+
+## Completed plan: TASK-014D3 Focused Transaction Cleanup Closeout
+
+- Status: Integrated through PR #19 at
+  `9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`
 - Started: 2026-07-29
 - Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
 - Baseline `main`: `dc6dad52d4a40714d6e3f12352d5593763655c55`
@@ -139,8 +205,8 @@ canonical 12-state loadout contract/resolver
   for feature `6d43609d099b9a4909b92c7edb288afe615e7615` and reviewed evidence
   `9cdf32003ed654b619acb6a7cf4b4808eed719ac`. Append-only acceptance evidence
   is recorded at `118003e6e8dc85d7bb86900f5f252e856461e0e9`.
-- Draft PR publication is the only remaining closeout action. TASK-014D4
-  remains unstarted.
+- Integrated through squash PR #19 after pre-merge and post-merge Actions
+  verification. TASK-014D4 remains unstarted.
 
 ## Completed plan: TASK-014D2 Final Runtime Semantics Closure
 
@@ -224,9 +290,10 @@ time math, or canonical full-character integration.
 - Feature scope is within 50 files/10,000 net lines with zero tracked MP4 files.
 - Evidence is isolated, reproducible, decoded, and available for review.
 
-## Accepted plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
+## Completed plan: TASK-014D1 Engine-Neutral VFX Cue Authoring Contract
 
-- Status: Accepted
+- Status: Integrated through PR #17 at
+  `ae5fb4ef7a68a20706485741ab352a6037d25f12`
 - Started: 2026-07-28
 - Branch: `feat/task-014d1-vfx-cue-authoring-contract`
 - Baseline `main`: `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
@@ -298,9 +365,10 @@ Cocos, Unity, and Godot compilers.
   review is clear; and no tag, release, Scene, media, or runtime-adapter
   change occurs within TASK-014D1.
 
-## Implemented plan: v0.3.0 Character Semantic Events & VFX Baseline
+## Completed plan: v0.3.0 Character Semantic Events & VFX Baseline
 
-- Status: Draft PR pending review
+- Status: Integrated through PR #16 at
+  `67a6c702eb701a90762b8b5fd93184e3cf0ebfc5`
 - Started: 2026-07-28
 - Branch: `docs/release-v0.3.0-semantic-vfx`
 - Baseline `main`: `5c3baba4062bd529bb6bd4b787b8c391452ee459`

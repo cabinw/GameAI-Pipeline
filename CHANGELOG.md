@@ -4,6 +4,52 @@ All notable project milestones are recorded in this file. The repository is
 still pre-release package infrastructure; Git tags and GitHub Releases remain
 separate publication actions.
 
+## v0.4.0 — Data-Driven VFX Authoring Baseline
+
+Baseline source: `main` at
+`9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`.
+
+### Added
+
+- An engine-neutral VFX authoring schema and deterministic compiler that
+  resolves typed parameters into concrete Render Plans.
+- Canonical integer-tick time, linear/clamped curves, exact boundaries,
+  deterministic particle schedules, `xorshift32-v1` samples, and explicit
+  compilation/runtime budgets.
+- A shared Cocos Render Plan adapter/runtime with typed
+  primitive/recipe/blend dispatch and exact D1 sampler reuse.
+- Transactional renderer, material, node, root, and input ownership with
+  compensation, same-component retry, rebuild, disposal, and Exact Reset.
+- Canonical 12-state full-loadout integration with atomic prop/clip/target
+  rebind, Dust, Hand/Tool Trail, Aura, and Combined.
+- Real Creator `onDisable → onDestroy`, eight early partial-build
+  compensation gates, a 25/25 Creator fault matrix, and complete visual
+  acceptance.
+
+### Verification
+
+- Working-copy and fresh frozen tracked-files-only verification: 491/491
+  tests each.
+- Focused D3/Scene 28/28, complete extension 293/293, D1 16/16, Character
+  Semantic Events 24/24, and Cocos CI 3/3 plus typecheck.
+- Generated-output closure, schema identity, D2 parity, metadata, Scene
+  identity, Markdown links, diff/content closure, and binary/media audits:
+  PASS.
+- Zero tracked MP4 or release evidence media.
+
+### Known limitations
+
+- Prerelease framework baseline with procedural/reference VFX rather than
+  production art.
+- No audio playback or gameplay execution consumer.
+- No Unity or Godot runtime adapter and no Windows verification.
+- Original Red Cap reconstruction, AI asset generation, automatic fitting,
+  and a complete production editor UI remain incomplete.
+- TASK-014D4 is not started.
+
+This documentation closeout does not create the `v0.4.0` tag or a GitHub
+Release and does not move the existing `v0.2.0` or `v0.3.0` tags.
+
 ## v0.3.0 — Character Semantic Events & VFX Baseline
 
 Baseline source: `main` at

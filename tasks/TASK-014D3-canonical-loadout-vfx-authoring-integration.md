@@ -1,6 +1,7 @@
 # TASK-014D3: Canonical Full-Loadout Data-Driven VFX Integration
 
-- Status: Accepted after external code and visual review
+- Status: Accepted and integrated through PR #19 at
+  `9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`
 - Date: 2026-07-29
 - Branch: `feat/task-014d3-canonical-loadout-vfx-authoring-integration`
 - Baseline: `dc6dad52d4a40714d6e3f12352d5593763655c55`
