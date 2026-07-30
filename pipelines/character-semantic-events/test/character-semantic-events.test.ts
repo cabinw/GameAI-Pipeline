@@ -1116,3 +1116,111 @@ test("advance overflow and crossing budgets reject without partial mutation", as
   );
   assert.deepEqual(overflow.value.snapshot, beforeOverflow);
 });
+
+test("runs PROGRAM-015 Red Cap boundaries, skipped frames, multi-loop, and cleanup", async () => {
+  const redCapRoot = path.join(repositoryRoot, "examples/red-cap-production-v1");
+  const contractText = await readFile(
+    path.join(redCapRoot, "semantic-events.json"),
+    "utf8",
+  );
+  const layout = JSON.parse(
+    await readFile(path.join(redCapRoot, "rig-layout.json"), "utf8"),
+  ) as {
+    layoutId: string;
+    schemaVersion: string;
+    sockets: Array<{ socketId: string; parentPartId: string }>;
+  };
+  const clips = await Promise.all(
+    ["rest", "idle", "walk", "wave"].map(async (name) => {
+      const animation = JSON.parse(
+        await readFile(
+          path.join(redCapRoot, "animations", `${name}.json`),
+          "utf8",
+        ),
+      ) as { animationId: string; duration: number };
+      return {
+        clipId: animation.animationId,
+        durationSeconds: animation.duration,
+      };
+    }),
+  );
+  const redCapContext: SemanticEventValidationContext = {
+    clips,
+    rigLayout: {
+      layoutId: layout.layoutId,
+      schemaVersion: layout.schemaVersion,
+      sockets: [
+        { socketId: "left-foot-contact", parentPartId: "foot-left" },
+        { socketId: "right-foot-contact", parentPartId: "foot-right" },
+        layout.sockets.find((socket) => socket.socketId === "left-grip")!,
+      ],
+    },
+  };
+  const parsed = parseCharacterSemanticEvents(contractText, redCapContext);
+  assert.equal(parsed.ok, true, JSON.stringify(parsed));
+  if (!parsed.ok) return;
+
+  const walk = createCharacterSemanticEventEvaluator(
+    parsed.value,
+    redCapContext,
+    "red-cap-walk-events",
+  );
+  assert.equal(walk.ok, true);
+  if (!walk.ok) return;
+  walk.value.play();
+  assert.deepEqual(walk.value.advance(0.19), []);
+  assert.deepEqual(
+    walk.value.advance(0.62).map((command) => command.eventId),
+    ["red-cap-step-left", "red-cap-step-right"],
+  );
+  const multiLoop = walk.value.advance(2.4);
+  assert.equal(
+    multiLoop.filter((command) => command.command === "emit").length,
+    4,
+  );
+  walk.value.pause();
+  const paused = walk.value.snapshot;
+  assert.deepEqual(walk.value.advance(1), []);
+  assert.deepEqual(walk.value.snapshot, paused);
+  walk.value.resume();
+  assert.equal(walk.value.snapshot.status, "playing");
+
+  assert.deepEqual(walk.value.switchTrack("red-cap-wave-events"), []);
+  walk.value.play();
+  const waveStart = walk.value.advance(0.21);
+  assert.equal(waveStart[0]?.command, "start");
+  assert.equal(walk.value.snapshot.activeInstanceIds.length, 1);
+  const resetCleanup = walk.value.exactReset();
+  assert.equal(resetCleanup[0]?.command, "stop");
+  assert.equal(
+    resetCleanup[0]?.command === "stop" ? resetCleanup[0].reason : undefined,
+    "exact-reset",
+  );
+  assert.equal(walk.value.snapshot.status, "stopped");
+  assert.equal(walk.value.snapshot.activeInstanceIds.length, 0);
+
+  walk.value.play();
+  walk.value.advance(0.21);
+  const switchCleanup = walk.value.switchTrack("red-cap-rest-events");
+  assert.equal(
+    switchCleanup[0]?.command === "stop"
+      ? switchCleanup[0].reason
+      : undefined,
+    "track-switch",
+  );
+  walk.value.switchTrack("red-cap-wave-events");
+  walk.value.play();
+  walk.value.advance(0.21);
+  const disposeCleanup = walk.value.dispose();
+  assert.equal(
+    disposeCleanup[0]?.command === "stop"
+      ? disposeCleanup[0].reason
+      : undefined,
+    "dispose",
+  );
+  assert.equal(walk.value.snapshot.activeInstanceIds.length, 0);
+  assert.throws(
+    () => walk.value.switchTrack("red-cap-unknown-events"),
+    SemanticEventEvaluationError,
+  );
+});

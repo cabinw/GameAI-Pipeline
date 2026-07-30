@@ -1,0 +1,32 @@
+[
+  {
+    "resourceId": "program015.aura-glow",
+    "recipeKind": "textured-sprite",
+    "compatiblePrimitives": ["sprite-quad"],
+    "compatibleBlendRoles": ["additive"]
+  },
+  {
+    "resourceId": "program015.aura-ring",
+    "recipeKind": "procedural-ring",
+    "compatiblePrimitives": ["ring"],
+    "compatibleBlendRoles": ["screen"]
+  },
+  {
+    "resourceId": "program015.dust-ring",
+    "recipeKind": "procedural-ring",
+    "compatiblePrimitives": ["ring"],
+    "compatibleBlendRoles": ["alpha"]
+  },
+  {
+    "resourceId": "program015.dust-soft",
+    "recipeKind": "textured-sprite",
+    "compatiblePrimitives": ["burst-particles"],
+    "compatibleBlendRoles": ["alpha"]
+  },
+  {
+    "resourceId": "program015.ribbon",
+    "recipeKind": "procedural-ribbon",
+    "compatiblePrimitives": ["ribbon"],
+    "compatibleBlendRoles": ["additive"]
+  }
+]

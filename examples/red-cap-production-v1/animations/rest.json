@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "animationId": "red-cap-production-v1-rest",
+  "rig": {
+    "rigId": "red-cap-production-v1-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "duration": 1,
+  "loop": true,
+  "tracks": [
+    {
+      "jointId": "pelvis",
+      "property": "position",
+      "keyframes": [
+        {
+          "time": 0,
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        },
+        {
+          "time": 1,
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "interpolation": "linear",
+          "easing": "ease-in-out-sine"
+        }
+      ]
+    }
+  ]
+}

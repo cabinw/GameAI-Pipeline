@@ -1,0 +1,76 @@
+{
+  "assetPackId": "red-cap-production-v1",
+  "title": "Original Red Cap Adventurer Production Source Pack",
+  "createdAt": "2026-07-29",
+  "createdBy": {
+    "tool": "OpenAI ImageGen in ChatGPT",
+    "workflow": "built-in image generation with chroma-key alpha extraction",
+    "humanRequester": "KB / cabinw"
+  },
+  "originalityIntent": {
+    "originalCharacter": true,
+    "existingIpRequested": false,
+    "namedArtistStyleRequested": false
+  },
+  "rightsReview": {
+  "status": "confirmed-by-project-owner",
+  "commercialUseAllowed": true,
+  "modificationAllowed": true,
+  "redistributionAllowed": true,
+  "confirmedBy": "cabinw",
+  "confirmedAt": "2026-07-29",
+  "applicableTermsReviewed": "OpenAI Terms applicable to my account, reviewed 2026-07-29",
+  "internalApprovalReference": "N/A",
+  "note": "Project owner approved this exact asset pack for commercial use, modification, public repository inclusion and redistribution."
+},
+  "files": [
+    {
+      "path": "red-cap-character-master.png",
+      "role": "canonical neutral full-body reference",
+      "width": 1254,
+      "height": 1254,
+      "colorMode": "RGBA",
+      "sha256": "7a4cf6a690aa6532a51c209d839d7d71b28396e40e021973c0f35fb0f828f3a1"
+    },
+    {
+      "path": "red-cap-parts-sheet.png",
+      "role": "primary exploded sprite-parts source sheet",
+      "width": 1254,
+      "height": 1254,
+      "colorMode": "RGBA",
+      "sha256": "83bae1e794339b453a316eb4a9540968a1c7ec4e1bc5d7c3b50a43c76c709e79"
+    },
+    {
+      "path": "red-cap-joint-parts-supplement.png",
+      "role": "joint-overlap and connector source supplement",
+      "width": 1536,
+      "height": 1024,
+      "colorMode": "RGBA",
+      "sha256": "7f22200a57992b66257e32670b0c5eacfd0f9a47073a758d74efb63b38bed96e"
+    },
+    {
+      "path": "training-ground-background.png",
+      "role": "two-character showcase background",
+      "width": 1672,
+      "height": 941,
+      "colorMode": "RGB",
+      "sha256": "9f985dfad9218fd88f915a861aa5fbb016a5de1e138c5f2000e2fd5a45fb7b58"
+    },
+    {
+      "path": "style-board.png",
+      "role": "character and environment style board",
+      "width": 1672,
+      "height": 941,
+      "colorMode": "RGB",
+      "sha256": "9f4c4fd1a6a176fa72ffd54e0509435de972051e8e930f24366722935f43ca5e"
+    }
+  ],
+  "alphaExtraction": {
+    "method": "remove_chroma_key.py",
+    "autoKey": "border",
+    "softMatte": true,
+    "transparentThreshold": 12,
+    "opaqueThreshold": 220,
+    "despill": true
+  }
+}

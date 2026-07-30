@@ -1,0 +1,555 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "passed",
+  "fixtureId": "red-cap-production-v1",
+  "canvas": {
+    "width": 1446,
+    "height": 1446,
+    "padding": 96
+  },
+  "oracle": {
+    "pivotRoi": {
+      "width": 12,
+      "height": 12
+    },
+    "maximumChannelDelta": 2,
+    "rule": "No two-pixel transparent crossing perpendicular to the parent-child axis."
+  },
+  "poses": [
+    {
+      "poseId": "positive",
+      "rotations": {
+        "upper-arm-right": 12,
+        "forearm-right": 12,
+        "hand-right": 8,
+        "upper-arm-left": -12,
+        "forearm-left": -12,
+        "hand-left": -8,
+        "thigh-right": 8,
+        "shin-right": 8,
+        "foot-right": 6,
+        "thigh-left": -8,
+        "shin-left": -8,
+        "foot-left": -6
+      },
+      "withinCanvas": [
+        {
+          "partId": "upper-arm-right",
+          "value": true
+        },
+        {
+          "partId": "forearm-right",
+          "value": true
+        },
+        {
+          "partId": "hand-right",
+          "value": true
+        },
+        {
+          "partId": "upper-arm-left",
+          "value": true
+        },
+        {
+          "partId": "forearm-left",
+          "value": true
+        },
+        {
+          "partId": "hand-left",
+          "value": true
+        },
+        {
+          "partId": "thigh-right",
+          "value": true
+        },
+        {
+          "partId": "shin-right",
+          "value": true
+        },
+        {
+          "partId": "foot-right",
+          "value": true
+        },
+        {
+          "partId": "thigh-left",
+          "value": true
+        },
+        {
+          "partId": "shin-left",
+          "value": true
+        },
+        {
+          "partId": "foot-left",
+          "value": true
+        },
+        {
+          "partId": "pelvis",
+          "value": true
+        },
+        {
+          "partId": "pouch",
+          "value": true
+        },
+        {
+          "partId": "torso",
+          "value": true
+        },
+        {
+          "partId": "bandana",
+          "value": true
+        },
+        {
+          "partId": "head",
+          "value": true
+        },
+        {
+          "partId": "hair",
+          "value": true
+        },
+        {
+          "partId": "cap",
+          "value": true
+        }
+      ],
+      "joints": [
+        {
+          "partId": "upper-arm-right",
+          "parentPartId": "torso",
+          "worldPivot": {
+            "x": 520.00004,
+            "y": 449.99995
+          },
+          "intersectionPixelCount": 144,
+          "contactPixelCount": 144,
+          "overlapOrContactPixelCount": 288,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "forearm-right",
+          "parentPartId": "upper-arm-right",
+          "worldPivot": {
+            "x": 449.639201,
+            "y": 551.85461
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 111,
+          "coverageRatio": 0.770833,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "hand-right",
+          "parentPartId": "forearm-right",
+          "worldPivot": {
+            "x": 435.099883,
+            "y": 676.548567
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 140,
+          "coverageRatio": 0.972222,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "upper-arm-left",
+          "parentPartId": "torso",
+          "worldPivot": {
+            "x": 729.999925,
+            "y": 449.99995
+          },
+          "intersectionPixelCount": 144,
+          "contactPixelCount": 144,
+          "overlapOrContactPixelCount": 288,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "forearm-left",
+          "parentPartId": "upper-arm-left",
+          "worldPivot": {
+            "x": 800.360734,
+            "y": 551.854603
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 122,
+          "coverageRatio": 0.847222,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "hand-left",
+          "parentPartId": "forearm-left",
+          "worldPivot": {
+            "x": 814.900112,
+            "y": 676.548587
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "thigh-right",
+          "parentPartId": "pelvis",
+          "worldPivot": {
+            "x": 565.00007,
+            "y": 688.00014
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "shin-right",
+          "parentPartId": "thigh-right",
+          "worldPivot": {
+            "x": 572.381553,
+            "y": 862.672662
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "foot-right",
+          "parentPartId": "shin-right",
+          "worldPivot": {
+            "x": 604.813951,
+            "y": 1022.941531
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "thigh-left",
+          "parentPartId": "pelvis",
+          "worldPivot": {
+            "x": 684.999935,
+            "y": 688.00014
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "shin-left",
+          "parentPartId": "thigh-left",
+          "worldPivot": {
+            "x": 677.618447,
+            "y": 862.672661
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "foot-left",
+          "parentPartId": "shin-left",
+          "worldPivot": {
+            "x": 645.186049,
+            "y": 1022.94153
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        }
+      ],
+      "decodedPixelSha256": "f98192d9bfb6fc9d34ed02922a6522ba23cfd28f170d57842617af719517ec8c",
+      "pngSha256": "1154f41416be3612f82e7c37a67e5389293bcb13faa5b8f93857fa91bff1d1ff"
+    },
+    {
+      "poseId": "negative",
+      "rotations": {
+        "upper-arm-right": -12,
+        "forearm-right": -12,
+        "hand-right": -8,
+        "upper-arm-left": 12,
+        "forearm-left": 12,
+        "hand-left": 8,
+        "thigh-right": -8,
+        "shin-right": -8,
+        "foot-right": -6,
+        "thigh-left": 8,
+        "shin-left": 8,
+        "foot-left": 6
+      },
+      "withinCanvas": [
+        {
+          "partId": "upper-arm-right",
+          "value": true
+        },
+        {
+          "partId": "forearm-right",
+          "value": true
+        },
+        {
+          "partId": "hand-right",
+          "value": true
+        },
+        {
+          "partId": "upper-arm-left",
+          "value": true
+        },
+        {
+          "partId": "forearm-left",
+          "value": true
+        },
+        {
+          "partId": "hand-left",
+          "value": true
+        },
+        {
+          "partId": "thigh-right",
+          "value": true
+        },
+        {
+          "partId": "shin-right",
+          "value": true
+        },
+        {
+          "partId": "foot-right",
+          "value": true
+        },
+        {
+          "partId": "thigh-left",
+          "value": true
+        },
+        {
+          "partId": "shin-left",
+          "value": true
+        },
+        {
+          "partId": "foot-left",
+          "value": true
+        },
+        {
+          "partId": "pelvis",
+          "value": true
+        },
+        {
+          "partId": "pouch",
+          "value": true
+        },
+        {
+          "partId": "torso",
+          "value": true
+        },
+        {
+          "partId": "bandana",
+          "value": true
+        },
+        {
+          "partId": "head",
+          "value": true
+        },
+        {
+          "partId": "hair",
+          "value": true
+        },
+        {
+          "partId": "cap",
+          "value": true
+        }
+      ],
+      "joints": [
+        {
+          "partId": "upper-arm-right",
+          "parentPartId": "torso",
+          "worldPivot": {
+            "x": 520.00004,
+            "y": 449.99995
+          },
+          "intersectionPixelCount": 144,
+          "contactPixelCount": 144,
+          "overlapOrContactPixelCount": 288,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "forearm-right",
+          "parentPartId": "upper-arm-right",
+          "worldPivot": {
+            "x": 414.294193,
+            "y": 514.43048
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 101,
+          "coverageRatio": 0.701389,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "hand-right",
+          "parentPartId": "forearm-right",
+          "worldPivot": {
+            "x": 311.899821,
+            "y": 587.062205
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 141,
+          "coverageRatio": 0.979167,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "upper-arm-left",
+          "parentPartId": "torso",
+          "worldPivot": {
+            "x": 729.999925,
+            "y": 449.99995
+          },
+          "intersectionPixelCount": 144,
+          "contactPixelCount": 144,
+          "overlapOrContactPixelCount": 288,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "forearm-left",
+          "parentPartId": "upper-arm-left",
+          "worldPivot": {
+            "x": 835.705743,
+            "y": 514.430487
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 117,
+          "coverageRatio": 0.8125,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "hand-left",
+          "parentPartId": "forearm-left",
+          "worldPivot": {
+            "x": 938.100174,
+            "y": 587.062184
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "thigh-right",
+          "parentPartId": "pelvis",
+          "worldPivot": {
+            "x": 565.00007,
+            "y": 688.00014
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "shin-right",
+          "parentPartId": "thigh-right",
+          "worldPivot": {
+            "x": 523.949334,
+            "y": 857.940757
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "foot-right",
+          "parentPartId": "shin-right",
+          "worldPivot": {
+            "x": 466.524007,
+            "y": 1011.043019
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "thigh-left",
+          "parentPartId": "pelvis",
+          "worldPivot": {
+            "x": 684.999935,
+            "y": 688.00014
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "shin-left",
+          "parentPartId": "thigh-left",
+          "worldPivot": {
+            "x": 726.050666,
+            "y": 857.940758
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        },
+        {
+          "partId": "foot-left",
+          "parentPartId": "shin-left",
+          "worldPivot": {
+            "x": 783.475993,
+            "y": 1011.04302
+          },
+          "intersectionPixelCount": 0,
+          "contactPixelCount": 0,
+          "overlapOrContactPixelCount": 0,
+          "coveredPixelCount": 144,
+          "coverageRatio": 1,
+          "transparentTwoPixelCrossing": false
+        }
+      ],
+      "decodedPixelSha256": "2bb70ea41bc1fff57d6dd56773ec59bbbb5a72c6d5b4326f689ffc3b0d8b4c1f",
+      "pngSha256": "5f7e3a22349f4fdc1a07143a8e4096e62a6532548b78ba9fbeafd89b0a698618"
+    }
+  ],
+  "failures": []
+}

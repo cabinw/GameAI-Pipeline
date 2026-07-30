@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "sequenceId": "program-015-two-character-showcase",
+  "durationSeconds": 8,
+  "events": [
+    {
+      "timeSeconds": 1,
+      "command": "emit",
+      "cueId": "program015-dust",
+      "targetId": "showcase.production-lite.left-foot"
+    },
+    {
+      "timeSeconds": 2.25,
+      "command": "start",
+      "cueId": "program015-trail",
+      "instanceId": "program015.trail.active",
+      "targetId": "showcase.red-cap.left-grip"
+    },
+    {
+      "timeSeconds": 4,
+      "command": "stop",
+      "instanceId": "program015.trail.active"
+    },
+    {
+      "timeSeconds": 4.5,
+      "command": "start",
+      "cueId": "program015-aura",
+      "instanceId": "program015.aura.active",
+      "targetId": "showcase.red-cap.torso"
+    }
+  ]
+}

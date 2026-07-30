@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.0.0",
+  "rig": {
+    "layoutId": "red-cap-production-v1-layout",
+    "schemaVersion": "1.0.0"
+  },
+  "vfxCues": [
+    {
+      "cueId": "footstep-dust",
+      "effectKind": "burst",
+      "visualIntent": "A bounded dust one-shot at the evaluated Red Cap foot.",
+      "defaultDurationSeconds": 0.35
+    },
+    {
+      "cueId": "hand-swing-trail",
+      "effectKind": "trail",
+      "visualIntent": "A looping trail following the evaluated Red Cap left grip.",
+      "defaultDurationSeconds": 0.75
+    }
+  ],
+  "tracks": [
+    {
+      "trackId": "red-cap-rest-events",
+      "clipId": "red-cap-production-v1-rest",
+      "events": []
+    },
+    {
+      "trackId": "red-cap-idle-events",
+      "clipId": "red-cap-production-v1-idle",
+      "events": []
+    },
+    {
+      "trackId": "red-cap-walk-events",
+      "clipId": "red-cap-production-v1-walk",
+      "events": [
+        {
+          "eventId": "red-cap-step-left",
+          "timeSeconds": 0.2,
+          "eventKind": "vfx",
+          "semanticCueId": "footstep-dust",
+          "socketId": "left-foot-contact",
+          "localTransform": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotationDegrees": 0,
+            "scale": {
+              "x": 1,
+              "y": 1
+            }
+          },
+          "layerRole": "behind-character",
+          "followPolicy": {
+            "position": false,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "durationSeconds": 0.35,
+          "order": 0,
+          "payload": {
+            "kind": "vfx",
+            "cueDefinitionId": "footstep-dust"
+          }
+        },
+        {
+          "eventId": "red-cap-step-right",
+          "timeSeconds": 0.8,
+          "eventKind": "vfx",
+          "semanticCueId": "footstep-dust",
+          "socketId": "right-foot-contact",
+          "localTransform": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotationDegrees": 0,
+            "scale": {
+              "x": 1,
+              "y": 1
+            }
+          },
+          "layerRole": "behind-character",
+          "followPolicy": {
+            "position": false,
+            "rotation": false,
+            "scale": false
+          },
+          "lifecycle": "one-shot",
+          "durationSeconds": 0.35,
+          "order": 0,
+          "payload": {
+            "kind": "vfx",
+            "cueDefinitionId": "footstep-dust"
+          }
+        }
+      ]
+    },
+    {
+      "trackId": "red-cap-wave-events",
+      "clipId": "red-cap-production-v1-wave",
+      "events": [
+        {
+          "eventId": "red-cap-left-hand-trail",
+          "timeSeconds": 0.2,
+          "eventKind": "vfx",
+          "semanticCueId": "hand-swing-trail",
+          "socketId": "left-grip",
+          "localTransform": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotationDegrees": 0,
+            "scale": {
+              "x": 1,
+              "y": 1
+            }
+          },
+          "layerRole": "in-front-of-character",
+          "followPolicy": {
+            "position": true,
+            "rotation": true,
+            "scale": false
+          },
+          "lifecycle": "looping",
+          "durationSeconds": 0.75,
+          "order": 0,
+          "payload": {
+            "kind": "vfx",
+            "cueDefinitionId": "hand-swing-trail"
+          }
+        }
+      ]
+    }
+  ]
+}

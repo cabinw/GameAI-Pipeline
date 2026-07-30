@@ -1,0 +1,503 @@
+{
+  "schemaVersion": "1.0.0",
+  "mapId": "red-cap-production-v1-source-authority",
+  "characterId": "red-cap-production-v1",
+  "coordinateSystem": {
+    "origin": "top-left",
+    "x": "right",
+    "y": "down",
+    "masterWidth": 1254,
+    "masterHeight": 1254
+  },
+  "authorities": {
+    "neutralAppearance": {
+      "file": "source/red-cap-character-master.png",
+      "sha256": "7a4cf6a690aa6532a51c209d839d7d71b28396e40e021973c0f35fb0f828f3a1"
+    },
+    "primaryPartsCandidate": {
+      "file": "source/red-cap-parts-sheet.png",
+      "sha256": "83bae1e794339b453a316eb4a9540968a1c7ec4e1bc5d7c3b50a43c76c709e79",
+      "use": "part identification, structural mapping, boundary checks, and manual audit only; never neutral visible authority"
+    },
+    "jointSupplement": {
+      "file": "source/red-cap-joint-parts-supplement.png",
+      "sha256": "7f22200a57992b66257e32670b0c5eacfd0f9a47073a758d74efb63b38bed96e",
+      "use": "declared hidden connectors only; never neutral visible authority"
+    }
+  },
+  "sideSemantics": "character-left appears on viewer-right in the neutral front view",
+  "fallbackPartId": "torso",
+  "ownershipOrder": [
+    "cap",
+    "bandana",
+    "pouch",
+    "hand-right",
+    "hand-left",
+    "forearm-right",
+    "forearm-left",
+    "upper-arm-right",
+    "upper-arm-left",
+    "foot-right",
+    "foot-left",
+    "shin-right",
+    "shin-left",
+    "thigh-right",
+    "thigh-left",
+    "pelvis",
+    "hair",
+    "head",
+    "torso"
+  ],
+  "drawOrder": [
+    "upper-arm-right",
+    "forearm-right",
+    "hand-right",
+    "upper-arm-left",
+    "forearm-left",
+    "hand-left",
+    "thigh-right",
+    "shin-right",
+    "foot-right",
+    "thigh-left",
+    "shin-left",
+    "foot-left",
+    "pelvis",
+    "pouch",
+    "torso",
+    "bandana",
+    "head",
+    "hair",
+    "cap"
+  ],
+  "parts": [
+    {
+      "partId": "pelvis",
+      "parent": null,
+      "pivotCandidate": [625, 684],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [480, 575, 290, 180],
+        "visibleRegion": [[480, 575], [770, 575], [770, 755], [480, 755]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [495, 656, 235, 136],
+        "conflictStatus": "combined-left-right-segments",
+        "resolution": "master owns visible pixels; candidate may supply only hidden waist coverage"
+      },
+      "hiddenOverlapRegion": [[565, 575], [685, 575], [685, 625], [565, 625]],
+      "leftRightIdentity": "center",
+      "drawOrder": 12,
+      "confidence": 0.99,
+      "rejectionReason": null
+    },
+    {
+      "partId": "torso",
+      "parent": "pelvis",
+      "pivotCandidate": [625, 592],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [450, 350, 350, 275],
+        "visibleRegion": [[500, 350], [750, 350], [800, 525], [735, 625], [515, 625], [450, 525]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [471, 476, 301, 172],
+        "conflictStatus": "integrated-sleeves-duplicate-standalone-arms",
+        "resolution": "master owns visible torso; standalone sleeve candidates own no neutral pixels"
+      },
+      "hiddenOverlapRegion": [[495, 390], [755, 390], [755, 610], [495, 610]],
+      "leftRightIdentity": "center",
+      "drawOrder": 14,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "head",
+      "parent": "torso",
+      "pivotCandidate": [625, 371],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [455, 155, 340, 250],
+        "visibleRegion": [[455, 155], [795, 155], [795, 405], [455, 405]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [288, 199, 269, 255],
+        "conflictStatus": "pose-scale-drift",
+        "resolution": "master owns all neutral visible face pixels"
+      },
+      "hiddenOverlapRegion": [[565, 330], [685, 330], [685, 405], [565, 405]],
+      "leftRightIdentity": "center",
+      "drawOrder": 16,
+      "confidence": 1,
+      "rejectionReason": null
+    },
+    {
+      "partId": "hair",
+      "parent": "head",
+      "pivotCandidate": [625, 238],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [435, 125, 380, 265],
+        "visibleRegion": [[430, 115], [820, 115], [820, 390], [740, 390], [740, 215], [510, 215], [510, 390], [430, 390]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRects": [[736, 41, 240, 193], [599, 266, 245, 166]],
+        "conflictStatus": "front-and-back-layers",
+        "resolution": "master owns visible hair; both sheet layers are accepted hidden coverage candidates"
+      },
+      "hiddenOverlapRegion": [[445, 125], [805, 125], [805, 360], [445, 360]],
+      "leftRightIdentity": "center",
+      "drawOrder": 17,
+      "confidence": 0.99,
+      "rejectionReason": null
+    },
+    {
+      "partId": "cap",
+      "parent": "head",
+      "pivotCandidate": [625, 156],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [430, 25, 390, 200],
+        "visibleRegion": [[430, 25], [820, 25], [820, 225], [430, 225]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRects": [[103, 34, 221, 149], [425, 39, 237, 131]],
+        "conflictStatus": "rear-and-front-views",
+        "resolution": "master owns visible cap; rear candidate may supply hidden back coverage"
+      },
+      "hiddenOverlapRegion": [[450, 80], [800, 80], [800, 205], [450, 205]],
+      "leftRightIdentity": "center",
+      "drawOrder": 18,
+      "confidence": 1,
+      "rejectionReason": null
+    },
+    {
+      "partId": "bandana",
+      "parent": "torso",
+      "pivotCandidate": [625, 378],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [510, 330, 270, 125],
+        "visibleRegion": [[510, 330], [780, 330], [780, 455], [510, 455]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [890, 384, 141, 79],
+        "conflictStatus": "none",
+        "resolution": "master owns visible pixels; sheet supplies hidden neck wrap only"
+      },
+      "hiddenOverlapRegion": [[535, 345], [755, 345], [755, 430], [535, 430]],
+      "leftRightIdentity": "center",
+      "drawOrder": 15,
+      "confidence": 0.99,
+      "rejectionReason": null
+    },
+    {
+      "partId": "pouch",
+      "parent": "pelvis",
+      "pivotCandidate": [755, 635],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [700, 590, 125, 190],
+        "visibleRegion": [[700, 590], [825, 590], [825, 780], [700, 780]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [845, 825, 56, 82],
+        "conflictStatus": "none",
+        "resolution": "master owns visible pixels; candidate retained for hidden strap coverage"
+      },
+      "hiddenOverlapRegion": [[725, 610], [790, 610], [790, 670], [725, 670]],
+      "leftRightIdentity": "character-left",
+      "drawOrder": 13,
+      "confidence": 1,
+      "rejectionReason": null
+    },
+    {
+      "partId": "upper-arm-right",
+      "parent": "torso",
+      "pivotCandidate": [520, 450],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [395, 385, 165, 190],
+        "visibleRegion": [[385, 370], [530, 370], [560, 525], [435, 575]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [181, 479, 95, 141],
+        "conflictStatus": "none",
+        "resolution": "master owns visible sleeve; sheet component confirms independent right sleeve"
+      },
+      "jointSupplement": [113, 52, 85, 206],
+      "hiddenOverlapRegion": [[455, 395], [530, 395], [545, 470], [470, 485]],
+      "leftRightIdentity": "character-right/viewer-left",
+      "drawOrder": 0,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "forearm-right",
+      "parent": "upper-arm-right",
+      "pivotCandidate": [430, 535],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [345, 500, 130, 175],
+        "visibleRegion": [[395, 500], [475, 520], [430, 680], [335, 655]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [160, 655, 75, 165],
+        "conflictStatus": "combined-hand",
+        "resolution": "master ownership splits at wrist; source pixels remain direct and reversible"
+      },
+      "jointSupplement": [602, 348, 88, 196],
+      "hiddenOverlapRegion": [[395, 505], [470, 505], [470, 575], [395, 575]],
+      "leftRightIdentity": "character-right/viewer-left",
+      "drawOrder": 1,
+      "confidence": 0.96,
+      "rejectionReason": null
+    },
+    {
+      "partId": "hand-right",
+      "parent": "forearm-right",
+      "pivotCandidate": [366, 643],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [290, 590, 150, 155],
+        "visibleRegion": [[290, 590], [440, 590], [440, 745], [290, 745]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-joint-parts-supplement.png",
+        "sourceRect": [99, 324, 94, 223],
+        "conflictStatus": "hand-with-forearm-connector",
+        "resolution": "master owns visible hand; supplement owns only hidden wrist connector"
+      },
+      "hiddenOverlapRegion": [[345, 610], [405, 610], [405, 675], [345, 675]],
+      "leftRightIdentity": "character-right/viewer-left; thumb points inward",
+      "drawOrder": 2,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "upper-arm-left",
+      "parent": "torso",
+      "pivotCandidate": [730, 450],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [690, 385, 175, 190],
+        "visibleRegion": [[720, 370], [865, 370], [815, 575], [690, 525]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [929, 480, 91, 140],
+        "conflictStatus": "none",
+        "resolution": "master owns visible sleeve; sheet component confirms independent left sleeve"
+      },
+      "jointSupplement": [374, 52, 85, 206],
+      "hiddenOverlapRegion": [[720, 395], [795, 395], [780, 485], [705, 470]],
+      "leftRightIdentity": "character-left/viewer-right",
+      "drawOrder": 3,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "forearm-left",
+      "parent": "upper-arm-left",
+      "pivotCandidate": [820, 535],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [775, 500, 135, 175],
+        "visibleRegion": [[775, 520], [855, 500], [915, 655], [820, 680]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [957, 655, 64, 166],
+        "conflictStatus": "combined-hand",
+        "resolution": "master ownership splits at wrist; source pixels remain direct and reversible"
+      },
+      "jointSupplement": [833, 348, 87, 196],
+      "hiddenOverlapRegion": [[780, 505], [855, 505], [855, 575], [780, 575]],
+      "leftRightIdentity": "character-left/viewer-right",
+      "drawOrder": 4,
+      "confidence": 0.96,
+      "rejectionReason": null
+    },
+    {
+      "partId": "hand-left",
+      "parent": "forearm-left",
+      "pivotCandidate": [884, 643],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [810, 590, 150, 155],
+        "visibleRegion": [[810, 590], [960, 590], [960, 745], [810, 745]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-joint-parts-supplement.png",
+        "sourceRect": [366, 324, 89, 224],
+        "conflictStatus": "hand-with-forearm-connector",
+        "resolution": "master owns visible hand; supplement owns only hidden wrist connector"
+      },
+      "hiddenOverlapRegion": [[845, 610], [905, 610], [905, 675], [845, 675]],
+      "leftRightIdentity": "character-left/viewer-right; thumb points inward",
+      "drawOrder": 5,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "thigh-right",
+      "parent": "pelvis",
+      "pivotCandidate": [565, 688],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [470, 610, 165, 290],
+        "visibleRegion": [[470, 610], [635, 610], [635, 900], [470, 900]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [470, 808, 104, 131],
+        "conflictStatus": "none",
+        "resolution": "master owns visible shorts leg; candidate supplies hidden hip and knee coverage"
+      },
+      "jointSupplement": [1060, 338, 121, 198],
+      "hiddenOverlapRegion": [[515, 625], [615, 625], [615, 735], [515, 735]],
+      "leftRightIdentity": "character-right/viewer-left",
+      "drawOrder": 6,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "shin-right",
+      "parent": "thigh-right",
+      "pivotCandidate": [548, 862],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [450, 815, 160, 245],
+        "visibleRegion": [[450, 815], [610, 815], [610, 1060], [450, 1060]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [471, 957, 68, 111],
+        "conflictStatus": "none",
+        "resolution": "master owns visible skin/sock; candidate supplies hidden knee and ankle coverage"
+      },
+      "jointSupplement": [324, 589, 78, 191],
+      "hiddenOverlapRegion": [[495, 825], [590, 825], [590, 915], [495, 915]],
+      "leftRightIdentity": "character-right/viewer-left",
+      "drawOrder": 7,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "foot-right",
+      "parent": "shin-right",
+      "pivotCandidate": [535, 1025],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [390, 965, 235, 255],
+        "visibleRegion": [[390, 965], [625, 965], [625, 1220], [390, 1220]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [417, 1078, 118, 143],
+        "conflictStatus": "none",
+        "resolution": "master owns visible boot; candidate supplies hidden ankle interior"
+      },
+      "jointSupplement": [562, 751, 138, 212],
+      "hiddenOverlapRegion": [[470, 975], [590, 975], [590, 1060], [470, 1060]],
+      "leftRightIdentity": "character-right/viewer-left; toe points viewer-left",
+      "drawOrder": 8,
+      "confidence": 1,
+      "rejectionReason": null
+    },
+    {
+      "partId": "thigh-left",
+      "parent": "pelvis",
+      "pivotCandidate": [685, 688],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [620, 610, 165, 290],
+        "visibleRegion": [[620, 610], [785, 610], [785, 900], [620, 900]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [648, 808, 102, 131],
+        "conflictStatus": "none",
+        "resolution": "master owns visible shorts leg; candidate supplies hidden hip and knee coverage"
+      },
+      "jointSupplement": [1306, 338, 121, 198],
+      "hiddenOverlapRegion": [[635, 625], [735, 625], [735, 735], [635, 735]],
+      "leftRightIdentity": "character-left/viewer-right",
+      "drawOrder": 9,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "shin-left",
+      "parent": "thigh-left",
+      "pivotCandidate": [702, 862],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [640, 815, 160, 245],
+        "visibleRegion": [[640, 815], [800, 815], [800, 1060], [640, 1060]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [679, 957, 67, 111],
+        "conflictStatus": "none",
+        "resolution": "master owns visible skin/sock; candidate supplies hidden knee and ankle coverage"
+      },
+      "jointSupplement": [1100, 589, 78, 191],
+      "hiddenOverlapRegion": [[660, 825], [755, 825], [755, 915], [660, 915]],
+      "leftRightIdentity": "character-left/viewer-right",
+      "drawOrder": 10,
+      "confidence": 0.98,
+      "rejectionReason": null
+    },
+    {
+      "partId": "foot-left",
+      "parent": "shin-left",
+      "pivotCandidate": [715, 1025],
+      "visibleAuthority": {
+        "file": "source/red-cap-character-master.png",
+        "sourceRect": [625, 965, 235, 255],
+        "visibleRegion": [[625, 965], [860, 965], [860, 1220], [625, 1220]]
+      },
+      "candidateSource": {
+        "file": "source/red-cap-parts-sheet.png",
+        "sourceRect": [686, 1078, 117, 143],
+        "conflictStatus": "none",
+        "resolution": "master owns visible boot; candidate supplies hidden ankle interior"
+      },
+      "jointSupplement": [829, 751, 136, 212],
+      "hiddenOverlapRegion": [[660, 975], [780, 975], [780, 1060], [660, 1060]],
+      "leftRightIdentity": "character-left/viewer-right; toe points viewer-right",
+      "drawOrder": 11,
+      "confidence": 1,
+      "rejectionReason": null
+    }
+  ],
+  "rejectedSupplementComponents": [
+    {
+      "sourceRect": [1256, 815, 214, 142],
+      "reason": "duplicate combined pelvis/shorts authority"
+    },
+    {
+      "sourceRect": [1088, 835, 76, 112],
+      "reason": "ambiguous generic connector; no unique joint identity"
+    }
+  ],
+  "audit": {
+    "requiredParts": 19,
+    "mappedParts": 19,
+    "missingSegments": [],
+    "ambiguousAcceptedConnectors": [],
+    "duplicateVisibleAuthority": "resolved in favor of character master",
+    "costumeDrift": "none accepted into visible authority",
+    "proportionDrift": "candidate sheets require documented fitting; neutral visible pixels remain master-owned",
+    "status": "passed"
+  }
+}

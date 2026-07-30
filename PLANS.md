@@ -3,51 +3,220 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: CI FFmpeg Dependency Remediation
+## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: In progress
+- Status: PROGRAM-015 accepted by external code/runtime/Creator/visual review;
+  awaiting Draft PR publication
 - Started: 2026-07-30
-- Branch: `fix/ci-install-ffmpeg`
-- Exact baseline `main`: `46d4523194f8ba064bd73db7b1c797e77cfa7745`
-- Scope budget: at most 4 files and 300 changed lines; zero runtime, schema,
-  Scene, asset, test-expectation, generated-output, binary, media, evidence,
-  package, lockfile, or PROGRAM-015 changes.
+- Branch: `feat/task-015-red-cap-production-vertical-slice`
+- Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
+- Final remediation ceiling: at most 112 changed files and 16,000 changed
+  lines; at most 42 touched PNG files, 3 Scene/`.meta` pairs, 1 feature
+  manifest, zero feature MP4 files, and at most 3 evidence MP4 files isolated
+  on `evidence/task-015`.
+- Phase 0 resumed scope: at most 20 files and 5,000 changed lines, including
+  exactly 5 approved source PNGs plus the project-owner-reviewed provenance,
+  rights assertion, source-authority map, layout lock, and documentation;
+  zero runtime, schema, generated, Scene, `.meta`, package, lockfile, audio,
+  or video changes.
 
 ### Goal
 
-Make media-derived verification reproducible in GitHub Actions by installing
-the required FFmpeg command-line tools before the frozen install and complete
-workspace verification.
+Deliver one deterministic production vertical slice from accepted Red Cap
+source through a static character, bounded rigid-sprite motion and semantic
+events, and a two-character production-lite showcase with scene-specific
+data-driven VFX.
 
-### Root cause and boundaries
+### Phase boundaries
 
-- PR #22 run `30553531763` reached the real PROGRAM-015 framebuffer test and
-  failed at process creation with `spawn ffmpeg ENOENT`.
-- The workflow did not install `ffmpeg` or `ffprobe`; all earlier build,
-  typecheck, and non-media test execution was healthy.
-- The analyzer invokes both tools by their ordinary executable names and
-  records the runtime FFmpeg version, but it does not require FFmpeg 8.1.2
-  bytes or a fixed version string.
-- Install Ubuntu's repository `ffmpeg` package, which provides both tools,
-  and print both `-version` outputs before Node, pnpm, dependency
-  installation, and verification.
-- Preserve the existing Node/pnpm/frozen-install/verify order and semantics.
-- Do not change, skip, catch, weaken, or provide a fallback for PROGRAM-015
-  framebuffer tests.
+- TASK-015A: at most 45 changed files and 8,000 changed lines; at most 38
+  touched PNGs and 2 Scene/`.meta` pairs; zero feature media.
+- TASK-015B: at most 24 changed files and 6,000 changed lines; zero new PNGs,
+  at most 1 modified Scene/`.meta` pair, and zero feature media.
+- TASK-015C: at most 35 changed files and 9,000 changed lines; at most 4 new
+  production-intent PNG resources, 1 new Scene/`.meta` pair, and zero feature
+  media.
+- Evidence: one isolated branch with at most 3 MP4 files, 12 PNG frames, 8
+  JSON reports/manifests, and 1 deterministic analyzer.
 
-### Done when
+The original aggregate ceiling was 96 files and 24,000 changed lines. The
+final read-only reconciliation against exact `main`
+`68444551b9b160a2455a97a2d8bf611aea608c6e` found 103 files and 12,341
+changed lines at Phase C. The project owner grants a one-time seven-file
+accounting exception, closing the reconciled Phase C scope at exactly 103
+files. The later project-owner-authorized live-evidence remediation may add
+only the runtime, analyzer, tests, generated closure, and existing-document
+corrections required by external review, with a final hard ceiling of 112
+feature files and 16,000 changed lines.
 
-- Workflow syntax, working-copy verification, frozen tracked-only
-  verification, generated closure, clean-tree, and media audits pass.
-- The independent fix PR logs resolvable `ffmpeg` and `ffprobe` executables,
-  explicit versions, and a complete passing workspace verification.
-- The fix is squash-merged, post-merge `main` Actions passes, and the updated
-  main is synchronized append-only into PROGRAM-015 for renewed Draft PR
-  verification.
+The independent Sharp atomic-publication fix was squash-merged to `main` at
+`46d4523194f8ba064bd73db7b1c797e77cfa7745` and synchronized append-only into
+this branch by merge commit
+`f1f0adfe6fd88a0e2c2f552be1870c0736dc1b8c`. Relative to the new `main`, the
+Program remains exactly 103 files and 12,599 changed lines before this
+documentation closeout. No implementation, source asset, Scene, `.meta`,
+schema, rights, or project provenance conflict occurred; `PLANS.md` was the
+sole conflict and retains both histories.
+
+Final R3 passed: 17 focused PROGRAM-015 assertions, asset-intake 74/74,
+Character Semantic Events 25/25, Cocos project 9/9, Creator extension
+293/293, and complete workspace 507/507. Typecheck, clean-CI, working-copy
+verification, frozen tracked-files-only verification, deterministic
+generation, synchronized generator concurrency, generated closure,
+Scene/meta/class identity, Markdown links, diff whitespace, media/protected
+refs, and post-verify clean-content closure all passed.
+
+### External-review live-evidence remediation
+
+External review rejected the first evidence publication because its Phase B/C
+animation was synthesized from a flat composite and its headline
+framebuffer counts were not derived from the published MP4 bytes. That
+evidence remains immutable on the evidence branch and is classified as
+`failed-external-review-synthetic-animation-and-non-media-derived-metrics`.
+It is historical evidence only and does not establish visual acceptance.
+
+The replacement runtime consumes the accepted 19-part atlas, rig hierarchy,
+Rest/Idle/Walk/Wave clips, per-joint transforms, semantic sockets, and the
+existing D2 VFX host in Creator 3.8.8 Web Preview. Its visible HUD and runtime
+diagnostics bind the exact feature commit, Scene/runtime identity, evidence
+session, viewport, Creator version, lifecycle counters, playback state, and
+cleanup state. The replacement analyzer accepts only the final MP4, decodes
+specified RGB24 frames with FFmpeg, and derives every Dust, Trail, Aura,
+Pause, and Resume result from frame bytes inside predeclared half-open ROIs.
+No flat-frame animation, prepared mask, fixed result, retry, sleep, or static
+PASS field is an acceptance source.
+
+### External review acceptance closeout
+
+Independent review downloaded exact evidence commit
+`c974011d4f13d95c9970144cbfc7fa2ad40b9595` from GitHub and reviewed feature
+`2bd0968835dcf25239ea705fe153d8eb68a91336`. The replacement Phase B payload
+at `791be5581e89f48822f5dba85b57d967e74c75b6` proves two independent Rebuild
+inputs and the visible/runtime transition `1/0/0 → 2/1/1 → 3/2/2`, followed
+by working Rest, Idle, Walk, Wave, Pause, Resume, Exact Reset, and a five
+second clean hold. Its downloaded analyzer reproduced byte-identical output.
+
+The downloaded Phase C MP4 SHA-256
+`f4842ced0f428cade5fb2917fc6e6867f16d8a990d56df023f66126c491a130c`
+reproduced Dust `7,645`, Trail `4,454`, Aura `25,072`, Pause `0`, and Resume
+`25,612` pixels twice with byte-identical analysis SHA-256
+`8d69f220d1ccb7cb1dc5abec1e37a9ca8e5453c6b14ffdcdb5d831c23d608744`.
+Controlled decoded-frame perturbation changed both the frame hash and derived
+pixel count.
+
+Master-only visible-pixel authority, parts-sheet audit-only authority, and
+hidden-connector-only supplement authority remain unchanged. Rights and
+provenance remain byte-identical at
+`335cef8824d574c4999492ae32201c79eb76683a78c342e1ae23696a85cc45f4`
+and
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+Evidence acceptance commit
+`6011d48915a2097153fb6ee63303a781a41557d6` records external
+code/runtime/Creator/visual/spatial/control/evidence review PASS while
+preserving both historical failure statuses. PROGRAM-015 is Accepted and
+awaiting Draft PR publication.
+
+### TASK-015B declared implementation scope
+
+TASK-015A passed its automated and Creator gates in commit `9d1627b` and is
+pushed to the Program branch. TASK-015B is limited to at most 21 changed
+files: four status/acceptance documents, one deterministic motion generator,
+one package script entry, four clip documents, one semantic-event document,
+one generated motion-quality report, generated Cocos motion data and
+component files with their Creator-owned metadata, one motion Scene/`.meta`
+pair, and three existing package test files. The phase adds zero PNG or video
+files and remains below 6,000 changed lines.
+
+TASK-015B closed at 21 files and 3,279 changed lines with zero PNG, audio, or
+video changes. Four normalized clips, Program semantic-event data, 60 Hz
+sampling, loop continuity, planted-foot, socket, lifecycle, Creator runtime,
+two-rebuild, post-rebuild, Reset, stress/debug, and nine-point fault gates
+passed. `CI=true pnpm verify` passed before the B checkpoint.
+
+The previous 3,246-line value was an incomplete pre-closeout accounting
+snapshot. It excluded the 32 changed lines in the final TASK-015B closeout
+document and the one-line package-script registration, while the final commit
+contains both. There were no renames or post-B edits involved.
+
+### Final scope reconciliation
+
+Using one `git diff --find-renames --numstat` method for every boundary gives:
+
+- Phase 0 (`main..0ea3c8d`): 23 files, 1,329 additions, 18 deletions,
+  1,347 changed lines, 5 binary PNGs.
+- Phase A (`0ea3c8d..9d1627b`): 45 files, 5,462 additions, 19 deletions,
+  5,481 changed lines, 24 binary PNGs.
+- Phase B (`9d1627b..70e0ba3`): 21 files, 3,269 additions, 10 deletions,
+  3,279 changed lines, no binary files.
+- Phase C (`70e0ba3..25d5069`): 30 files, 2,299 additions, 7 deletions,
+  2,306 changed lines, 4 binary PNGs.
+- Aggregate (`main..25d5069`): 103 distinct files, 12,323 additions,
+  18 deletions, 12,341 changed lines, 33 binary PNGs.
+
+The original 96-file roll-up accounted for `PLANS.md` but omitted seven
+required modifications to pre-existing cross-cutting surfaces:
+`CHANGELOG.md`, `docs/index.md`,
+`docs/releases/v0.4.0-data-driven-vfx-authoring-baseline.md`,
+`tasks/RELEASE-0.4.0-data-driven-vfx-authoring-baseline.md`,
+`cocos/projects/character-rig-builder-mvp/test/ci-typecheck-config.test.mjs`,
+`pipelines/character-asset-intake/package.json`, and
+`pipelines/character-semantic-events/test/character-semantic-events.test.ts`.
+They were introduced respectively in Phase 0 (four), Phase A (two), and
+Phase B (one). Each is required for Program status isolation, CI/typecheck
+coverage, deterministic command registration, or semantic-event regression
+coverage. None is duplicate, temporary, cached, generated by mistake, or
+evidence media. The complete per-file classification is recorded in the
+Program acceptance document. This reconciliation changes accounting and
+documentation only; it does not repair or alter implementation.
+
+### Phase 0 result
+
+The replacement `red-cap-production-v1` source pack passes resumed Phase
+0A–0C. The project-owner-reviewed rights assertion is bound to provenance SHA
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`;
+all governed image hashes and integrity checks pass. A machine-readable
+19-part map assigns all final visible-pixel authority to the character
+master, limits the parts sheet to identification/structure/boundary/manual
+audit, restricts the joint supplement to declared hidden connectors, and
+rejects ambiguous or duplicate components. The background deterministically crops to
+1664×936 and scales by 10/13 to the locked 1280×720 composition and ROIs.
+
+Approved source bytes are promoted under
+`examples/red-cap-production-v1/source/`; ignored intake and ZIP files remain
+untracked. TASK-015A is accepted and TASK-015B may proceed.
+See `tasks/PROGRAM-015-red-cap-production-vertical-slice.md` and
+`docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md`.
+
+## Completed plan: CI FFmpeg Dependency Remediation
+
+- Status: Implemented, verified, and merged to `main`
+- Started: 2026-07-30
+- Branch: `fix/ci-install-ffmpeg`
+- Exact baseline `main`: `46d4523194f8ba064bd73db7b1c797e77cfa7745`
+- Fix commit: `dc017cc8162943fc250ff24bb2dec5092fe60e16`
+- Squash/main commit: `4f172c4a769a195df07560ea602b3f0c03e676bf`
+- Scope: 4 files and 89 changed lines; zero runtime, schema, Scene, asset,
+  test-expectation, generated-output, binary, media, evidence, package,
+  lockfile, or PROGRAM-015 changes.
+
+### Root cause and result
+
+PROGRAM-015 Draft PR #22 run `30553531763` reached the real media-derived
+framebuffer test and failed at process creation with `spawn ffmpeg ENOENT`.
+The Ubuntu workflow installed neither `ffmpeg` nor `ffprobe`; the analyzer
+uses both ordinary executable names but does not bind FFmpeg 8.1.2-specific
+bytes or output.
+
+PR #23 installs Ubuntu's repository `ffmpeg` package before Node/pnpm setup,
+requires both executables on `PATH`, and prints both version reports. Its
+Actions run `30555447522` passed with FFmpeg/ffprobe 6.1.1, complete
+verification, and clean generated-output closure. The fix was squash-merged;
+post-merge main run `30555787659` also passed. No PROGRAM-015 test,
+expectation, runtime, or media byte changed.
 
 ## Completed plan: Sharp PNG Atomic Generation Fix
 
-- Status: Implemented and verified
+- Status: Implemented, verified, and merged to `main`
 - Started: 2026-07-30
 - Branch: `fix/sharp-empty-buffer-generation-race`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -62,7 +231,7 @@ Prevent concurrent generators and readers from observing zero-byte or partial
 PNG publication while preserving every non-provenance accepted generated
 byte.
 
-### Boundaries
+### Boundaries and closure
 
 - Reuse the existing same-directory atomic-write implementation.
 - Give production-lite generators explicit isolated output roots.
@@ -72,7 +241,6 @@ byte.
   retry, test serialization, timeout changes, fallback images, or reduced
   concurrency.
 - Preserve every non-provenance accepted generated byte and strict closure.
-- Do not modify or publish PROGRAM-015 from this maintenance branch.
 
 The generator self-fingerprint makes a literal old-provenance byte comparison
 impossible after generator changes. The baseline/final generator SHA-256 values
@@ -82,23 +250,16 @@ semantic change is the generator input SHA. An intermediate `ab46f05c…`
 generator produced the previously audited `e8b22d27…` candidate before the
 complete isolated input-root correction.
 
-The concurrency fixture now snapshots the full source/config/part/attachment
+The concurrency fixture snapshots the full source/config/part/attachment
 closure read-only. This resolves the earlier missing
 `source/character-source.json` `ENOENT` without retry, sleep, serialization,
-fallback, ignored errors, or reduced concurrency.
-
-### Done when
-
-- Focused atomic/generator coverage passes.
-- The complete asset-intake package passes three consecutive real-concurrency
-  runs.
-- Working-copy and frozen tracked-only verification each pass twice.
-- Generated outputs, tracked PNGs, scope, media, metadata, and clean-tree
-  closure pass.
+fallback, ignored errors, or reduced concurrency. Focused coverage, three
+asset-intake runs, two working-copy verifications, and two frozen
+tracked-files-only verifications passed before merge.
 
 ## Completed plan: v0.4.0 Data-Driven VFX Authoring Baseline
 
-- Status: Implemented; Draft PR pending review
+- Status: Published and complete
 - Started: 2026-07-30
 - Branch: `docs/release-v0.4.0-data-driven-vfx-authoring`
 - Baseline `main`: `9c3fb8ed55f18967b13f82d59a1e46cc016a12a7`
@@ -150,7 +311,8 @@ VFX Authoring Document
 4. Run working-copy and fresh frozen tracked-files-only `CI=true pnpm verify`,
    generated-output closure, and post-verify clean/content closure.
 5. Commit and push the documentation branch, create a Draft PR to `main`,
-   wait for Actions PASS, and leave it Draft and unmerged.
+   wait for Actions PASS, merge the accepted documentation, and publish the
+   annotated `v0.4.0` prerelease from the peeled target.
 
 ### Done when
 
@@ -158,9 +320,9 @@ VFX Authoring Document
   task boundaries or overstating production readiness.
 - Working-copy, frozen tracked-only, Markdown/link, generated closure,
   diff/content, scope/media/code, and protected-reference gates pass.
-- One Draft PR targets the exact main baseline and Actions passes.
-- No tag or GitHub Release is created or moved, and TASK-014D4 remains
-  unstarted.
+- The documentation PR targets the exact main baseline and Actions passes.
+- The annotated `v0.4.0` tag and prerelease are published from
+  `68444551b9b160a2455a97a2d8bf611aea608c6e`; TASK-014D4 remains unstarted.
 
 ## Completed plan: TASK-014D3 Focused Transaction Cleanup Closeout
 
