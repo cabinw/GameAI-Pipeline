@@ -3,7 +3,49 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: Sharp PNG Atomic Generation Fix
+## Active plan: CI FFmpeg Dependency Remediation
+
+- Status: In progress
+- Started: 2026-07-30
+- Branch: `fix/ci-install-ffmpeg`
+- Exact baseline `main`: `46d4523194f8ba064bd73db7b1c797e77cfa7745`
+- Scope budget: at most 4 files and 300 changed lines; zero runtime, schema,
+  Scene, asset, test-expectation, generated-output, binary, media, evidence,
+  package, lockfile, or PROGRAM-015 changes.
+
+### Goal
+
+Make media-derived verification reproducible in GitHub Actions by installing
+the required FFmpeg command-line tools before the frozen install and complete
+workspace verification.
+
+### Root cause and boundaries
+
+- PR #22 run `30553531763` reached the real PROGRAM-015 framebuffer test and
+  failed at process creation with `spawn ffmpeg ENOENT`.
+- The workflow did not install `ffmpeg` or `ffprobe`; all earlier build,
+  typecheck, and non-media test execution was healthy.
+- The analyzer invokes both tools by their ordinary executable names and
+  records the runtime FFmpeg version, but it does not require FFmpeg 8.1.2
+  bytes or a fixed version string.
+- Install Ubuntu's repository `ffmpeg` package, which provides both tools,
+  and print both `-version` outputs before Node, pnpm, dependency
+  installation, and verification.
+- Preserve the existing Node/pnpm/frozen-install/verify order and semantics.
+- Do not change, skip, catch, weaken, or provide a fallback for PROGRAM-015
+  framebuffer tests.
+
+### Done when
+
+- Workflow syntax, working-copy verification, frozen tracked-only
+  verification, generated closure, clean-tree, and media audits pass.
+- The independent fix PR logs resolvable `ffmpeg` and `ffprobe` executables,
+  explicit versions, and a complete passing workspace verification.
+- The fix is squash-merged, post-merge `main` Actions passes, and the updated
+  main is synchronized append-only into PROGRAM-015 for renewed Draft PR
+  verification.
+
+## Completed plan: Sharp PNG Atomic Generation Fix
 
 - Status: Implemented and verified
 - Started: 2026-07-30
