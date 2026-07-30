@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "red-cap-production-v1",
+  "displayName": "Red Cap Production v1",
+  "rigLayoutFile": "rig-layout.json",
+  "requiredParts": [
+    "bandana",
+    "cap",
+    "foot-left",
+    "foot-right",
+    "forearm-left",
+    "forearm-right",
+    "hair",
+    "hand-left",
+    "hand-right",
+    "head",
+    "pelvis",
+    "pouch",
+    "shin-left",
+    "shin-right",
+    "thigh-left",
+    "thigh-right",
+    "torso",
+    "upper-arm-left",
+    "upper-arm-right"
+  ],
+  "requiredAnimationTargets": [
+    "bandana",
+    "cap",
+    "foot-left",
+    "foot-right",
+    "forearm-left",
+    "forearm-right",
+    "hair",
+    "hand-left",
+    "hand-right",
+    "head",
+    "pelvis",
+    "pouch",
+    "shin-left",
+    "shin-right",
+    "thigh-left",
+    "thigh-right",
+    "torso",
+    "upper-arm-left",
+    "upper-arm-right"
+  ],
+  "animationTargets": [
+    {
+      "targetId": "bandana",
+      "partId": "bandana"
+    },
+    {
+      "targetId": "cap",
+      "partId": "cap"
+    },
+    {
+      "targetId": "foot-left",
+      "partId": "foot-left"
+    },
+    {
+      "targetId": "foot-right",
+      "partId": "foot-right"
+    },
+    {
+      "targetId": "forearm-left",
+      "partId": "forearm-left"
+    },
+    {
+      "targetId": "forearm-right",
+      "partId": "forearm-right"
+    },
+    {
+      "targetId": "hair",
+      "partId": "hair"
+    },
+    {
+      "targetId": "hand-left",
+      "partId": "hand-left"
+    },
+    {
+      "targetId": "hand-right",
+      "partId": "hand-right"
+    },
+    {
+      "targetId": "head",
+      "partId": "head"
+    },
+    {
+      "targetId": "pelvis",
+      "partId": "pelvis"
+    },
+    {
+      "targetId": "pouch",
+      "partId": "pouch"
+    },
+    {
+      "targetId": "shin-left",
+      "partId": "shin-left"
+    },
+    {
+      "targetId": "shin-right",
+      "partId": "shin-right"
+    },
+    {
+      "targetId": "thigh-left",
+      "partId": "thigh-left"
+    },
+    {
+      "targetId": "thigh-right",
+      "partId": "thigh-right"
+    },
+    {
+      "targetId": "torso",
+      "partId": "torso"
+    },
+    {
+      "targetId": "upper-arm-left",
+      "partId": "upper-arm-left"
+    },
+    {
+      "targetId": "upper-arm-right",
+      "partId": "upper-arm-right"
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1.0.0",
+  "generator": "generate-red-cap-production-v1.mjs",
+  "sourceAuthorityMapSha256": "01d92fd23cfbb796add5fe8ddf01a5536195dfe54d2377e6e4ce92ed6a41fdb8",
+  "masterSha256": "7a4cf6a690aa6532a51c209d839d7d71b28396e40e021973c0f35fb0f828f3a1",
+  "files": [
+    {
+      "path": "atlas/parts-atlas.png",
+      "sha256": "4140f66b977ffd1fe3681c020b019adacb97150fc01d40e3814838c4e6e03c57"
+    },
+    {
+      "path": "character-rig.json",
+      "sha256": "cc212abb07455bc8249080202c9b91342c6e419ef9cf3456da1a1204fa0586bf"
+    },
+    {
+      "path": "parts/bandana.png",
+      "sha256": "2efe3c368229cd19592114fd37afc327a385b75e1471c85acd8cdc541fa55a02"
+    },
+    {
+      "path": "parts/cap.png",
+      "sha256": "af07483f91d4b9eabe72a8031a031ed3d2a5d4f77dce29609e36ddd7e498f27a"
+    },
+    {
+      "path": "parts/foot-left.png",
+      "sha256": "702e93ff183cf93622a9fe45bbb348b50c3a5693c52f44a7ee178dae8207941e"
+    },
+    {
+      "path": "parts/foot-right.png",
+      "sha256": "147246e8c9bf5d49a1439b2d6cde24e991cf9210c0f18519c6e11c2fe5589433"
+    },
+    {
+      "path": "parts/forearm-left.png",
+      "sha256": "da4595aadd989ea133831c0215c53005897e9f8628ea9b43592b02437f96c3c9"
+    },
+    {
+      "path": "parts/forearm-right.png",
+      "sha256": "5a0509dda220b874c4f7f55b25172130b2c0bcf78897472cdd04bd49c8e3c8a1"
+    },
+    {
+      "path": "parts/hair.png",
+      "sha256": "3ebab4c7803a57b8da68205ba1253e61876df0bfb8319ee23c3d8ced9e584456"
+    },
+    {
+      "path": "parts/hand-left.png",
+      "sha256": "c559d605286cfb531d7d06dd1bf2322ae54cd60865f28ad26cb60dbbd0f9591d"
+    },
+    {
+      "path": "parts/hand-right.png",
+      "sha256": "5cc6b37a815dc4ec2dc510fcfb5c1d386a0060b8fe00ce9e58efdbab7517bb50"
+    },
+    {
+      "path": "parts/head.png",
+      "sha256": "2bb8fb139f339d69ea6f1f928d7e3e01bbd75a8f70af344c56e261d2e5422fa7"
+    },
+    {
+      "path": "parts/pelvis.png",
+      "sha256": "f9f959ebd9f652434dfbda8326fb1a2257df5cf0474cf0e4d352e054050f5944"
+    },
+    {
+      "path": "parts/pouch.png",
+      "sha256": "d6a6a326de6388718988020c858d3d58e19f4c07666407c264131f5683a65d4b"
+    },
+    {
+      "path": "parts/shin-left.png",
+      "sha256": "505d49bb2bc0a88fe69e8b119382c5533c8d127698c54f52d8405132442bae1f"
+    },
+    {
+      "path": "parts/shin-right.png",
+      "sha256": "a575fc80a3c2a7bfd1b35e9d161fc47f2e7be86f8a78146639dbf4416442d422"
+    },
+    {
+      "path": "parts/thigh-left.png",
+      "sha256": "4afbf098e56a5812e035cc41be0ab6083d797b800bacafd7e4a136b01eb7316a"
+    },
+    {
+      "path": "parts/thigh-right.png",
+      "sha256": "6f369b58ab1accc6a2dfdf2b0942325dec725afbe68e69be74697e3a60edee8d"
+    },
+    {
+      "path": "parts/torso.png",
+      "sha256": "e1b192e1667c9edcdc39203e6e6e4611111b975e7d96a4d8a3ff9ce0f1ade5ca"
+    },
+    {
+      "path": "parts/upper-arm-left.png",
+      "sha256": "8521cd0b9bab1b3b71f6fd82931c07a5ea32b481805210410629a4f1304b5adc"
+    },
+    {
+      "path": "parts/upper-arm-right.png",
+      "sha256": "c3c962da9da15086eee4153fd012cd681a4e48105985bbd36d4939f38adc822a"
+    },
+    {
+      "path": "provenance/part-ownership.png",
+      "sha256": "681d574abbc3d4859ba52a4d30a38223553fa23439c21ae41069a1172bec69cb"
+    },
+    {
+      "path": "reference/reconstructed-neutral.png",
+      "sha256": "1242b68442c99c73ff493ac4a28a58ca1c7c1ec17d9dbb95e74885b355fe3c41"
+    },
+    {
+      "path": "rig-layout.json",
+      "sha256": "b28814a5db830c870bd7d283a51c3e193ccfb8f7be3e06eeefe2b46350d6bf44"
+    }
+  ],
+  "cocosMirrors": [
+    {
+      "path": "assets/resources/red-cap-production-v1/parts-atlas.png",
+      "sha256": "4140f66b977ffd1fe3681c020b019adacb97150fc01d40e3814838c4e6e03c57"
+    },
+    {
+      "path": "assets/gameai/red-cap-production/red-cap-production-static-data.ts",
+      "sha256": "76a26625399e735ed173593d1b8d32618abf846098ab4867d96aad570cb59b78"
+    }
+  ]
+}

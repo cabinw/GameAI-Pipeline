@@ -1,0 +1,673 @@
+{
+  "schemaVersion": "1.0.0",
+  "layoutId": "red-cap-production-v1-layout",
+  "sourceCanvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "referenceScale": 0.4,
+  "drawOrderPolicy": "unique",
+  "visualPlacementMode": "source-canvas-rect",
+  "parts": [
+    {
+      "partId": "upper-arm-right",
+      "file": "parts/upper-arm-right.png",
+      "parentId": "torso",
+      "originalRect": {
+        "x": 395,
+        "y": 385,
+        "width": 165,
+        "height": 190
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.757576,
+        "y": 0.342105
+      },
+      "restPose": {
+        "position": {
+          "x": -42,
+          "y": 56.8
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 0
+    },
+    {
+      "partId": "forearm-right",
+      "file": "parts/forearm-right.png",
+      "parentId": "upper-arm-right",
+      "originalRect": {
+        "x": 345,
+        "y": 500,
+        "width": 130,
+        "height": 175
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.653846,
+        "y": 0.2
+      },
+      "restPose": {
+        "position": {
+          "x": -36,
+          "y": -34
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 1
+    },
+    {
+      "partId": "hand-right",
+      "file": "parts/hand-right.png",
+      "parentId": "forearm-right",
+      "originalRect": {
+        "x": 290,
+        "y": 590,
+        "width": 150,
+        "height": 155
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.506667,
+        "y": 0.341935
+      },
+      "restPose": {
+        "position": {
+          "x": -25.6,
+          "y": -43.2
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 2
+    },
+    {
+      "partId": "upper-arm-left",
+      "file": "parts/upper-arm-left.png",
+      "parentId": "torso",
+      "originalRect": {
+        "x": 690,
+        "y": 385,
+        "width": 175,
+        "height": 190
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.228571,
+        "y": 0.342105
+      },
+      "restPose": {
+        "position": {
+          "x": 42,
+          "y": 56.8
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 3
+    },
+    {
+      "partId": "forearm-left",
+      "file": "parts/forearm-left.png",
+      "parentId": "upper-arm-left",
+      "originalRect": {
+        "x": 775,
+        "y": 500,
+        "width": 135,
+        "height": 175
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.333333,
+        "y": 0.2
+      },
+      "restPose": {
+        "position": {
+          "x": 36,
+          "y": -34
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 4
+    },
+    {
+      "partId": "hand-left",
+      "file": "parts/hand-left.png",
+      "parentId": "forearm-left",
+      "originalRect": {
+        "x": 810,
+        "y": 590,
+        "width": 150,
+        "height": 155
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.493333,
+        "y": 0.341935
+      },
+      "restPose": {
+        "position": {
+          "x": 25.6,
+          "y": -43.2
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 5
+    },
+    {
+      "partId": "thigh-right",
+      "file": "parts/thigh-right.png",
+      "parentId": "pelvis",
+      "originalRect": {
+        "x": 470,
+        "y": 610,
+        "width": 165,
+        "height": 290
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.575758,
+        "y": 0.268966
+      },
+      "restPose": {
+        "position": {
+          "x": -24,
+          "y": -1.6
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 6
+    },
+    {
+      "partId": "shin-right",
+      "file": "parts/shin-right.png",
+      "parentId": "thigh-right",
+      "originalRect": {
+        "x": 450,
+        "y": 815,
+        "width": 160,
+        "height": 245
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.6125,
+        "y": 0.191837
+      },
+      "restPose": {
+        "position": {
+          "x": -6.8,
+          "y": -69.6
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 7
+    },
+    {
+      "partId": "foot-right",
+      "file": "parts/foot-right.png",
+      "parentId": "shin-right",
+      "originalRect": {
+        "x": 390,
+        "y": 965,
+        "width": 235,
+        "height": 255
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.617021,
+        "y": 0.235294
+      },
+      "restPose": {
+        "position": {
+          "x": -5.2,
+          "y": -65.2
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 8
+    },
+    {
+      "partId": "thigh-left",
+      "file": "parts/thigh-left.png",
+      "parentId": "pelvis",
+      "originalRect": {
+        "x": 620,
+        "y": 610,
+        "width": 165,
+        "height": 290
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.393939,
+        "y": 0.268966
+      },
+      "restPose": {
+        "position": {
+          "x": 24,
+          "y": -1.6
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 9
+    },
+    {
+      "partId": "shin-left",
+      "file": "parts/shin-left.png",
+      "parentId": "thigh-left",
+      "originalRect": {
+        "x": 640,
+        "y": 815,
+        "width": 160,
+        "height": 245
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.3875,
+        "y": 0.191837
+      },
+      "restPose": {
+        "position": {
+          "x": 6.8,
+          "y": -69.6
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 10
+    },
+    {
+      "partId": "foot-left",
+      "file": "parts/foot-left.png",
+      "parentId": "shin-left",
+      "originalRect": {
+        "x": 625,
+        "y": 965,
+        "width": 235,
+        "height": 255
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.382979,
+        "y": 0.235294
+      },
+      "restPose": {
+        "position": {
+          "x": 5.2,
+          "y": -65.2
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 11
+    },
+    {
+      "partId": "pelvis",
+      "file": "parts/pelvis.png",
+      "parentId": null,
+      "originalRect": {
+        "x": 480,
+        "y": 575,
+        "width": 290,
+        "height": 180
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.605556
+      },
+      "restPose": {
+        "position": {
+          "x": -0.8,
+          "y": -22.8
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 12
+    },
+    {
+      "partId": "pouch",
+      "file": "parts/pouch.png",
+      "parentId": "pelvis",
+      "originalRect": {
+        "x": 700,
+        "y": 590,
+        "width": 125,
+        "height": 190
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.44,
+        "y": 0.236842
+      },
+      "restPose": {
+        "position": {
+          "x": 52,
+          "y": 19.6
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 13
+    },
+    {
+      "partId": "torso",
+      "file": "parts/torso.png",
+      "parentId": "pelvis",
+      "originalRect": {
+        "x": 450,
+        "y": 350,
+        "width": 350,
+        "height": 275
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "restPose": {
+        "position": {
+          "x": 0,
+          "y": 36.8
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 14
+    },
+    {
+      "partId": "bandana",
+      "file": "parts/bandana.png",
+      "parentId": "torso",
+      "originalRect": {
+        "x": 510,
+        "y": 330,
+        "width": 270,
+        "height": 125
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.425926,
+        "y": 0.384
+      },
+      "restPose": {
+        "position": {
+          "x": 0,
+          "y": 85.6
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 15
+    },
+    {
+      "partId": "head",
+      "file": "parts/head.png",
+      "parentId": "torso",
+      "originalRect": {
+        "x": 455,
+        "y": 155,
+        "width": 340,
+        "height": 250
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.864
+      },
+      "restPose": {
+        "position": {
+          "x": 0,
+          "y": 88.4
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 16
+    },
+    {
+      "partId": "hair",
+      "file": "parts/hair.png",
+      "parentId": "head",
+      "originalRect": {
+        "x": 435,
+        "y": 125,
+        "width": 380,
+        "height": 265
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.426415
+      },
+      "restPose": {
+        "position": {
+          "x": 0,
+          "y": 53.2
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 17
+    },
+    {
+      "partId": "cap",
+      "file": "parts/cap.png",
+      "parentId": "head",
+      "originalRect": {
+        "x": 430,
+        "y": 25,
+        "width": 390,
+        "height": 200
+      },
+      "trimOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.655
+      },
+      "restPose": {
+        "position": {
+          "x": 0,
+          "y": 86
+        },
+        "rotationDegrees": 0,
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "opacity": 1
+      },
+      "drawOrder": 18
+    }
+  ],
+  "sockets": [
+    {
+      "socketId": "left-grip",
+      "parentPartId": "hand-left",
+      "position": {
+        "x": 8.8,
+        "y": -22.8
+      },
+      "rotationDegrees": 0
+    },
+    {
+      "socketId": "right-grip",
+      "parentPartId": "hand-right",
+      "position": {
+        "x": -8.8,
+        "y": -22.8
+      },
+      "rotationDegrees": 0
+    },
+    {
+      "socketId": "torso-vfx",
+      "parentPartId": "torso",
+      "position": {
+        "x": 0,
+        "y": 32
+      },
+      "rotationDegrees": 0
+    }
+  ],
+  "hitAreas": [
+    {
+      "hitAreaId": "body-hit",
+      "parentPartId": "torso",
+      "shape": {
+        "type": "rect",
+        "x": -48,
+        "y": -50,
+        "width": 96,
+        "height": 110
+      }
+    },
+    {
+      "hitAreaId": "head-hit",
+      "parentPartId": "head",
+      "shape": {
+        "type": "circle",
+        "x": 0,
+        "y": 32,
+        "radius": 54
+      }
+    }
+  ]
+}

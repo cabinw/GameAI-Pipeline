@@ -26,6 +26,28 @@
     }
   },
   "sideSemantics": "character-left appears on viewer-right in the neutral front view",
+  "fallbackPartId": "torso",
+  "ownershipOrder": [
+    "cap",
+    "bandana",
+    "pouch",
+    "hand-right",
+    "hand-left",
+    "forearm-right",
+    "forearm-left",
+    "upper-arm-right",
+    "upper-arm-left",
+    "foot-right",
+    "foot-left",
+    "shin-right",
+    "shin-left",
+    "thigh-right",
+    "thigh-left",
+    "pelvis",
+    "hair",
+    "head",
+    "torso"
+  ],
   "drawOrder": [
     "upper-arm-right",
     "forearm-right",
@@ -54,7 +76,7 @@
       "pivotCandidate": [625, 684],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [485, 575, 285, 180],
+        "sourceRect": [480, 575, 290, 180],
         "visibleRegion": [[480, 575], [770, 575], [770, 755], [480, 755]]
       },
       "candidateSource": {
@@ -118,7 +140,7 @@
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
         "sourceRect": [435, 125, 380, 265],
-        "visibleRegion": [[430, 115], [820, 115], [820, 390], [430, 390]]
+        "visibleRegion": [[430, 115], [820, 115], [820, 390], [740, 390], [740, 215], [510, 215], [510, 390], [430, 390]]
       },
       "candidateSource": {
         "file": "source/red-cap-parts-sheet.png",
@@ -138,7 +160,7 @@
       "pivotCandidate": [625, 156],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [445, 40, 360, 180],
+        "sourceRect": [430, 25, 390, 200],
         "visibleRegion": [[430, 25], [820, 25], [820, 225], [430, 225]]
       },
       "candidateSource": {
@@ -159,7 +181,7 @@
       "pivotCandidate": [625, 378],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [520, 335, 250, 115],
+        "sourceRect": [510, 330, 270, 125],
         "visibleRegion": [[510, 330], [780, 330], [780, 455], [510, 455]]
       },
       "candidateSource": {
@@ -180,7 +202,7 @@
       "pivotCandidate": [755, 635],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [710, 610, 100, 155],
+        "sourceRect": [700, 590, 125, 190],
         "visibleRegion": [[700, 590], [825, 590], [825, 780], [700, 780]]
       },
       "candidateSource": {
@@ -198,10 +220,10 @@
     {
       "partId": "upper-arm-right",
       "parent": "torso",
-      "pivotCandidate": [493, 424],
+      "pivotCandidate": [520, 450],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [395, 385, 150, 180],
+        "sourceRect": [395, 385, 165, 190],
         "visibleRegion": [[385, 370], [530, 370], [560, 525], [435, 575]]
       },
       "candidateSource": {
@@ -245,7 +267,7 @@
       "pivotCandidate": [366, 643],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [300, 605, 125, 125],
+        "sourceRect": [290, 590, 150, 155],
         "visibleRegion": [[290, 590], [440, 590], [440, 745], [290, 745]]
       },
       "candidateSource": {
@@ -263,10 +285,10 @@
     {
       "partId": "upper-arm-left",
       "parent": "torso",
-      "pivotCandidate": [757, 424],
+      "pivotCandidate": [730, 450],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [705, 385, 150, 180],
+        "sourceRect": [690, 385, 175, 190],
         "visibleRegion": [[720, 370], [865, 370], [815, 575], [690, 525]]
       },
       "candidateSource": {
@@ -288,7 +310,7 @@
       "pivotCandidate": [820, 535],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [780, 500, 130, 175],
+        "sourceRect": [775, 500, 135, 175],
         "visibleRegion": [[775, 520], [855, 500], [915, 655], [820, 680]]
       },
       "candidateSource": {
@@ -310,7 +332,7 @@
       "pivotCandidate": [884, 643],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [825, 605, 125, 125],
+        "sourceRect": [810, 590, 150, 155],
         "visibleRegion": [[810, 590], [960, 590], [960, 745], [810, 745]]
       },
       "candidateSource": {
@@ -331,7 +353,7 @@
       "pivotCandidate": [565, 688],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [470, 620, 165, 275],
+        "sourceRect": [470, 610, 165, 290],
         "visibleRegion": [[470, 610], [635, 610], [635, 900], [470, 900]]
       },
       "candidateSource": {
@@ -353,7 +375,7 @@
       "pivotCandidate": [548, 862],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [455, 825, 145, 225],
+        "sourceRect": [450, 815, 160, 245],
         "visibleRegion": [[450, 815], [610, 815], [610, 1060], [450, 1060]]
       },
       "candidateSource": {
@@ -375,7 +397,7 @@
       "pivotCandidate": [535, 1025],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [400, 975, 220, 230],
+        "sourceRect": [390, 965, 235, 255],
         "visibleRegion": [[390, 965], [625, 965], [625, 1220], [390, 1220]]
       },
       "candidateSource": {
@@ -397,7 +419,7 @@
       "pivotCandidate": [685, 688],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [620, 620, 165, 275],
+        "sourceRect": [620, 610, 165, 290],
         "visibleRegion": [[620, 610], [785, 610], [785, 900], [620, 900]]
       },
       "candidateSource": {
@@ -419,7 +441,7 @@
       "pivotCandidate": [702, 862],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [650, 825, 145, 225],
+        "sourceRect": [640, 815, 160, 245],
         "visibleRegion": [[640, 815], [800, 815], [800, 1060], [640, 1060]]
       },
       "candidateSource": {
@@ -441,7 +463,7 @@
       "pivotCandidate": [715, 1025],
       "visibleAuthority": {
         "file": "source/red-cap-character-master.png",
-        "sourceRect": [630, 975, 220, 230],
+        "sourceRect": [625, 965, 235, 255],
         "visibleRegion": [[625, 965], [860, 965], [860, 1220], [625, 1220]]
       },
       "candidateSource": {
