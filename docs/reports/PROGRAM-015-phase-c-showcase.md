@@ -2,15 +2,18 @@
 
 ## Decision
 
-TASK-015C implementation was accepted locally on 2026-07-30. Its first
-evidence publication subsequently failed external review because the
-animation was synthesized from a flat composite and the framebuffer counts
-were not derived from the published MP4. The Creator-owned
+TASK-015C implementation was accepted on 2026-07-30. Its first evidence
+publication subsequently failed external review because the animation was
+synthesized from a flat composite and the framebuffer counts were not derived
+from the published MP4. Replacement Creator Web Preview evidence passed
+external code/runtime/Creator/visual/spatial/control review, and PR #22
+integrated PROGRAM-015 at
+`555f0b8e34affff0942ea0785dec5ce041440ae2`. The Creator-owned
 `red-cap-production-showcase.scene` presents production-lite and Red Cap on
 the licensed training-ground background with deterministic scene-specific
 Dust, Trail, and Aura compiled through the existing D1 authoring and D2
-runtime path. Replacement live evidence remains
-`pending-external-code-and-visual-review`.
+runtime path. The historical failed payload remains preserved as failed
+evidence and does not override the accepted replacement.
 
 ## Deterministic source and resource closure
 
@@ -110,3 +113,18 @@ The automated suite covers:
   modifications.
 
 No MP4 or other evidence media is tracked on the feature branch.
+
+## Replacement acceptance result
+
+The accepted Phase B replacement records two independent rebuild inputs and
+the lifecycle transition `1/0/0 → 2/1/1 → 3/2/2`, followed by working Rest,
+Idle, jointed Walk, joint-following Wave, Pause, Resume, Exact Reset, and a
+five-second clean hold. Root/input remain `1/1`, while
+duplicate/leak/stale/cleanup counts remain zero.
+
+The accepted downloaded Phase C MP4 reproduces Dust `7,645`, Trail `4,454`,
+Aura `25,072`, Pause `0`, and Resume `25,612` changed pixels from decoded
+RGB24 frames. The analyzer reproduced byte-identical output twice, and a
+controlled frame perturbation changed the derived result. Creator and Preview
+application warnings/errors relevant to the session were zero. Accepted
+media remained outside the feature and `main`.

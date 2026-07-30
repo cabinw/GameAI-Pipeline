@@ -38,6 +38,7 @@
 - [TASK-014D3 canonical full-loadout data-driven VFX acceptance](acceptance/TASK-014D3-canonical-loadout-vfx-authoring-integration.md)
 - [PROGRAM-015 Red Cap production vertical slice acceptance](acceptance/PROGRAM-015-red-cap-production-vertical-slice.md)
 - [PROGRAM-015 Phase 0 source-readiness report](reports/PROGRAM-015-phase-0-source-readiness.md)
+- [PROGRAM-015 Phase C showcase report](reports/PROGRAM-015-phase-c-showcase.md)
 - [ADR-0018 production-slice source readiness](adr/ADR-0018-production-slice-source-readiness.md)
 - [TASK-013 Cocos runtime postmortem](postmortems/TASK-013-cocos-runtime-integration.md)
 
@@ -46,6 +47,7 @@
 - [v0.2.0 Character Loadout Baseline](releases/v0.2.0-character-loadout-baseline.md)
 - [v0.3.0 Character Semantic Events & VFX Baseline](releases/v0.3.0-character-semantic-events-vfx-baseline.md)
 - [v0.4.0 Data-Driven VFX Authoring Baseline](releases/v0.4.0-data-driven-vfx-authoring-baseline.md)
+- [v0.5.0 Production Character Vertical Slice Baseline](releases/v0.5.0-production-character-vertical-slice-baseline.md)
 - [Compatibility matrix](compatibility.md)
 - [Changelog](../CHANGELOG.md)
 - [Roadmap](../ROADMAP.md)

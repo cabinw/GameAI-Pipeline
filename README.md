@@ -141,48 +141,53 @@ historical provenance and deterministic regression. Its generators are not
 part of the normal build and run only through the explicit
 `legacy:verify-task013-provenance` command.
 
-## Current status — v0.4.0 Data-Driven VFX Authoring Baseline
+## Current status — v0.5.0 Production Character Vertical Slice Baseline
 
-The accepted Character Pipeline now connects portable visual authoring to the
-canonical 12-state full-loadout Cocos runtime:
+The accepted Character Pipeline now closes one production-character path from
+reviewed source authority through deterministic Creator acceptance:
 
 ```text
-VFX Authoring Document
-→ deterministic compiler
-→ concrete Render Plan
-→ shared Cocos adapter/runtime
-→ canonical full-loadout integration
-→ Creator lifecycle/spatial/visual acceptance
+source authority and asset intake
+→ deterministic layered asset generation
+→ production character joint hierarchy
+→ Rest / Idle / Walk / Wave runtime animation
+→ semantic events and concrete VFX Render Plans
+→ shared Cocos renderer/runtime
+→ Creator lifecycle, rebuild, reset and spatial validation
+→ production vertical-slice acceptance
 ```
 
-TASK-014D1 owns the engine-neutral authoring schema, fail-closed deterministic
-compiler, canonical integer-tick sampling, curves, concrete parameter
-resolution, particle randomness, and explicit budgets. TASK-014D2 consumes
-only the concrete plan through typed primitive, recipe, and blend dispatch,
-exact sampler reuse, deterministic sorting/spatial guards, and transactional
-ownership/cleanup. TASK-014D3 composes that shared runtime with all 12
-canonical loadout states and actual feet, torso, hand, and prop-grip targets.
+PROGRAM-015 contributes the accepted 19-part Red Cap hierarchy, Rest, Idle,
+Walk, and Wave, foot-contact and hand-target validation, Dust, Trail, Aura,
+Pause/Resume, Transform Stress, Debug, two consecutive rebuilds, Exact Reset,
+and a final clean hold. Independent code/runtime/Creator/visual review passed,
+Creator and Preview reported zero relevant warnings or errors, and PR #22
+integrated the feature without tracking accepted evidence media on `main`.
 
-The Cocos Creator 3.8.8 macOS acceptance covers prop/clip/target rebind,
-Footstep Dust, Hand/Tool Trail, Persistent Aura, Combined, Transform Stress,
-two rebuilds, post-rebuild effects, Exact Reset, real
-`onDisable → onDestroy`, early partial-build compensation, and a 25/25
-Creator fault matrix. Stable states retain one runtime root and one input
-handler with zero duplicate, stale, leaked, non-finite, viewport, ownership,
-or cleanup failures.
+The baseline also includes two publication-safety improvements. PR #24
+eliminates the shared Sharp PNG reader/writer race through complete
+same-directory temporary writes, atomic rename, read-only tracked inputs,
+isolated input/output roots, and deterministic concurrent regression
+coverage—without retry, sleep, serialization, or repository fallback.
+PR #25 defines Local Experimental Asset Mode: ignored material below
+`artifacts/experimental/<experiment-id>/` may support local Creator/runtime
+experiments but remains untracked and cannot enter GitHub without
+Repository Candidate promotion and publication review.
 
-Working-copy and tracked-files-only verification each pass 491/491 tests.
-Creator lifecycle/spatial/visual acceptance and external review pass, while
-feature and documentation branches track zero evidence media.
+Working-copy and frozen tracked-files-only verification pass 508/508 tests.
+`main` tracks zero MP4 files, and ignored local experimental inputs are not a
+CI or clean-checkout dependency.
 
-v0.4.0 remains a prerelease framework baseline. Its effects are
-procedural/reference VFX, not production art. Audio/gameplay execution,
-Unity/Godot adapters, Windows verification, original Red Cap reconstruction,
-AI asset generation, automatic fitting, and a complete production editor UI
-remain unimplemented or unverified. TASK-014D4 has not started.
+v0.5.0 is a prerelease **Production Character Vertical Slice Baseline**, not a
+complete commercial game or a general-purpose art-production system. Cocos
+Creator 3.8.8 on macOS is the verified live environment. Windows remains
+unverified; Unity and Godot adapters, audio/gameplay execution, and a complete
+production editor UI are not implemented. TASK-015D and TASK-014D4 have not
+started. A possible two-character, one-scene fighting experiment is only a
+future candidate direction.
 
-See the [v0.4.0 release
-baseline](docs/releases/v0.4.0-data-driven-vfx-authoring-baseline.md),
-[v0.3.0 semantic events
-baseline](docs/releases/v0.3.0-character-semantic-events-vfx-baseline.md),
-and [compatibility matrix](docs/compatibility.md).
+See the [v0.5.0 release
+baseline](docs/releases/v0.5.0-production-character-vertical-slice-baseline.md),
+[PROGRAM-015 acceptance](docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md),
+[asset publication policy](docs/asset-pipeline.md), and
+[compatibility matrix](docs/compatibility.md).
