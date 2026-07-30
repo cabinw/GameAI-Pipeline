@@ -3,74 +3,106 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: Sharp Full-Loadout Empty-Buffer Regression
+## Active plan: Local Experimental Asset Mode
 
-- Status: Implementation and local verification complete; publication pending
+- Status: Accepted; pending final integration
 - Started: 2026-07-31
-- Branch: `fix/sharp-empty-buffer-generation-race-regression`
-- Exact baseline `main`: `555f0b8e34affff0942ea0785dec5ce041440ae2`
-- Scope ceiling: at most 14 changed files and 2,000 changed lines; zero
-  binary, PNG, Scene, `.meta`, PROGRAM-015 runtime/asset/semantic, rights, or
-  provenance changes.
+- Branch: `policy/local-experimental-asset-mode`
+- Exact baseline `main`: `61d4e443dcabe2a74b75f07498c4de6886875a6f`
+- Scope ceiling: at most 8 changed files and 1,200 changed lines; zero binary,
+  media, runtime, schema, generator, package, lockfile, accepted asset,
+  rights, provenance, Scene, or `.meta` changes.
 
 ### Goal
 
-Eliminate the remaining path by which concurrent production-lite generator
-tests can expose an empty or partial attachment PNG to the full-loadout
-reader, while preserving every accepted output byte.
+Define a repository policy that permits disposable local-only asset
+experiments under one ignored directory without weakening the publication
+gate for anything that will be tracked, pushed, reviewed, or released.
 
-### Root cause and boundaries
+### Boundaries
 
-The earlier Sharp fix made the base-character and full-loadout writers atomic
-and added isolated output roots. Three sibling production-lite family tests
-still ran their generators and reconstruction verifiers against tracked
-fixture and Cocos roots. Those scripts used direct `writeFile` publication for
-attachment and reference PNGs. Node's package test runner executes test files
-concurrently, so the full-loadout generator could read a garment or prop
-attachment after truncate and before the matching direct write completed.
-
-The repair keeps tracked inputs read-only, gives every generator test a
-complete read-only input snapshot and unique fixture/Cocos output roots,
-routes all related family generator/verifier publication through the existing
-same-directory atomic writer, and retains real concurrent scheduling with
-explicit barriers. No retry, sleep, serialization, fallback, or relaxed test
-is permitted.
+- `artifacts/experimental/<experiment-id>/` is the only standard local
+  experimental root. Inputs, generated outputs, temporary Scenes, recordings,
+  screenshots, and analyses below it remain ignored and untracked.
+- Local Experimental Assets do not require repository publication rights or
+  provenance records, but they are not approved for repository publication or
+  redistribution and create no ownership, commercial-use, or redistribution
+  claim.
+- Promotion begins before Git staging. A Repository Candidate must pass
+  rights/provenance, privacy, security, redistribution, dependency, binary,
+  media, generated-closure, and budget review before it can become an
+  Accepted Repository Asset.
+- Tracked code and CI must remain independently verifiable from tracked-only
+  inputs and must never read, enumerate, hash, log, or upload the ignored
+  experimental directory.
+- PROGRAM-015 accepted assets, rights/provenance records, and historical
+  evidence are unchanged. This policy applies prospectively.
 
 ### Execution
 
-1. Parameterize the head-accessory, garment, and one-handed-prop generators
-   and verifiers with explicit input and output roots.
-2. Replace their direct output writes with complete write/sync/close plus
-   same-directory atomic rename and failure cleanup.
-3. Isolate all corresponding generator tests and the full-loadout generation
-   test from tracked mutable roots.
-4. Prove old/new atomic visibility, valid PNG signatures/Sharp metadata,
-   dual-generator barrier overlap, input immutability, mirror identity, temp
-   cleanup, and accepted byte closure.
-5. Run focused, three consecutive package, two-environment workspace,
-   generated-output, Markdown, binary/media, and protected-content gates.
+1. Add the ignored root and document the three asset states and promotion
+   gate in `AGENTS.md`, the asset-pipeline guide, and the documentation index.
+2. Add a task with explicit acceptance criteria and a focused text-only
+   policy test that evaluates ignore/index rules without creating or scanning
+   experimental files.
+3. Run the focused test, ignore/index assertions, Markdown-link and whitespace
+   checks, working-copy verification, frozen tracked-files-only verification,
+   generated-output closure, and binary/media audits.
+4. Publish one documentation commit to a Draft PR and keep the PR unmerged.
 
 ### Done when
 
-- No related production-lite generator or verifier directly publishes a PNG.
-- Full-loadout readers never share a writable input path with sibling tests.
-- Accepted PNGs and all non-provenance semantic outputs remain byte-identical.
-- Working-copy, frozen tracked-files-only, and GitHub Actions verification
-  pass.
-- The independent fix is squash-merged and post-merge main verification
-  passes before the local policy task resumes.
+- The standard experimental path is ignored and has no tracked entries.
+- The three states and pre-staging promotion gate are unambiguous.
+- CI and clean tracked-only validation have no hidden local-asset dependency.
+- The change stays within 8 files and 1,200 changed lines with zero binary or
+  media changes.
+- The Draft PR CI passes while protected refs, releases, PROGRAM-015,
+  accepted rights, and provenance remain unchanged.
 
 ### Local verification result
 
-The repair changes 13 text files and no binary/media, PNG, Scene, `.meta`,
-runtime, schema, PROGRAM-015, rights, or provenance bytes. Six focused
-atomic/concurrency/isolation tests passed. The complete character-asset-intake
-package passed 75/75 three consecutive times under its normal concurrent
-schedule. Working-copy and fresh frozen tracked-files-only workspace
-verification each passed 508/508. Accepted fixture and Cocos output hashes,
-all tracked PNGs, and the locked rights/provenance files remained
-byte-identical; direct-writer, generated-output, temp-cleanup, Markdown-link,
-whitespace, and media gates passed.
+The focused policy test, literal ignore probe, empty tracked-index query,
+Markdown links, whitespace, generated-output closure, and binary/media audits
+passed without creating or inspecting an experimental asset. Working-copy and
+fresh frozen tracked-files-only workspace verification each passed 508/508.
+The final policy scope is 8 text files and remains below 1,200 changed lines;
+PROGRAM-015, accepted rights/provenance, Tags, Releases, and protected refs
+remain unchanged.
+
+### Final review result
+
+Final policy review of PR #25 at implementation commit
+`059eb86bec925fc6c26b5a66aab74e6b7498038a` passed. The review confirmed the
+exact eight-file policy boundary, path/index-only test isolation, a clean
+tracked-files-only dependency boundary, zero binary/media/runtime/schema
+scope, and zero reviews, comments, requested changes, or unresolved review
+threads. GitHub Actions run `30568550710` passed on that exact commit. This
+append-only acceptance record changes only this plan and the existing policy
+task; it does not alter the accepted policy, PROGRAM-015, rights/provenance,
+or any protected ref.
+
+## Completed plan: Sharp Full-Loadout Empty-Buffer Regression
+
+- Status: Published through PR #24 and squash-merged to `main` at
+  `61d4e443dcabe2a74b75f07498c4de6886875a6f`
+- Started: 2026-07-31
+- Branch: `fix/sharp-empty-buffer-generation-race-regression`
+- Exact baseline `main`: `555f0b8e34affff0942ea0785dec5ce041440ae2`
+- Final scope: 13 text files, 772 additions, 136 deletions; zero binary/media,
+  PNG, Scene, `.meta`, PROGRAM-015 runtime/asset/semantic, rights, or
+  provenance changes.
+
+### Result
+
+All affected production-lite family generator and verifier output publication
+uses the existing same-directory atomic writer. Generator tests use complete
+read-only input snapshots and unique fixture/Cocos roots, while an explicit
+barrier preserves real concurrent base/full-loadout scheduling. Six focused
+tests, three consecutive 75/75 package runs, working-copy and frozen
+tracked-files-only 508/508 workspace verification, PR Actions run
+`30567473033`, and post-merge main run `30567717149` passed. The accepted
+561-file fixture/Cocos closure remained byte-identical.
 
 ## Completed plan: PROGRAM-015 Red Cap Production Vertical Slice
 

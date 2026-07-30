@@ -23,6 +23,32 @@ Task → plan → implementation → validation → documentation → pull reque
 
 Before editing code, update `PLANS.md` for work spanning multiple files or architectural boundaries.
 
+## Asset states and local experiments
+
+The authoritative asset-state and promotion policy is
+[`docs/asset-pipeline.md`](docs/asset-pipeline.md).
+
+- A **Local Experimental Asset** is disposable local-only experimental input,
+  not approved for repository publication or redistribution. Its only
+  standard root is `artifacts/experimental/<experiment-id>/`, and the input
+  plus every direct derivative stays ignored and untracked.
+- “Do not upload to GitHub” is a hard boundary for Local Experimental Assets:
+  do not stage, commit, push, attach them to a PR, place them on an evidence
+  branch, or publish them in a Tag or Release.
+- Missing repository rights/provenance records must not block a purely local
+  experiment. This exception does not assert ownership, commercial use,
+  modification, or redistribution rights and never applies to publication.
+- Before an asset or direct derivative is prepared for Git staging, pushing,
+  review, or publication, classify it as a **Repository Candidate** and run
+  the complete rights/provenance, privacy, security, redistribution, and
+  dependency audit.
+- Only an **Accepted Repository Asset** may enter Git. Tracked code, fixtures,
+  generators, manifests, Scenes, and tests must work in a clean tracked-only
+  checkout without local experimental assets.
+- Automation and CI must not read, enumerate, hash, log, or upload the ignored
+  experimental directory. Use public, programmatic, synthetic, or already
+  accepted fixtures for remote checks.
+
 ## Pull request sizing and evidence policy
 
 - Keep one runtime capability per pull request.
