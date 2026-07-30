@@ -1,6 +1,6 @@
 # PROGRAM-015: Red Cap Production Vertical Slice
 
-- Status: TASK-015A and TASK-015B accepted; TASK-015C in progress
+- Status: Accepted; TASK-015A/B/C complete
 - Date: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -198,4 +198,10 @@ fault, rebuild, Reset, and console gates in commit `9d1627b`; TASK-015B may
 proceed. TASK-015B subsequently passed its four-clip 60 Hz, loop, planted-foot,
 socket, semantic lifecycle, Creator playback, pause/resume, two-rebuild,
 post-rebuild, stress/debug, Exact Reset, nine-point fault, clean-console, and
-full-workspace gates; TASK-015C may proceed.
+full-workspace gates in commit `70e0ba3`; TASK-015C may proceed. TASK-015C
+subsequently passed deterministic source/resource closure, independent
+Scene/meta identity, two-character safe composition, namespace isolation,
+D1/D2 reuse, locked Dust/Trail/Aura framebuffer thresholds, Pause/Resume,
+Stress/Debug, two rebuilds, post-rebuild effects, Exact Reset, restart, final
+hold, and clean-console gates. PROGRAM-015 is accepted locally with all A/B/C
+tasks complete.

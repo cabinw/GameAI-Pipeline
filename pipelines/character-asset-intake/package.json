@@ -35,6 +35,7 @@
     "generate:red-cap-overlaps": "node scripts/extract-canonical-parts.mjs && node scripts/generate-articulation-overlaps.mjs && node scripts/prepare-mapped-assets.mjs ../../examples/red-cap-target-remade/source-asset-map.json && pnpm --filter @gameai/rig-layout-generator fixtures:generate && node scripts/reconstruct-red-cap-remade.mjs && pnpm run audit:red-cap && node scripts/verify-articulation-stress.mjs && pnpm run sync:red-cap-cocos && node scripts/generate-cocos-articulation-scenes.mjs",
     "generate:red-cap-production-v1": "node scripts/generate-red-cap-production-v1.mjs",
     "generate:red-cap-production-motion": "node scripts/generate-red-cap-production-motion.mjs",
+    "generate:red-cap-showcase": "pnpm --filter @gameai/vfx-authoring build && node scripts/generate-red-cap-showcase.mjs",
     "verify:red-cap-production-static": "node scripts/verify-red-cap-production-static.mjs",
     "verify:red-cap-articulation": "pnpm run build && node scripts/verify-articulation-stress.mjs",
     "sync:red-cap-cocos": "node scripts/sync-cocos-fixture.mjs ../../examples/red-cap-target-remade ../../cocos/projects/character-rig-builder-mvp/assets/gameai/red-cap-target-remade"

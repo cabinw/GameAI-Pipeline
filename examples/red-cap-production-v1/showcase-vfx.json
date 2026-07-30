@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "1.0.0",
+  "cues": [
+    {
+      "cueId": "program015-aura",
+      "lifecycle": "persistent",
+      "deterministicSeed": 15003,
+      "layers": [
+        {
+          "layerId": "inner-glow",
+          "order": 0,
+          "primitive": "sprite-quad",
+          "logicalResourceId": "program015.aura-glow",
+          "durationSeconds": 1.5,
+          "color": { "r": 0.22, "g": 0.72, "b": 1, "a": 1 },
+          "opacity": 0.32,
+          "scaleCurve": [
+            { "time": 0, "value": 1.5 },
+            { "time": 0.5, "value": 1.8 },
+            { "time": 1, "value": 1.5 }
+          ],
+          "blendRole": "additive"
+        },
+        {
+          "layerId": "outer-ring",
+          "order": 10,
+          "primitive": "ring",
+          "logicalResourceId": "program015.aura-ring",
+          "durationSeconds": 1.5,
+          "color": { "r": 0.25, "g": 0.78, "b": 1, "a": 1 },
+          "opacity": 0.8,
+          "scaleCurve": [
+            { "time": 0, "value": 1.45 },
+            { "time": 0.5, "value": 1.75 },
+            { "time": 1, "value": 1.45 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": 0 },
+            { "time": 1, "value": 360 }
+          ],
+          "blendRole": "screen"
+        }
+      ]
+    },
+    {
+      "cueId": "program015-dust",
+      "lifecycle": "one-shot",
+      "deterministicSeed": 15001,
+      "layers": [
+        {
+          "layerId": "dust-burst",
+          "order": 0,
+          "primitive": "burst-particles",
+          "logicalResourceId": "program015.dust-soft",
+          "durationSeconds": 0.6,
+          "transform": {
+            "position": { "x": 0, "y": 4 },
+            "rotationDegrees": 0,
+            "scale": { "x": 1.2, "y": 0.8 }
+          },
+          "color": { "r": 0.76, "g": 0.55, "b": 0.31, "a": 1 },
+          "opacity": 0.92,
+          "scaleCurve": [
+            { "time": 0, "value": 0.7 },
+            { "time": 1, "value": 1.2 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": -8 },
+            { "time": 1, "value": 12 }
+          ],
+          "emission": { "count": 12, "ratePerSecond": 36 },
+          "blendRole": "alpha"
+        },
+        {
+          "layerId": "ground-ring",
+          "order": 10,
+          "primitive": "ring",
+          "logicalResourceId": "program015.dust-ring",
+          "durationSeconds": 0.45,
+          "color": { "r": 0.9, "g": 0.69, "b": 0.4, "a": 1 },
+          "opacity": 0.72,
+          "scaleCurve": [
+            { "time": 0, "value": 0.25 },
+            { "time": 1, "value": 0.65 }
+          ],
+          "blendRole": "alpha"
+        }
+      ]
+    },
+    {
+      "cueId": "program015-trail",
+      "lifecycle": "looping",
+      "deterministicSeed": 15002,
+      "layers": [
+        {
+          "layerId": "hand-ribbon",
+          "order": 0,
+          "primitive": "ribbon",
+          "logicalResourceId": "program015.ribbon",
+          "durationSeconds": 0.48,
+          "transform": {
+            "position": { "x": 0, "y": 0 },
+            "rotationDegrees": -20,
+            "scale": { "x": 1.15, "y": 1.15 }
+          },
+          "color": { "r": 1, "g": 0.48, "b": 0.2, "a": 1 },
+          "opacity": 0.96,
+          "scaleCurve": [
+            { "time": 0, "value": 1 },
+            { "time": 1, "value": 0.3 }
+          ],
+          "rotationCurve": [
+            { "time": 0, "value": -12 },
+            { "time": 1, "value": 28 }
+          ],
+          "blendRole": "additive"
+        }
+      ]
+    }
+  ]
+}

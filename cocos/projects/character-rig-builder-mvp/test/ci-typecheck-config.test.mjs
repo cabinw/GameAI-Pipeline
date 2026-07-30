@@ -321,3 +321,115 @@ test("keeps PROGRAM-015 motion controls, runtime imports, and fault ownership ex
   assert.match(source, /this\.semantic\.dispose\(\)/);
   assert.match(source, /input\.off\(Input\.EventType\.KEY_DOWN/);
 });
+
+test("binds the PROGRAM-015 showcase scene to one enabled production component", async () => {
+  const scene = JSON.parse(
+    await readFile(
+      path.join(projectRoot, "assets/red-cap-production-showcase.scene"),
+      "utf8",
+    ),
+  );
+  const sceneMeta = JSON.parse(
+    await readFile(
+      path.join(projectRoot, "assets/red-cap-production-showcase.scene.meta"),
+      "utf8",
+    ),
+  );
+  const showcaseMeta = JSON.parse(
+    await readFile(
+      path.join(
+        projectRoot,
+        "assets/gameai/program015-showcase/program015-production-showcase.ts.meta",
+      ),
+      "utf8",
+    ),
+  );
+  const legacyMotion = scene.find(
+    (entry) => entry.__type__ === "150bbm28mVCw4UuJxhamvPz",
+  );
+  const showcase = scene.find(
+    (entry) => entry.__type__ === "e64a7BRfO9BBL009GoOm9Gf",
+  );
+
+  assert.equal(scene[0]._name, "red-cap-production-showcase");
+  assert.equal(sceneMeta.importer, "scene");
+  assert.equal(sceneMeta.uuid, "07e80c54-7a3f-45cf-876f-349923543a90");
+  assert.equal(showcaseMeta.importer, "typescript");
+  assert.equal(showcaseMeta.uuid, "e64a7051-7cef-4104-bd34-f46a0e9bd19f");
+  assert.ok(legacyMotion);
+  assert.equal(legacyMotion._enabled, false);
+  assert.ok(showcase);
+  assert.equal(showcase._enabled, true);
+  assert.equal(
+    scene.filter((entry) => entry.__type__ === "e64a7BRfO9BBL009GoOm9Gf").length,
+    1,
+  );
+});
+
+test("keeps PROGRAM-015 showcase resources, controls, and D1/D2 boundary explicit", async () => {
+  const source = await readFile(
+    path.join(
+      projectRoot,
+      "assets/gameai/program015-showcase/program015-production-showcase.ts",
+    ),
+    "utf8",
+  );
+  for (const key of [
+    "DIGIT_1",
+    "DIGIT_2",
+    "DIGIT_3",
+    "SPACE",
+    "KEY_T",
+    "KEY_B",
+    "KEY_R",
+    "KEY_D",
+  ]) {
+    assert.match(source, new RegExp(`KeyCode\\.${key}`));
+  }
+  for (const target of [
+    "showcase.production-lite.left-foot",
+    "showcase.production-lite.body-center",
+    "showcase.red-cap.left-grip",
+    "showcase.red-cap.right-grip",
+    "showcase.red-cap.torso",
+  ]) {
+    assert.match(source, new RegExp(target.replaceAll(".", "\\.")));
+  }
+  for (const signal of [
+    "PROGRAM015_SHOWCASE_READY",
+    "PROGRAM015_SHOWCASE_EXACT_RESET",
+  ]) {
+    assert.match(source, new RegExp(signal));
+  }
+  assert.match(source, /compileCocosVfxRenderDescriptors/);
+  assert.match(source, /new CocosRenderPlanHost/);
+  assert.match(source, /new CocosVfxRuntimeState/);
+  assert.match(source, /vfxSoftMaskFrame/);
+  assert.doesNotMatch(
+    source,
+    /spriteFrame:\s*resource\.recipeKind === "textured-sprite"\s*\?\s*redCapFrame/,
+  );
+  assert.match(source, /input\.off\(Input\.EventType\.KEY_DOWN/);
+  assert.match(source, /this\.vfxRuntime\?\.cleanup\(reason\)/);
+
+  for (const file of [
+    "training-ground-background.png",
+    "production-lite-character.png",
+    "red-cap-character.png",
+    "vfx-soft-mask.png",
+  ]) {
+    const meta = JSON.parse(
+      await readFile(
+        path.join(
+          projectRoot,
+          "assets/resources/program015-showcase",
+          `${file}.meta`,
+        ),
+        "utf8",
+      ),
+    );
+    assert.equal(meta.importer, "image", file);
+    assert.equal(meta.imported, true, file);
+    assert.ok(meta.subMetas.f9941, file);
+  }
+});

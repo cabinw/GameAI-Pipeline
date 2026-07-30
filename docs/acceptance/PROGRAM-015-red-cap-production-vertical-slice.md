@@ -2,16 +2,18 @@
 
 ## Current decision
 
-Phase 0 source readiness, TASK-015A, and TASK-015B are accepted on
-2026-07-30. TASK-015C is in progress.
+Phase 0 source readiness and TASK-015A/B/C are accepted on 2026-07-30.
+PROGRAM-015 is complete locally.
 
 ## Required acceptance chain
 
 1. Phase 0 source readiness passes.
 2. TASK-015A automated and Creator gates pass; append A checkpoint. PASS
    (`9d1627b`).
-3. TASK-015B automated and Creator gates pass; append B checkpoint. PASS.
+3. TASK-015B automated and Creator gates pass; append B checkpoint. PASS
+   (`70e0ba3`).
 4. TASK-015C automated and Creator gates pass; append C/final checkpoint.
+   PASS.
 5. Complete workspace, typecheck, clean-CI, working-copy, frozen
    tracked-files-only, closure, Scene/meta identity, deterministic bytes,
    Markdown links, diff, media scope, and protected-reference gates pass.
@@ -66,3 +68,21 @@ All rows in
 The accepted machine-readable inputs are
 `../../examples/red-cap-production-v1/source-authority-map.json` and
 `../../examples/red-cap-production-v1/showcase-layout.json`.
+
+## Phase C accepted evidence
+
+- Independent Creator-owned Scene:
+  `../../cocos/projects/character-rig-builder-mvp/assets/red-cap-production-showcase.scene`.
+- Four deterministic PNG resources: licensed background, accepted
+  production-lite composite, accepted Red Cap composite, and procedural VFX
+  soft mask.
+- D1 authoring produces a byte-stable Render Plan consumed by the existing D2
+  Creator host/runtime; no D1/D2 public source changed.
+- Locked changed-pixel gates: Dust 376, Trail 4,077, Aura 16,492.
+- Pause stability: zero changed pixels; Resume active ROI: 40,125 changed
+  pixels.
+- Creator 3.8.8 restart, sequence, Transform Stress, debug, two rebuilds,
+  post-rebuild effects, Exact Reset, final hold, and clean Preview console:
+  PASS.
+- Full details:
+  `../reports/PROGRAM-015-phase-c-showcase.md`.

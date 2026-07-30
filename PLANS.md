@@ -5,7 +5,7 @@ time.
 
 ## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: TASK-015A and TASK-015B accepted; TASK-015C in progress
+- Status: Accepted; TASK-015A/B/C complete
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`

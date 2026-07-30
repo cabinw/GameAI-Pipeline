@@ -497,3 +497,119 @@ test("generates byte-stable 60 Hz Red Cap motion with locked contacts and socket
     assert.ok(Math.hypot(evaluated.x - expected.x, evaluated.y - expected.y) <= 2);
   }
 });
+
+test("closes the PROGRAM-015 showcase layout, sequence, VFX, and generated resources", async () => {
+  const layout = JSON.parse(
+    await readFile(path.join(fixtureRoot, "showcase-layout.json"), "utf8"),
+  ) as {
+    viewport: { width: number; height: number; safeInset: number };
+    characters: Array<{
+      namespace: string;
+      maximumSilhouette: { x: number; y: number; width: number; height: number };
+    }>;
+  };
+  const sequence = JSON.parse(
+    await readFile(path.join(fixtureRoot, "showcase-sequence.json"), "utf8"),
+  ) as {
+    events: Array<{ cueId?: string; targetId?: string }>;
+  };
+  const registry = JSON.parse(
+    await readFile(
+      path.join(fixtureRoot, "showcase-vfx-resource-registry.json"),
+      "utf8",
+    ),
+  ) as Array<{ resourceId: string; recipeKind: string }>;
+  const renderPlan = JSON.parse(
+    await readFile(path.join(fixtureRoot, "showcase.render-plan.json"), "utf8"),
+  ) as {
+    cues: Array<{
+      cueId: string;
+      layers: Array<{ resource: { resourceId: string } }>;
+    }>;
+  };
+  const report = JSON.parse(
+    await readFile(
+      path.join(fixtureRoot, "showcase-generation-report.json"),
+      "utf8",
+    ),
+  ) as {
+    status: string;
+    newPngResourceCount: number;
+    featureMediaCount: number;
+    vfxPath: {
+      existingPrimitivesOnly: boolean;
+      publicRuntimeChanges: boolean;
+      texturedSpriteSource: string;
+    };
+    outputs: Record<string, string>;
+  };
+
+  assert.deepEqual(layout.viewport, { width: 1280, height: 720, safeInset: 64 });
+  assert.deepEqual(
+    layout.characters.map((character) => character.namespace),
+    ["showcase.production-lite", "showcase.red-cap"],
+  );
+  const left = layout.characters[0]!.maximumSilhouette;
+  const right = layout.characters[1]!.maximumSilhouette;
+  assert.ok(right.x - (left.x + left.width) >= 48);
+  for (const bounds of [left, right]) {
+    assert.ok(bounds.x >= 64);
+    assert.ok(bounds.y >= 64);
+    assert.ok(bounds.x + bounds.width <= 1216);
+    assert.ok(bounds.y + bounds.height <= 656);
+  }
+
+  const resourceIds = new Set(registry.map((resource) => resource.resourceId));
+  assert.deepEqual(
+    [...new Set(renderPlan.cues.map((cue) => cue.cueId))].sort(),
+    ["program015-aura", "program015-dust", "program015-trail"],
+  );
+  for (const cue of renderPlan.cues) {
+    for (const layer of cue.layers) {
+      assert.ok(resourceIds.has(layer.resource.resourceId));
+    }
+  }
+  assert.ok(
+    sequence.events.every(
+      (event) =>
+        event.targetId === undefined ||
+        event.targetId.startsWith("showcase.production-lite.") ||
+        event.targetId.startsWith("showcase.red-cap."),
+    ),
+  );
+
+  assert.equal(report.status, "passed");
+  assert.equal(report.newPngResourceCount, 4);
+  assert.equal(report.featureMediaCount, 0);
+  assert.deepEqual(report.vfxPath, {
+    ...report.vfxPath,
+    existingPrimitivesOnly: true,
+    publicRuntimeChanges: false,
+    texturedSpriteSource: "deterministic 64x64 procedural soft mask",
+  });
+  for (const [file, expectedSha] of Object.entries(report.outputs)) {
+    assert.equal(
+      createHash("sha256")
+        .update(await readFile(path.join(repositoryRoot, file)))
+        .digest("hex"),
+      expectedSha,
+      file,
+    );
+  }
+
+  const resourceRoot = path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/assets/resources/program015-showcase",
+  );
+  const expectedDimensions = new Map([
+    ["training-ground-background.png", [1280, 720]],
+    ["production-lite-character.png", [212, 480]],
+    ["red-cap-character.png", [274, 500]],
+    ["vfx-soft-mask.png", [64, 64]],
+  ]);
+  for (const [file, [width, height]] of expectedDimensions) {
+    const metadata = await sharp(path.join(resourceRoot, file)).metadata();
+    assert.equal(metadata.width, width, file);
+    assert.equal(metadata.height, height, file);
+  }
+});

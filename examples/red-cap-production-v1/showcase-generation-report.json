@@ -1,0 +1,46 @@
+{
+  "status": "passed",
+  "generator": "generate-red-cap-showcase.mjs",
+  "backgroundAuthority": {
+    "source": "source/training-ground-background.png",
+    "sourceSha256": "9f985dfad9218fd88f915a861aa5fbb016a5de1e138c5f2000e2fd5a45fb7b58",
+    "operation": "locked crop then deterministic 1280x720 resize",
+    "generatedOrProceduralFallback": false
+  },
+  "styleBoard": {
+    "source": "source/style-board.png",
+    "sha256": "9f4c4fd1a6a176fa72ffd54e0509435de972051e8e930f24366722935f43ca5e",
+    "runtimeAuthority": false
+  },
+  "vfxPath": {
+    "authoring": "showcase-vfx.json",
+    "compiler": "@gameai/vfx-authoring",
+    "renderPlan": "showcase.render-plan.json",
+    "existingPrimitivesOnly": true,
+    "publicRuntimeChanges": false,
+    "texturedSpriteSource": "deterministic 64x64 procedural soft mask"
+  },
+  "characters": {
+    "productionLite": {
+      "sourceWidth": 269,
+      "sourceHeight": 608,
+      "width": 212,
+      "height": 480
+    },
+    "redCap": {
+      "sourceWidth": 632,
+      "sourceHeight": 1151,
+      "width": 274,
+      "height": 500
+    }
+  },
+  "newPngResourceCount": 4,
+  "featureMediaCount": 0,
+  "outputs": {
+    "cocos/projects/character-rig-builder-mvp/assets/resources/program015-showcase/training-ground-background.png": "8e7c2a16ea0b9266b19a310b1ef1731af13b63cc38042a4bd6d5dabf89090590",
+    "cocos/projects/character-rig-builder-mvp/assets/resources/program015-showcase/vfx-soft-mask.png": "2417db1c5bf96712c96581ab793ff1ecaa017a86bfbea44cc2874eb658254ff5",
+    "cocos/projects/character-rig-builder-mvp/assets/resources/program015-showcase/production-lite-character.png": "4b3406e545c8df0369f1877482b8da8353e9aee6ab0696203a920cac5df6a72e",
+    "cocos/projects/character-rig-builder-mvp/assets/resources/program015-showcase/red-cap-character.png": "efdb58ec6467ac712eee52ae170fff3f45801fd0172424cd7fce6360af5cdf15",
+    "examples/red-cap-production-v1/showcase.render-plan.json": "3adda5bb3c090ca22f580ab44781f323ff81b7915302972619bb90951230c91d"
+  }
+}
