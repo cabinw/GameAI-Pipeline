@@ -1,20 +1,41 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import sharp from "sharp";
 
+import { atomicWriteFile } from "../../../cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/atomic-write.mjs";
+
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
-const fixtureRoot = path.join(repositoryRoot, "examples/production-lite-character");
-const cocosRoot = path.join(
-  repositoryRoot,
-  "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-character",
+const option = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined || value.startsWith("--")) {
+    throw new Error(`MISSING_OPTION_VALUE:${name}`);
+  }
+  return path.resolve(value);
+};
+const sourceRoot = option(
+  "--source-root",
+  path.join(repositoryRoot, "examples/production-lite-character"),
+);
+const fixtureRoot = option(
+  "--fixture-output-root",
+  path.join(repositoryRoot, "examples/production-lite-character"),
+);
+const cocosRoot = option(
+  "--cocos-output-root",
+  path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-character",
+  ),
 );
 const outputRoots = [fixtureRoot, cocosRoot];
 const sourceText = await readFile(
-  path.join(fixtureRoot, "source/character-source.json"),
+  path.join(sourceRoot, "source/character-source.json"),
   "utf8",
 );
 const source = JSON.parse(sourceText);
@@ -209,15 +230,24 @@ for (const root of outputRoots) {
   await mkdir(path.join(root, "parts"), { recursive: true });
   await mkdir(path.join(root, "animations"), { recursive: true });
   await mkdir(path.join(root, "reference"), { recursive: true });
-  await writeFile(path.join(root, "rig-layout.json"), json(layout));
-  await writeFile(path.join(root, "character-rig.json"), json(characterRig));
-  await writeFile(path.join(root, "reference/reference-composite.png"), reference);
-  await writeFile(path.join(root, "reference/authoring-provenance.json"), json(provenance));
+  await atomicWriteFile(path.join(root, "rig-layout.json"), json(layout));
+  await atomicWriteFile(path.join(root, "character-rig.json"), json(characterRig));
+  await atomicWriteFile(
+    path.join(root, "reference/reference-composite.png"),
+    reference,
+  );
+  await atomicWriteFile(
+    path.join(root, "reference/authoring-provenance.json"),
+    json(provenance),
+  );
   for (const [partId, png] of generatedParts) {
-    await writeFile(path.join(root, `parts/${partId}.png`), png);
+    await atomicWriteFile(path.join(root, `parts/${partId}.png`), png);
   }
   for (const generatedClip of clips) {
     const file = generatedClip.animationId.replace("production-lite-", "");
-    await writeFile(path.join(root, `animations/${file}.json`), json(generatedClip));
+    await atomicWriteFile(
+      path.join(root, `animations/${file}.json`),
+      json(generatedClip),
+    );
   }
 }

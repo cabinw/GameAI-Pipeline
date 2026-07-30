@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,23 +10,44 @@ import {
 import sharp from "sharp";
 
 import { reconstructAttachmentVariant } from "../dist/index.js";
+import { atomicWriteFile } from "../../../cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/atomic-write.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
-const fixtureRoot = path.join(
-  repositoryRoot,
-  "examples/production-lite-full-loadout",
+const option = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined || value.startsWith("--")) {
+    throw new Error(`MISSING_OPTION_VALUE:${name}`);
+  }
+  return path.resolve(value);
+};
+const inputExamplesRoot = option(
+  "--input-examples-root",
+  path.join(repositoryRoot, "examples"),
 );
-const sourceFile = path.join(fixtureRoot, "source/full-loadout-source.json");
+const sourceFixtureRoot = path.join(inputExamplesRoot, "production-lite-full-loadout");
+const fixtureRoot = option("--fixture-output-root", sourceFixtureRoot);
+const sourceFile = path.join(
+  sourceFixtureRoot,
+  "source/full-loadout-source.json",
+);
 const source = JSON.parse(await readFile(sourceFile, "utf8"));
 const sourceDirectory = path.dirname(sourceFile);
-const baseRoot = path.resolve(sourceDirectory, source.baseFixture);
+const baseRoot = option(
+  "--base-asset-root",
+  path.resolve(sourceDirectory, source.baseFixture),
+);
 const rigLayout = JSON.parse(
   await readFile(path.resolve(sourceDirectory, source.rigSource), "utf8"),
 );
-const cocosRoot = path.join(
-  repositoryRoot,
-  "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-full-loadout",
+const cocosRoot = option(
+  "--cocos-output-root",
+  path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-full-loadout",
+  ),
 );
 const outputRoots = [fixtureRoot, cocosRoot];
 const generatorFile = fileURLToPath(import.meta.url);
@@ -166,15 +187,15 @@ const animationSources = [
 const clips = [];
 for (const [fileName, relativeSource, animationId] of animationSources) {
   const clip = JSON.parse(
-    await readFile(path.join(repositoryRoot, "examples", relativeSource), "utf8"),
+    await readFile(path.join(inputExamplesRoot, relativeSource), "utf8"),
   );
   clips.push([fileName, { ...clip, animationId }]);
 }
 const garmentStress = JSON.parse(
   await readFile(
     path.join(
-      repositoryRoot,
-      "examples/production-lite-garment-layering/animations/garment-stress.json",
+      inputExamplesRoot,
+      "production-lite-garment-layering/animations/garment-stress.json",
     ),
     "utf8",
   ),
@@ -182,8 +203,8 @@ const garmentStress = JSON.parse(
 const propStress = JSON.parse(
   await readFile(
     path.join(
-      repositoryRoot,
-      "examples/production-lite-one-handed-prop/animations/prop-stress.json",
+      inputExamplesRoot,
+      "production-lite-one-handed-prop/animations/prop-stress.json",
     ),
     "utf8",
   ),
@@ -221,31 +242,32 @@ for (const root of outputRoots) {
   await mkdir(path.join(root, "families"), { recursive: true });
   await mkdir(path.join(root, "reference"), { recursive: true });
   await mkdir(path.join(root, "resolved"), { recursive: true });
-  await writeFile(path.join(root, "rig-layout.json"), json(rigLayout));
-  await writeFile(path.join(root, "loadout-contract.json"), json(serializedContract));
-  await writeFile(
+  await atomicWriteFile(path.join(root, "rig-layout.json"), json(rigLayout));
+  await atomicWriteFile(
+    path.join(root, "loadout-contract.json"),
+    json(serializedContract),
+  );
+  await atomicWriteFile(
     path.join(root, "attachment-layout.json"),
     json(parsedCombined.value),
   );
   for (const family of families) {
-    await writeFile(
+    await atomicWriteFile(
       path.join(root, `families/${family.familyId}.attachment-layout.json`),
       json(family.attachmentLayout),
     );
   }
   for (const [fileName, clip] of clips) {
-    await writeFile(path.join(root, `animations/${fileName}`), json(clip));
+    await atomicWriteFile(path.join(root, `animations/${fileName}`), json(clip));
   }
 }
 
 for (const attachment of parsedCombined.value.attachments) {
   const origin = attachmentOrigin.get(attachment.attachmentId);
   if (origin === undefined) throw new Error(`ATTACHMENT_ORIGIN_MISSING:${attachment.attachmentId}`);
+  const bytes = await readFile(path.join(origin, attachment.file));
   for (const root of outputRoots) {
-    await copyFile(
-      path.join(origin, attachment.file),
-      path.join(root, attachment.file),
-    );
+    await atomicWriteFile(path.join(root, attachment.file), bytes);
   }
 }
 
@@ -313,23 +335,64 @@ for (const preset of source.exactRestPresets) {
   }
   reports[outputId] = exact.metrics;
   for (const root of outputRoots) {
-    await writeFile(path.join(root, `reference/${outputId}.png`), authored.reconstructed);
-    await writeFile(
+    await atomicWriteFile(
+      path.join(root, `reference/${outputId}.png`),
+      authored.reconstructed,
+    );
+    await atomicWriteFile(
       path.join(root, `reference/${outputId}-reconstructed.png`),
       exact.reconstructed,
     );
-    await writeFile(path.join(root, `reference/${outputId}-diff.png`), exact.comparison);
-    await writeFile(
+    await atomicWriteFile(
+      path.join(root, `reference/${outputId}-diff.png`),
+      exact.comparison,
+    );
+    await atomicWriteFile(
       path.join(root, `reference/${outputId}-report.json`),
       json(exact.metrics),
     );
-    await writeFile(
+    await atomicWriteFile(
       path.join(root, `resolved/${outputId}.json`),
       json(resolved),
     );
   }
 }
 
+const provenancePath = (file) => {
+  const relativeInput = path.relative(inputExamplesRoot, file);
+  if (
+    relativeInput !== ".." &&
+    !relativeInput.startsWith(`..${path.sep}`) &&
+    !path.isAbsolute(relativeInput)
+  ) {
+    return `examples/${relativeInput.replaceAll(path.sep, "/")}`;
+  }
+  return path.relative(repositoryRoot, file).replaceAll(path.sep, "/");
+};
+const provenanceInputs = [
+  generatorFile,
+  sourceFile,
+  path.resolve(sourceDirectory, source.rigSource),
+  ...loadedSources.keys(),
+  path.join(baseRoot, "source/character-source.json"),
+  ...animationSources.map(([, relativeSource]) =>
+    path.join(inputExamplesRoot, relativeSource),
+  ),
+  path.join(
+    inputExamplesRoot,
+    "production-lite-garment-layering/animations/garment-stress.json",
+  ),
+  path.join(
+    inputExamplesRoot,
+    "production-lite-one-handed-prop/animations/prop-stress.json",
+  ),
+  ...parsedCombined.value.attachments.map((attachment) =>
+    path.join(attachmentOrigin.get(attachment.attachmentId), attachment.file),
+  ),
+]
+  .filter((file, index, files) => files.indexOf(file) === index)
+  .map((file) => ({ file, path: provenancePath(file) }))
+  .sort((left, right) => left.path.localeCompare(right.path));
 const provenance = {
   schemaVersion: "1.0.0",
   taskId: "TASK-013",
@@ -342,34 +405,8 @@ const provenance = {
     .digest("hex"),
   exactRestPresets: source.exactRestPresets,
   inputs: await Promise.all(
-    [
-      generatorFile,
-      sourceFile,
-      path.resolve(sourceDirectory, source.rigSource),
-      ...loadedSources.keys(),
-      path.join(baseRoot, "source/character-source.json"),
-      ...animationSources.map(([, relativeSource]) =>
-        path.join(repositoryRoot, "examples", relativeSource),
-      ),
-      path.join(
-        repositoryRoot,
-        "examples/production-lite-garment-layering/animations/garment-stress.json",
-      ),
-      path.join(
-        repositoryRoot,
-        "examples/production-lite-one-handed-prop/animations/prop-stress.json",
-      ),
-      ...parsedCombined.value.attachments.map((attachment) =>
-        path.join(
-          attachmentOrigin.get(attachment.attachmentId),
-          attachment.file,
-        ),
-      ),
-    ]
-      .filter((file, index, files) => files.indexOf(file) === index)
-      .sort()
-      .map(async (file) => ({
-        path: path.relative(repositoryRoot, file).replaceAll(path.sep, "/"),
+    provenanceInputs.map(async ({ file, path: inputPath }) => ({
+        path: inputPath,
         sha256: createHash("sha256")
           .update(await readFile(file))
           .digest("hex"),
@@ -383,11 +420,11 @@ const provenance = {
   },
 };
 for (const root of outputRoots) {
-  await writeFile(
+  await atomicWriteFile(
     path.join(root, "reference/authoring-provenance.json"),
     json(provenance),
   );
-  await writeFile(
+  await atomicWriteFile(
     path.join(root, "reference/reconstruction-summary.json"),
     json(reports),
   );

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { mkdtemp, readFile, readdir } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -80,14 +80,40 @@ async function generatedDigests(root: string): Promise<Record<string, string>> {
 test("regenerates byte-stable transparent organic parts and the authored reference", async () => {
   const fixtureBefore = await generatedDigests(fixtureRoot);
   const cocosBefore = await generatedDigests(cocosRoot);
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/generate-production-lite-character.mjs")],
-    { cwd: packageRoot },
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "production-lite-character-generation-"),
   );
-  assert.deepEqual(await generatedDigests(fixtureRoot), fixtureBefore);
-  assert.deepEqual(await generatedDigests(cocosRoot), cocosBefore);
-  assert.deepEqual(cocosBefore, fixtureBefore);
+  const generatedFixtureRoot = path.join(temporaryRoot, "fixture");
+  const generatedCocosRoot = path.join(temporaryRoot, "cocos");
+  try {
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(packageRoot, "scripts/generate-production-lite-character.mjs"),
+        "--fixture-output-root",
+        generatedFixtureRoot,
+        "--cocos-output-root",
+        generatedCocosRoot,
+      ],
+      { cwd: packageRoot },
+    );
+    assert.deepEqual(
+      await generatedDigests(generatedFixtureRoot),
+      fixtureBefore,
+    );
+    assert.deepEqual(await generatedDigests(generatedCocosRoot), cocosBefore);
+    assert.deepEqual(cocosBefore, fixtureBefore);
+    assert.deepEqual(await generatedDigests(fixtureRoot), fixtureBefore);
+    assert.deepEqual(await generatedDigests(cocosRoot), cocosBefore);
+    assert.equal(
+      (await readdir(temporaryRoot, { recursive: true })).some((entry) =>
+        String(entry).endsWith(".tmp"),
+      ),
+      false,
+    );
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
 
   const dimensions = new Set<string>();
   const offsets = new Set<string>();

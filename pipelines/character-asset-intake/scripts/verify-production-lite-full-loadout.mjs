@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -21,21 +21,44 @@ import {
   reconstructAttachmentVariant,
   validateAttachmentSeamCoverage,
 } from "../dist/index.js";
+import { atomicWriteFile } from "../../../cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/atomic-write.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
-const fixtureRoot = path.join(
-  repositoryRoot,
-  "examples/production-lite-full-loadout",
+const option = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined || value.startsWith("--")) {
+    throw new Error(`MISSING_OPTION_VALUE:${name}`);
+  }
+  return path.resolve(value);
+};
+const inputExamplesRoot = option(
+  "--input-examples-root",
+  path.join(repositoryRoot, "examples"),
 );
-const cocosRoot = path.join(
-  repositoryRoot,
-  "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-full-loadout",
+const sourceFixtureRoot = path.join(inputExamplesRoot, "production-lite-full-loadout");
+const fixtureRoot = option("--fixture-output-root", sourceFixtureRoot);
+const cocosRoot = option(
+  "--cocos-output-root",
+  path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-full-loadout",
+  ),
 );
-const baseRoot = path.join(repositoryRoot, "examples/production-lite-character");
+const baseRoot = option(
+  "--base-asset-root",
+  path.join(inputExamplesRoot, "production-lite-character"),
+);
 const readJson = async (file) =>
   JSON.parse(await readFile(path.join(fixtureRoot, file), "utf8"));
-const source = await readJson("source/full-loadout-source.json");
+const source = JSON.parse(
+  await readFile(
+    path.join(sourceFixtureRoot, "source/full-loadout-source.json"),
+    "utf8",
+  ),
+);
 const serialized = await readJson("loadout-contract.json");
 const rigLayout = await readJson("rig-layout.json");
 const combinedLayout = await readJson("attachment-layout.json");
@@ -367,7 +390,7 @@ const report = {
   status: firstFailure === null ? "passed" : "failed",
 };
 for (const root of [fixtureRoot, cocosRoot]) {
-  await writeFile(
+  await atomicWriteFile(
     path.join(root, "continuous-validation-report.json"),
     json(report),
   );
