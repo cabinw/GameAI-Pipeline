@@ -1,24 +1,49 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import sharp from "sharp";
 
+import { atomicWriteFile } from "../../../cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/atomic-write.mjs";
+
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
-const fixtureRoot = path.join(
-  repositoryRoot,
-  "examples/production-lite-head-accessories",
+const option = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined || value.startsWith("--")) {
+    throw new Error(`MISSING_OPTION_VALUE:${name}`);
+  }
+  return path.resolve(value);
+};
+const inputExamplesRoot = option(
+  "--input-examples-root",
+  path.join(repositoryRoot, "examples"),
 );
-const baseRoot = path.join(repositoryRoot, "examples/production-lite-character");
-const cocosRoot = path.join(
-  repositoryRoot,
-  "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-head-accessories",
+const sourceFixtureRoot = path.join(
+  inputExamplesRoot,
+  "production-lite-head-accessories",
+);
+const fixtureRoot = option(
+  "--fixture-output-root",
+  sourceFixtureRoot,
+);
+const baseRoot = option(
+  "--base-asset-root",
+  path.join(inputExamplesRoot, "production-lite-character"),
+);
+const cocosRoot = option(
+  "--cocos-output-root",
+  path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-head-accessories",
+  ),
 );
 const outputRoots = [fixtureRoot, cocosRoot];
 const sourceText = await readFile(
-  path.join(fixtureRoot, "source/accessory-source.json"),
+  path.join(sourceFixtureRoot, "source/accessory-source.json"),
   "utf8",
 );
 const source = JSON.parse(sourceText);
@@ -198,19 +223,25 @@ for (const root of outputRoots) {
   await mkdir(path.join(root, "attachments"), { recursive: true });
   await mkdir(path.join(root, "animations"), { recursive: true });
   await mkdir(path.join(root, "reference"), { recursive: true });
-  await writeFile(path.join(root, "attachment-layout.json"), json(attachmentLayout));
-  await writeFile(
+  await atomicWriteFile(
+    path.join(root, "attachment-layout.json"),
+    json(attachmentLayout),
+  );
+  await atomicWriteFile(
     path.join(root, "animations/head-accessory-stress.json"),
     json(accessoryStress),
   );
-  await writeFile(
+  await atomicWriteFile(
     path.join(root, "reference/authoring-provenance.json"),
     json(provenance),
   );
   for (const [attachmentId, png] of attachmentPngs) {
-    await writeFile(path.join(root, `attachments/${attachmentId}.png`), png);
+    await atomicWriteFile(
+      path.join(root, `attachments/${attachmentId}.png`),
+      png,
+    );
   }
   for (const [variantId, png] of references) {
-    await writeFile(path.join(root, `reference/${variantId}.png`), png);
+    await atomicWriteFile(path.join(root, `reference/${variantId}.png`), png);
   }
 }

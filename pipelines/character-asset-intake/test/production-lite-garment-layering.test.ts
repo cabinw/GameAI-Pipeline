@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { readFile, readdir } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
@@ -31,6 +32,10 @@ import {
   type AttachmentSeamSample,
   type ProductionLiteLayout,
 } from "../source";
+import {
+  assertNoTemporaryFiles,
+  createReadOnlyExamplesSnapshot,
+} from "./generation-isolation";
 
 const execFileAsync = promisify(execFile);
 const packageRoot = path.resolve(__dirname, "../..");
@@ -139,30 +144,74 @@ test("generates byte-stable garment assets and preserves TASK-009/TASK-010", asy
       ]),
     ),
   );
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/generate-production-lite-garment-layering.mjs")],
-    { cwd: packageRoot },
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "production-lite-garment-generation-"),
   );
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/verify-production-lite-garment-layering.mjs")],
-    { cwd: packageRoot },
+  const snapshot = await createReadOnlyExamplesSnapshot(
+    repositoryRoot,
+    temporaryRoot,
+    ["production-lite-character", "production-lite-garment-layering"],
   );
-  assert.deepEqual(await digests(fixtureRoot, generated), before);
-  assert.deepEqual(await digests(cocosRoot, generated), mirror);
-  assert.deepEqual(mirror, before);
-  const acceptedAfter = Object.fromEntries(
-    await Promise.all(
-      acceptedFiles.map(async ([root, file]) => [
-        `${root}:${file}`,
-        createHash("sha256")
-          .update(await readFile(path.join(root, file)))
-          .digest("hex"),
-      ]),
-    ),
-  );
-  assert.deepEqual(acceptedAfter, acceptedBefore);
+  const generatedFixtureRoot = path.join(temporaryRoot, "fixture");
+  const generatedCocosRoot = path.join(temporaryRoot, "cocos");
+  const rootArguments = [
+    "--input-examples-root",
+    snapshot.root,
+    "--base-asset-root",
+    snapshot.fixture("production-lite-character"),
+    "--fixture-output-root",
+    generatedFixtureRoot,
+    "--cocos-output-root",
+    generatedCocosRoot,
+  ];
+  try {
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(
+          packageRoot,
+          "scripts/generate-production-lite-garment-layering.mjs",
+        ),
+        ...rootArguments,
+      ],
+      { cwd: packageRoot },
+    );
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(
+          packageRoot,
+          "scripts/verify-production-lite-garment-layering.mjs",
+        ),
+        ...rootArguments,
+      ],
+      { cwd: packageRoot },
+    );
+    assert.deepEqual(
+      await digests(generatedFixtureRoot, generated),
+      before,
+    );
+    assert.deepEqual(await digests(generatedCocosRoot, generated), mirror);
+    assert.deepEqual(mirror, before);
+    assert.deepEqual(await digests(fixtureRoot, generated), before);
+    assert.deepEqual(await digests(cocosRoot, generated), mirror);
+    const acceptedAfter = Object.fromEntries(
+      await Promise.all(
+        acceptedFiles.map(async ([root, file]) => [
+          `${root}:${file}`,
+          createHash("sha256")
+            .update(await readFile(path.join(root, file)))
+            .digest("hex"),
+        ]),
+      ),
+    );
+    assert.deepEqual(acceptedAfter, acceptedBefore);
+    await snapshot.assertUnchanged();
+    await assertNoTemporaryFiles(temporaryRoot);
+  } finally {
+    await snapshot.restoreWritable();
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
 });
 
 test("parses generic garment slots and grouped enable state without rig mutation", () => {

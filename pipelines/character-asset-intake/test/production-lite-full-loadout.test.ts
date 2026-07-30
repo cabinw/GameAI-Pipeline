@@ -19,6 +19,13 @@ import { promisify } from "node:util";
 
 import sharp from "sharp";
 
+import {
+  assertCompletePng,
+  assertNoTemporaryFiles,
+  createReadOnlyExamplesSnapshot,
+  createStartBarrier,
+} from "./generation-isolation";
+
 const execFileAsync = promisify(execFile);
 const packageRoot = path.resolve(__dirname, "../..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
@@ -92,6 +99,16 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
   const temporaryRoot = await mkdtemp(
     path.join(os.tmpdir(), "production-lite-full-loadout-generation-"),
   );
+  const snapshot = await createReadOnlyExamplesSnapshot(
+    repositoryRoot,
+    temporaryRoot,
+    [
+      "production-lite-character",
+      "production-lite-full-loadout",
+      "production-lite-garment-layering",
+      "production-lite-one-handed-prop",
+    ],
+  );
   const generatedFixtureRoot = path.join(temporaryRoot, "fixture");
   const generatedCocosRoot = path.join(temporaryRoot, "cocos");
   const generatedFiles = [
@@ -116,6 +133,10 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
       generatedFixtureRoot,
       "--cocos-output-root",
       generatedCocosRoot,
+      "--input-examples-root",
+      snapshot.root,
+      "--base-asset-root",
+      snapshot.fixture("production-lite-character"),
     ];
     await execFileAsync(process.execPath, generatorArguments, {
       cwd: packageRoot,
@@ -131,6 +152,10 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
         generatedFixtureRoot,
         "--cocos-output-root",
         generatedCocosRoot,
+        "--input-examples-root",
+        snapshot.root,
+        "--base-asset-root",
+        snapshot.fixture("production-lite-character"),
       ],
       { cwd: packageRoot },
     );
@@ -164,13 +189,16 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
       (await recursiveFiles(generatedCocosRoot)).sort(),
       generatedFiles,
     );
-    assert.equal(
-      (await readdir(temporaryRoot, { recursive: true })).some((entry) =>
-        String(entry).endsWith(".tmp"),
-      ),
-      false,
-    );
+    for (const file of generatedFiles.filter((entry) =>
+      entry.endsWith(".png"),
+    )) {
+      await assertCompletePng(path.join(generatedFixtureRoot, file));
+      await assertCompletePng(path.join(generatedCocosRoot, file));
+    }
+    await snapshot.assertUnchanged();
+    await assertNoTemporaryFiles(temporaryRoot);
   } finally {
+    await snapshot.restoreWritable();
     await rm(temporaryRoot, { recursive: true, force: true });
   }
 });
@@ -318,9 +346,14 @@ test("concurrent base generation and full-loadout reading stay byte-closed", asy
         .sort()
         .map((file) => digest(path.join(stableBaseRoot, "parts", file))),
     );
+    const waitForBothGenerators = createStartBarrier(2);
+    const runFromBarrier = async (arguments_: string[]) => {
+      await waitForBothGenerators();
+      return execFileAsync(process.execPath, arguments_, { cwd: packageRoot });
+    };
     await Promise.all([
-      execFileAsync(process.execPath, baseGenerator, { cwd: packageRoot }),
-      execFileAsync(process.execPath, fullGenerator, { cwd: packageRoot }),
+      runFromBarrier(baseGenerator),
+      runFromBarrier(fullGenerator),
     ]);
     await execFileAsync(
       process.execPath,
@@ -349,6 +382,10 @@ test("concurrent base generation and full-loadout reading stay byte-closed", asy
       stableInputBefore,
     );
     assert.deepEqual(acceptedBase, stableInputBefore);
+    for (const attachment of generatedLayout.attachments) {
+      await assertCompletePng(path.join(fullFixtureRoot, attachment.file));
+      await assertCompletePng(path.join(fullCocosRoot, attachment.file));
+    }
     assert.equal(
       (await readdir(temporaryRoot, { recursive: true })).some((entry) =>
         String(entry).endsWith(".tmp"),

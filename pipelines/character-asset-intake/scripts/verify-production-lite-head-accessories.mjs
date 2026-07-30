@@ -1,25 +1,54 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { reconstructAttachmentVariant } from "../dist/index.js";
+import { atomicWriteFile } from "../../../cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/atomic-write.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
-const baseRoot = path.join(repositoryRoot, "examples/production-lite-character");
-const roots = [
-  path.join(repositoryRoot, "examples/production-lite-head-accessories"),
+const option = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined || value.startsWith("--")) {
+    throw new Error(`MISSING_OPTION_VALUE:${name}`);
+  }
+  return path.resolve(value);
+};
+const inputExamplesRoot = option(
+  "--input-examples-root",
+  path.join(repositoryRoot, "examples"),
+);
+const sourceFixtureRoot = path.join(
+  inputExamplesRoot,
+  "production-lite-head-accessories",
+);
+const baseRoot = option(
+  "--base-asset-root",
+  path.join(inputExamplesRoot, "production-lite-character"),
+);
+const fixtureRoot = option(
+  "--fixture-output-root",
+  sourceFixtureRoot,
+);
+const cocosRoot = option(
+  "--cocos-output-root",
   path.join(
     repositoryRoot,
     "cocos/projects/character-rig-builder-mvp/assets/resources/production-lite-head-accessories",
   ),
+);
+const roots = [
+  fixtureRoot,
+  cocosRoot,
 ];
 const rigLayout = JSON.parse(
   await readFile(path.join(baseRoot, "rig-layout.json"), "utf8"),
 );
 const source = JSON.parse(
   await readFile(
-    path.join(roots[0], "source/accessory-source.json"),
+    path.join(sourceFixtureRoot, "source/accessory-source.json"),
     "utf8",
   ),
 );
@@ -41,15 +70,15 @@ for (const root of roots) {
       variant.slotOverrides,
       reference,
     );
-    await writeFile(
+    await atomicWriteFile(
       path.join(root, `reference/${variant.variantId}-reconstructed.png`),
       result.reconstructed,
     );
-    await writeFile(
+    await atomicWriteFile(
       path.join(root, `reference/${variant.variantId}-diff.png`),
       result.comparison,
     );
-    await writeFile(
+    await atomicWriteFile(
       path.join(root, `reference/${variant.variantId}-report.json`),
       json(result.metrics),
     );
