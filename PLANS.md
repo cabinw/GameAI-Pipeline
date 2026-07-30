@@ -5,7 +5,7 @@ time.
 
 ## Active plan: Local Experimental Asset Mode
 
-- Status: Implementation and local verification complete; Draft publication pending
+- Status: Accepted; pending final integration
 - Started: 2026-07-31
 - Branch: `policy/local-experimental-asset-mode`
 - Exact baseline `main`: `61d4e443dcabe2a74b75f07498c4de6886875a6f`
@@ -69,6 +69,18 @@ fresh frozen tracked-files-only workspace verification each passed 508/508.
 The final policy scope is 8 text files and remains below 1,200 changed lines;
 PROGRAM-015, accepted rights/provenance, Tags, Releases, and protected refs
 remain unchanged.
+
+### Final review result
+
+Final policy review of PR #25 at implementation commit
+`059eb86bec925fc6c26b5a66aab74e6b7498038a` passed. The review confirmed the
+exact eight-file policy boundary, path/index-only test isolation, a clean
+tracked-files-only dependency boundary, zero binary/media/runtime/schema
+scope, and zero reviews, comments, requested changes, or unresolved review
+threads. GitHub Actions run `30568550710` passed on that exact commit. This
+append-only acceptance record changes only this plan and the existing policy
+task; it does not alter the accepted policy, PROGRAM-015, rights/provenance,
+or any protected ref.
 
 ## Completed plan: Sharp Full-Loadout Empty-Buffer Regression
 

@@ -1,6 +1,6 @@
 # Policy: Local Experimental Asset Mode
 
-- Status: Implementation and local verification complete; Draft publication pending
+- Status: Accepted; pending final integration
 - Date: 2026-07-31
 - Branch: `policy/local-experimental-asset-mode`
 - Exact baseline: `61d4e443dcabe2a74b75f07498c4de6886875a6f`
@@ -62,7 +62,7 @@ derivatives.
       zero binary or media files.
 - [x] PROGRAM-015 accepted bytes, rights/provenance hashes, protected refs,
       Tags, and Releases remain unchanged.
-- [ ] The branch is published as a Draft PR and remains unmerged.
+- [x] The branch is published as a Draft PR and remains unmerged.
 
 ## Local verification record
 
@@ -75,3 +75,14 @@ derivatives.
   Scene, `.meta`, runtime, schema, generator, package, and lockfile changes: 0.
 - PROGRAM-015, rights/provenance, generated outputs, protected refs, Tags, and
   Releases: unchanged.
+
+## Final review record
+
+PR #25 was reviewed at implementation commit
+`059eb86bec925fc6c26b5a66aab74e6b7498038a`. Its exact eight-file scope,
+three-state promotion policy, opaque ignored-directory boundary, CI-only
+policy gate, clean tracked-only verification, media/binary audit, and
+protected-content audit passed. Reviews, comments, requested changes, and
+unresolved threads were all zero, and GitHub Actions run `30568550710`
+completed successfully on the reviewed commit. The policy is accepted and
+awaits only final integration.
