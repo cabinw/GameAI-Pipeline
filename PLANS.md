@@ -3,10 +3,79 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
+## Active plan: Sharp Full-Loadout Empty-Buffer Regression
 
-- Status: PROGRAM-015 accepted by external code/runtime/Creator/visual review;
-  awaiting Draft PR publication
+- Status: Implementation and local verification complete; publication pending
+- Started: 2026-07-31
+- Branch: `fix/sharp-empty-buffer-generation-race-regression`
+- Exact baseline `main`: `555f0b8e34affff0942ea0785dec5ce041440ae2`
+- Scope ceiling: at most 14 changed files and 2,000 changed lines; zero
+  binary, PNG, Scene, `.meta`, PROGRAM-015 runtime/asset/semantic, rights, or
+  provenance changes.
+
+### Goal
+
+Eliminate the remaining path by which concurrent production-lite generator
+tests can expose an empty or partial attachment PNG to the full-loadout
+reader, while preserving every accepted output byte.
+
+### Root cause and boundaries
+
+The earlier Sharp fix made the base-character and full-loadout writers atomic
+and added isolated output roots. Three sibling production-lite family tests
+still ran their generators and reconstruction verifiers against tracked
+fixture and Cocos roots. Those scripts used direct `writeFile` publication for
+attachment and reference PNGs. Node's package test runner executes test files
+concurrently, so the full-loadout generator could read a garment or prop
+attachment after truncate and before the matching direct write completed.
+
+The repair keeps tracked inputs read-only, gives every generator test a
+complete read-only input snapshot and unique fixture/Cocos output roots,
+routes all related family generator/verifier publication through the existing
+same-directory atomic writer, and retains real concurrent scheduling with
+explicit barriers. No retry, sleep, serialization, fallback, or relaxed test
+is permitted.
+
+### Execution
+
+1. Parameterize the head-accessory, garment, and one-handed-prop generators
+   and verifiers with explicit input and output roots.
+2. Replace their direct output writes with complete write/sync/close plus
+   same-directory atomic rename and failure cleanup.
+3. Isolate all corresponding generator tests and the full-loadout generation
+   test from tracked mutable roots.
+4. Prove old/new atomic visibility, valid PNG signatures/Sharp metadata,
+   dual-generator barrier overlap, input immutability, mirror identity, temp
+   cleanup, and accepted byte closure.
+5. Run focused, three consecutive package, two-environment workspace,
+   generated-output, Markdown, binary/media, and protected-content gates.
+
+### Done when
+
+- No related production-lite generator or verifier directly publishes a PNG.
+- Full-loadout readers never share a writable input path with sibling tests.
+- Accepted PNGs and all non-provenance semantic outputs remain byte-identical.
+- Working-copy, frozen tracked-files-only, and GitHub Actions verification
+  pass.
+- The independent fix is squash-merged and post-merge main verification
+  passes before the local policy task resumes.
+
+### Local verification result
+
+The repair changes 13 text files and no binary/media, PNG, Scene, `.meta`,
+runtime, schema, PROGRAM-015, rights, or provenance bytes. Six focused
+atomic/concurrency/isolation tests passed. The complete character-asset-intake
+package passed 75/75 three consecutive times under its normal concurrent
+schedule. Working-copy and fresh frozen tracked-files-only workspace
+verification each passed 508/508. Accepted fixture and Cocos output hashes,
+all tracked PNGs, and the locked rights/provenance files remained
+byte-identical; direct-writer, generated-output, temp-cleanup, Markdown-link,
+whitespace, and media gates passed.
+
+## Completed plan: PROGRAM-015 Red Cap Production Vertical Slice
+
+- Status: Accepted, published through PR #22, and squash-merged to `main` at
+  `555f0b8e34affff0942ea0785dec5ce041440ae2`
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`

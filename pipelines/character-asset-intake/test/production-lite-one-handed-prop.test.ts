@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { readFile, readdir } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
@@ -27,6 +28,10 @@ import {
   reconstructAttachmentVariant,
   type ProductionLiteLayout,
 } from "../source";
+import {
+  assertNoTemporaryFiles,
+  createReadOnlyExamplesSnapshot,
+} from "./generation-isolation";
 
 const execFileAsync = promisify(execFile);
 const packageRoot = path.resolve(__dirname, "../..");
@@ -94,23 +99,82 @@ test("generates byte-stable transparent prop fixture and Cocos mirror", async ()
   const before = Object.fromEntries(
     await Promise.all(files.map(async (file) => [file, await digest(path.join(fixtureRoot, file))])),
   );
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/generate-production-lite-one-handed-prop.mjs")],
-    { cwd: packageRoot },
+  const mirrorBefore = Object.fromEntries(
+    await Promise.all(
+      files.map(async (file) => [file, await digest(path.join(cocosRoot, file))]),
+    ),
   );
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/verify-production-lite-one-handed-prop.mjs")],
-    { cwd: packageRoot },
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "production-lite-prop-generation-"),
   );
-  for (const file of files) {
-    assert.equal(await digest(path.join(fixtureRoot, file)), before[file], file);
-    assert.equal(
-      await digest(path.join(cocosRoot, file)),
-      before[file],
-      `Cocos mirror ${file}`,
+  const snapshot = await createReadOnlyExamplesSnapshot(
+    repositoryRoot,
+    temporaryRoot,
+    ["production-lite-character", "production-lite-one-handed-prop"],
+  );
+  const generatedFixtureRoot = path.join(temporaryRoot, "fixture");
+  const generatedCocosRoot = path.join(temporaryRoot, "cocos");
+  const rootArguments = [
+    "--input-examples-root",
+    snapshot.root,
+    "--base-asset-root",
+    snapshot.fixture("production-lite-character"),
+    "--fixture-output-root",
+    generatedFixtureRoot,
+    "--cocos-output-root",
+    generatedCocosRoot,
+  ];
+  try {
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(
+          packageRoot,
+          "scripts/generate-production-lite-one-handed-prop.mjs",
+        ),
+        ...rootArguments,
+      ],
+      { cwd: packageRoot },
     );
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(
+          packageRoot,
+          "scripts/verify-production-lite-one-handed-prop.mjs",
+        ),
+        ...rootArguments,
+      ],
+      { cwd: packageRoot },
+    );
+    for (const file of files) {
+      assert.equal(
+        await digest(path.join(generatedFixtureRoot, file)),
+        before[file],
+        file,
+      );
+      assert.equal(
+        await digest(path.join(generatedCocosRoot, file)),
+        mirrorBefore[file],
+        `Cocos mirror ${file}`,
+      );
+      assert.equal(
+        await digest(path.join(fixtureRoot, file)),
+        before[file],
+        `tracked fixture ${file}`,
+      );
+      assert.equal(
+        await digest(path.join(cocosRoot, file)),
+        mirrorBefore[file],
+        `tracked Cocos mirror ${file}`,
+      );
+    }
+    assert.deepEqual(mirrorBefore, before);
+    await snapshot.assertUnchanged();
+    await assertNoTemporaryFiles(temporaryRoot);
+  } finally {
+    await snapshot.restoreWritable();
+    await rm(temporaryRoot, { recursive: true, force: true });
   }
   for (const attachment of source.attachments) {
     const metadata = await sharp(path.join(fixtureRoot, attachment.file)).metadata();
