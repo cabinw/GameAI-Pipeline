@@ -6,6 +6,7 @@
 - [Architecture](01-architecture.md)
 - [Development environment](environment.md)
 - [Schema versioning](schema-versioning.md)
+- [Asset states and publication pipeline](asset-pipeline.md)
 - [Project workflow and PR policy](../AGENTS.md)
 
 ## Character Pipeline

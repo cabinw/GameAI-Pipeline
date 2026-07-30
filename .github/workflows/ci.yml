@@ -48,6 +48,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
+      - name: Verify local experimental asset policy
+        run: node scripts/test-local-experimental-asset-policy.mjs
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

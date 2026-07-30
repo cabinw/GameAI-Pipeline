@@ -14,6 +14,9 @@ build/
 profiles/
 native/engine/android/**/assets/
 
+# Disposable local-only experiments; never publish or scan from automation
+/artifacts/experimental/
+
 # Editors and operating systems
 .DS_Store
 .idea/
