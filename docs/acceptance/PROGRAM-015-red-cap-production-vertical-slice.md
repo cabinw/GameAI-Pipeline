@@ -5,8 +5,9 @@
 Phase 0 source readiness and TASK-015A/B/C implementation are accepted on
 2026-07-30. The first Phase B/C evidence publication failed external review
 because it used synthetic flat-composite motion and non-media-derived
-framebuffer metrics. Replacement Creator Web Preview evidence is pending
-external code/visual review; PROGRAM-015 is not externally accepted.
+framebuffer metrics. Replacement Creator Web Preview evidence subsequently
+passed independent external code/runtime/Creator/visual/spatial/control/
+evidence review. PROGRAM-015 is Accepted and awaiting Draft PR publication.
 
 ## Required acceptance chain
 
@@ -332,5 +333,44 @@ following are captured from one Creator 3.8.8 Web Preview session identity:
 
 The runtime HUD, diagnostics JSON, Creator/Preview record, analysis JSON, and
 manifest must bind the same exact feature SHA, Scene/runtime ID, session ID,
-viewport, and Creator version. The external review status remains
-`pending-external-code-and-visual-review`.
+viewport, and Creator version. The external review status was promoted only
+by the independent review recorded below.
+
+## External review acceptance closeout
+
+- Reviewed feature:
+  `2bd0968835dcf25239ea705fe153d8eb68a91336`.
+- Reviewed evidence:
+  `c974011d4f13d95c9970144cbfc7fa2ad40b9595`.
+- Evidence acceptance:
+  `6011d48915a2097153fb6ee63303a781a41557d6`.
+- Replacement Phase B payload:
+  `791be5581e89f48822f5dba85b57d967e74c75b6`.
+
+The replacement Phase B video contains two independent `KeyB` inputs and
+synchronized video/HUD/runtime evidence for
+`1/0/0 → 2/1/1 → 3/2/2`. After the second Rebuild, Rest, Idle, jointed Walk,
+joint-following Wave, Pause, Resume, Exact Reset, root/input `1/1`, zero
+duplicate/leak/stale/cleanup failures, and a five-second clean hold pass.
+Sixteen Walk samples contain 9/7 left/right planted samples with 0/0 sliding;
+the Wave target displacement is `52.94557` px. Phase B analyzer output
+reproduces byte-identically from the GitHub-downloaded payload.
+
+The downloaded Phase C MP4 SHA-256
+`f4842ced0f428cade5fb2917fc6e6867f16d8a990d56df023f66126c491a130c`
+reproduces Dust `7,645`, Trail `4,454`, Aura `25,072`, Pause `0`, and Resume
+`25,612` pixels. Two runs produce byte-identical analysis SHA-256
+`8d69f220d1ccb7cb1dc5abec1e37a9ca8e5453c6b14ffdcdb5d831c23d608744`;
+a controlled decoded-frame perturbation changes both the frame hash and the
+derived pixel result.
+
+The final visible-pixel authority remains character-master-only. The parts
+sheet remains identification/structure/boundary/manual-audit-only, and the
+supplement remains limited to declared hidden joint connectors. Rights and
+provenance bytes remain unchanged at
+`335cef8824d574c4999492ae32201c79eb76683a78c342e1ae23696a85cc45f4`
+and
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+The historical synthetic/non-media-derived and missing-second-Rebuild
+evidence statuses remain preserved. External code, runtime, Creator, visual,
+spatial, control, and evidence review PASS.

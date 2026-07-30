@@ -1,7 +1,7 @@
 # PROGRAM-015: Red Cap Production Vertical Slice
 
-- Status: TASK-015A/B/C implementation complete; replacement live evidence
-  pending external code/visual review
+- Status: Accepted by external code/runtime/Creator/visual review; awaiting
+  Draft PR publication
 - Date: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -237,8 +237,8 @@ subsequently passed deterministic source/resource closure, independent
 Scene/meta identity, two-character safe composition, namespace isolation,
 D1/D2 reuse, locked Dust/Trail/Aura framebuffer thresholds, Pause/Resume,
 Stress/Debug, two rebuilds, post-rebuild effects, Exact Reset, restart, final
-hold, and clean-console gates. PROGRAM-015 A/B/C implementation is accepted
-locally; replacement evidence remains pending external code/visual review.
+hold, and clean-console gates. PROGRAM-015 A/B/C implementation is accepted,
+and the replacement evidence has passed external review as recorded below.
 
 ## Infrastructure sync and final R3
 
@@ -277,6 +277,37 @@ record, framebuffer analysis, and evidence manifest share one exact
 feature/Scene/runtime/session/viewport/Creator identity. Visual measurements
 are computed only from RGB24 frames decoded from the final MP4 with recorded
 frame numbers, timestamps, frame hashes, half-open ROIs, channel threshold,
-video SHA, analyzer SHA, and FFmpeg version. The replacement evidence remains
-`pending-external-code-and-visual-review`; no local result may promote that
-external status to PASS.
+video SHA, analyzer SHA, and FFmpeg version. External review, rather than a
+local gate, promoted the reviewed evidence to
+`passed-external-code-and-visual-review`.
+
+## External review acceptance
+
+External review independently downloaded and inspected feature
+`2bd0968835dcf25239ea705fe153d8eb68a91336` and evidence
+`c974011d4f13d95c9970144cbfc7fa2ad40b9595`. The Phase B replacement payload
+commit `791be5581e89f48822f5dba85b57d967e74c75b6` contains two distinct `KeyB`
+inputs with `REBUILD_1_READY` and `REBUILD_2_READY`, producing
+`1/0/0 → 2/1/1 → 3/2/2`. Rest, Idle, jointed Walk, joint-following Wave,
+Pause, Resume, Exact Reset, root/input `1/1`, zero duplicate/leak/stale/
+cleanup failures, and a five-second clean hold passed visual and diagnostic
+review.
+
+The Phase C downloaded MP4 SHA-256
+`f4842ced0f428cade5fb2917fc6e6867f16d8a990d56df023f66126c491a130c`
+reproduced Dust `7,645`, Trail `4,454`, Aura `25,072`, Pause `0`, and Resume
+`25,612` pixels in two byte-identical analyzer runs. Controlled decoded-frame
+perturbation changed the frame hash and derived count, confirming media-derived
+measurement.
+
+The source-authority rule remains master-only for final visible pixels,
+parts-sheet audit-only, and joint-supplement hidden-connectors-only. Rights and
+provenance remain byte-identical at
+`335cef8824d574c4999492ae32201c79eb76683a78c342e1ae23696a85cc45f4`
+and
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+Evidence acceptance commit
+`6011d48915a2097153fb6ee63303a781a41557d6` records external
+code/runtime/Creator/visual/spatial/control/evidence review PASS and preserves
+all superseded failure statuses. PROGRAM-015 is Accepted and awaiting Draft
+PR publication.

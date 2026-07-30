@@ -5,8 +5,8 @@ time.
 
 ## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: TASK-015A/B/C implementation complete; replacement live evidence
-  remediation in progress; external code/visual review pending
+- Status: PROGRAM-015 accepted by external code/runtime/Creator/visual review;
+  awaiting Draft PR publication
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -85,6 +85,36 @@ specified RGB24 frames with FFmpeg, and derives every Dust, Trail, Aura,
 Pause, and Resume result from frame bytes inside predeclared half-open ROIs.
 No flat-frame animation, prepared mask, fixed result, retry, sleep, or static
 PASS field is an acceptance source.
+
+### External review acceptance closeout
+
+Independent review downloaded exact evidence commit
+`c974011d4f13d95c9970144cbfc7fa2ad40b9595` from GitHub and reviewed feature
+`2bd0968835dcf25239ea705fe153d8eb68a91336`. The replacement Phase B payload
+at `791be5581e89f48822f5dba85b57d967e74c75b6` proves two independent Rebuild
+inputs and the visible/runtime transition `1/0/0 → 2/1/1 → 3/2/2`, followed
+by working Rest, Idle, Walk, Wave, Pause, Resume, Exact Reset, and a five
+second clean hold. Its downloaded analyzer reproduced byte-identical output.
+
+The downloaded Phase C MP4 SHA-256
+`f4842ced0f428cade5fb2917fc6e6867f16d8a990d56df023f66126c491a130c`
+reproduced Dust `7,645`, Trail `4,454`, Aura `25,072`, Pause `0`, and Resume
+`25,612` pixels twice with byte-identical analysis SHA-256
+`8d69f220d1ccb7cb1dc5abec1e37a9ca8e5453c6b14ffdcdb5d831c23d608744`.
+Controlled decoded-frame perturbation changed both the frame hash and derived
+pixel count.
+
+Master-only visible-pixel authority, parts-sheet audit-only authority, and
+hidden-connector-only supplement authority remain unchanged. Rights and
+provenance remain byte-identical at
+`335cef8824d574c4999492ae32201c79eb76683a78c342e1ae23696a85cc45f4`
+and
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+Evidence acceptance commit
+`6011d48915a2097153fb6ee63303a781a41557d6` records external
+code/runtime/Creator/visual/spatial/control/evidence review PASS while
+preserving both historical failure statuses. PROGRAM-015 is Accepted and
+awaiting Draft PR publication.
 
 ### TASK-015B declared implementation scope
 
