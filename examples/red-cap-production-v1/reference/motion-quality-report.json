@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "passed",
+  "sampleRateHz": 60,
+  "clips": {
+    "rest": {
+      "animationId": "red-cap-production-v1-rest",
+      "durationSeconds": 1,
+      "sampleCount": 61,
+      "loopBoundaryContinuous": true
+    },
+    "idle": {
+      "animationId": "red-cap-production-v1-idle",
+      "durationSeconds": 2,
+      "sampleCount": 121,
+      "loopBoundaryContinuous": true
+    },
+    "walk": {
+      "animationId": "red-cap-production-v1-walk",
+      "durationSeconds": 1.2,
+      "sampleCount": 73,
+      "loopBoundaryContinuous": true
+    },
+    "wave": {
+      "animationId": "red-cap-production-v1-wave",
+      "durationSeconds": 1.2,
+      "sampleCount": 73,
+      "loopBoundaryContinuous": true
+    }
+  },
+  "walkContacts": [
+    {
+      "socketId": "left-foot-contact",
+      "intervalSeconds": [
+        0,
+        0.6
+      ],
+      "maximumVerticalErrorPx": 0,
+      "maximumSlidingPx": 0
+    },
+    {
+      "socketId": "right-foot-contact",
+      "intervalSeconds": [
+        0.6,
+        1.2
+      ],
+      "maximumVerticalErrorPx": 0,
+      "maximumSlidingPx": 0
+    }
+  ],
+  "seams": {
+    "sampledFrames": 328,
+    "maximumTransparentPivotCrossingPx": 0,
+    "staticCoverageReport": "reference/static-stress-report.json"
+  },
+  "handSocket": {
+    "socketId": "left-grip",
+    "maximumErrorPx": 0,
+    "authority": "rig-layout parented socket"
+  },
+  "semantic": {
+    "tracks": 4,
+    "events": 3,
+    "publicSchemaChange": false
+  },
+  "generatedClosure": {
+    "files": [
+      {
+        "file": "animations/idle.json",
+        "sha256": "a67701aaae3727dff100f5939f1606d988bafbde4edafeaca5e64aede59baf0d"
+      },
+      {
+        "file": "animations/rest.json",
+        "sha256": "bd860b2c77fbe2840d2f8d98a2898ea7259f1a1bd68ed73d4425b150cd2ebdf7"
+      },
+      {
+        "file": "animations/walk.json",
+        "sha256": "4e5545f190614dc8398113b61b45c4afa5e0c03765a447b8748837071205bb17"
+      },
+      {
+        "file": "animations/wave.json",
+        "sha256": "c83fb37869852ded7eb2e2327f3f1c3c7fd966687a55724f1dfa6ff669154e4a"
+      },
+      {
+        "file": "cocos/red-cap-production-motion-data.ts",
+        "sha256": "ffab8043383079e9af39508e409d3e0086a30a216e4e2417632564152586c2fa"
+      },
+      {
+        "file": "semantic-events.json",
+        "sha256": "8a17ee1f7c151778ebfb32f1b32cd093bb0e90364ff753d04a2b3521f9ed27a5"
+      }
+    ]
+  }
+}

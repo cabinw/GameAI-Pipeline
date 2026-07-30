@@ -220,3 +220,104 @@ test("keeps the PROGRAM-015 static lifecycle and fault surface explicit", async 
   assert.match(source, /KeyCode\.KEY_R/);
   assert.match(source, /KeyCode\.KEY_G/);
 });
+
+test("binds the PROGRAM-015 motion scene to the Creator atlas and motion component", async () => {
+  const scene = JSON.parse(
+    await readFile(
+      path.join(projectRoot, "assets/red-cap-production-motion-harness.scene"),
+      "utf8",
+    ),
+  );
+  const sceneMeta = JSON.parse(
+    await readFile(
+      path.join(
+        projectRoot,
+        "assets/red-cap-production-motion-harness.scene.meta",
+      ),
+      "utf8",
+    ),
+  );
+  const harnessMeta = JSON.parse(
+    await readFile(
+      path.join(
+        projectRoot,
+        "assets/gameai/red-cap-production/red-cap-production-motion-harness.ts.meta",
+      ),
+      "utf8",
+    ),
+  );
+  const component = scene.find(
+    (entry) => entry.__type__ === "150bbm28mVCw4UuJxhamvPz",
+  );
+
+  assert.equal(scene[0]._name, "red-cap-production-motion-harness");
+  assert.equal(sceneMeta.importer, "scene");
+  assert.equal(sceneMeta.uuid, "dbc61d6d-8c76-4225-a312-67c8cbd492f8");
+  assert.equal(harnessMeta.importer, "typescript");
+  assert.equal(harnessMeta.uuid, "150bb9b6-f265-42c3-852e-27185a9af3f3");
+  assert.ok(component);
+  assert.deepEqual(component.atlasFrame, {
+    __uuid__: "be7c6f0a-24fc-45dc-9068-83d41ec078ca@f9941",
+    __expectedType__: "cc.SpriteFrame",
+  });
+  assert.equal(component.failurePoint, "");
+  assert.equal(
+    scene.some((entry) => entry.__type__ === "e3debvB9LZKXo+fZ+IYgf2r"),
+    false,
+  );
+  assert.equal(
+    scene.some((entry) => /^(CHR_|JNT_|SPR_)/.test(entry._name ?? "")),
+    false,
+  );
+});
+
+test("keeps PROGRAM-015 motion controls, runtime imports, and fault ownership explicit", async () => {
+  const source = await readFile(
+    path.join(
+      projectRoot,
+      "assets/gameai/red-cap-production/red-cap-production-motion-harness.ts",
+    ),
+    "utf8",
+  );
+  for (const point of [
+    "before-resource-completion",
+    "after-resource-completion",
+    "after-root-publication",
+    "after-input-publication",
+    "after-target-publication",
+    "after-renderer-creation",
+    "after-sorting2d-attachment",
+    "during-rebuild-detachment",
+    "during-dispose-finalization",
+  ]) {
+    assert.match(source, new RegExp(`"${point}"`));
+  }
+  for (const key of [
+    "DIGIT_1",
+    "DIGIT_2",
+    "DIGIT_3",
+    "DIGIT_4",
+    "SPACE",
+    "KEY_T",
+    "KEY_B",
+    "KEY_R",
+    "KEY_D",
+    "KEY_G",
+  ]) {
+    assert.match(source, new RegExp(`KeyCode\\.${key}`));
+  }
+  for (const signal of [
+    "PROGRAM015_MOTION_READY",
+    "PROGRAM015_MOTION_CLIP",
+    "PROGRAM015_MOTION_SEMANTIC",
+    "PROGRAM015_MOTION_BUILD_FAILED",
+    "PROGRAM015_MOTION_CLEANUP_ERRORS",
+    "PROGRAM015_MOTION_FAULT_SELECTED",
+  ]) {
+    assert.match(source, new RegExp(signal));
+  }
+  assert.match(source, /dist\/runtime-esm\/runtime\.js/);
+  assert.doesNotMatch(source, /node:fs|node:path|node:crypto/);
+  assert.match(source, /this\.semantic\.dispose\(\)/);
+  assert.match(source, /input\.off\(Input\.EventType\.KEY_DOWN/);
+});

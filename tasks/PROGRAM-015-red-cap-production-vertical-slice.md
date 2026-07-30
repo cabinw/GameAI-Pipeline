@@ -1,6 +1,6 @@
 # PROGRAM-015: Red Cap Production Vertical Slice
 
-- Status: Phase 0 accepted; TASK-015A in progress
+- Status: TASK-015A and TASK-015B accepted; TASK-015C in progress
 - Date: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -192,5 +192,10 @@ All governed hashes and integrity checks pass.
 The source-authority map resolves 19/19 required parts, assigns master-only
 neutral visible authority, records sheet/supplement conflicts, and rejects
 ambiguous or duplicate components. The background/style inputs support the
-predeclared 1280×720 framebuffer oracle. Phase 0 is accepted and TASK-015A
-may proceed.
+predeclared 1280×720 framebuffer oracle. Phase 0 is accepted. TASK-015A
+passed its deterministic, contract, Creator lifecycle, spatial, visual, stress,
+fault, rebuild, Reset, and console gates in commit `9d1627b`; TASK-015B may
+proceed. TASK-015B subsequently passed its four-clip 60 Hz, loop, planted-foot,
+socket, semantic lifecycle, Creator playback, pause/resume, two-rebuild,
+post-rebuild, stress/debug, Exact Reset, nine-point fault, clean-console, and
+full-workspace gates; TASK-015C may proceed.

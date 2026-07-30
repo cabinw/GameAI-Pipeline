@@ -2,14 +2,15 @@
 
 ## Current decision
 
-Phase 0 source readiness accepted on 2026-07-30. TASK-015A is in progress;
-no A/B/C checkpoint is accepted yet.
+Phase 0 source readiness, TASK-015A, and TASK-015B are accepted on
+2026-07-30. TASK-015C is in progress.
 
 ## Required acceptance chain
 
 1. Phase 0 source readiness passes.
-2. TASK-015A automated and Creator gates pass; append A checkpoint.
-3. TASK-015B automated and Creator gates pass; append B checkpoint.
+2. TASK-015A automated and Creator gates pass; append A checkpoint. PASS
+   (`9d1627b`).
+3. TASK-015B automated and Creator gates pass; append B checkpoint. PASS.
 4. TASK-015C automated and Creator gates pass; append C/final checkpoint.
 5. Complete workspace, typecheck, clean-CI, working-copy, frozen
    tracked-files-only, closure, Scene/meta identity, deterministic bytes,

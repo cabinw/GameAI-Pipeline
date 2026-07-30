@@ -5,7 +5,7 @@ time.
 
 ## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: Phase 0 accepted; TASK-015A in progress
+- Status: TASK-015A and TASK-015B accepted; TASK-015C in progress
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -42,6 +42,23 @@ The aggregate ceiling, not the sum of phase ceilings, is authoritative.
 Crossing 100 files or 25,000 changed lines requires an explicit split decision
 before implementation.
 
+### TASK-015B declared implementation scope
+
+TASK-015A passed its automated and Creator gates in commit `9d1627b` and is
+pushed to the Program branch. TASK-015B is limited to at most 21 changed
+files: four status/acceptance documents, one deterministic motion generator,
+one package script entry, four clip documents, one semantic-event document,
+one generated motion-quality report, generated Cocos motion data and
+component files with their Creator-owned metadata, one motion Scene/`.meta`
+pair, and three existing package test files. The phase adds zero PNG or video
+files and remains below 6,000 changed lines.
+
+TASK-015B closed at 21 files and 3,246 changed lines with zero PNG, audio, or
+video changes. Four normalized clips, Program semantic-event data, 60 Hz
+sampling, loop continuity, planted-foot, socket, lifecycle, Creator runtime,
+two-rebuild, post-rebuild, Reset, stress/debug, and nine-point fault gates
+passed. `CI=true pnpm verify` passed before the B checkpoint.
+
 ### Phase 0 result
 
 The replacement `red-cap-production-v1` source pack passes resumed Phase
@@ -55,7 +72,7 @@ ambiguous or duplicate components. The background deterministically crops to
 
 Approved source bytes are promoted under
 `examples/red-cap-production-v1/source/`; ignored intake and ZIP files remain
-untracked. TASK-015A may proceed.
+untracked. TASK-015A is accepted and TASK-015B may proceed.
 See `tasks/PROGRAM-015-red-cap-production-vertical-slice.md` and
 `docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md`.
 

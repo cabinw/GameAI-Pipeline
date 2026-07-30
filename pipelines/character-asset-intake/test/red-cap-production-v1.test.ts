@@ -8,6 +8,14 @@ import test from "node:test";
 import { promisify } from "node:util";
 
 import { parseCharacterContract } from "@gameai/character-contracts";
+import {
+  evaluateRigPose,
+  normalizeRigAnimation,
+  parseRigAnimation,
+  sampleRigAnimation,
+  transformPoint,
+  type RigHierarchyJoint,
+} from "@gameai/rig-animation";
 import sharp from "sharp";
 
 const execFileAsync = promisify(execFile);
@@ -21,6 +29,10 @@ const generator = path.join(
 const staticVerifier = path.join(
   packageRoot,
   "scripts/verify-red-cap-production-static.mjs",
+);
+const motionGenerator = path.join(
+  packageRoot,
+  "scripts/generate-red-cap-production-motion.mjs",
 );
 
 interface AuthorityPart {
@@ -357,5 +369,131 @@ test("passes byte-stable positive and negative joint-seam stress", async () => {
       assert.ok(joint.coverageRatio >= 0.65);
       assert.equal(joint.transparentTwoPixelCrossing, false);
     }
+  }
+});
+
+test("generates byte-stable 60 Hz Red Cap motion with locked contacts and socket", async () => {
+  const files = [
+    "animations/rest.json",
+    "animations/idle.json",
+    "animations/walk.json",
+    "animations/wave.json",
+    "semantic-events.json",
+    "reference/motion-quality-report.json",
+  ];
+  const before = Object.fromEntries(
+    await Promise.all(
+      files.map(async (file) => [
+        file,
+        createHash("sha256")
+          .update(await readFile(path.join(fixtureRoot, file)))
+          .digest("hex"),
+      ]),
+    ),
+  );
+  await execFileAsync(process.execPath, [motionGenerator], { cwd: packageRoot });
+  const after = Object.fromEntries(
+    await Promise.all(
+      files.map(async (file) => [
+        file,
+        createHash("sha256")
+          .update(await readFile(path.join(fixtureRoot, file)))
+          .digest("hex"),
+      ]),
+    ),
+  );
+  assert.deepEqual(after, before);
+
+  const layout = JSON.parse(
+    await readFile(path.join(fixtureRoot, "rig-layout.json"), "utf8"),
+  ) as {
+    layoutId: string;
+    parts: Array<{
+      partId: string;
+      parentId: string | null;
+      restPose: RigHierarchyJoint["restPose"];
+    }>;
+    sockets: Array<{
+      socketId: string;
+      parentPartId: string;
+      position: { x: number; y: number };
+    }>;
+  };
+  const hierarchy: RigHierarchyJoint[] = layout.parts.map((part) => ({
+    jointId: part.partId,
+    parentId: part.parentId,
+    restPose: part.restPose,
+  }));
+  const jointIds = new Set(layout.parts.map((part) => part.partId));
+  const animations = [];
+  for (const file of files.slice(0, 4)) {
+    const parsed = parseRigAnimation(
+      await readFile(path.join(fixtureRoot, file), "utf8"),
+      {
+        rigId: layout.layoutId,
+        rigSchemaVersion: "1.0.0",
+        jointIds,
+      },
+    );
+    assert.equal(parsed.ok, true, `${file}:${JSON.stringify(parsed)}`);
+    if (!parsed.ok) continue;
+    const animation = normalizeRigAnimation(parsed.value);
+    animations.push(animation);
+    const zero = JSON.stringify(sampleRigAnimation(animation, 0).joints);
+    const boundary = JSON.stringify(
+      sampleRigAnimation(animation, animation.duration).joints,
+    );
+    assert.equal(boundary, zero, file);
+    for (let frame = 0; frame <= animation.duration * 60; frame += 1) {
+      const first = sampleRigAnimation(animation, frame / 60);
+      const second = sampleRigAnimation(animation, frame / 60);
+      assert.deepEqual(second, first, `${file}:${frame}`);
+      assert.equal(evaluateRigPose(hierarchy, first).evaluationOrder.length, 19);
+    }
+  }
+
+  const walk = animations.find(
+    (animation) => animation.animationId === "red-cap-production-v1-walk",
+  )!;
+  for (const contact of [
+    { jointId: "foot-left", start: 0, end: 0.6 },
+    { jointId: "foot-right", start: 0.6, end: 1.2 },
+  ]) {
+    const points = [];
+    for (
+      let frame = Math.round(contact.start * 60);
+      frame <= Math.round(contact.end * 60);
+      frame += 1
+    ) {
+      points.push(
+        evaluateRigPose(hierarchy, sampleRigAnimation(walk, frame / 60))
+          .joints[contact.jointId]!.worldPivot,
+      );
+    }
+    const origin = points[0]!;
+    assert.ok(
+      Math.max(...points.map((point) => Math.abs(point.y - origin.y))) <= 2,
+      `${contact.jointId}:vertical`,
+    );
+    assert.ok(
+      Math.max(...points.map((point) => Math.abs(point.x - origin.x))) <= 3,
+      `${contact.jointId}:sliding`,
+    );
+  }
+
+  const wave = animations.find(
+    (animation) => animation.animationId === "red-cap-production-v1-wave",
+  )!;
+  const socket = layout.sockets.find(
+    (candidate) => candidate.socketId === "left-grip",
+  )!;
+  for (let frame = 0; frame <= wave.duration * 60; frame += 1) {
+    const hand = evaluateRigPose(
+      hierarchy,
+      sampleRigAnimation(wave, frame / 60),
+    ).joints[socket.parentPartId]!;
+    const evaluated = transformPoint(hand.worldTransform, socket.position);
+    const expected = transformPoint(hand.worldTransform, socket.position);
+    assert.ok(Math.hypot(evaluated.x - expected.x, evaluated.y - expected.y) <= 2);
   }
 });
