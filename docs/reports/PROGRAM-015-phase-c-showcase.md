@@ -2,11 +2,15 @@
 
 ## Decision
 
-TASK-015C is accepted on 2026-07-30. The Creator-owned
+TASK-015C implementation was accepted locally on 2026-07-30. Its first
+evidence publication subsequently failed external review because the
+animation was synthesized from a flat composite and the framebuffer counts
+were not derived from the published MP4. The Creator-owned
 `red-cap-production-showcase.scene` presents production-lite and Red Cap on
 the licensed training-ground background with deterministic scene-specific
 Dust, Trail, and Aura compiled through the existing D1 authoring and D2
-runtime path.
+runtime path. Replacement live evidence remains
+`pending-external-code-and-visual-review`.
 
 ## Deterministic source and resource closure
 
@@ -39,14 +43,15 @@ runtime path.
 - Background, character, VFX, debug, and HUD sorting bands remain
   non-overlapping.
 
-## Creator and framebuffer acceptance
+## Superseded Creator and framebuffer record
 
 Creator 3.8.8 imported all four resources and generated their image and
 sprite-frame metadata. The scene was opened after a Creator restart and
 previewed at 1280×720.
 
-All changed-pixel counts below use decoded RGB pixels, channel delta greater
-than 12, and the predeclared framebuffer ROIs:
+The counts below are retained only as the historical local record. External
+review found that they were not computed from the final published MP4, so
+they do not establish framebuffer acceptance:
 
 | Gate | Required | Observed | Result |
 | --- | ---: | ---: | --- |
@@ -67,6 +72,27 @@ Creator interaction also passed:
 - clean reopen/restart with both characters and the licensed background
   visible; and
 - zero relevant Preview warnings or errors.
+
+The old evidence payload is preserved byte-for-byte and classified
+`failed-external-review-synthetic-animation-and-non-media-derived-metrics`.
+
+## Replacement evidence method
+
+The remediated runtime builds Red Cap from the accepted 19-part atlas and
+applies Rest/Idle/Walk/Wave per-joint transforms through the existing rig
+playback. Semantic sockets and VFX targets are children of the actual joint
+nodes. The visible HUD and diagnostics bind the exact feature SHA,
+Scene/runtime ID, evidence session ID, 1280×720 viewport, Creator 3.8.8
+version, animation state/time, lifecycle counters, VFX ownership, and cleanup
+state.
+
+The replacement analyzer accepts only the final MP4. FFmpeg decodes the exact
+configured frames to RGB24 bytes; the analyzer records the video SHA, FFmpeg
+version, frame number and timestamp, frame hash, half-open ROI, channel
+threshold, changed-pixel result, and threshold decision. Dust, Trail, Aura,
+Pause, and Resume measurements are therefore reproducible from the downloaded
+media rather than a prepared mask, static PNG triptych, fixed count, or flat
+animation surrogate.
 
 ## Validation
 

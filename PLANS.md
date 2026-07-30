@@ -5,14 +5,15 @@ time.
 
 ## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: Accepted; TASK-015A/B/C complete; final R3 passed
+- Status: TASK-015A/B/C implementation complete; replacement live evidence
+  remediation in progress; external code/visual review pending
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
-- Final reconciled Program scope: exactly 103 changed files and fewer than
-  24,000 changed lines; at most 42 touched PNG files, 3 Scene/`.meta` pairs, 1
-  feature manifest, zero feature MP4 files, and at most 3 evidence MP4 files
-  isolated on `evidence/task-015`.
+- Final remediation ceiling: at most 112 changed files and 16,000 changed
+  lines; at most 42 touched PNG files, 3 Scene/`.meta` pairs, 1 feature
+  manifest, zero feature MP4 files, and at most 3 evidence MP4 files isolated
+  on `evidence/task-015`.
 - Phase 0 resumed scope: at most 20 files and 5,000 changed lines, including
   exactly 5 approved source PNGs plus the project-owner-reviewed provenance,
   rights assertion, source-authority map, layout lock, and documentation;
@@ -42,13 +43,16 @@ The original aggregate ceiling was 96 files and 24,000 changed lines. The
 final read-only reconciliation against exact `main`
 `68444551b9b160a2455a97a2d8bf611aea608c6e` found 103 files and 12,341
 changed lines at Phase C. The project owner grants a one-time seven-file
-accounting exception, closing the feature cap at exactly 103 files; it is not
-new implementation capacity. A 104th feature file remains prohibited.
+accounting exception, closing the reconciled Phase C scope at exactly 103
+files. The later project-owner-authorized live-evidence remediation may add
+only the runtime, analyzer, tests, generated closure, and existing-document
+corrections required by external review, with a final hard ceiling of 112
+feature files and 16,000 changed lines.
 
 The independent Sharp atomic-publication fix was squash-merged to `main` at
 `46d4523194f8ba064bd73db7b1c797e77cfa7745` and synchronized append-only into
 this branch by merge commit
-`f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c`. Relative to the new `main`, the
+`f1f0adfe6fd88a0e2c2f552be1870c0736dc1b8c`. Relative to the new `main`, the
 Program remains exactly 103 files and 12,599 changed lines before this
 documentation closeout. No implementation, source asset, Scene, `.meta`,
 schema, rights, or project provenance conflict occurred; `PLANS.md` was the
@@ -61,6 +65,26 @@ verification, frozen tracked-files-only verification, deterministic
 generation, synchronized generator concurrency, generated closure,
 Scene/meta/class identity, Markdown links, diff whitespace, media/protected
 refs, and post-verify clean-content closure all passed.
+
+### External-review live-evidence remediation
+
+External review rejected the first evidence publication because its Phase B/C
+animation was synthesized from a flat composite and its headline
+framebuffer counts were not derived from the published MP4 bytes. That
+evidence remains immutable on the evidence branch and is classified as
+`failed-external-review-synthetic-animation-and-non-media-derived-metrics`.
+It is historical evidence only and does not establish visual acceptance.
+
+The replacement runtime consumes the accepted 19-part atlas, rig hierarchy,
+Rest/Idle/Walk/Wave clips, per-joint transforms, semantic sockets, and the
+existing D2 VFX host in Creator 3.8.8 Web Preview. Its visible HUD and runtime
+diagnostics bind the exact feature commit, Scene/runtime identity, evidence
+session, viewport, Creator version, lifecycle counters, playback state, and
+cleanup state. The replacement analyzer accepts only the final MP4, decodes
+specified RGB24 frames with FFmpeg, and derives every Dust, Trail, Aura,
+Pause, and Resume result from frame bytes inside predeclared half-open ROIs.
+No flat-frame animation, prepared mask, fixed result, retry, sleep, or static
+PASS field is an acceptance source.
 
 ### TASK-015B declared implementation scope
 
@@ -121,9 +145,10 @@ The replacement `red-cap-production-v1` source pack passes resumed Phase
 0A–0C. The project-owner-reviewed rights assertion is bound to provenance SHA
 `55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`;
 all governed image hashes and integrity checks pass. A machine-readable
-19-part map assigns neutral visible authority to the character master,
-restricts sheet/supplement pixels to declared hidden coverage, and rejects
-ambiguous or duplicate components. The background deterministically crops to
+19-part map assigns all final visible-pixel authority to the character
+master, limits the parts sheet to identification/structure/boundary/manual
+audit, restricts the joint supplement to declared hidden connectors, and
+rejects ambiguous or duplicate components. The background deterministically crops to
 1664×936 and scales by 10/13 to the locked 1280×720 composition and ROIs.
 
 Approved source bytes are promoted under

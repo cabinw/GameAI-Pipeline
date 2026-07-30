@@ -1,6 +1,7 @@
 # TASK-015C: Two-Character Production Showcase
 
-- Status: Accepted on 2026-07-30
+- Status: Implementation accepted; replacement live evidence pending
+  external code/visual review
 - Parent: PROGRAM-015
 - Budget: 35 files, 9,000 changed lines, 4 new PNG resources, 1
   Scene/`.meta` pair, zero feature media
@@ -38,15 +39,18 @@ Dust, Trail, and Aura authored through the published D1/D2 path.
 No D1/D2 public change, new primitive, new blend/runtime behavior, generated
 background, procedural fallback background, or manual Scene correction.
 
-## Acceptance result
+## Implementation result and evidence remediation
 
-PASS. The deterministic generator closes four PNG resources and the compiled
+The deterministic generator closes four PNG resources and the compiled
 Render Plan without changing D1/D2 public code. Creator 3.8.8 imported the
 resources and opened the independent showcase Scene after restart.
 
-The locked framebuffer gates passed with 376 Dust, 4,077 Trail, and 16,492
-Aura changed pixels; the paused frame had zero changed pixels and Resume
-changed 40,125 active-ROI pixels. Transform Stress, debug projection, two
-rebuilds, post-rebuild effects, Exact Reset, final hold, and clean Preview
-console also passed. See
+The previously reported 376 Dust, 4,077 Trail, 16,492 Aura, zero Pause, and
+40,125 Resume values came from the superseded synthetic/offline evidence
+path, not from the final published MP4. They remain a historical local result
+only. Replacement evidence uses the real part-atlas/joint runtime in Creator
+Web Preview and computes every framebuffer value from exact FFmpeg-decoded
+MP4 frames. The old payload is preserved and classified
+`failed-external-review-synthetic-animation-and-non-media-derived-metrics`.
+See
 `../docs/reports/PROGRAM-015-phase-c-showcase.md`.

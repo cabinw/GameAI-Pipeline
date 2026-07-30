@@ -1,6 +1,7 @@
 # PROGRAM-015: Red Cap Production Vertical Slice
 
-- Status: Accepted; TASK-015A/B/C complete
+- Status: TASK-015A/B/C implementation complete; replacement live evidence
+  pending external code/visual review
 - Date: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -68,8 +69,13 @@ bytes and project-owner-reviewed provenance live under that fixture's
 `source/` directory.
 
 Every nontransparent canonical pixel must have exactly one visible semantic
-owner. Hidden overlap pixels must remain directly traceable to an approved
-source rectangle; nearest-color texture synthesis is not accepted.
+owner. The character master is the sole final visible-pixel authority. The
+parts sheet is limited to part identification, structural mapping, boundary
+checks, and manual audit; it is not a visible-pixel authority. The joint
+supplement may supply only the declared hidden shoulder, elbow, wrist, hip,
+knee, and ankle connector pixels. Hidden overlap pixels must remain directly
+traceable to that approved source rectangle; nearest-color texture synthesis
+is not accepted.
 
 ## Locked motion and controls
 
@@ -82,6 +88,8 @@ Controls are:
 
 - `1` Rest, `2` Idle, `3` Walk, `4` Wave;
 - `Space` Pause/Resume;
+- `5` Dust one-shot, `6` Trail toggle, `7` Aura toggle;
+- `C` clean all active VFX;
 - `T` Transform Stress;
 - `B` deterministic rebuild;
 - `R` Exact Reset; and
@@ -171,9 +179,12 @@ MP4 files.
 ## Budgets and final reconciliation
 
 - Original aggregate: at most 96 changed files and 24,000 changed lines.
-- One-time final exception: exactly 103 feature files and fewer than 24,000
-  changed lines. This is a closed final scope, not capacity for a 104th file
-  or further implementation.
+- One-time reconciliation: Phase C closed at exactly 103 feature files and
+  fewer than 24,000 changed lines.
+- External-review remediation hard ceiling: at most 112 feature files and
+  16,000 changed lines. It is limited to actual jointed runtime evidence,
+  MP4-derived analysis, regression coverage, generated closure, and
+  corrections to existing documents; it is not follow-on feature capacity.
 - Phase 0 resumed: 20 files and 5,000 changed lines, including exactly 5
   approved source PNGs.
 - TASK-015A: 45 files, 8,000 lines, 38 touched PNGs, 2 Scene/`.meta` pairs.
@@ -226,15 +237,15 @@ subsequently passed deterministic source/resource closure, independent
 Scene/meta identity, two-character safe composition, namespace isolation,
 D1/D2 reuse, locked Dust/Trail/Aura framebuffer thresholds, Pause/Resume,
 Stress/Debug, two rebuilds, post-rebuild effects, Exact Reset, restart, final
-hold, and clean-console gates. PROGRAM-015 is accepted locally with all A/B/C
-tasks complete.
+hold, and clean-console gates. PROGRAM-015 A/B/C implementation is accepted
+locally; replacement evidence remains pending external code/visual review.
 
 ## Infrastructure sync and final R3
 
 The independent Sharp PNG atomic-publication maintenance PR was squash-merged
 to `main` as `46d4523194f8ba064bd73db7b1c797e77cfa7745`. PROGRAM-015 incorporated
 that exact main commit with append-only merge
-`f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c`; no Phase 0/A/B/C commit was
+`f1f0adfe6fd88a0e2c2f552be1870c0736dc1b8c`; no Phase 0/A/B/C commit was
 rewritten. `PLANS.md` was the only merge conflict, and its resolution retains
 the Program record and the completed maintenance record.
 
@@ -249,3 +260,23 @@ identity, Markdown links, diff checks, and clean/content closure passed.
 The project-owner rights/provenance bytes remain unchanged. Feature MP4,
 evidence payload, Creator temp/cache, `node_modules`, TASK-015D, TASK-014D4,
 Unity, Godot, and Windows scope remain absent.
+
+## External-review remediation boundary
+
+The original Phase B/C evidence publication is preserved byte-for-byte and
+classified
+`failed-external-review-synthetic-animation-and-non-media-derived-metrics`.
+Its flat-composite animation and non-media-derived counts do not prove the
+Creator runtime or published video.
+
+Replacement evidence must come from the actual Creator 3.8.8 Web Preview
+Scene. Red Cap is assembled from the accepted part atlas and animated with
+the existing rig, Rest/Idle/Walk/Wave clips, per-joint transforms, and
+joint-attached sockets. The visible HUD, runtime diagnostics, Creator/Preview
+record, framebuffer analysis, and evidence manifest share one exact
+feature/Scene/runtime/session/viewport/Creator identity. Visual measurements
+are computed only from RGB24 frames decoded from the final MP4 with recorded
+frame numbers, timestamps, frame hashes, half-open ROIs, channel threshold,
+video SHA, analyzer SHA, and FFmpeg version. The replacement evidence remains
+`pending-external-code-and-visual-review`; no local result may promote that
+external status to PASS.

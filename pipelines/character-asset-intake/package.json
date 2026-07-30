@@ -36,6 +36,7 @@
     "generate:red-cap-production-v1": "node scripts/generate-red-cap-production-v1.mjs",
     "generate:red-cap-production-motion": "node scripts/generate-red-cap-production-motion.mjs",
     "generate:red-cap-showcase": "pnpm --filter @gameai/vfx-authoring build && node scripts/generate-red-cap-showcase.mjs",
+    "analyze:program015-live-evidence": "node scripts/analyze-program015-live-evidence.mjs",
     "verify:red-cap-production-static": "node scripts/verify-red-cap-production-static.mjs",
     "verify:red-cap-articulation": "pnpm run build && node scripts/verify-articulation-stress.mjs",
     "sync:red-cap-cocos": "node scripts/sync-cocos-fixture.mjs ../../examples/red-cap-target-remade ../../cocos/projects/character-rig-builder-mvp/assets/gameai/red-cap-target-remade"

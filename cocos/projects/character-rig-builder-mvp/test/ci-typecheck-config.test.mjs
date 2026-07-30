@@ -378,11 +378,16 @@ test("keeps PROGRAM-015 showcase resources, controls, and D1/D2 boundary explici
     "DIGIT_1",
     "DIGIT_2",
     "DIGIT_3",
+    "DIGIT_4",
+    "DIGIT_5",
+    "DIGIT_6",
+    "DIGIT_7",
     "SPACE",
     "KEY_T",
     "KEY_B",
     "KEY_R",
     "KEY_D",
+    "KEY_C",
   ]) {
     assert.match(source, new RegExp(`KeyCode\\.${key}`));
   }
@@ -392,15 +397,40 @@ test("keeps PROGRAM-015 showcase resources, controls, and D1/D2 boundary explici
     "showcase.red-cap.left-grip",
     "showcase.red-cap.right-grip",
     "showcase.red-cap.torso",
+    "showcase.red-cap.left-foot",
+    "showcase.red-cap.right-foot",
   ]) {
     assert.match(source, new RegExp(target.replaceAll(".", "\\.")));
   }
   for (const signal of [
-    "PROGRAM015_SHOWCASE_READY",
-    "PROGRAM015_SHOWCASE_EXACT_RESET",
+    "PROGRAM015_LIVE_EVIDENCE",
+    "PROGRAM015_LIVE_SEMANTIC",
+    "PROGRAM015_LIVE_CLEANUP_ERROR",
   ]) {
     assert.match(source, new RegExp(signal));
   }
+  assert.match(source, /RED_CAP_PRODUCTION_STATIC_PLAN/);
+  assert.match(source, /RED_CAP_PRODUCTION_MOTION_CLIPS/);
+  assert.match(source, /RigAnimationPlayback/);
+  assert.match(source, /composeJointPose/);
+  assert.match(source, /createRedCapJointHierarchy/);
+  assert.match(source, /applyRedCapSample/);
+  assert.match(source, /featureSha/);
+  assert.match(source, /evidenceSession/);
+  assert.match(source, /__PROGRAM015_LIVE_EVIDENCE__/);
+  assert.match(source, /manualEvidence/);
+  assert.match(source, /runtimeRoots/);
+  assert.match(source, /inputHandlers/);
+  assert.match(source, /setupCount/);
+  assert.match(source, /teardownCount/);
+  assert.match(source, /rebuildCount/);
+  assert.match(source, /this\.playback\.update\(deltaSeconds\)/);
+  assert.match(source, /this\.playback\?\.status === "playing"/);
+  assert.match(source, /this\.playback\?\.status === "paused"/);
+  assert.match(source, /this\.playback = this\.createPlayback\("rest"\)/);
+  assert.doesNotMatch(source, /redCap:\s*"program015-showcase\/red-cap-character/);
+  assert.doesNotMatch(source, /animateCharacters/);
+  assert.doesNotMatch(source, /redCapOffset|setPosition\(\s*96 \+ Math\.sin/);
   assert.match(source, /compileCocosVfxRenderDescriptors/);
   assert.match(source, /new CocosRenderPlanHost/);
   assert.match(source, /new CocosVfxRuntimeState/);
@@ -411,6 +441,23 @@ test("keeps PROGRAM-015 showcase resources, controls, and D1/D2 boundary explici
   );
   assert.match(source, /input\.off\(Input\.EventType\.KEY_DOWN/);
   assert.match(source, /this\.vfxRuntime\?\.cleanup\(reason\)/);
+
+  const repositoryRoot = path.resolve(projectRoot, "../../..");
+  const currentDocuments = [
+    "PLANS.md",
+    "tasks/PROGRAM-015-red-cap-production-vertical-slice.md",
+    "docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md",
+    "docs/reports/PROGRAM-015-phase-0-source-readiness.md",
+    "docs/reports/PROGRAM-015-phase-c-showcase.md",
+  ];
+  for (const relative of currentDocuments) {
+    const document = await readFile(path.join(repositoryRoot, relative), "utf8");
+    assert.doesNotMatch(
+      document,
+      /f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c/,
+      relative,
+    );
+  }
 
   for (const file of [
     "training-ground-background.png",

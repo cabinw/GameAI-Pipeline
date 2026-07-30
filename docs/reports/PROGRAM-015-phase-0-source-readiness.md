@@ -70,12 +70,15 @@ ID, parent, pivot candidate, draw order, character-relative side, source
 rectangle, visible region, hidden-overlap region, conflict, resolution,
 confidence and rejection reason.
 
-The character master is the sole neutral visible authority. The parts sheet
-and joint supplement may supply only declared hidden coverage. Integrated
-sleeves, combined hand/forearm and combined pelvis candidates are explicitly
-resolved. An ambiguous generic connector and duplicate supplement pelvis are
-rejected. No nearest-pixel copying, generative completion, mirroring,
-repainting or Creator compensation is authorized.
+The character master is the sole final visible-pixel authority. The parts
+sheet is used only for part identification, structural mapping, boundary
+checks, and manual audit; it cannot supply final visible pixels. The joint
+supplement may supply only declared hidden shoulder, elbow, wrist, hip, knee,
+and ankle connector coverage. Integrated sleeves, combined hand/forearm and
+combined pelvis candidates are explicitly resolved. An ambiguous generic
+connector and duplicate supplement pelvis are rejected. No nearest-pixel
+copying, generative completion, mirroring, repainting or Creator compensation
+is authorized.
 
 ## Background and framebuffer authority
 

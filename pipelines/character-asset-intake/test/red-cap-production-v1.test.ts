@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import {
+  copyFile,
+  mkdtemp,
+  readFile,
+  writeFile,
+} from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
@@ -34,6 +40,10 @@ const motionGenerator = path.join(
   packageRoot,
   "scripts/generate-red-cap-production-motion.mjs",
 );
+const liveEvidenceAnalyzer = path.join(
+  packageRoot,
+  "scripts/analyze-program015-live-evidence.mjs",
+);
 
 interface AuthorityPart {
   partId: string;
@@ -52,6 +62,11 @@ interface AuthorityPart {
 const authority = JSON.parse(
   readFileSync(path.join(fixtureRoot, "source-authority-map.json"), "utf8"),
 ) as {
+  authorities: {
+    neutralAppearance: { file: string };
+    primaryPartsCandidate: { file: string; use: string };
+    jointSupplement: { file: string; use: string };
+  };
   fallbackPartId: string;
   ownershipOrder: string[];
   drawOrder: string[];
@@ -127,6 +142,22 @@ test("locks reviewed rights, governed hashes, and complete source authority", as
   }
 
   assert.equal(authority.parts.length, 19);
+  assert.deepEqual(authority.authorities, {
+    neutralAppearance: {
+      ...authority.authorities.neutralAppearance,
+      file: "source/red-cap-character-master.png",
+    },
+    primaryPartsCandidate: {
+      ...authority.authorities.primaryPartsCandidate,
+      file: "source/red-cap-parts-sheet.png",
+      use: "part identification, structural mapping, boundary checks, and manual audit only; never neutral visible authority",
+    },
+    jointSupplement: {
+      ...authority.authorities.jointSupplement,
+      file: "source/red-cap-joint-parts-supplement.png",
+      use: "declared hidden connectors only; never neutral visible authority",
+    },
+  });
   assert.equal(new Set(authority.parts.map((part) => part.partId)).size, 19);
   assert.equal(new Set(authority.parts.map((part) => part.drawOrder)).size, 19);
   assert.equal(authority.ownershipOrder.length, 19);
@@ -612,4 +643,140 @@ test("closes the PROGRAM-015 showcase layout, sequence, VFX, and generated resou
     assert.equal(metadata.width, width, file);
     assert.equal(metadata.height, height, file);
   }
+});
+
+test("derives PROGRAM-015 framebuffer evidence from decoded MP4 frames deterministically", async () => {
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "program015-live-analysis-"),
+  );
+  const video = path.join(temporaryRoot, "live.mp4");
+  const changedVideo = path.join(temporaryRoot, "live-changed.mp4");
+  const copy = path.join(temporaryRoot, "downloaded-copy.mp4");
+  const config = path.join(temporaryRoot, "analysis-config.json");
+  const first = path.join(temporaryRoot, "first.json");
+  const second = path.join(temporaryRoot, "second.json");
+  const downloaded = path.join(temporaryRoot, "downloaded.json");
+  const changed = path.join(temporaryRoot, "changed.json");
+  const encode = async (target: string, boxWidth: number) => {
+    await execFileAsync(
+      "ffmpeg",
+      [
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "color=c=black:s=1280x720:r=30:d=1",
+        "-vf",
+        `drawbox=x=100:y=120:w=${boxWidth}:h=40:color=red:t=fill:enable=gte(t\\,0.5)`,
+        "-c:v",
+        "libx264",
+        "-profile:v",
+        "high",
+        "-pix_fmt",
+        "yuv420p",
+        "-r",
+        "30",
+        "-y",
+        target,
+      ],
+      { cwd: packageRoot },
+    );
+  };
+  await encode(video, 80);
+  await encode(changedVideo, 120);
+  await copyFile(video, copy);
+  await writeFile(
+    config,
+    `${JSON.stringify(
+      {
+        schemaVersion: "1.0.0",
+        identity: {
+          featureSha: "a".repeat(40),
+          sessionId: "program015-test-session",
+          sceneId: "red-cap-production-showcase",
+          runtimeId: "program015-live-jointed-showcase-v2",
+          creatorVersion: "3.8.8",
+          viewport: { width: 1280, height: 720 },
+        },
+        video: {
+          file: "live.mp4",
+          width: 1280,
+          height: 720,
+          frameRate: "30/1",
+        },
+        comparisons: [
+          {
+            id: "visible-change",
+            baselineFrame: 5,
+            activeFrame: 20,
+            roi: [80, 100, 180, 100],
+            channelDeltaThreshold: 12,
+            minimumChangedPixels: 1000,
+          },
+          {
+            id: "stable-baseline",
+            baselineFrame: 2,
+            activeFrame: 5,
+            roi: [80, 100, 180, 100],
+            channelDeltaThreshold: 12,
+            minimumChangedPixels: 0,
+            maximumChangedPixels: 0,
+          },
+        ],
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  const analyze = async (input: string, output: string) => {
+    await execFileAsync(
+      process.execPath,
+      [
+        liveEvidenceAnalyzer,
+        "--video",
+        input,
+        "--config",
+        config,
+        "--output",
+        output,
+      ],
+      { cwd: packageRoot },
+    );
+  };
+  await analyze(video, first);
+  await analyze(video, second);
+  await analyze(copy, downloaded);
+  await analyze(changedVideo, changed);
+
+  const firstBytes = await readFile(first);
+  assert.deepEqual(await readFile(second), firstBytes);
+  assert.deepEqual(await readFile(downloaded), firstBytes);
+  assert.notDeepEqual(await readFile(changed), firstBytes);
+  const result = JSON.parse(firstBytes.toString("utf8")) as {
+    status: string;
+    analyzer: { algorithm: string };
+    comparisons: Array<{ id: string; changedPixels: number; status: string }>;
+  };
+  assert.equal(result.status, "passed");
+  assert.equal(
+    result.analyzer.algorithm,
+    "ffmpeg-rgb24-half-open-roi-channel-delta-v1",
+  );
+  assert.ok(
+    result.comparisons.find(
+      (comparison) => comparison.id === "visible-change",
+    )!.changedPixels > 0,
+  );
+  assert.deepEqual(
+    result.comparisons.map(({ id, status }) => ({ id, status })),
+    [
+      { id: "visible-change", status: "passed" },
+      { id: "stable-baseline", status: "passed" },
+    ],
+  );
+  const analyzerSource = await readFile(liveEvidenceAnalyzer, "utf8");
+  assert.match(analyzerSource, /decodeRgb24Frame/);
+  assert.match(analyzerSource, /countChangedPixels/);
+  assert.doesNotMatch(analyzerSource, /exactMask|resumeMask|fixedResult|retry|sleep/);
 });

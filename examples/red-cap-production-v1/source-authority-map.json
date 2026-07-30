@@ -17,7 +17,7 @@
     "primaryPartsCandidate": {
       "file": "source/red-cap-parts-sheet.png",
       "sha256": "83bae1e794339b453a316eb4a9540968a1c7ec4e1bc5d7c3b50a43c76c709e79",
-      "use": "hidden overlap and independently identifiable source candidates only"
+      "use": "part identification, structural mapping, boundary checks, and manual audit only; never neutral visible authority"
     },
     "jointSupplement": {
       "file": "source/red-cap-joint-parts-supplement.png",

@@ -2,8 +2,11 @@
 
 ## Current decision
 
-Phase 0 source readiness and TASK-015A/B/C are accepted on 2026-07-30.
-PROGRAM-015 is complete locally.
+Phase 0 source readiness and TASK-015A/B/C implementation are accepted on
+2026-07-30. The first Phase B/C evidence publication failed external review
+because it used synthetic flat-composite motion and non-media-derived
+framebuffer metrics. Replacement Creator Web Preview evidence is pending
+external code/visual review; PROGRAM-015 is not externally accepted.
 
 ## Required acceptance chain
 
@@ -57,10 +60,13 @@ All rows in
   `55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
 - Master: 1254×1254 RGBA, transparent corners, 282,476 visible pixels,
   SHA `7a4cf6a690aa6532a51c209d839d7d71b28396e40e021973c0f35fb0f828f3a1`.
-- Parts sheet: 19 independent alpha components; 19/19 required parts resolve
-  through the authority map.
-- Joint supplement: accepted only for declared hidden connectors; ambiguous
-  generic connector and duplicate combined pelvis are rejected.
+- Parts sheet: 19 independent alpha components used only for part
+  identification, structural mapping, boundary checks, and manual audit; it
+  is never final visible-pixel authority.
+- Joint supplement: accepted only for declared hidden shoulder, elbow, wrist,
+  hip, knee, and ankle connectors; ambiguous generic connector and duplicate
+  combined pelvis are rejected.
+- Character master: sole final visible-pixel authority.
 - Background/style: 1672×941 RGB inputs with a locked 1664×936 crop,
   10/13 scale, 1280×720 output, ground line, safe area and framebuffer ROIs.
 - Working tree contained no untracked/staged intake file at promotion.
@@ -69,7 +75,7 @@ The accepted machine-readable inputs are
 `../../examples/red-cap-production-v1/source-authority-map.json` and
 `../../examples/red-cap-production-v1/showcase-layout.json`.
 
-## Phase C accepted evidence
+## Historical Phase C local evidence
 
 - Independent Creator-owned Scene:
   `../../cocos/projects/character-rig-builder-mvp/assets/red-cap-production-showcase.scene`.
@@ -78,12 +84,14 @@ The accepted machine-readable inputs are
   soft mask.
 - D1 authoring produces a byte-stable Render Plan consumed by the existing D2
   Creator host/runtime; no D1/D2 public source changed.
-- Locked changed-pixel gates: Dust 376, Trail 4,077, Aura 16,492.
-- Pause stability: zero changed pixels; Resume active ROI: 40,125 changed
-  pixels.
-- Creator 3.8.8 restart, sequence, Transform Stress, debug, two rebuilds,
-  post-rebuild effects, Exact Reset, final hold, and clean Preview console:
-  PASS.
+- The previously reported Dust 376, Trail 4,077, Aura 16,492 and Resume
+  40,125 counts were produced by a synthetic/offline path, not derived from
+  the final published MP4. They are not external visual evidence.
+- The old payload remains byte-identical and is classified
+  `failed-external-review-synthetic-animation-and-non-media-derived-metrics`.
+- Replacement evidence must use the actual jointed Creator 3.8.8 Web Preview
+  runtime and derive Dust, Trail, Aura, Pause, and Resume results from exact
+  decoded MP4 frames.
 - Full details:
   `../reports/PROGRAM-015-phase-c-showcase.md`.
 
@@ -123,9 +131,12 @@ seven necessary modifications to existing cross-cutting files:
 | `../../pipelines/character-semantic-events/test/character-semantic-events.test.ts` | Phase B | Shared regression file omitted; required to prove reuse without public semantic changes. |
 
 All seven belong to approved Program work. None is duplicate, temporary,
-cached, incorrectly generated, or evidence. The one-time exception closes
-the feature at exactly 103 files and fewer than 24,000 changed lines. It is
-not capacity for a 104th file.
+cached, incorrectly generated, or evidence. The one-time reconciliation
+closed Phase C at exactly 103 files and fewer than 24,000 changed lines. The
+subsequent project-owner-authorized external-review remediation has a hard
+ceiling of 112 feature files and 16,000 changed lines and is limited to
+actual runtime evidence, media-derived analysis, regression coverage,
+generated closure, and corrections to existing documents.
 
 ### Complete 103-file classification
 
@@ -269,7 +280,7 @@ or Windows implementation is present.
 - Maintenance commit: `75ca9ab121405a3780e1832c7b6f6bc02b6fb9d0`
 - Squash/main commit: `46d4523194f8ba064bd73db7b1c797e77cfa7745`
 - Append-only Program merge:
-  `f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c`
+  `f1f0adfe6fd88a0e2c2f552be1870c0736dc1b8c`
 - Pre-documentation-closeout Program scope against new main: 103 files,
   12,567 additions, 32 deletions, 12,599 changed lines.
 
@@ -300,3 +311,26 @@ Rights and Program provenance remain byte-identical at
 and
 `55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
 No implementation changed during final R3.
+
+## Replacement evidence acceptance
+
+The replacement publication is accepted locally only when all of the
+following are captured from one Creator 3.8.8 Web Preview session identity:
+
+- actual part-atlas Rest/Idle/Walk/Wave motion with alternating foot contact,
+  continuous shoulder/elbow/wrist/hip/knee/ankle motion, and joint-following
+  targets;
+- Pause stability, Resume progress without reinitialization, two consecutive
+  rebuilds, post-rebuild animation/VFX, Exact Reset, and a five-second clean
+  hold;
+- visible and diagnostic proof of one runtime root, one input handler, zero
+  duplicate/leaked/stale renderers, and zero cleanup errors;
+- final MP4 H.264 High, 1280×720, 30 fps, yuv420p, complete decode, and no
+  pointer or editor overlay over acceptance content; and
+- deterministic RGB24 framebuffer analysis rerun byte-identically against a
+  GitHub-downloaded copy of the exact evidence-commit video.
+
+The runtime HUD, diagnostics JSON, Creator/Preview record, analysis JSON, and
+manifest must bind the same exact feature SHA, Scene/runtime ID, session ID,
+viewport, and Creator version. The external review status remains
+`pending-external-code-and-visual-review`.
