@@ -1,7 +1,7 @@
 # PROGRAM-015: Red Cap Production Vertical Slice
 
-- Status: Accepted by external code/runtime/Creator/visual review; awaiting
-  Draft PR publication
+- Status: Accepted by external code/runtime/Creator/visual review and
+  integrated through PR #22
 - Date: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -309,5 +309,7 @@ and
 Evidence acceptance commit
 `6011d48915a2097153fb6ee63303a781a41557d6` records external
 code/runtime/Creator/visual/spatial/control/evidence review PASS and preserves
-all superseded failure statuses. PROGRAM-015 is Accepted and awaiting Draft
-PR publication.
+all superseded failure statuses. PROGRAM-015 was published through PR #22 and
+squash-merged to `main` at
+`555f0b8e34affff0942ea0785dec5ce041440ae2`. The feature branch tracked zero
+MP4 files, and no accepted evidence payload entered `main`.

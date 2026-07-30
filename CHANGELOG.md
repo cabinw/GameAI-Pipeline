@@ -4,6 +4,55 @@ All notable project milestones are recorded in this file. The repository is
 still pre-release package infrastructure; Git tags and GitHub Releases remain
 separate publication actions.
 
+## v0.5.0 — Production Character Vertical Slice Baseline
+
+Release source is the squash/main commit produced by the v0.5.0 documentation
+closeout. The annotated `v0.5.0` tag and attachment-free GitHub prerelease are
+published only after exact-squash main CI passes.
+
+### Added
+
+- PROGRAM-015 Red Cap production vertical slice, integrated through PR #22:
+  source authority and asset intake, deterministic 19-part layered
+  reconstruction, Rest/Idle/Walk/Wave runtime motion, semantic targets and
+  scene-specific concrete VFX Render Plans, and a two-character Creator
+  showcase.
+- Creator 3.8.8 macOS acceptance for alternating foot contact,
+  hand/socket following, Dust, Trail, Aura, Pause/Resume, Transform Stress,
+  Debug, two consecutive lifecycle rebuilds, Exact Reset, and a final clean
+  hold with zero relevant Creator/Preview warnings or errors.
+- Structural Sharp PNG publication-race remediation through PR #24: read-only
+  tracked inputs, isolated roots, complete same-directory temporary writes,
+  atomic rename, and deterministic concurrency regression without retry,
+  sleep, serialization, or fallback.
+- Local Experimental Asset Mode through PR #25, keeping
+  `artifacts/experimental/<experiment-id>/` ignored, untracked, local-only,
+  and outside publication until Repository Candidate review passes.
+
+### Verification
+
+- Working-copy and fresh frozen tracked-files-only verification: 508/508
+  tests each.
+- PROGRAM-015 automated, typecheck, generated-closure, Scene/meta/class,
+  Creator lifecycle/spatial/control, framebuffer, external review, and
+  protected-content gates: PASS.
+- Rights and provenance remain byte-identical to the accepted project-owner
+  records.
+- Zero tracked MP4 files or accepted evidence payload on `main`.
+
+### Known limitations
+
+- Prerelease production-character vertical-slice baseline, not a complete
+  commercial game or general-purpose art-production system.
+- Verified live environment is Cocos Creator 3.8.8 on macOS; Windows is not
+  formally verified.
+- No Unity or Godot adapter, real audio/gameplay execution, or complete
+  production editor UI.
+- Local Experimental Assets are not repository-publication or redistribution
+  approved and remain ineligible for release until promoted and audited.
+- TASK-015D and TASK-014D4 are not started. A possible two-character,
+  one-scene fighting experiment remains a future candidate only.
+
 ## v0.4.0 — Data-Driven VFX Authoring Baseline
 
 Published source and peeled tag target: `main` at

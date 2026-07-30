@@ -14,6 +14,9 @@ architecture that remains portable in principle.
 | Deterministic concrete Render Plan and exact sampler | Implemented and verified |
 | Shared Cocos typed primitive/recipe/blend adapter/runtime | Implemented and verified |
 | Canonical 12-state data-driven VFX integration | Implemented and verified |
+| Red Cap 19-part production character hierarchy | Implemented and verified |
+| Red Cap Rest / Idle / Walk / Wave runtime animation | Implemented and verified |
+| PROGRAM-015 Creator production vertical slice | Implemented and externally accepted |
 | Cocos Creator 3.8.8 VFX runtime on validated macOS environment | Implemented and verified, including lifecycle/fault/visual gates |
 | Clean tracked-files-only CI | Verified |
 | Windows development environment | Not yet verified |
@@ -26,7 +29,8 @@ architecture that remains portable in principle.
 | Production VFX art | Not provided; current effects are procedural/reference |
 | Audio playback and gameplay execution | Not implemented |
 | AI asset generation and automatic fitting | Not implemented |
-| Original Red Cap production reconstruction | Deferred |
+| Red Cap production vertical slice | Implemented and verified |
+| Two-character, one-scene fighting experiment | Future candidate; not started |
 | TASK-014D4 | Not started |
 
 ## Interpretation
@@ -50,12 +54,14 @@ recorded macOS environment. CI verifies tracked-file reproducibility without
 installing Creator. Windows has neither a verified development toolchain nor
 an accepted Creator run.
 
-The production-lite character is the accepted integration fixture. Historical
-Red Cap artifacts remain useful for provenance and earlier rig gates, but the
-original Red Cap has not been reconstructed through the complete canonical V2
-loadout runtime.
+The production-lite character remains the accepted canonical 12-state
+loadout fixture. PROGRAM-015 separately provides an accepted Red Cap
+production vertical slice with its own 19-part hierarchy, bounded
+Rest/Idle/Walk/Wave animation, semantic targets, shared Cocos VFX runtime, and
+Creator showcase. This does not add Red Cap to the canonical V2 loadout
+matrix or imply a general automatic-fitting system.
 
 See [Development Environment](environment.md),
 [Cocos Scene Rig Builder](cocos-scene-rig-builder.md), and
-[v0.4.0 Data-Driven VFX Authoring
-Baseline](releases/v0.4.0-data-driven-vfx-authoring-baseline.md).
+[v0.5.0 Production Character Vertical Slice
+Baseline](releases/v0.5.0-production-character-vertical-slice-baseline.md).

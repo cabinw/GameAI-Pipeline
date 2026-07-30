@@ -1,6 +1,6 @@
 # Policy: Local Experimental Asset Mode
 
-- Status: Accepted; pending final integration
+- Status: Accepted and integrated through PR #25
 - Date: 2026-07-31
 - Branch: `policy/local-experimental-asset-mode`
 - Exact baseline: `61d4e443dcabe2a74b75f07498c4de6886875a6f`
@@ -62,7 +62,8 @@ derivatives.
       zero binary or media files.
 - [x] PROGRAM-015 accepted bytes, rights/provenance hashes, protected refs,
       Tags, and Releases remain unchanged.
-- [x] The branch is published as a Draft PR and remains unmerged.
+- [x] The branch passed Draft PR review and was integrated only after
+      exact-head and post-merge CI passed.
 
 ## Local verification record
 
@@ -85,4 +86,6 @@ policy gate, clean tracked-only verification, media/binary audit, and
 protected-content audit passed. Reviews, comments, requested changes, and
 unresolved threads were all zero, and GitHub Actions run `30568550710`
 completed successfully on the reviewed commit. The policy is accepted and
-awaits only final integration.
+was subsequently squash-merged through PR #25 at
+`e24e6d8bb4ee7d9581787814c858a3f4f1dc410e`. The remote policy branch was
+deleted; the local policy and backup branches were retained.

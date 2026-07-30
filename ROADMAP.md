@@ -64,6 +64,29 @@ placeholder VFX, not production-ready final art or complete tooling.
 v0.4.0 remains a prerelease framework baseline. The accepted procedural
 effects prove data and runtime contracts but do not represent production art.
 
+## v0.5.0 — Production Character Vertical Slice Baseline — Completed
+
+- PROGRAM-015 source authority, project-owner-reviewed rights/provenance, and
+  deterministic Red Cap asset intake
+- 19-part production character hierarchy with Rest, Idle, Walk, and Wave
+- Alternating planted-foot validation and joint-following hand target/socket
+- Character Semantic Events and scene-specific concrete Dust, Trail, and Aura
+  Render Plans over the shared Cocos runtime
+- Pause/Resume, Transform Stress, Debug, two consecutive rebuilds,
+  post-rebuild behavior, Exact Reset, and final clean hold
+- Cocos Creator 3.8.8 macOS runtime, spatial, framebuffer, control, console,
+  and external visual acceptance
+- PR #24 structural Sharp PNG publication-race fix with isolated roots and
+  atomic rename
+- PR #25 Local Experimental Asset Mode with a pre-staging Repository
+  Candidate publication gate
+- Working-copy and frozen tracked-files-only 508/508 verification
+- Zero tracked MP4 or accepted evidence payload on `main`
+
+v0.5.0 is a prerelease production-character vertical-slice baseline. It does
+not claim a complete game, general art-production system, Windows support,
+cross-engine adapters, audio/gameplay execution, or a complete editor UI.
+
 ## Next roadmap
 
 ### TASK-014D4 — Not started
@@ -116,10 +139,12 @@ Validate the supported toolchain, native image dependency, generation, and
 engine workflow on Windows. No Windows development environment has been
 accepted.
 
-### Original Red Cap reconstruction
+### Production-character follow-up
 
-Return to production reconstruction only through the accepted provenance,
-rig, articulation, adapter, and visual gates. It remains deferred.
+The Red Cap production vertical slice is accepted in v0.5.0. Any broader
+character, combat, or content-production scope requires a new task and
+acceptance boundary. A possible two-character, one-scene fighting experiment
+is a future candidate direction only; it is not started by this release.
 
 ## Long-term direction
 

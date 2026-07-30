@@ -3,9 +3,84 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: Local Experimental Asset Mode
+## Active plan: v0.5.0 Production Character Vertical Slice Baseline
 
-- Status: Accepted; pending final integration
+- Status: Documentation closeout in progress
+- Started: 2026-07-31
+- Branch: `docs/release-v0.5.0-production-character-vertical-slice`
+- Exact baseline `main`: `e24e6d8bb4ee7d9581787814c858a3f4f1dc410e`
+- Scope ceiling: at most 14 Markdown files and 1,500 changed lines; zero
+  runtime, schema, test, fixture, generated-output, binary, media, package,
+  lockfile, CI, rights, provenance, Scene, or `.meta` changes.
+
+### Goal
+
+Publish the accepted production-character path as the v0.5.0 **Production
+Character Vertical Slice Baseline**, closing current-facing documentation
+without changing any accepted implementation or asset byte.
+
+### Baseline chain
+
+```text
+source authority and asset intake
+→ deterministic layered asset generation
+→ production character joint hierarchy
+→ Rest / Idle / Walk / Wave runtime animation
+→ semantic events and concrete VFX Render Plans
+→ shared Cocos renderer/runtime
+→ Creator lifecycle, rebuild, reset and spatial validation
+→ production vertical-slice acceptance
+```
+
+The release includes PROGRAM-015 as integrated through PR #22, the structural
+Sharp PNG publication fix integrated through PR #24, and Local Experimental
+Asset Mode integrated through PR #25. It is a prerelease framework baseline,
+not a finished commercial game or a general-purpose art-production system.
+
+### Boundaries
+
+- Documentation-only closeout, Draft PR, squash merge, annotated tag, and
+  attachment-free GitHub prerelease are authorized.
+- PROGRAM-015 runtime, source assets, Scenes, metadata, tests, generated
+  outputs, rights, and provenance remain byte-identical.
+- Cocos Creator 3.8.8 on macOS is the verified live environment. Windows,
+  Unity, and Godot remain unverified or unimplemented.
+- Audio/gameplay execution and a complete production editor UI remain absent.
+- Local Experimental Assets remain ignored, untracked, local-only, and
+  ineligible for publication until Repository Candidate promotion passes.
+- TASK-015D, TASK-014D4, and the possible two-character fighting experiment
+  remain unstarted future directions.
+
+### Execution
+
+1. Reconcile current-facing release, roadmap, compatibility, PROGRAM-015, and
+   Local Experimental Asset Mode documentation.
+2. Add one release baseline and one release task, remaining within the
+   Markdown-only scope ceiling.
+3. Run changed/all-Markdown links, status consistency, stale-claim,
+   whitespace, working-copy, frozen tracked-only, generated-closure,
+   media/binary, rights/provenance, and protected-reference gates.
+4. Publish a Draft PR, require exact-head Actions success and clean review,
+   then Ready and squash merge.
+5. Require exact-squash main Actions success before publishing an annotated
+   `v0.5.0` tag and an attachment-free GitHub prerelease.
+
+### Done when
+
+- The documented baseline and limitations match accepted repository facts.
+- The final diff contains no non-Markdown path and stays within 14 files and
+  1,500 changed lines.
+- Working-copy, tracked-only, PR, and post-merge main verification pass.
+- `v0.5.0` is an annotated tag on the exact squash/main commit and its GitHub
+  Release is published as a prerelease with zero assets.
+- Existing v0.2.0–v0.4.0 tags/releases, PROGRAM-015 bytes,
+  rights/provenance, backup/recovery/archive refs, and unstarted tasks remain
+  unchanged.
+
+## Completed plan: Local Experimental Asset Mode
+
+- Status: Accepted, published through PR #25, and squash-merged to `main` at
+  `e24e6d8bb4ee7d9581787814c858a3f4f1dc410e`
 - Started: 2026-07-31
 - Branch: `policy/local-experimental-asset-mode`
 - Exact baseline `main`: `61d4e443dcabe2a74b75f07498c4de6886875a6f`
@@ -80,7 +155,12 @@ scope, and zero reviews, comments, requested changes, or unresolved review
 threads. GitHub Actions run `30568550710` passed on that exact commit. This
 append-only acceptance record changes only this plan and the existing policy
 task; it does not alter the accepted policy, PROGRAM-015, rights/provenance,
-or any protected ref.
+or any protected ref. Acceptance commit
+`759796e489d07ac066321e616ef5af7f4ba2872d` passed working-copy,
+tracked-files-only, and exact-head Actions run `30570955473`. PR #25 was then
+squash-merged with post-merge main Actions run `30571397488` passing; the
+remote policy branch was deleted while the local policy and backup branches
+were retained.
 
 ## Completed plan: Sharp Full-Loadout Empty-Buffer Regression
 
@@ -215,7 +295,8 @@ Evidence acceptance commit
 `6011d48915a2097153fb6ee63303a781a41557d6` records external
 code/runtime/Creator/visual/spatial/control/evidence review PASS while
 preserving both historical failure statuses. PROGRAM-015 is Accepted and
-awaiting Draft PR publication.
+was subsequently published through PR #22 and squash-merged to `main` at
+`555f0b8e34affff0942ea0785dec5ce041440ae2`.
 
 ### TASK-015B declared implementation scope
 

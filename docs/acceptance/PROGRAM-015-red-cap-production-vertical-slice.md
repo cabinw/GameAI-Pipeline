@@ -7,7 +7,10 @@ Phase 0 source readiness and TASK-015A/B/C implementation are accepted on
 because it used synthetic flat-composite motion and non-media-derived
 framebuffer metrics. Replacement Creator Web Preview evidence subsequently
 passed independent external code/runtime/Creator/visual/spatial/control/
-evidence review. PROGRAM-015 is Accepted and awaiting Draft PR publication.
+evidence review. PROGRAM-015 is Accepted and integrated.
+PR #22 integrated the accepted Program by squash merge at
+`555f0b8e34affff0942ea0785dec5ce041440ae2`; no accepted evidence media entered
+`main`.
 
 ## Required acceptance chain
 

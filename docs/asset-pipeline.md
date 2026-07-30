@@ -146,5 +146,11 @@ records. In particular, PROGRAM-015 source authority, rights assertions,
 provenance, generated assets, runtime acceptance, and historical evidence
 retain their existing status and bytes.
 
+Local Experimental Asset Mode was integrated through PR #25. The v0.5.0
+Production Character Vertical Slice Baseline applies this policy
+prospectively: ignored local experiments remain outside the release, while
+PROGRAM-015 remains an Accepted Repository Asset set governed by its existing
+project-owner-reviewed rights/provenance and deterministic closure.
+
 Implementation and acceptance criteria for this policy are recorded in
 [`tasks/POLICY-local-experimental-asset-mode.md`](../tasks/POLICY-local-experimental-asset-mode.md).
