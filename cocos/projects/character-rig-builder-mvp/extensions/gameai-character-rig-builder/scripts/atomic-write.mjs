@@ -2,7 +2,11 @@ import { open, rename, rm } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
-export async function atomicWriteFile(targetFile, data) {
+export async function atomicWriteFile(
+  targetFile,
+  data,
+  { beforePublish } = {},
+) {
   const temporaryFile = path.join(
     path.dirname(targetFile),
     `.${path.basename(targetFile)}.${process.pid}.${randomUUID()}.tmp`,
@@ -15,6 +19,7 @@ export async function atomicWriteFile(targetFile, data) {
     await handle.sync();
     await handle.close();
     handle = undefined;
+    await beforePublish?.(temporaryFile);
     await rename(temporaryFile, targetFile);
     published = true;
   } finally {

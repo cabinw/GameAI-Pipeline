@@ -158,7 +158,7 @@
     },
     {
       "path": "pipelines/character-asset-intake/scripts/generate-production-lite-full-loadout.mjs",
-      "sha256": "e3ded341b516b22602c87bee83fb95e87efa45050984b395555418270460cf47"
+      "sha256": "209b395148c925ada61ece67103bf3e9831cd59c015581aab07d24aa9e921d05"
     }
   ],
   "tolerances": {

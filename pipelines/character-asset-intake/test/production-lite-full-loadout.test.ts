@@ -2,14 +2,40 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { readFile, readdir, stat } from "node:fs/promises";
+import {
+  chmod,
+  cp,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  stat,
+  writeFile,
+} from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 
+import sharp from "sharp";
+
 const execFileAsync = promisify(execFile);
 const packageRoot = path.resolve(__dirname, "../..");
 const repositoryRoot = path.resolve(packageRoot, "../..");
+const { atomicWriteFile } = require(
+  path.join(
+    repositoryRoot,
+    "cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder/scripts/atomic-write.mjs",
+  ),
+) as {
+  atomicWriteFile(
+    target: string,
+    data: Buffer,
+    options?: {
+      beforePublish?: (temporaryFile: string) => Promise<void>;
+    },
+  ): Promise<void>;
+};
 const fixtureRoot = path.join(
   repositoryRoot,
   "examples/production-lite-full-loadout",
@@ -63,34 +89,11 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
       ]),
     ),
   );
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/generate-production-lite-full-loadout.mjs")],
-    { cwd: packageRoot },
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "production-lite-full-loadout-generation-"),
   );
-  await execFileAsync(
-    process.execPath,
-    [path.join(packageRoot, "scripts/verify-production-lite-full-loadout.mjs")],
-    { cwd: packageRoot },
-  );
-  await execFileAsync(
-    process.execPath,
-    [
-      path.join(
-        packageRoot,
-        "scripts/generate-production-lite-full-loadout-cocos-metas.mjs",
-      ),
-    ],
-    { cwd: packageRoot },
-  );
-  for (const file of files) {
-    assert.equal(await digest(path.join(fixtureRoot, file)), before[file], file);
-    assert.equal(
-      await digest(path.join(cocosRoot, file)),
-      before[file],
-      `Cocos mirror ${file}`,
-    );
-  }
+  const generatedFixtureRoot = path.join(temporaryRoot, "fixture");
+  const generatedCocosRoot = path.join(temporaryRoot, "cocos");
   const generatedFiles = [
     ...files,
     ...generatedLayout.attachments.map((attachment) => attachment.file),
@@ -103,18 +106,268 @@ test("generates byte-stable full-loadout fixture and Cocos resource mirror", asy
     }
     return result;
   };
-  const fixtureFiles = (await recursiveFiles(fixtureRoot))
-    .filter(
-      (file) =>
-        file !== "README.md" &&
-        file !== "source/full-loadout-source.json",
-    )
-    .sort();
-  assert.deepEqual(fixtureFiles, generatedFiles);
-  const cocosFiles = (await recursiveFiles(cocosRoot))
-    .filter((file) => !file.endsWith(".meta"))
-    .sort();
-  assert.deepEqual(cocosFiles, generatedFiles);
+  try {
+    const generatorArguments = [
+      path.join(
+        packageRoot,
+        "scripts/generate-production-lite-full-loadout.mjs",
+      ),
+      "--fixture-output-root",
+      generatedFixtureRoot,
+      "--cocos-output-root",
+      generatedCocosRoot,
+    ];
+    await execFileAsync(process.execPath, generatorArguments, {
+      cwd: packageRoot,
+    });
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(
+          packageRoot,
+          "scripts/verify-production-lite-full-loadout.mjs",
+        ),
+        "--fixture-output-root",
+        generatedFixtureRoot,
+        "--cocos-output-root",
+        generatedCocosRoot,
+      ],
+      { cwd: packageRoot },
+    );
+    for (const file of files) {
+      assert.equal(
+        await digest(path.join(generatedFixtureRoot, file)),
+        before[file],
+        file,
+      );
+      assert.equal(
+        await digest(path.join(generatedCocosRoot, file)),
+        before[file],
+        `Cocos mirror ${file}`,
+      );
+      assert.equal(
+        await digest(path.join(fixtureRoot, file)),
+        before[file],
+        `tracked fixture ${file}`,
+      );
+      assert.equal(
+        await digest(path.join(cocosRoot, file)),
+        before[file],
+        `tracked Cocos mirror ${file}`,
+      );
+    }
+    assert.deepEqual(
+      (await recursiveFiles(generatedFixtureRoot)).sort(),
+      generatedFiles,
+    );
+    assert.deepEqual(
+      (await recursiveFiles(generatedCocosRoot)).sort(),
+      generatedFiles,
+    );
+    assert.equal(
+      (await readdir(temporaryRoot, { recursive: true })).some((entry) =>
+        String(entry).endsWith(".tmp"),
+      ),
+      false,
+    );
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test("publishes complete PNGs at synchronized atomic boundaries", async () => {
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "production-lite-atomic-png-"),
+  );
+  const target = path.join(temporaryRoot, "part.png");
+  const previous = await readFile(
+    path.join(
+      repositoryRoot,
+      "examples/production-lite-character/parts/hair-back.png",
+    ),
+  );
+  const next = await readFile(
+    path.join(
+      repositoryRoot,
+      "examples/production-lite-character/parts/torso.png",
+    ),
+  );
+  const validPng = async (bytes: Buffer) => {
+    assert.ok(bytes.length > 0);
+    assert.equal(bytes.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+    const metadata = await sharp(bytes).metadata();
+    assert.equal(metadata.format, "png");
+    assert.ok((metadata.width ?? 0) > 0);
+    assert.ok((metadata.height ?? 0) > 0);
+  };
+  let releasePublication!: () => void;
+  const publicationReleased = new Promise<void>((resolve) => {
+    releasePublication = resolve;
+  });
+  let staged!: (file: string) => void;
+  const fullyStaged = new Promise<string>((resolve) => {
+    staged = resolve;
+  });
+  try {
+    await writeFile(target, previous);
+    const publication = atomicWriteFile(target, next, {
+      beforePublish: async (temporaryFile: string) => {
+        const stagedBytes = await readFile(temporaryFile);
+        await validPng(stagedBytes);
+        staged(temporaryFile);
+        await publicationReleased;
+      },
+    });
+    const temporaryFile = await fullyStaged;
+    assert.equal(path.dirname(temporaryFile), temporaryRoot);
+    const duringPublication = await readFile(target);
+    await validPng(duringPublication);
+    assert.deepEqual(duringPublication, previous);
+    releasePublication();
+    await publication;
+    const afterPublication = await readFile(target);
+    await validPng(afterPublication);
+    assert.deepEqual(afterPublication, next);
+    await assert.rejects(
+      atomicWriteFile(target, previous, {
+        beforePublish: async () => {
+          throw new Error("EXPECTED_PUBLICATION_FAILURE");
+        },
+      }),
+      /EXPECTED_PUBLICATION_FAILURE/,
+    );
+    assert.deepEqual(await readFile(target), next);
+    assert.equal(
+      (await readdir(temporaryRoot)).some((entry) => entry.endsWith(".tmp")),
+      false,
+    );
+  } finally {
+    releasePublication();
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test("concurrent base generation and full-loadout reading stay byte-closed", async () => {
+  const temporaryRoot = await mkdtemp(
+    path.join(os.tmpdir(), "production-lite-concurrent-generation-"),
+  );
+  const inputExamplesRoot = path.join(temporaryRoot, "inputs");
+  const stableBaseRoot = path.join(
+    inputExamplesRoot,
+    "production-lite-character",
+  );
+  const baseFixtureRoot = path.join(temporaryRoot, "base-fixture");
+  const baseCocosRoot = path.join(temporaryRoot, "base-cocos");
+  const fullFixtureRoot = path.join(temporaryRoot, "full-fixture");
+  const fullCocosRoot = path.join(temporaryRoot, "full-cocos");
+  const baseGenerator = [
+    path.join(packageRoot, "scripts/generate-production-lite-character.mjs"),
+    "--source-root",
+    stableBaseRoot,
+    "--fixture-output-root",
+    baseFixtureRoot,
+    "--cocos-output-root",
+    baseCocosRoot,
+  ];
+  const fullGenerator = [
+    path.join(
+      packageRoot,
+      "scripts/generate-production-lite-full-loadout.mjs",
+    ),
+    "--fixture-output-root",
+    fullFixtureRoot,
+    "--cocos-output-root",
+    fullCocosRoot,
+    "--base-asset-root",
+    stableBaseRoot,
+    "--input-examples-root",
+    inputExamplesRoot,
+  ];
+  try {
+    for (const fixture of [
+      "production-lite-character",
+      "production-lite-full-loadout",
+      "production-lite-garment-layering",
+      "production-lite-one-handed-prop",
+    ]) {
+      await cp(
+        path.join(repositoryRoot, "examples", fixture),
+        path.join(inputExamplesRoot, fixture),
+        { recursive: true },
+      );
+    }
+    const inputEntries = await readdir(inputExamplesRoot, {
+      recursive: true,
+      withFileTypes: true,
+    });
+    for (const entry of inputEntries.reverse()) {
+      await chmod(
+        path.join(entry.parentPath, entry.name),
+        entry.isDirectory() ? 0o555 : 0o444,
+      );
+    }
+    await chmod(inputExamplesRoot, 0o555);
+    const stableInputBefore = await Promise.all(
+      (await readdir(path.join(stableBaseRoot, "parts")))
+        .sort()
+        .map((file) => digest(path.join(stableBaseRoot, "parts", file))),
+    );
+    await execFileAsync(process.execPath, baseGenerator, { cwd: packageRoot });
+    const acceptedBase = await Promise.all(
+      (await readdir(path.join(stableBaseRoot, "parts")))
+        .sort()
+        .map((file) => digest(path.join(stableBaseRoot, "parts", file))),
+    );
+    await Promise.all([
+      execFileAsync(process.execPath, baseGenerator, { cwd: packageRoot }),
+      execFileAsync(process.execPath, fullGenerator, { cwd: packageRoot }),
+    ]);
+    await execFileAsync(
+      process.execPath,
+      [
+        path.join(
+          packageRoot,
+          "scripts/verify-production-lite-full-loadout.mjs",
+        ),
+        "--fixture-output-root",
+        fullFixtureRoot,
+        "--cocos-output-root",
+        fullCocosRoot,
+        "--base-asset-root",
+        stableBaseRoot,
+        "--input-examples-root",
+        inputExamplesRoot,
+      ],
+      { cwd: packageRoot },
+    );
+    assert.deepEqual(
+      await Promise.all(
+        (await readdir(path.join(stableBaseRoot, "parts")))
+          .sort()
+          .map((file) => digest(path.join(stableBaseRoot, "parts", file))),
+      ),
+      stableInputBefore,
+    );
+    assert.deepEqual(acceptedBase, stableInputBefore);
+    assert.equal(
+      (await readdir(temporaryRoot, { recursive: true })).some((entry) =>
+        String(entry).endsWith(".tmp"),
+      ),
+      false,
+    );
+  } finally {
+    await chmod(inputExamplesRoot, 0o755).catch(() => undefined);
+    const cleanupEntries = await readdir(inputExamplesRoot, {
+      recursive: true,
+      withFileTypes: true,
+    }).catch(() => []);
+    for (const entry of cleanupEntries) {
+      if (entry.isDirectory()) {
+        await chmod(path.join(entry.parentPath, entry.name), 0o755);
+      }
+    }
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
 });
 
 test("all eight authored Rest reports are exact zero-difference", async () => {
