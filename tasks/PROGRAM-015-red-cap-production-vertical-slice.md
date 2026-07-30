@@ -168,9 +168,12 @@ the first final-frame inspection.
 Evidence is 1280×720, 30 fps, H.264 High, yuv420p. Feature branches track zero
 MP4 files.
 
-## Budgets
+## Budgets and final reconciliation
 
-- Aggregate: at most 96 changed files and 24,000 changed lines.
+- Original aggregate: at most 96 changed files and 24,000 changed lines.
+- One-time final exception: exactly 103 feature files and fewer than 24,000
+  changed lines. This is a closed final scope, not capacity for a 104th file
+  or further implementation.
 - Phase 0 resumed: 20 files and 5,000 changed lines, including exactly 5
   approved source PNGs.
 - TASK-015A: 45 files, 8,000 lines, 38 touched PNGs, 2 Scene/`.meta` pairs.
@@ -178,8 +181,28 @@ MP4 files.
 - TASK-015C: 35 files, 9,000 lines, 4 new PNG resources, 1 Scene/`.meta` pair.
 - Evidence branch: 3 MP4, 12 PNG, 8 JSON/script files.
 
-The aggregate ceiling is authoritative. Exceeding 100 files or 25,000 lines
-requires an explicit split decision before coding.
+The final read-only audit from exact `main`
+`68444551b9b160a2455a97a2d8bf611aea608c6e` through Phase C
+`25d506983d213449559f84587c5b19bf8ceef6b9` records 103 distinct files,
+12,323 additions, 18 deletions, and 12,341 changed lines. The seven-file
+exception covers required pre-existing cross-cutting files omitted from the
+original artifact roll-up: four Phase 0 status/index/release-isolation
+surfaces, two Phase A CI/command-registration surfaces, and one Phase B
+semantic-event regression surface. No file was removed, merged, renamed, or
+regenerated to meet the budget.
+
+Phase B is 21 files, 3,269 additions, 10 deletions, and 3,279 changed lines.
+The former 3,246-line record excluded exactly the 32-line TASK-015B closeout
+delta and the one-line package-script registration from its pre-closeout
+snapshot. It was not caused by rename handling, a later documentation change,
+or binary accounting.
+
+The full 103-file classification in
+`../docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md` confirms
+that every file maps to Phase 0/A/B/C authority, generation, runtime,
+Creator, validation, or documentation scope. This is scope/accounting
+reconciliation only; Phase 0/A/B/C history and implementation bytes remain
+unchanged.
 
 ## Phase 0 closeout
 
