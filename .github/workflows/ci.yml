@@ -25,6 +25,17 @@ jobs:
             exit 1
           fi
 
+      - name: Install and audit FFmpeg
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          ffmpeg -version
+          ffprobe -version
+
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:

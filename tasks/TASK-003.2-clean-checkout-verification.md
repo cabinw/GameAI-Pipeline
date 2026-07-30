@@ -49,3 +49,28 @@ The root `verify` script currently runs repository-wide typechecking before buil
   ```
 
 - All 63 tests pass and all regenerated `dist` and `dist-test` directories remain ignored.
+
+## 2026-07-30 media-tool dependency extension
+
+PROGRAM-015 added a deterministic media-derived framebuffer test that creates
+an H.264 fixture with `ffmpeg`, inspects it with `ffprobe`, decodes RGB24
+frames, and derives pixel counts from those bytes. Draft PR #22 Actions run
+`30553531763` reached that test but failed before encoding with
+`spawn ffmpeg ENOENT`; the clean Ubuntu runner had neither executable because
+the workflow installed only Node, pnpm, and workspace packages.
+
+The clean-checkout contract now also requires:
+
+1. Install Ubuntu's repository `ffmpeg` package before Node/pnpm setup and
+   dependency installation.
+2. Resolve both `ffmpeg` and `ffprobe` from `PATH`.
+3. Print `ffmpeg -version` and `ffprobe -version` for every CI audit.
+4. Fail the job if installation or either executable/version probe fails.
+5. Preserve the frozen install, complete `pnpm verify`, and generated-output
+   cleanliness gates without changing media tests or expectations.
+
+The analyzer records the available FFmpeg version but does not compare
+version-specific output bytes or require the locally recorded FFmpeg 8.1.2
+build. Ubuntu's supported system package is therefore the authoritative CI
+installation method; no third-party binary action, fallback, skipped test, or
+committed binary is introduced.

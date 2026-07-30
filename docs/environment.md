@@ -37,7 +37,14 @@ pnpm verify
 
 `pnpm verify` is the required local and CI gate. It performs a topologically ordered workspace build before repository-wide typechecking, then runs the complete test suite. The build-first order is required on a clean checkout because workspace consumers resolve dependency declarations from generated package `dist` directories. Neither local verification nor CI relies on pre-existing `dist` or `dist-test` output.
 
-CI starts from a checkout with no build output, runs `pnpm install --frozen-lockfile`, and then runs `pnpm verify`. Creator itself is not installed in CI, so editor integration remains a recorded local acceptance check.
+CI starts from a checkout with no build output. The Ubuntu job installs the
+distribution `ffmpeg` package, resolves both `ffmpeg` and `ffprobe`, and
+prints both version reports before Node/pnpm setup. It then runs
+`pnpm install --frozen-lockfile` and `pnpm verify`. Media-derived tests use
+those executables for real H.264 encode, metadata probing, and RGB24 frame
+decoding; a missing tool fails the job rather than skipping or substituting
+the test. Creator itself is not installed in CI, so editor integration
+remains a recorded local acceptance check.
 
 ## Workspace and Cocos project decision
 

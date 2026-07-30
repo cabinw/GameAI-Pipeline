@@ -187,6 +187,33 @@ untracked. TASK-015A is accepted and TASK-015B may proceed.
 See `tasks/PROGRAM-015-red-cap-production-vertical-slice.md` and
 `docs/acceptance/PROGRAM-015-red-cap-production-vertical-slice.md`.
 
+## Completed plan: CI FFmpeg Dependency Remediation
+
+- Status: Implemented, verified, and merged to `main`
+- Started: 2026-07-30
+- Branch: `fix/ci-install-ffmpeg`
+- Exact baseline `main`: `46d4523194f8ba064bd73db7b1c797e77cfa7745`
+- Fix commit: `dc017cc8162943fc250ff24bb2dec5092fe60e16`
+- Squash/main commit: `4f172c4a769a195df07560ea602b3f0c03e676bf`
+- Scope: 4 files and 89 changed lines; zero runtime, schema, Scene, asset,
+  test-expectation, generated-output, binary, media, evidence, package,
+  lockfile, or PROGRAM-015 changes.
+
+### Root cause and result
+
+PROGRAM-015 Draft PR #22 run `30553531763` reached the real media-derived
+framebuffer test and failed at process creation with `spawn ffmpeg ENOENT`.
+The Ubuntu workflow installed neither `ffmpeg` nor `ffprobe`; the analyzer
+uses both ordinary executable names but does not bind FFmpeg 8.1.2-specific
+bytes or output.
+
+PR #23 installs Ubuntu's repository `ffmpeg` package before Node/pnpm setup,
+requires both executables on `PATH`, and prints both version reports. Its
+Actions run `30555447522` passed with FFmpeg/ffprobe 6.1.1, complete
+verification, and clean generated-output closure. The fix was squash-merged;
+post-merge main run `30555787659` also passed. No PROGRAM-015 test,
+expectation, runtime, or media byte changed.
+
 ## Completed plan: Sharp PNG Atomic Generation Fix
 
 - Status: Implemented, verified, and merged to `main`
