@@ -228,3 +228,24 @@ D1/D2 reuse, locked Dust/Trail/Aura framebuffer thresholds, Pause/Resume,
 Stress/Debug, two rebuilds, post-rebuild effects, Exact Reset, restart, final
 hold, and clean-console gates. PROGRAM-015 is accepted locally with all A/B/C
 tasks complete.
+
+## Infrastructure sync and final R3
+
+The independent Sharp PNG atomic-publication maintenance PR was squash-merged
+to `main` as `46d4523194f8ba064bd73db7b1c797e77cfa7745`. PROGRAM-015 incorporated
+that exact main commit with append-only merge
+`f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c`; no Phase 0/A/B/C commit was
+rewritten. `PLANS.md` was the only merge conflict, and its resolution retains
+the Program record and the completed maintenance record.
+
+Relative to the new main, the feature remained exactly 103 files and 12,599
+changed lines before this documentation closeout. Final R3 passed with 17
+focused assertions, asset-intake 74/74, Character Semantic Events 25/25,
+Cocos project 9/9, Creator extension 293/293, and complete workspace 507/507.
+Working-copy and frozen tracked-files-only verification, typecheck, clean-CI,
+deterministic generation, synchronized generator concurrency, Scene/meta/class
+identity, Markdown links, diff checks, and clean/content closure passed.
+
+The project-owner rights/provenance bytes remain unchanged. Feature MP4,
+evidence payload, Creator temp/cache, `node_modules`, TASK-015D, TASK-014D4,
+Unity, Godot, and Windows scope remain absent.

@@ -262,3 +262,41 @@ Character Semantic Events source file changed; the only semantic-events
 change is regression coverage. No Creator temp/cache, `node_modules`,
 feature evidence payload, tracked MP4, TASK-015D, TASK-014D4, Unity, Godot,
 or Windows implementation is present.
+
+## Final infrastructure sync and R3 closure
+
+- Independent maintenance PR: `#21`
+- Maintenance commit: `75ca9ab121405a3780e1832c7b6f6bc02b6fb9d0`
+- Squash/main commit: `46d4523194f8ba064bd73db7b1c797e77cfa7745`
+- Append-only Program merge:
+  `f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c`
+- Pre-documentation-closeout Program scope against new main: 103 files,
+  12,567 additions, 32 deletions, 12,599 changed lines.
+
+The PR and exact squash-SHA push CI both passed. PR comments, submitted
+reviews, and unresolved review threads were zero; the ready PR was mergeable.
+The remote maintenance branch was deleted after merge, while the local fix
+branch and PROGRAM-015 backup remain.
+
+Final R3 results:
+
+- Focused PROGRAM-015: 17/17.
+- Character asset intake: 74/74.
+- Character Semantic Events: 25/25.
+- Cocos project: 9/9.
+- Creator extension: 293/293.
+- Complete workspace: 507/507.
+- Root TypeScript/typecheck and Cocos clean-CI: PASS.
+- Working-copy `CI=true pnpm verify`: PASS.
+- Fresh tracked-files-only frozen install plus verify: PASS.
+- Synchronized Sharp atomic/concurrency regression: PASS in working and
+  tracked-only executions.
+- Deterministic Red Cap static, motion, showcase, full-loadout, generated
+  mirror, Scene/meta/class identity, Markdown-link, whitespace, temp-cleanup,
+  media, protected-ref, and post-verify clean/content closure: PASS.
+
+Rights and Program provenance remain byte-identical at
+`335cef8824d574c4999492ae32201c79eb76683a78c342e1ae23696a85cc45f4`
+and
+`55d350c9e44a38c8bef6d3f6b0eb0654caa1bb846c491dd7c547c71e3a862758`.
+No implementation changed during final R3.

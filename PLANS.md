@@ -5,7 +5,7 @@ time.
 
 ## Active plan: PROGRAM-015 Red Cap Production Vertical Slice
 
-- Status: Accepted; TASK-015A/B/C complete
+- Status: Accepted; TASK-015A/B/C complete; final R3 passed
 - Started: 2026-07-30
 - Branch: `feat/task-015-red-cap-production-vertical-slice`
 - Exact baseline `main`: `68444551b9b160a2455a97a2d8bf611aea608c6e`
@@ -44,6 +44,23 @@ final read-only reconciliation against exact `main`
 changed lines at Phase C. The project owner grants a one-time seven-file
 accounting exception, closing the feature cap at exactly 103 files; it is not
 new implementation capacity. A 104th feature file remains prohibited.
+
+The independent Sharp atomic-publication fix was squash-merged to `main` at
+`46d4523194f8ba064bd73db7b1c797e77cfa7745` and synchronized append-only into
+this branch by merge commit
+`f1f0adfc5e8352bfcd7b50bd50b2a93d3f5c628c`. Relative to the new `main`, the
+Program remains exactly 103 files and 12,599 changed lines before this
+documentation closeout. No implementation, source asset, Scene, `.meta`,
+schema, rights, or project provenance conflict occurred; `PLANS.md` was the
+sole conflict and retains both histories.
+
+Final R3 passed: 17 focused PROGRAM-015 assertions, asset-intake 74/74,
+Character Semantic Events 25/25, Cocos project 9/9, Creator extension
+293/293, and complete workspace 507/507. Typecheck, clean-CI, working-copy
+verification, frozen tracked-files-only verification, deterministic
+generation, synchronized generator concurrency, generated closure,
+Scene/meta/class identity, Markdown links, diff whitespace, media/protected
+refs, and post-verify clean-content closure all passed.
 
 ### TASK-015B declared implementation scope
 
