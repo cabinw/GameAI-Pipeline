@@ -22,6 +22,8 @@
 
 - [Animation Review Workspace RFC](rfc/RFC-0016-animation-review-workspace.md)
 - [PROGRAM-015D master task](../tasks/PROGRAM-015D-animation-review-workspace.md)
+- [PROGRAM-015D Product Owner Acceptance](acceptance/PROGRAM-015D-product-owner-acceptance.md)
+- [PROGRAM-015D Product Owner defect ledger](reports/PROGRAM-015D-product-owner-defect-ledger.md)
 - [Animation review editor design seed](task15-animation-review-editor-design.md)
 
 ## Architecture decisions
@@ -45,7 +47,7 @@
 - [TASK-014C canonical full-loadout Semantic VFX acceptance](acceptance/TASK-014C-canonical-loadout-semantic-vfx.md)
 - [TASK-014D3 canonical full-loadout data-driven VFX acceptance](acceptance/TASK-014D3-canonical-loadout-vfx-authoring-integration.md)
 - [PROGRAM-015 Red Cap production vertical slice acceptance](acceptance/PROGRAM-015-red-cap-production-vertical-slice.md)
-- [PROGRAM-015D Animation Review Workspace acceptance](acceptance/PROGRAM-015D-animation-review-workspace.md)
+- [PROGRAM-015D Animation Review Workspace technical acceptance record](acceptance/PROGRAM-015D-animation-review-workspace.md)
 - [PROGRAM-015 Phase 0 source-readiness report](reports/PROGRAM-015-phase-0-source-readiness.md)
 - [PROGRAM-015 Phase C showcase report](reports/PROGRAM-015-phase-c-showcase.md)
 - [ADR-0018 production-slice source readiness](adr/ADR-0018-production-slice-source-readiness.md)

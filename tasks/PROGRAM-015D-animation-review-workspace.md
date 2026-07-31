@@ -2,14 +2,19 @@
 
 ## Status
 
-TASK-015D1–D4 implementation and the single external code/UI/Creator review
-are complete on `feat/task-015d-animation-review-workspace`. Review status is
-`passed-external-code-ui-and-creator-review` at implementation SHA
-`c99cee9ad62c963b1163a6f727604429995b74e2`; acceptance publication, final PR
-CI, and conditional squash integration remain.
+`integrated-pending-product-owner-acceptance`.
 
-TASK-015D1 through TASK-015D4 are executed continuously on this branch as four
-append-only commits. TASK-014D4 and TASK-016 remain not started.
+TASK-015D1–D4 implementation, automated verification, Creator technical
+verification, and PR #27 integration are complete. PR #27 was squash-merged
+to `main` at `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e` on 2026-07-31.
+Product Owner Acceptance is PENDING and overall product acceptance is
+INCOMPLETE. Codex evidence and operation do not constitute Product Owner
+Acceptance; only the project owner may pass that gate.
+
+The acceptance state is reopened on
+`fix/program-015d-product-owner-acceptance`. `v0.6.0`, TASK-015E, TASK-016,
+and TASK-014D4 remain unstarted. `v0.6.0` and TASK-016 are blocked until the
+project owner explicitly completes Product Owner Acceptance.
 
 ## Objective
 
@@ -161,9 +166,11 @@ commands and snapshots. Cocos owns engine state, Scene lookup, playback,
 overlays, and actual runtime diagnostics; successful Panel mutations are
 mirrored to the local adapter so Standalone and Compact views do not diverge.
 
-## External review result
+## Technical review result — not Product Owner Acceptance
 
-Review date: 2026-07-31, Asia/Shanghai. Creator version: 3.8.8.
+Review date: 2026-07-31, Asia/Shanghai. Creator version: 3.8.8. Every PASS in
+this section is a technical verification result; none is a Product Owner
+Acceptance decision.
 
 | Surface | Executed acceptance | Result |
 | --- | --- | --- |
@@ -203,6 +210,8 @@ not staged, pushed, attached to the PR, or used by CI.
 - [ADR-0019](../docs/adr/ADR-0019-engine-neutral-review-core-cocos-bridge.md)
 - [ADR-0020](../docs/adr/ADR-0020-local-review-service-shared-ui-boundary.md)
 - [Program acceptance](../docs/acceptance/PROGRAM-015D-animation-review-workspace.md)
+- [Product Owner Acceptance record](../docs/acceptance/PROGRAM-015D-product-owner-acceptance.md)
+- [Product Owner defect ledger](../docs/reports/PROGRAM-015D-product-owner-defect-ledger.md)
 
 ## Program acceptance criteria
 
@@ -221,5 +230,10 @@ not staged, pushed, attached to the PR, or used by CI.
 7. Loopback/path/body/version/revision security checks, focused tests, full
    working-copy and tracked-only verification, generated/metadata closure,
    scope/media/protected-ref audits, and Draft PR CI pass.
-8. One Draft PR remains unmerged for the single external code/UI/Creator
-   review. `v0.6.0`, Tag, Release, TASK-014D4, and TASK-016 remain untouched.
+8. Technical implementation is integrated through PR #27 with exact-head and
+   post-merge CI passing; `v0.6.0`, Tag, Release, TASK-014D4, and TASK-016
+   remain untouched.
+9. Product Owner Acceptance is performed by the project owner through the
+   formal multi-round record. Until the owner explicitly passes it, overall
+   product acceptance remains incomplete and no release or TASK-016 start is
+   permitted.
