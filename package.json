@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "pnpm --recursive --if-present run build",
+    "review:animation": "pnpm --filter @gameai/animation-review-workspace start",
     "typecheck": "pnpm --recursive --if-present run typecheck",
     "test": "pnpm --recursive --if-present run test",
     "verify": "pnpm build && pnpm typecheck && pnpm test"

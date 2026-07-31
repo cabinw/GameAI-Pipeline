@@ -29,6 +29,9 @@ importers:
 
   cocos/projects/character-rig-builder-mvp:
     dependencies:
+      '@gameai/animation-review-core':
+        specifier: workspace:*
+        version: link:../../../pipelines/animation-review-core
       '@gameai/character-semantic-events':
         specifier: workspace:*
         version: link:../../../pipelines/character-semantic-events
@@ -42,6 +45,12 @@ importers:
 
   cocos/projects/character-rig-builder-mvp/extensions/gameai-character-rig-builder:
     dependencies:
+      '@gameai/animation-review-core':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/animation-review-core
+      '@gameai/animation-review-ui':
+        specifier: workspace:*
+        version: link:../../../../../pipelines/animation-review-ui
       '@gameai/character-asset-intake':
         specifier: workspace:*
         version: link:../../../../../pipelines/character-asset-intake
@@ -87,6 +96,57 @@ importers:
       ajv:
         specifier: 'catalog:'
         version: 8.17.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
+  pipelines/animation-review-core:
+    dependencies:
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../rig-animation
+      ajv:
+        specifier: 'catalog:'
+        version: 8.17.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
+  pipelines/animation-review-ui:
+    dependencies:
+      '@gameai/animation-review-core':
+        specifier: workspace:*
+        version: link:../animation-review-core
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
+  pipelines/animation-review-workspace:
+    dependencies:
+      '@gameai/animation-review-core':
+        specifier: workspace:*
+        version: link:../animation-review-core
+      '@gameai/animation-review-ui':
+        specifier: workspace:*
+        version: link:../animation-review-ui
+      '@gameai/character-contracts':
+        specifier: workspace:*
+        version: link:../../framework/character-contracts
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../rig-animation
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

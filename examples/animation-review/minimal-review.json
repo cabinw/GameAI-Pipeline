@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewId": "minimal-review",
+  "revision": 0,
+  "status": "in-review",
+  "subject": {
+    "characterId": "minimal-character",
+    "rigId": "minimal-rig",
+    "animationId": "minimal-loop",
+    "sourceRevision": "fixture-v1",
+    "duration": 1,
+    "loop": true
+  },
+  "metrics": {
+    "duration": 1,
+    "trackCount": 1,
+    "keyframeCount": 3,
+    "animatedJointCount": 1,
+    "untrackedJointCount": 0,
+    "loopContinuityError": 0,
+    "maxAbsoluteRotationDegrees": 10,
+    "maxAngularSpeedDegreesPerSecond": 20,
+    "maxLinearSpeedUnitsPerSecond": 0
+  },
+  "findings": [],
+  "checklist": [
+    {
+      "checkId": "loop-continuity",
+      "label": "Loop boundary is continuous",
+      "status": "passed",
+      "details": "Maximum loop boundary error is 0.",
+      "relatedFindingIds": []
+    }
+  ],
+  "decisions": [],
+  "adjustments": [],
+  "auditTrail": [
+    {
+      "entryId": "audit-review-created-0",
+      "action": "review-created",
+      "actorId": "fixture-author",
+      "revision": 0,
+      "details": "Created minimal review fixture.",
+      "createdAt": "2026-07-31T00:00:00.000Z"
+    }
+  ],
+  "createdAt": "2026-07-31T00:00:00.000Z",
+  "updatedAt": "2026-07-31T00:00:00.000Z"
+}

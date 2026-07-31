@@ -63,6 +63,19 @@ pnpm install --frozen-lockfile
 pnpm verify
 ```
 
+Start the local Animation Review Workspace for the accepted PROGRAM-015 Red
+Cap fixture with:
+
+```bash
+pnpm review:animation
+```
+
+The command binds `127.0.0.1:41715` by default and prints the browser URL.
+`--port`, `--fixture`, `--session-root`, and `--export-root` are explicit
+overrides. The local service atomically persists versioned Sessions below the
+configured safe root, serves only declared accepted fixture PNGs, and exports
+review bundles without overwriting source animation or asset files.
+
 Exact versions, individual commands, the workspace topology, and the Cocos extension spike are documented in `docs/environment.md`.
 
 Character Rig and Rig Layout contracts, validation codes, and usage are documented in `docs/character-contracts.md`. Schema compatibility rules are documented in `docs/schema-versioning.md`.

@@ -13,9 +13,11 @@ local/
 build/
 profiles/
 native/engine/android/**/assets/
+/cocos/projects/*/.creator/asset-template/
 
 # Disposable local-only experiments; never publish or scan from automation
 /artifacts/experimental/
+/.gameai/
 
 # Editors and operating systems
 .DS_Store

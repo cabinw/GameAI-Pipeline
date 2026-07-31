@@ -18,6 +18,10 @@ declare namespace Editor {
 }
 
 declare module "cc" {
+  export class Component {
+    readonly node: Node;
+  }
+
   export class Node {
     static readonly EventType: Readonly<Record<string, string>>;
     readonly uuid: string;

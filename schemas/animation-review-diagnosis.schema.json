@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review-diagnosis/1.0.0",
+  "title": "GameAI Animation Review Diagnosis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "diagnosisId", "findingId", "source", "severity", "status", "summary", "targetIds", "ruleId", "providerId"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "diagnosisId": { "$ref": "#/$defs/id" },
+    "findingId": { "$ref": "#/$defs/id" },
+    "source": { "enum": ["validator", "assistant", "provider", "human"] },
+    "severity": { "enum": ["info", "warning", "error"] },
+    "status": { "enum": ["open", "resolved"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "targetIds": {
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "timeRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "number", "minimum": 0 },
+        "end": { "type": "number", "minimum": 0 }
+      }
+    },
+    "ruleId": { "$ref": "#/$defs/id" },
+    "providerId": { "$ref": "#/$defs/id" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    }
+  }
+}

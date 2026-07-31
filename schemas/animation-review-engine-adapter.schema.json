@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review-engine-adapter/1.0.0",
+  "title": "GameAI Animation Review Engine Adapter Protocol",
+  "oneOf": [
+    { "$ref": "#/$defs/request" },
+    { "$ref": "#/$defs/response" }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "finiteNumber": { "type": "number" },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clipId": { "$ref": "#/$defs/id" },
+        "time": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 },
+        "deltaFrames": { "type": "integer", "minimum": -600, "maximum": 600 },
+        "frameRate": {
+          "type": "number",
+          "$ref": "#/$defs/finiteNumber",
+          "exclusiveMinimum": 0,
+          "maximum": 240
+        },
+        "rate": {
+          "type": "number",
+          "$ref": "#/$defs/finiteNumber",
+          "minimum": 0.05,
+          "maximum": 4
+        },
+        "loop": { "type": "boolean" },
+        "overlay": {
+          "enum": ["skeleton", "pivots", "sockets", "hit-areas", "attachments"]
+        },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "protocolVersion",
+        "requestId",
+        "adapterId",
+        "command",
+        "payload"
+      ],
+      "properties": {
+        "kind": { "const": "request" },
+        "protocolVersion": { "const": "1.0.0" },
+        "requestId": { "$ref": "#/$defs/id" },
+        "adapterId": { "$ref": "#/$defs/id" },
+        "command": {
+          "enum": [
+            "describe",
+            "observe-playback",
+            "select-clip",
+            "play",
+            "pause",
+            "seek",
+            "step",
+            "set-rate",
+            "set-loop",
+            "set-overlay",
+            "exact-reset"
+          ]
+        },
+        "expectedRevision": { "type": "integer", "minimum": 0 },
+        "payload": { "$ref": "#/$defs/payload" }
+      }
+    },
+    "adapterError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "$ref": "#/$defs/id" },
+        "message": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "playback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "time",
+        "duration",
+        "rate",
+        "loop",
+        "clipId",
+        "availableClipIds"
+      ],
+      "properties": {
+        "status": { "enum": ["playing", "paused", "stopped"] },
+        "time": { "type": "number", "minimum": 0 },
+        "duration": { "type": "number", "exclusiveMinimum": 0 },
+        "rate": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },
+        "loop": { "type": "boolean" },
+        "clipId": { "$ref": "#/$defs/id" },
+        "availableClipIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a", "b", "c", "d", "tx", "ty"],
+      "properties": {
+        "a": { "type": "number" },
+        "b": { "type": "number" },
+        "c": { "type": "number" },
+        "d": { "type": "number" },
+        "tx": { "type": "number" },
+        "ty": { "type": "number" }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "available"],
+      "properties": {
+        "command": {
+          "enum": [
+            "describe",
+            "observe-playback",
+            "select-clip",
+            "play",
+            "pause",
+            "seek",
+            "step",
+            "set-rate",
+            "set-loop",
+            "set-overlay",
+            "exact-reset"
+          ]
+        },
+        "available": { "type": "boolean" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "partId",
+        "parentId",
+        "assetUrl",
+        "drawOrder",
+        "width",
+        "height",
+        "anchor",
+        "visualOffset",
+        "worldTransform"
+      ],
+      "properties": {
+        "partId": { "$ref": "#/$defs/id" },
+        "parentId": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/id" }]
+        },
+        "assetUrl": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "drawOrder": { "type": "integer", "minimum": -1000000, "maximum": 1000000 },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 },
+        "anchor": { "$ref": "#/$defs/vector" },
+        "visualOffset": { "$ref": "#/$defs/vector" },
+        "worldTransform": { "$ref": "#/$defs/matrix" }
+      }
+    },
+    "joint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jointId", "parentId", "worldPivot"],
+      "properties": {
+        "jointId": { "$ref": "#/$defs/id" },
+        "parentId": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/id" }]
+        },
+        "worldPivot": { "$ref": "#/$defs/vector" }
+      }
+    },
+    "keyframe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time", "value"],
+      "properties": {
+        "time": { "type": "number", "minimum": 0 },
+        "value": {
+          "oneOf": [
+            { "type": "number" },
+            { "$ref": "#/$defs/vector" }
+          ]
+        }
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jointId", "property", "keyframes"],
+      "properties": {
+        "jointId": { "$ref": "#/$defs/id" },
+        "property": { "enum": ["position", "rotation", "scale"] },
+        "keyframes": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": { "$ref": "#/$defs/keyframe" }
+        }
+      }
+    },
+    "primitive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primitiveId", "overlay", "shape", "label", "x", "y"],
+      "properties": {
+        "primitiveId": { "$ref": "#/$defs/id" },
+        "overlay": {
+          "enum": ["skeleton", "pivots", "sockets", "hit-areas", "attachments"]
+        },
+        "shape": { "enum": ["point", "line", "rect", "circle"] },
+        "label": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "x2": { "type": "number" },
+        "y2": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 },
+        "radius": { "type": "number", "minimum": 0 }
+      }
+    },
+    "overlays": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skeleton", "pivots", "sockets", "hit-areas", "attachments"],
+      "properties": {
+        "skeleton": { "type": "boolean" },
+        "pivots": { "type": "boolean" },
+        "sockets": { "type": "boolean" },
+        "hit-areas": { "type": "boolean" },
+        "attachments": { "type": "boolean" }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "maxProperties": 1000,
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "number" },
+          { "type": "string", "maxLength": 2000 },
+          { "type": "boolean" }
+        ]
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapterId",
+        "adapterRevision",
+        "characterId",
+        "rigId",
+        "playback",
+        "capabilities",
+        "overlays",
+        "parts",
+        "joints",
+        "timeline",
+        "runtimeDiagnostics"
+      ],
+      "properties": {
+        "adapterId": { "$ref": "#/$defs/id" },
+        "adapterRevision": { "type": "integer", "minimum": 0 },
+        "characterId": { "$ref": "#/$defs/id" },
+        "rigId": { "$ref": "#/$defs/id" },
+        "playback": { "$ref": "#/$defs/playback" },
+        "capabilities": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/capability" }
+        },
+        "overlays": { "$ref": "#/$defs/overlays" },
+        "parts": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/part" }
+        },
+        "joints": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/joint" }
+        },
+        "timeline": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/track" }
+        },
+        "overlayPrimitives": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/primitive" }
+        },
+        "runtimeDiagnostics": { "$ref": "#/$defs/diagnostics" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "protocolVersion",
+        "requestId",
+        "adapterId",
+        "ok",
+        "responseType"
+      ],
+      "properties": {
+        "kind": { "const": "response" },
+        "protocolVersion": { "const": "1.0.0" },
+        "requestId": { "$ref": "#/$defs/id" },
+        "adapterId": { "$ref": "#/$defs/id" },
+        "ok": { "type": "boolean" },
+        "responseType": { "enum": ["snapshot", "playback", "error"] },
+        "snapshot": { "$ref": "#/$defs/snapshot" },
+        "adapterRevision": { "type": "integer", "minimum": 0 },
+        "playback": { "$ref": "#/$defs/playback" },
+        "runtimeDiagnostics": { "$ref": "#/$defs/diagnostics" },
+        "error": { "$ref": "#/$defs/adapterError" }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "ok": { "const": true },
+            "responseType": { "const": "snapshot" },
+            "snapshot": { "$ref": "#/$defs/snapshot" },
+            "adapterRevision": false,
+            "playback": false,
+            "runtimeDiagnostics": false,
+            "error": false
+          },
+          "required": ["snapshot"]
+        },
+        {
+          "properties": {
+            "ok": { "const": true },
+            "responseType": { "const": "playback" },
+            "snapshot": false,
+            "adapterRevision": { "type": "integer", "minimum": 0 },
+            "playback": { "$ref": "#/$defs/playback" },
+            "runtimeDiagnostics": { "$ref": "#/$defs/diagnostics" },
+            "error": false
+          },
+          "required": [
+            "adapterRevision",
+            "playback",
+            "runtimeDiagnostics"
+          ]
+        },
+        {
+          "properties": {
+            "ok": { "const": false },
+            "responseType": { "const": "error" },
+            "snapshot": false,
+            "adapterRevision": false,
+            "playback": false,
+            "runtimeDiagnostics": false,
+            "error": { "$ref": "#/$defs/adapterError" }
+          },
+          "required": ["error"]
+        }
+      ]
+    }
+  }
+}

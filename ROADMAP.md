@@ -87,6 +87,33 @@ v0.5.0 is a prerelease production-character vertical-slice baseline. It does
 not claim a complete game, general art-production system, Windows support,
 cross-engine adapters, audio/gameplay execution, or a complete editor UI.
 
+## PROGRAM-015D — Animation Review Workspace — Final acceptance pending
+
+- TASK-015D1: versioned Review Document and Engine Adapter Protocol contracts,
+  deterministic metrics/findings/checklist, immutable review state, and
+  stable diagnostics
+- TASK-015D2: Cocos Scene/runtime adapter plus a compact dockable review Panel
+- TASK-015D3: loopback local service and standalone shared workspace UI over
+  accepted PROGRAM-015 Red Cap fixtures
+- TASK-015D4: deterministic local assistant/provider boundary, explicit human
+  decisions, constrained quick edits, automatic revalidation, and structured
+  export
+- Four append-only commits on
+  `feat/task-015d-animation-review-workspace`, followed by one Draft PR and a
+  single external code/UI/Creator review
+
+TASK-015D1–D4 implementation is complete. Independent external code/UI/
+Creator review produced one centralized remediation: versioned persistent
+Sessions, six-kind Patch Preview/Apply, human Finding/Rule authoring,
+undo/redo/reset, atomic storage, lightweight observation, and one shared
+Panel/Standalone Session authority. The feature remains unreleased and
+unmerged until exact-head acceptance and CI pass.
+
+PROGRAM-015D is a bounded review and correction workspace, not a complete
+animation authoring suite. It does not add IK, blending, automatic repair,
+cloud AI, source overwrite, hosted collaboration, or a new engine adapter.
+TASK-016 remains not started until this workspace passes its external gate.
+
 ## Next roadmap
 
 ### TASK-014D4 — Not started
@@ -118,8 +145,9 @@ is not part of v0.2.0.
 
 ### Production editor UI
 
-Turn validated pipeline operations into a production-oriented authoring and
-inspection workflow instead of acceptance-only fixtures.
+PROGRAM-015D is the first in-progress production-oriented inspection and
+bounded adjustment workflow. Broader asset, rig, animation, VFX, and level
+authoring remains future work and requires separate tasks.
 
 ### Unity adapter
 

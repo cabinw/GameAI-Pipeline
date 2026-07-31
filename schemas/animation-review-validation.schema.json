@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review-validation/1.0.0",
+  "title": "GameAI Animation Review Validation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "ruleId", "ruleKind", "status", "details", "relatedFindingIds"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "ruleId": { "$ref": "#/$defs/id" },
+    "ruleKind": { "enum": ["automatic", "human-judgment"] },
+    "status": { "enum": ["unresolved", "waived", "passed", "failed"] },
+    "details": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "relatedFindingIds": {
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "decidedBy": { "$ref": "#/$defs/id" },
+    "decidedAt": { "$ref": "#/$defs/timestamp" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "timestamp": { "type": "string", "minLength": 1, "maxLength": 64 }
+  }
+}

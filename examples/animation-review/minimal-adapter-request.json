@@ -1,0 +1,11 @@
+{
+  "kind": "request",
+  "protocolVersion": "1.0.0",
+  "requestId": "request-1",
+  "adapterId": "minimal-adapter",
+  "command": "seek",
+  "expectedRevision": 0,
+  "payload": {
+    "time": 0.5
+  }
+}
