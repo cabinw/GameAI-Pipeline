@@ -15,6 +15,8 @@
     "test": "pnpm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js test/*.test.mjs"
   },
   "dependencies": {
+    "@gameai/animation-review-core": "workspace:*",
+    "@gameai/animation-review-ui": "workspace:*",
     "@gameai/character-asset-intake": "workspace:*",
     "@gameai/character-contracts": "workspace:*",
     "@gameai/character-semantic-events": "workspace:*",
@@ -28,6 +30,17 @@
     "typescript": "catalog:"
   },
   "panels": {
+    "animation-review": {
+      "title": "GameAI Animation Review",
+      "type": "dockable",
+      "main": "dist/panels/animation-review",
+      "size": {
+        "min-width": 360,
+        "min-height": 420,
+        "width": 440,
+        "height": 680
+      }
+    },
     "default": {
       "title": "GameAI Character Rig Builder",
       "type": "dockable",
@@ -49,9 +62,24 @@
         "path": "i18n:menu.panel/GameAI Pipeline",
         "label": "Character Rig Builder",
         "message": "open-panel"
+      },
+      {
+        "path": "i18n:menu.panel/GameAI Pipeline",
+        "label": "Animation Review",
+        "message": "open-animation-review-panel"
       }
     ],
     "messages": {
+      "open-animation-review-panel": {
+        "methods": [
+          "openAnimationReviewPanel"
+        ]
+      },
+      "review-animation": {
+        "methods": [
+          "reviewAnimation"
+        ]
+      },
       "open-panel": {
         "methods": [
           "openPanel"

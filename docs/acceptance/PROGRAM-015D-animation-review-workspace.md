@@ -63,18 +63,30 @@ No earlier D1/D2/D3 checkpoint requests external acceptance.
   mirror, binary, media, tag, Release, worktree, or protected ref. Tracked MP4
   remains zero, and the rights/provenance hashes remain exact.
 
-## D2 — Cocos Adapter & Compact Panel
+## D2 — Cocos Adapter & Compact Panel — PASS
 
-Pending implementation.
-
-Required evidence:
-
-- exact request correlation and supported command matrix;
-- real PROGRAM-015 runtime snapshot/control boundary;
-- compact shared-UI Panel registration;
-- no Scene or metadata mutation;
-- existing lifecycle/input/runtime regression pass;
-- focused and full verification.
+- One shared dependency-free TypeScript UI controller/DOM renderer is built as
+  CommonJS for Cocos and browser ESM for standalone. Three focused tests cover
+  compact markup, protocol identity, optimistic revision dispatch, and
+  response-correlation failure.
+- The registered dockable Panel uses the shared UI and sends Panel → Main →
+  Scene requests with exact protocol, request, and adapter identity. Four
+  focused adapter/runtime tests cover validation, unique runtime selection,
+  missing/ambiguous runtime rejection, runtime errors, snapshot drift, and the
+  complete command surface.
+- The active PROGRAM-015 motion harness provides actual clip/play/pause/seek/
+  step/rate/loop/overlay/reset operations, one overlay renderer, portable
+  structure/timeline snapshots, semantic scrub synchronization, stale
+  revision protection, and lifecycle diagnostics without duplicate roots,
+  input, targets, or renderers.
+- Focused UI tests pass 3/3; extension tests pass 297/297; project tests pass
+  9/9; strict extension and clean-checkout project typechecks pass.
+- `CI=true pnpm verify`: 522/522 PASS. D2 changes exactly 20 files and 1,591
+  lines within its 20-file/5,000-line gate. The lockfile adds workspace links
+  only and resolves no new third-party version.
+- Generated closure and complete metadata audits pass. No Scene, `.meta`,
+  accepted asset, binary, evidence, or media file changes; tracked MP4 remains
+  zero and protected rights/provenance hashes remain exact.
 
 ## D3 — Standalone Workspace MVP
 

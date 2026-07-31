@@ -67,7 +67,9 @@ components across both hosts.
   aggregate 85-file ceiling is unchanged.
 - TASK-015D2: at most 20 changed files and 5,000 lines; Cocos extension
   adapter, compact panel, message bridge, PROGRAM-015 motion runtime review
-  surface, tests, and documentation. Zero new Scene or `.meta` files.
+  surface, shared UI package, tests, documentation, and mechanical workspace
+  link updates in the lockfile. Zero new Scene or `.meta` files and zero new
+  resolved third-party versions.
 - TASK-015D3: at most 24 changed files and 6,500 lines; loopback local service,
   Red Cap fixture adapter, shared standalone UI, CLI, API/security tests, and
   usage documentation.

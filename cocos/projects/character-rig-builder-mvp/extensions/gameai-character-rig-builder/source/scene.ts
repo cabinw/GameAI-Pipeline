@@ -1,6 +1,7 @@
 import {
   assetManager,
   Camera,
+  Component,
   director,
   Layers,
   Node,
@@ -12,6 +13,11 @@ import {
   UIOpacity,
 } from "cc";
 
+import {
+  executeCocosAnimationReviewRequest,
+  isCocosAnimationReviewRuntime,
+  type CocosAnimationReviewRuntime,
+} from "./animation-review/cocos-review-adapter";
 import {
   SceneRigBuilderError,
   SceneRigDiagnosticCode,
@@ -376,6 +382,24 @@ function failure(
 }
 
 export const methods = {
+  reviewAnimation(value: unknown) {
+    const scene = director.getScene();
+    if (scene === null) {
+      return executeCocosAnimationReviewRequest(value, []);
+    }
+    const components = scene.getComponentsInChildren(Component);
+    const runtimes = components.filter(
+      (
+        component,
+      ): component is Component & CocosAnimationReviewRuntime =>
+        isCocosAnimationReviewRuntime(component),
+    );
+    return executeCocosAnimationReviewRequest(
+      value,
+      runtimes,
+    );
+  },
+
   async buildRig(plan: CocosSceneRigPlan): Promise<SceneBuildResult> {
     let replacementRoot: Node | null = null;
     let newRoot: Node | null = null;

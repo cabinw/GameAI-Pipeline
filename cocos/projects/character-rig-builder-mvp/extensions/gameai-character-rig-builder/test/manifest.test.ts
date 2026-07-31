@@ -33,6 +33,14 @@ describe("Character Rig Builder extension manifest", () => {
       value.contributions.messages["build-character-rig"]?.methods,
       ["buildCharacterRig"],
     );
+    assert.deepEqual(
+      value.contributions.messages["review-animation"]?.methods,
+      ["reviewAnimation"],
+    );
+    assert.deepEqual(
+      value.contributions.messages["open-animation-review-panel"]?.methods,
+      ["openAnimationReviewPanel"],
+    );
   });
 
   it("declares all engine-neutral packages and produces both process entries", async () => {
@@ -40,6 +48,8 @@ describe("Character Rig Builder extension manifest", () => {
     assert.deepEqual(
       Object.keys(value.dependencies).sort(),
       [
+        "@gameai/animation-review-core",
+        "@gameai/animation-review-ui",
         "@gameai/character-asset-intake",
         "@gameai/character-contracts",
         "@gameai/character-semantic-events",
@@ -52,6 +62,7 @@ describe("Character Rig Builder extension manifest", () => {
       access(resolve(process.cwd(), "dist/main.js")),
       access(resolve(process.cwd(), "dist/scene.js")),
       access(resolve(process.cwd(), "dist/panels/default.js")),
+      access(resolve(process.cwd(), "dist/panels/animation-review.js")),
     ]);
   });
 });

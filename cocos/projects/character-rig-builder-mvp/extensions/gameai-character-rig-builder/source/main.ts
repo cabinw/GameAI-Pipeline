@@ -10,8 +10,15 @@ import {
   normalizeRigAnimation,
   parseRigAnimation,
 } from "@gameai/rig-animation";
+import {
+  validateAnimationReviewAdapterRequest,
+  type AnimationReviewAdapterResponse,
+} from "@gameai/animation-review-core";
 
 import { resolveJsonAsset, resolveSpriteFrameAssets } from "./assetdb";
+import {
+  animationReviewFailure,
+} from "./animation-review/cocos-review-adapter";
 import {
   SceneRigBuilderError,
   SceneRigDiagnosticCode,
@@ -27,6 +34,49 @@ import type {
 } from "./types";
 
 const EXTENSION_NAME = "gameai-character-rig-builder";
+
+async function requestAnimationReviewScene(
+  value: unknown,
+): Promise<AnimationReviewAdapterResponse> {
+  const parsed = validateAnimationReviewAdapterRequest(value);
+  if (!parsed.ok) {
+    const diagnostic = parsed.diagnostics[0];
+    return animationReviewFailure(
+      value,
+      diagnostic?.code ?? "ADAPTER_SCHEMA_VALIDATION_ERROR",
+      diagnostic?.message ?? "Animation review request is invalid.",
+    );
+  }
+  try {
+    const response = (await Editor.Message.request(
+      "scene",
+      "execute-scene-script",
+      {
+        name: EXTENSION_NAME,
+        method: "reviewAnimation",
+        args: [parsed.value],
+      },
+    )) as AnimationReviewAdapterResponse;
+    if (
+      response.requestId !== parsed.value.requestId ||
+      response.adapterId !== parsed.value.adapterId ||
+      response.protocolVersion !== parsed.value.protocolVersion
+    ) {
+      return animationReviewFailure(
+        parsed.value,
+        "COCOS_REVIEW_RESPONSE_CORRELATION_FAILED",
+        "Scene adapter response identity did not match the request.",
+      );
+    }
+    return response;
+  } catch (error) {
+    return animationReviewFailure(
+      parsed.value,
+      "COCOS_REVIEW_SCENE_BRIDGE_FAILED",
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+}
 
 function inside(root: string, candidate: string): boolean {
   const local = relative(root, candidate);
@@ -202,6 +252,14 @@ async function writeEvidence(evidence: CharacterRigBuilderEvidence): Promise<voi
 export const methods = {
   async openPanel(): Promise<void> {
     await Editor.Panel.open(EXTENSION_NAME);
+  },
+
+  async openAnimationReviewPanel(): Promise<void> {
+    await Editor.Panel.open(`${EXTENSION_NAME}.animation-review`);
+  },
+
+  async reviewAnimation(value: unknown): Promise<AnimationReviewAdapterResponse> {
+    return requestAnimationReviewScene(value);
   },
 
   async buildCharacterRig(

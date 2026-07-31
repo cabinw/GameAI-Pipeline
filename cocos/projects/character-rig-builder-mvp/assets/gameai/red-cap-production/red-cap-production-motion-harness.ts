@@ -1,7 +1,9 @@
 import {
   _decorator,
+  Color,
   Component,
   EventKeyboard,
+  Graphics,
   input,
   Input,
   KeyCode,
@@ -13,6 +15,11 @@ import {
   UITransform,
 } from "cc";
 
+import type {
+  AnimationReviewAdapterRequest,
+  AnimationReviewAdapterSnapshot,
+  AnimationReviewOverlay,
+} from "@gameai/animation-review-core";
 import {
   createPrevalidatedCharacterSemanticEventEvaluator,
   type CharacterSemanticEventEvaluator,
@@ -37,6 +44,61 @@ import { RED_CAP_PRODUCTION_STATIC_PLAN } from "./red-cap-production-static-data
 const { ccclass, property } = _decorator;
 type PartPlan = (typeof RED_CAP_PRODUCTION_STATIC_PLAN.parts)[number];
 type ClipName = keyof typeof RED_CAP_PRODUCTION_MOTION_CLIPS;
+type ReviewMatrix = AnimationReviewAdapterSnapshot["parts"][number]["worldTransform"];
+
+const REVIEW_ADAPTER_ID = "cocos-red-cap-production-motion";
+const REVIEW_CLIPS: readonly ClipName[] = ["rest", "idle", "walk", "wave"];
+const REVIEW_OVERLAYS: readonly AnimationReviewOverlay[] = [
+  "skeleton",
+  "pivots",
+  "sockets",
+  "hit-areas",
+  "attachments",
+];
+const REVIEW_COMMANDS = [
+  "describe",
+  "select-clip",
+  "play",
+  "pause",
+  "seek",
+  "step",
+  "set-rate",
+  "set-loop",
+  "set-overlay",
+  "exact-reset",
+] as const;
+
+function multiplyReviewMatrix(
+  left: ReviewMatrix,
+  right: ReviewMatrix,
+): ReviewMatrix {
+  return {
+    a: left.a * right.a + left.c * right.b,
+    b: left.b * right.a + left.d * right.b,
+    c: left.a * right.c + left.c * right.d,
+    d: left.b * right.c + left.d * right.d,
+    tx: left.a * right.tx + left.c * right.ty + left.tx,
+    ty: left.b * right.tx + left.d * right.ty + left.ty,
+  };
+}
+
+function localReviewMatrix(node: Node): ReviewMatrix {
+  const radians = (node.eulerAngles.z * Math.PI) / 180;
+  const cosine = Math.cos(radians);
+  const sine = Math.sin(radians);
+  return {
+    a: cosine * node.scale.x,
+    b: sine * node.scale.x,
+    c: -sine * node.scale.y,
+    d: cosine * node.scale.y,
+    tx: node.position.x,
+    ty: node.position.y,
+  };
+}
+
+function reviewRuntimeError(code: string, message: string): Error {
+  return Object.assign(new Error(message), { code });
+}
 
 const FAILURE_POINTS = [
   "before-resource-completion",
@@ -60,6 +122,8 @@ const TRACK_BY_CLIP: Record<ClipName, string> = {
 
 @ccclass("RedCapProductionMotionHarness")
 export class RedCapProductionMotionHarness extends Component {
+  readonly animationReviewAdapterId = REVIEW_ADAPTER_ID;
+
   @property
   atlasFrame: SpriteFrame | null = null;
 
@@ -79,6 +143,18 @@ export class RedCapProductionMotionHarness extends Component {
   private debugProjection = false;
   private lastPrimaryError = "";
   private cleanupErrors: string[] = [];
+  private reviewAdapterRevision = 0;
+  private reviewRate = 1;
+  private reviewLoop = true;
+  private reviewSuppressedSemanticCommands = 0;
+  private reviewOverlays: Record<AnimationReviewOverlay, boolean> = {
+    skeleton: false,
+    pivots: false,
+    sockets: false,
+    "hit-areas": false,
+    attachments: false,
+  };
+  private reviewOverlayGraphics: Graphics | null = null;
 
   onEnable(): void {
     input.on(Input.EventType.KEY_DOWN, this.onRecoveryKeyDown, this);
@@ -88,9 +164,11 @@ export class RedCapProductionMotionHarness extends Component {
 
   update(deltaSeconds: number): void {
     if (!this.playback || !this.semantic) return;
+    deltaSeconds *= this.reviewRate;
     const sample = this.playback.update(deltaSeconds);
     this.applySample(sample);
     this.dispatchSemantic(this.semantic.advance(deltaSeconds));
+    if (this.playback.status === "stopped") this.semantic.pause();
   }
 
   onDisable(): void {
@@ -122,10 +200,178 @@ export class RedCapProductionMotionHarness extends Component {
   }
 
   exactReset(): void {
+    this.resetReviewState();
+    this.reviewAdapterRevision += 1;
+  }
+
+  animationReviewExecute(
+    request: AnimationReviewAdapterRequest,
+  ): AnimationReviewAdapterSnapshot {
+    if (
+      request.expectedRevision !== undefined &&
+      request.expectedRevision !== this.reviewAdapterRevision
+    ) {
+      throw reviewRuntimeError(
+        "COCOS_REVIEW_STALE_REVISION",
+        `Expected runtime revision ${request.expectedRevision}, received ${this.reviewAdapterRevision}.`,
+      );
+    }
+    if (request.command !== "describe" && (!this.playback || !this.semantic)) {
+      throw reviewRuntimeError(
+        "COCOS_REVIEW_RUNTIME_NOT_READY",
+        "PROGRAM-015 motion runtime is not ready.",
+      );
+    }
+    switch (request.command) {
+      case "describe":
+        break;
+      case "select-clip":
+        this.selectClip(request.payload.clipId as ClipName);
+        break;
+      case "play":
+        this.playReview();
+        break;
+      case "pause":
+        this.pauseReview();
+        break;
+      case "seek":
+        this.seekReview(request.payload.time!);
+        break;
+      case "step":
+        this.stepReview(
+          request.payload.deltaFrames!,
+          request.payload.frameRate!,
+        );
+        break;
+      case "set-rate":
+        this.reviewRate = request.payload.rate!;
+        this.reviewAdapterRevision += 1;
+        break;
+      case "set-loop":
+        this.setReviewLoop(request.payload.loop!);
+        break;
+      case "set-overlay":
+        this.reviewOverlays[request.payload.overlay!] =
+          request.payload.enabled!;
+        this.redrawReviewOverlays();
+        this.reviewAdapterRevision += 1;
+        break;
+      case "exact-reset":
+        this.resetReviewState();
+        this.reviewAdapterRevision += 1;
+        break;
+      default:
+        throw reviewRuntimeError(
+          "COCOS_REVIEW_COMMAND_UNSUPPORTED",
+          `Unsupported animation review command ${String(request.command)}.`,
+        );
+    }
+    return this.animationReviewSnapshot();
+  }
+
+  animationReviewSnapshot(): AnimationReviewAdapterSnapshot {
+    const clip = RED_CAP_PRODUCTION_MOTION_CLIPS[this.activeClip];
+    const matrices = this.reviewJointMatrices();
+    return {
+      adapterId: REVIEW_ADAPTER_ID,
+      adapterRevision: this.reviewAdapterRevision,
+      characterId: "red-cap-production-v1",
+      rigId: RED_CAP_PRODUCTION_STATIC_PLAN.rigId,
+      playback: {
+        status: this.playback?.status ?? "stopped",
+        time: this.playback?.time ?? 0,
+        duration: clip.duration,
+        rate: this.reviewRate,
+        loop: this.reviewLoop,
+        clipId: this.activeClip,
+        availableClipIds: REVIEW_CLIPS,
+      },
+      capabilities: REVIEW_COMMANDS.map((command) => ({
+        command,
+        available: true,
+      })),
+      overlays: { ...this.reviewOverlays },
+      parts: RED_CAP_PRODUCTION_STATIC_PLAN.parts.map((part) => ({
+        partId: part.jointId,
+        parentId: part.parentId,
+        assetUrl:
+          "db://assets/resources/red-cap-production-v1/parts-atlas.png",
+        drawOrder: part.drawOrder,
+        width: part.visualSize.width,
+        height: part.visualSize.height,
+        anchor: { ...part.anchor },
+        visualOffset: { ...part.visualOffset },
+        worldTransform: multiplyReviewMatrix(
+          matrices.get(part.jointId) ?? {
+            a: 1,
+            b: 0,
+            c: 0,
+            d: 1,
+            tx: 0,
+            ty: 0,
+          },
+          {
+            a: 1,
+            b: 0,
+            c: 0,
+            d: 1,
+            tx: part.visualOffset.x,
+            ty: part.visualOffset.y,
+          },
+        ),
+      })),
+      joints: RED_CAP_PRODUCTION_STATIC_PLAN.parts.map((part) => {
+        const matrix = matrices.get(part.jointId);
+        return {
+          jointId: part.jointId,
+          parentId: part.parentId,
+          worldPivot: { x: matrix?.tx ?? 0, y: matrix?.ty ?? 0 },
+        };
+      }),
+      timeline: clip.tracks
+        .map((track) => ({
+          jointId: track.jointId,
+          property: track.property,
+          keyframes: track.keyframes.map((keyframe) => ({
+            time: keyframe.time,
+            value:
+              typeof keyframe.value === "number"
+                ? keyframe.value
+                : { ...keyframe.value },
+          })),
+        }))
+        .sort(
+          (left, right) =>
+            left.jointId.localeCompare(right.jointId) ||
+            left.property.localeCompare(right.property),
+        ),
+      runtimeDiagnostics: {
+        generation: this.generation,
+        runtimeRoots: this.runtimeRoot === null ? 0 : 1,
+        targets: this.targets.size,
+        renderers: this.rendererFrames.length,
+        semanticInstances:
+          this.semantic?.snapshot.activeInstanceIds.length ?? 0,
+        semanticTime: this.semantic?.snapshot.localTimeSeconds ?? 0,
+        suppressedSemanticCommands: this.reviewSuppressedSemanticCommands,
+        transformStress: this.transformStress,
+        debugProjection: this.debugProjection,
+        failurePoint: this.failurePoint || "none",
+        primaryError: this.lastPrimaryError || "none",
+        cleanupErrorCount: this.cleanupErrors.length,
+      },
+    };
+  }
+
+  private resetReviewState(): void {
     this.failurePoint = "";
     this.activeClip = "rest";
     this.transformStress = false;
     this.debugProjection = false;
+    this.reviewRate = 1;
+    this.reviewLoop = true;
+    this.reviewSuppressedSemanticCommands = 0;
+    for (const overlay of REVIEW_OVERLAYS) this.reviewOverlays[overlay] = false;
     this.rebuild();
   }
 
@@ -146,6 +392,11 @@ export class RedCapProductionMotionHarness extends Component {
     for (const part of RED_CAP_PRODUCTION_STATIC_PLAN.parts) {
       this.createPart(this.targets.get(part.jointId)!, part, atlasFrame);
     }
+    const reviewOverlayNode = new Node("AnimationReviewOverlay");
+    reviewOverlayNode.layer = Layers.Enum.UI_2D;
+    reviewOverlayNode.setParent(root);
+    this.reviewOverlayGraphics = reviewOverlayNode.addComponent(Graphics);
+    reviewOverlayNode.addComponent(Sorting2D).sortingOrder = 1000;
     this.fail("after-renderer-creation");
     this.fail("after-sorting2d-attachment");
 
@@ -177,24 +428,30 @@ export class RedCapProductionMotionHarness extends Component {
   }
 
   private selectClip(name: ClipName): void {
+    if (!REVIEW_CLIPS.includes(name)) {
+      throw reviewRuntimeError(
+        "COCOS_REVIEW_CLIP_NOT_FOUND",
+        `Unknown PROGRAM-015 review clip ${String(name)}.`,
+      );
+    }
     if (!this.semantic) return;
     this.dispatchSemantic(this.semantic.switchTrack(TRACK_BY_CLIP[name]));
     this.activeClip = name;
+    this.reviewLoop = RED_CAP_PRODUCTION_MOTION_CLIPS[name].loop;
     this.playback = this.createPlayback(name);
     this.playback.play();
     this.semantic.play();
     this.applySample(this.playback.sample());
+    this.reviewAdapterRevision += 1;
     console.info("PROGRAM015_MOTION_CLIP", JSON.stringify(this.snapshot()));
   }
 
   private togglePause(): void {
     if (!this.playback || !this.semantic) return;
     if (this.playback.status === "playing") {
-      this.playback.pause();
-      this.semantic.pause();
+      this.pauseReview();
     } else if (this.playback.status === "paused") {
-      this.playback.play();
-      this.semantic.resume();
+      this.playReview();
     }
     console.info("PROGRAM015_MOTION_PAUSE", JSON.stringify(this.snapshot()));
   }
@@ -213,6 +470,156 @@ export class RedCapProductionMotionHarness extends Component {
       debug: this.debugProjection,
       failurePoint: this.failurePoint,
     };
+  }
+
+  private playReview(): void {
+    if (!this.playback || !this.semantic) return;
+    this.applySample(this.playback.play());
+    if (this.semantic.snapshot.status === "paused") this.semantic.resume();
+    else this.semantic.play();
+    this.reviewAdapterRevision += 1;
+  }
+
+  private pauseReview(): void {
+    if (!this.playback || !this.semantic) return;
+    this.applySample(this.playback.pause());
+    this.semantic.pause();
+    this.reviewAdapterRevision += 1;
+  }
+
+  private seekReview(time: number): void {
+    if (!this.playback || !this.semantic) return;
+    const clip = RED_CAP_PRODUCTION_MOTION_CLIPS[this.activeClip];
+    const bounded = this.reviewLoop
+      ? time % clip.duration
+      : Math.min(time, clip.duration);
+    this.applySample(this.playback.seek(Math.max(0, bounded)));
+    this.playback.pause();
+    this.synchronizeReviewSemantic(Math.max(0, bounded), "paused");
+    this.reviewAdapterRevision += 1;
+  }
+
+  private stepReview(deltaFrames: number, frameRate: number): void {
+    this.seekReview(
+      (this.playback?.time ?? 0) + deltaFrames / frameRate,
+    );
+  }
+
+  private setReviewLoop(loop: boolean): void {
+    if (!this.playback) return;
+    const time = this.playback.time;
+    const status = this.playback.status;
+    const source = RED_CAP_PRODUCTION_MOTION_CLIPS[this.activeClip];
+    const normalized = {
+      schemaVersion: source.schemaVersion,
+      animationId: source.animationId,
+      rigId: source.rig.rigId,
+      rigSchemaVersion: source.rig.schemaVersion,
+      duration: source.duration,
+      loop,
+      tracks: source.tracks,
+    } as unknown as NormalizedRigAnimation;
+    this.reviewLoop = loop;
+    this.playback = new RigAnimationPlayback(normalized);
+    this.applySample(this.playback.seek(Math.min(time, source.duration)));
+    if (status === "playing") {
+      this.playback.play();
+    } else if (status === "paused") {
+      this.playback.play();
+      this.playback.pause();
+    }
+    this.reviewAdapterRevision += 1;
+  }
+
+  private synchronizeReviewSemantic(
+    time: number,
+    status: "playing" | "paused" | "stopped",
+  ): void {
+    if (this.semantic) this.dispatchSemantic(this.semantic.dispose());
+    this.semantic = createPrevalidatedCharacterSemanticEventEvaluator(
+      RED_CAP_PRODUCTION_SEMANTIC_EVENTS as unknown as CharacterSemanticEventContract,
+      RED_CAP_PRODUCTION_SEMANTIC_CONTEXT as unknown as SemanticEventValidationContext,
+      TRACK_BY_CLIP[this.activeClip],
+    );
+    if (status === "stopped") return;
+    this.semantic.play();
+    this.reviewSuppressedSemanticCommands +=
+      this.semantic.advance(time).length;
+    if (status === "paused") this.semantic.pause();
+  }
+
+  private reviewJointMatrices(): ReadonlyMap<string, ReviewMatrix> {
+    const matrices = new Map<string, ReviewMatrix>();
+    const visit = (jointId: string): ReviewMatrix => {
+      const existing = matrices.get(jointId);
+      if (existing) return existing;
+      const part = RED_CAP_PRODUCTION_STATIC_PLAN.parts.find(
+        (candidate) => candidate.jointId === jointId,
+      );
+      const node = this.targets.get(jointId);
+      if (!part || !node) {
+        return { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
+      }
+      const local = localReviewMatrix(node);
+      const world =
+        part.parentId === null
+          ? local
+          : multiplyReviewMatrix(visit(part.parentId), local);
+      matrices.set(jointId, world);
+      return world;
+    };
+    for (const part of RED_CAP_PRODUCTION_STATIC_PLAN.parts) {
+      visit(part.jointId);
+    }
+    return matrices;
+  }
+
+  private redrawReviewOverlays(): void {
+    const graphics = this.reviewOverlayGraphics;
+    if (!graphics) return;
+    graphics.clear();
+    const matrices = this.reviewJointMatrices();
+    if (this.reviewOverlays.skeleton) {
+      graphics.strokeColor = new Color().fromHEX("#53C7FF");
+      graphics.lineWidth = 2;
+      for (const part of RED_CAP_PRODUCTION_STATIC_PLAN.parts) {
+        if (part.parentId === null) continue;
+        const parent = matrices.get(part.parentId);
+        const child = matrices.get(part.jointId);
+        if (!parent || !child) continue;
+        graphics.moveTo(parent.tx, parent.ty);
+        graphics.lineTo(child.tx, child.ty);
+      }
+      graphics.stroke();
+    }
+    if (this.reviewOverlays.pivots) {
+      graphics.strokeColor = new Color().fromHEX("#FFD166");
+      graphics.lineWidth = 2;
+      for (const matrix of matrices.values()) graphics.circle(matrix.tx, matrix.ty, 3);
+      graphics.stroke();
+    }
+    if (this.reviewOverlays.sockets) {
+      graphics.strokeColor = new Color().fromHEX("#E879F9");
+      for (const jointId of ["hand-left", "hand-right", "torso"]) {
+        const matrix = matrices.get(jointId);
+        if (matrix) graphics.circle(matrix.tx, matrix.ty, 7);
+      }
+      graphics.stroke();
+    }
+    if (this.reviewOverlays["hit-areas"]) {
+      graphics.strokeColor = new Color().fromHEX("#FB7185");
+      const torso = matrices.get("torso");
+      const head = matrices.get("head");
+      if (torso) graphics.rect(torso.tx - 48, torso.ty - 50, 96, 110);
+      if (head) graphics.circle(head.tx, head.ty + 32, 54);
+      graphics.stroke();
+    }
+    if (this.reviewOverlays.attachments) {
+      graphics.strokeColor = new Color().fromHEX("#A7F3D0");
+      const briefcase = matrices.get("briefcase");
+      if (briefcase) graphics.rect(briefcase.tx - 32, briefcase.ty - 24, 64, 48);
+      graphics.stroke();
+    }
   }
 
   private createJointHierarchy(parent: Node): Map<string, Node> {
@@ -289,6 +696,7 @@ export class RedCapProductionMotionHarness extends Component {
       );
       joint?.setScale(pose.scale.x, pose.scale.y, 1);
     }
+    this.redrawReviewOverlays();
   }
 
   private dispatchSemantic(commands: readonly EvaluatedSemanticEvent[]): void {
@@ -315,10 +723,15 @@ export class RedCapProductionMotionHarness extends Component {
       this.transformStress = !this.transformStress;
       this.applySample(this.playback?.sample() ?? this.createPlayback("rest").sample());
       console.info("PROGRAM015_MOTION_STRESS", this.transformStress);
-    } else if (event.keyCode === KeyCode.KEY_B) this.rebuild();
+      this.reviewAdapterRevision += 1;
+    } else if (event.keyCode === KeyCode.KEY_B) {
+      this.rebuild();
+      this.reviewAdapterRevision += 1;
+    }
     else if (event.keyCode === KeyCode.KEY_D) {
       this.debugProjection = !this.debugProjection;
       console.info("PROGRAM015_MOTION_DEBUG", this.debugProjection);
+      this.reviewAdapterRevision += 1;
     }
   }
 
@@ -367,6 +780,7 @@ export class RedCapProductionMotionHarness extends Component {
       this.semantic = null;
     });
     this.playback = null;
+    this.reviewOverlayGraphics = null;
     if (this.inputPublished) {
       attempt("input", () => {
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
