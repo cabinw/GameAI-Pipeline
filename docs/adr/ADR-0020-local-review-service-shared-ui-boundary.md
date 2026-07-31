@@ -26,10 +26,11 @@ shared UI state/render/actions
 The UI module owns DOM rendering and user intent only. It never reads files,
 samples animations, validates findings, or mutates engine/source state.
 
-The local service owns one selected adapter, process-local review state,
-bounded JSON endpoints, safe declared asset serving, revision conflict
-checks, and explicit exports. There is no remote bind, upload, directory
-listing, recursive scan, credential store, source write, or background daemon.
+The local service owns one selected adapter, the persistent Session authority,
+bounded JSON endpoints, safe declared asset serving, revision conflict and
+duplicate-request checks, atomic safe-root Session/export publication, and
+explicit exports. There is no remote bind, upload, directory listing,
+recursive asset scan, credential store, source write, or background daemon.
 
 ## Why no frontend dependency
 
@@ -47,6 +48,10 @@ standalone. Host transports implement the same typed controller interface.
 - Service hosts are limited to `127.0.0.1` and `::1`.
 - Mutation requests require same-origin content type and a process token.
 - Bodies, URL lengths, and commands have fixed limits.
+- Session IDs become filenames only after closed identifier validation.
+- Writes use exclusive same-directory temporary files, file and directory
+  synchronization, atomic rename, bounded collision retry, and stale-temp
+  cleanup; symlink/non-file targets fail closed.
 - Asset access is allowlisted from the selected adapter snapshot and
   real-path contained under the selected accepted fixture root.
 - `artifacts/experimental/` remains opaque even when a repository root is
@@ -56,8 +61,15 @@ standalone. Host transports implement the same typed controller interface.
 ## Operational consequences
 
 - A tracked-only checkout can run the workspace without Creator.
-- Cocos and standalone share interaction and visual structure while retaining
-  separate transport and preview authority.
+- Cocos and standalone share one service-owned Session and interaction model.
+  Cocos retains live Scene/playback authority; the service retains review,
+  Patch, validation, history, and export authority.
+- A successful Compact Panel playback mutation is mirrored through the same
+  validated adapter command to the local service adapter. Review mutations do
+  not replace the live Cocos snapshot, so Exact Reset and reconnect cannot
+  silently create competing playback or Session views.
+- Panel close/reopen and service restart restore the same Session revision;
+  reconnect failure leaves stale UI state visible but read-only.
 - Browser tests can validate markup/actions without a heavyweight browser
   framework; final visual/Creator acceptance remains human-reviewed.
 - Future UI complexity that exceeds this boundary requires a new task and ADR

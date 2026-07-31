@@ -110,7 +110,7 @@ test("review and export inputs are deterministic and source animations remain re
   assert.equal(adapter.originalAnimationText(), before);
 });
 
-test("runs the complete AI proposal, human decision, constrained revision, reanalysis, and deterministic export loop", async () => {
+test("runs the Session-owned AI proposal, human edit, Preview, Apply, reanalysis, undo/redo, and deterministic export loop", async () => {
   const sourcePath = resolve(fixtureRoot, "animations/wave.json");
   const sourceBefore = await readFile(sourcePath, "utf8");
   const adapter = await RedCapFixtureAdapter.load({
@@ -127,124 +127,99 @@ test("runs the complete AI proposal, human decision, constrained revision, reana
   const finding = assistant.review.findings.find(
     (item) => item.code === "ASSISTANT_ROTATION_RANGE_PROPOSAL",
   )!;
+  const patch = assistant.session.patches.find(
+    (item) => item.findingId === finding.findingId,
+  )!;
   assert.equal(finding.source, "assistant");
   assert.equal(finding.status, "open");
   assert.ok(finding.suggestion);
+  assert.equal(patch.status, "AI_PROPOSED");
+  assert.deepEqual(
+    assistant.session.authoritativeState,
+    assistant.session.sourceState,
+  );
 
   assert.throws(
     () =>
-      adapter.applyReviewAdjustment({
+      adapter.applyPatch({
         expectedRevision: 1,
-        adjustmentId: "adjustment-before-accept",
-        findingId: finding.findingId,
-        parameterPath: finding.suggestion!.parameterPath,
-        nextValue: finding.suggestion!.proposedValue!,
+        patchId: patch.patchId,
         actorId: "reviewer",
         createdAt: "2026-07-31T00:02:00.000Z",
       }),
-    /Only an accepted AI\/provider proposal/,
+    /PATCH_PREVIEW_REQUIRED/,
   );
-  const accepted = adapter.decideReviewFinding({
+  const accepted = adapter.decidePatch({
     expectedRevision: 1,
-    decisionId: "decision-accept",
-    findingId: finding.findingId,
+    patchId: patch.patchId,
     decision: "accept",
     actorId: "reviewer",
-    note: "Use the bounded local proposal.",
     createdAt: "2026-07-31T00:02:00.000Z",
   });
-  assert.equal(accepted.review.revision, 2);
+  assert.equal(accepted.session.revision, 2);
   assert.throws(
     () =>
-      adapter.applyReviewAdjustment({
+      adapter.editPatch({
         expectedRevision: 1,
-        adjustmentId: "adjustment-stale",
-        findingId: finding.findingId,
-        parameterPath: finding.suggestion!.parameterPath,
-        nextValue: finding.suggestion!.proposedValue!,
+        patchId: patch.patchId,
+        operation: patch.operation,
         actorId: "reviewer",
         createdAt: "2026-07-31T00:03:00.000Z",
       }),
-    /REVIEW_REVISION_INVALID/,
+    /SESSION_REVISION_INVALID/,
   );
-  assert.throws(
-    () =>
-      adapter.applyReviewAdjustment({
-        expectedRevision: 2,
-        adjustmentId: "adjustment-out-of-range",
-        findingId: finding.findingId,
-        parameterPath: finding.suggestion!.parameterPath,
-        nextValue: finding.suggestion!.maximum + 1,
-        actorId: "reviewer",
-        createdAt: "2026-07-31T00:03:00.000Z",
-      }),
-    /Value must be finite and within/,
-  );
-  assert.throws(
-    () =>
-      adapter.applyReviewAdjustment({
-        expectedRevision: 2,
-        adjustmentId: "adjustment-non-finite",
-        findingId: finding.findingId,
-        parameterPath: finding.suggestion!.parameterPath,
-        nextValue: Number.NaN,
-        actorId: "reviewer",
-        createdAt: "2026-07-31T00:03:00.000Z",
-      }),
-    /Value must be finite and within/,
-  );
-  const pathMatch = /\/tracks\/(\d+)\/keyframes\/(\d+)\/value/.exec(
-    finding.suggestion!.parameterPath,
-  )!;
-  const unchangedValue =
-    adapter.currentAnimation().tracks[Number(pathMatch[1])]!.keyframes[
-      Number(pathMatch[2])
-    ]!.value as number;
-  assert.throws(
-    () =>
-      adapter.applyReviewAdjustment({
-        expectedRevision: 2,
-        adjustmentId: "adjustment-no-op",
-        findingId: finding.findingId,
-        parameterPath: finding.suggestion!.parameterPath,
-        nextValue: unchangedValue,
-        actorId: "reviewer",
-        createdAt: "2026-07-31T00:03:00.000Z",
-      }),
-    /must change the keyframe value/,
-  );
-  const adjusted = adapter.applyReviewAdjustment({
+  const edited = adapter.editPatch({
     expectedRevision: 2,
-    adjustmentId: "adjustment-wave-pose",
-    findingId: finding.findingId,
-    parameterPath: finding.suggestion!.parameterPath,
-    nextValue: finding.suggestion!.proposedValue!,
+    patchId: patch.patchId,
+    operation:
+      patch.operation.kind === "rotation-offset"
+        ? { ...patch.operation, deltaDegrees: patch.operation.deltaDegrees - 1 }
+        : patch.operation,
     actorId: "reviewer",
     createdAt: "2026-07-31T00:03:00.000Z",
   });
-  assert.equal(adjusted.review.revision, 3);
-  assert.equal(adjusted.review.adjustments.length, 1);
-  assert.equal(
-    adjusted.review.auditTrail.at(-1)?.action,
-    "analysis-ran",
+  const previewed = adapter.previewPatch({
+    expectedRevision: edited.session.revision,
+    patchId: patch.patchId,
+    actorId: "reviewer",
+    createdAt: "2026-07-31T00:03:30.000Z",
+  });
+  assert.deepEqual(
+    previewed.session.authoritativeState,
+    previewed.session.sourceState,
   );
-  const match = /\/tracks\/(\d+)\/keyframes\/(\d+)\/value/.exec(
-    finding.suggestion!.parameterPath,
-  )!;
-  const proposedValue =
-    adapter.currentAnimation().tracks[Number(match[1])]!.keyframes[
-      Number(match[2])
-    ]!.value;
-  assert.equal(proposedValue, finding.suggestion!.proposedValue);
+  assert.notEqual(previewed.session.preview, null);
+  const applied = adapter.applyPatch({
+    expectedRevision: previewed.session.revision,
+    patchId: patch.patchId,
+    actorId: "reviewer",
+    createdAt: "2026-07-31T00:04:00.000Z",
+  });
+  assert.equal(applied.session.patches.find((item) => item.patchId === patch.patchId)?.status, "APPLIED");
+  assert.equal(applied.session.historyCursor, 1);
+  assert.equal(applied.session.auditTrail.at(-1)?.action, "analysis-ran");
+  const appliedAnimation = adapter.authoritativeAnimation();
+  const undone = adapter.undo({
+    expectedRevision: applied.session.revision,
+    actorId: "reviewer",
+    createdAt: "2026-07-31T00:04:30.000Z",
+  });
+  assert.deepEqual(undone.session.authoritativeState, undone.session.sourceState);
+  const redone = adapter.redo({
+    expectedRevision: undone.session.revision,
+    actorId: "reviewer",
+    createdAt: "2026-07-31T00:04:45.000Z",
+  });
+  assert.deepEqual(adapter.authoritativeAnimation(), appliedAnimation);
 
-  const resolved = adapter.decideReviewFinding({
-    expectedRevision: 3,
+  const resolved = adapter.resolveFinding({
+    expectedRevision: redone.session.revision,
     decisionId: "decision-resolve",
     findingId: finding.findingId,
     decision: "resolve",
     actorId: "reviewer",
     note: "Reanalysis completed.",
-    createdAt: "2026-07-31T00:04:00.000Z",
+    createdAt: "2026-07-31T00:05:00.000Z",
   });
   assert.equal(
     resolved.review.findings.find(
@@ -257,19 +232,21 @@ test("runs the complete AI proposal, human decision, constrained revision, reana
 
   const firstExport = adapter.exportBundle() as {
     review: { revision: number; decisions: unknown[]; adjustments: unknown[] };
+    session: { revision: number; history: unknown[]; patches: unknown[] };
     proposedAnimation: { animationId: string };
     manifest: {
       algorithm: string;
       reviewSha256: string;
+      sessionSha256: string;
       originalAnimationSha256: string;
       proposedAnimationSha256: string;
     };
   };
   const secondExport = adapter.exportBundle();
   assert.deepEqual(firstExport, secondExport);
-  assert.equal(firstExport.review.revision, 4);
-  assert.equal(firstExport.review.decisions.length, 2);
-  assert.equal(firstExport.review.adjustments.length, 1);
+  assert.equal(firstExport.session.revision, resolved.session.revision);
+  assert.equal(firstExport.session.history.length, 1);
+  assert.equal(firstExport.session.patches.length > 0, true);
   assert.equal(
     firstExport.proposedAnimation.animationId,
     "red-cap-production-v1-wave",
@@ -277,6 +254,7 @@ test("runs the complete AI proposal, human decision, constrained revision, reana
   assert.equal(firstExport.manifest.algorithm, "sha256");
   for (const hash of [
     firstExport.manifest.reviewSha256,
+    firstExport.manifest.sessionSha256,
     firstExport.manifest.originalAnimationSha256,
     firstExport.manifest.proposedAnimationSha256,
   ]) {

@@ -70,9 +70,11 @@ Cap fixture with:
 pnpm review:animation
 ```
 
-The command binds an ephemeral port on `127.0.0.1` and prints the browser URL.
-The workspace is process-local, serves only declared accepted fixture PNGs,
-and exports proposals without overwriting source animation or asset files.
+The command binds `127.0.0.1:41715` by default and prints the browser URL.
+`--port`, `--fixture`, `--session-root`, and `--export-root` are explicit
+overrides. The local service atomically persists versioned Sessions below the
+configured safe root, serves only declared accepted fixture PNGs, and exports
+review bundles without overwriting source animation or asset files.
 
 Exact versions, individual commands, the workspace topology, and the Cocos extension spike are documented in `docs/environment.md`.
 

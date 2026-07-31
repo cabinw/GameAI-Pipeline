@@ -70,6 +70,10 @@ test("keeps canonical review schemas byte-identical to package copies", async ()
   for (const file of [
     "animation-review.schema.json",
     "animation-review-engine-adapter.schema.json",
+    "animation-review-patch.schema.json",
+    "animation-review-session.schema.json",
+    "animation-review-validation.schema.json",
+    "animation-review-diagnosis.schema.json",
   ]) {
     assert.deepEqual(
       await readFile(path.join(repositoryRoot, "schemas", file)),

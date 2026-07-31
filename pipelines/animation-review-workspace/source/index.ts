@@ -14,3 +14,7 @@ export {
   standaloneBrowserModule,
   standaloneWorkspaceHtml,
 } from "./standalone";
+export {
+  AnimationReviewSessionStore,
+  type AnimationReviewSessionStoreOptions,
+} from "./session-store";

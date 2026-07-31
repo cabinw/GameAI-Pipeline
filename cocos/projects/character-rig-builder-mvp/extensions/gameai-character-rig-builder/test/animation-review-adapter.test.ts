@@ -74,8 +74,107 @@ test("preserves request identity and returns the selected runtime snapshot", () 
   assert.equal(response.requestId, "request-1");
   assert.equal(response.adapterId, COCOS_RED_CAP_REVIEW_ADAPTER_ID);
   assert.equal(response.ok, true);
-  assert.equal(response.ok ? response.snapshot.adapterRevision : -1, 4);
+  assert.equal(
+    response.ok && response.responseType === "snapshot"
+      ? response.snapshot.adapterRevision
+      : -1,
+    4,
+  );
   assert.equal(seen[0]?.command, "seek");
+});
+
+test("returns lightweight playback observations without executing a mutating runtime command", () => {
+  let executions = 0;
+  const response = executeCocosAnimationReviewRequest(
+    request("observe-playback"),
+    [
+      {
+        animationReviewAdapterId: COCOS_RED_CAP_REVIEW_ADAPTER_ID,
+        animationReviewExecute() {
+          executions += 1;
+          return snapshot(5);
+        },
+        animationReviewSnapshot() {
+          return snapshot(5);
+        },
+      },
+    ],
+  );
+  assert.equal(response.ok, true);
+  assert.equal(response.ok ? response.responseType : "error", "playback");
+  assert.equal(
+    response.ok && response.responseType === "playback"
+      ? response.adapterRevision
+      : -1,
+    5,
+  );
+  assert.equal(executions, 0);
+});
+
+test("normalizes the public runtime's monotonic loop clock at the JSON adapter boundary", () => {
+  const response = executeCocosAnimationReviewRequest(request("observe-playback"), [
+    {
+      animationReviewAdapterId: COCOS_RED_CAP_REVIEW_ADAPTER_ID,
+      animationReviewExecute() {
+        return snapshot(6);
+      },
+      animationReviewSnapshot() {
+        return {
+          ...snapshot(6),
+          playback: {
+            ...snapshot(6).playback,
+            status: "playing",
+            loop: true,
+            duration: 1.2,
+            time: 4.369,
+          },
+        };
+      },
+    },
+  ]);
+  assert.equal(response.ok, true);
+  assert.equal(response.ok ? response.responseType : "error", "playback");
+  assert.ok(
+    response.ok &&
+      response.responseType === "playback" &&
+      Math.abs(response.playback.time - 0.769) < 1e-9,
+  );
+});
+
+test("prepares the existing public runtime lifecycle exactly once before live review", () => {
+  let runtimeRoots = 0;
+  let rebuilds = 0;
+  const runtime: CocosAnimationReviewRuntime = {
+    animationReviewAdapterId: COCOS_RED_CAP_REVIEW_ADAPTER_ID,
+    animationReviewExecute() {
+      return {
+        ...snapshot(1),
+        runtimeDiagnostics: { runtimeRoots },
+      };
+    },
+    animationReviewSnapshot() {
+      return {
+        ...snapshot(1),
+        runtimeDiagnostics: { runtimeRoots },
+      };
+    },
+    rebuild() {
+      rebuilds += 1;
+      runtimeRoots = 1;
+    },
+  };
+
+  const first = executeCocosAnimationReviewRequest(request(), [runtime]);
+  const second = executeCocosAnimationReviewRequest(request(), [runtime]);
+  assert.equal(first.ok, true);
+  assert.equal(second.ok, true);
+  assert.equal(rebuilds, 1);
+  assert.equal(
+    first.ok && first.responseType === "snapshot"
+      ? first.snapshot.runtimeDiagnostics.runtimeRoots
+      : 0,
+    1,
+  );
 });
 
 test("fails closed before runtime mutation for invalid, missing, or ambiguous runtimes", () => {
@@ -185,4 +284,29 @@ test("PROGRAM-015 runtime exposes the complete real review command surface", asy
   assert.match(source, /this\.playback = this\.createPlayback\("rest"\)/);
   assert.match(source, /AnimationReviewOverlay/);
   assert.doesNotMatch(source, /node:fs|node:path|node:crypto/);
+
+  const sceneBridge = await readFile(
+    resolve(process.cwd(), "source/scene.ts"),
+    "utf8",
+  );
+  assert.match(sceneBridge, /prepareAnimationReviewRuntimes/);
+  assert.match(
+    sceneBridge,
+    /be7c6f0a-24fc-45dc-9068-83d41ec078ca@f9941/,
+  );
+  assert.match(sceneBridge, /await loadSpriteFrame/);
+  assert.match(sceneBridge, /editorReviewTimers = new WeakMap/);
+  assert.match(sceneBridge, /editorReviewTimers\.has\(runtime\)/);
+  assert.match(sceneBridge, /!runtime\.node\.activeInHierarchy/);
+  assert.match(sceneBridge, /Math\.min\(/);
+  assert.match(sceneBridge, /Math\.max\(/);
+  assert.match(sceneBridge, /clearInterval\(timer\)/);
+
+  const panelBridge = await readFile(
+    resolve(process.cwd(), "source/panels/animation-review.ts"),
+    "utf8",
+  );
+  assert.match(panelBridge, /preserveAdapterSnapshotOnReviewAction: true/);
+  assert.match(panelBridge, /sync-animation-review-adapter/);
+  assert.match(panelBridge, /request\.command !== "observe-playback"/);
 });

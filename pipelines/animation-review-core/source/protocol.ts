@@ -6,8 +6,10 @@ import {
   ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
   type AnimationReviewAdapterPayload,
   type AnimationReviewAdapterRequest,
+  type AnimationReviewAdapterResponse,
   type AnimationReviewDiagnostic,
   type ParseAdapterRequestResult,
+  type ParseAdapterResponseResult,
 } from "./types";
 
 const ajv = new Ajv2020({ allErrors: true, strict: true });
@@ -29,6 +31,7 @@ const PAYLOAD_KEYS: Readonly<
   Record<AnimationReviewAdapterRequest["command"], readonly (keyof AnimationReviewAdapterPayload)[]>
 > = {
   describe: [],
+  "observe-playback": [],
   "select-clip": ["clipId"],
   play: [],
   pause: [],
@@ -120,4 +123,68 @@ export function parseAnimationReviewAdapterRequest(
     };
   }
   return validateAnimationReviewAdapterRequest(value);
+}
+
+export function validateAnimationReviewAdapterResponse(
+  value: unknown,
+): ParseAdapterResponseResult {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "protocolVersion" in value &&
+    (value as { protocolVersion?: unknown }).protocolVersion !==
+      ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION
+  ) {
+    return {
+      ok: false,
+      diagnostics: [
+        {
+          code: "ADAPTER_UNSUPPORTED_PROTOCOL_VERSION",
+          path: "/protocolVersion",
+          message: `Only Engine Adapter Protocol ${ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION} is supported.`,
+        },
+      ],
+    };
+  }
+  if (!validateShape(value)) {
+    return { ok: false, diagnostics: schemaDiagnostics(validateShape.errors) };
+  }
+  if ((value as { kind?: unknown }).kind !== "response") {
+    return {
+      ok: false,
+      diagnostics: [
+        {
+          code: "ADAPTER_SCHEMA_VALIDATION_ERROR",
+          path: "/kind",
+          message: "Adapter response input must have kind response.",
+        },
+      ],
+    };
+  }
+  return {
+    ok: true,
+    value: value as AnimationReviewAdapterResponse,
+    diagnostics: [],
+  };
+}
+
+export function parseAnimationReviewAdapterResponse(
+  text: string,
+): ParseAdapterResponseResult {
+  let value: unknown;
+  try {
+    value = JSON.parse(text) as unknown;
+  } catch (error) {
+    return {
+      ok: false,
+      diagnostics: [
+        {
+          code: "ADAPTER_JSON_PARSE_ERROR",
+          path: "",
+          message: error instanceof Error ? error.message : "Invalid JSON.",
+        },
+      ],
+    };
+  }
+  return validateAnimationReviewAdapterResponse(value);
 }

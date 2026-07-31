@@ -1,16 +1,28 @@
 import assert from "node:assert/strict";
-import { resolve } from "node:path";
+import { mkdtemp } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import test from "node:test";
 
 import type { AnimationReviewAdapterRequest } from "@gameai/animation-review-core";
 
 import {
   RedCapFixtureAdapter,
+  AnimationReviewSessionStore,
   STANDALONE_RED_CAP_ADAPTER_ID,
+  standaloneBrowserModule,
   startAnimationReviewServer,
 } from "../source";
 
 const repositoryRoot = resolve(process.cwd(), "../..");
+
+async function sessionStore(): Promise<AnimationReviewSessionStore> {
+  const root = await mkdtemp(join(tmpdir(), "animation-review-service-"));
+  return new AnimationReviewSessionStore({
+    sessionRoot: resolve(root, "sessions"),
+    exportRoot: resolve(root, "exports"),
+  });
+}
 
 function describeRequest(): AnimationReviewAdapterRequest {
   return {
@@ -24,6 +36,8 @@ function describeRequest(): AnimationReviewAdapterRequest {
 }
 
 test("serves a usable loopback workspace, accepted assets, adapter API, and export", async () => {
+  assert.match(standaloneBrowserModule(), /bootstrap = await readBootstrap\(\)/);
+  assert.match(standaloneBrowserModule(), /response\.status === 403/);
   const adapter = await RedCapFixtureAdapter.load({
     fixtureRoot: resolve(repositoryRoot, "examples/red-cap-production-v1"),
     nowMilliseconds: () => 0,
@@ -31,6 +45,7 @@ test("serves a usable loopback workspace, accepted assets, adapter API, and expo
   });
   const running = await startAnimationReviewServer({
     adapter,
+    sessionStore: await sessionStore(),
     host: "127.0.0.1",
     port: 0,
     mutationToken: "test-token",
@@ -125,7 +140,7 @@ test("serves a usable loopback workspace, accepted assets, adapter API, and expo
   }
 });
 
-test("serves an end-to-end AI and human review loop with optimistic review revisions", async () => {
+test("serves propose, human decision/edit, Preview, Apply, reanalysis, undo/redo, and validation actions", async () => {
   const adapter = await RedCapFixtureAdapter.load({
     fixtureRoot: resolve(repositoryRoot, "examples/red-cap-production-v1"),
     nowMilliseconds: () => 0,
@@ -133,6 +148,7 @@ test("serves an end-to-end AI and human review loop with optimistic review revis
   });
   const running = await startAnimationReviewServer({
     adapter,
+    sessionStore: await sessionStore(),
     mutationToken: "review-loop-token",
     uiModulePath: resolve(
       repositoryRoot,
@@ -166,71 +182,125 @@ test("serves an end-to-end AI and human review loop with optimistic review revis
     });
     assert.equal(assistantResponse.status, 200);
     const assistant = (await assistantResponse.json()) as {
-      review: {
+      session: {
         revision: number;
-        findings: Array<{
-          findingId: string;
-          code: string;
-          suggestion?: {
-            parameterPath: string;
-            proposedValue?: number;
-          };
+        patches: Array<{
+          patchId: string;
+          findingId?: string;
+          status: string;
+          operation: Record<string, unknown>;
         }>;
       };
+      review: { findings: Array<{ findingId: string; code: string }> };
     };
-    assert.equal(assistant.review.revision, 1);
+    assert.equal(assistant.session.revision, 1);
     const finding = assistant.review.findings.find(
       (item) => item.code === "ASSISTANT_ROTATION_RANGE_PROPOSAL",
     )!;
+    const patch = assistant.session.patches.find(
+      (item) => item.findingId === finding.findingId,
+    )!;
+    assert.equal(patch.status, "AI_PROPOSED");
 
-    const stale = await post("/api/review/decision", {
+    const stale = await post("/api/review/patch-decision", {
       expectedRevision: 0,
-      decisionId: "decision-stale",
-      findingId: finding.findingId,
+      patchId: patch.patchId,
       decision: "accept",
       actorId: "reviewer",
-      note: "",
       createdAt: "2026-07-31T00:02:00.000Z",
     });
     assert.equal(stale.status, 409);
     const afterStale = (await fetch(`${running.url}/api/workspace`).then(
       (response) => response.json(),
-    )) as { review: { revision: number; decisions: unknown[] } };
-    assert.equal(afterStale.review.revision, 1);
-    assert.equal(afterStale.review.decisions.length, 0);
+    )) as { session: { revision: number } };
+    assert.equal(afterStale.session.revision, 1);
 
-    const accepted = await post("/api/review/decision", {
+    const accepted = await post("/api/review/patch-decision", {
       expectedRevision: 1,
-      decisionId: "decision-accept",
-      findingId: finding.findingId,
+      patchId: patch.patchId,
       decision: "accept",
       actorId: "reviewer",
-      note: "Apply the local proposal.",
       createdAt: "2026-07-31T00:02:00.000Z",
     });
     assert.equal(accepted.status, 200);
-    const adjusted = await post("/api/review/adjustment", {
+    const editedOperation = {
+      ...patch.operation,
+      ...(patch.operation.kind === "rotation-offset"
+        ? { deltaDegrees: Number(patch.operation.deltaDegrees) - 1 }
+        : {}),
+    };
+    const edited = await post("/api/review/patch-edit", {
       expectedRevision: 2,
-      adjustmentId: "adjustment-wave",
-      findingId: finding.findingId,
-      parameterPath: finding.suggestion!.parameterPath,
-      nextValue: finding.suggestion!.proposedValue,
+      patchId: patch.patchId,
+      operation: editedOperation,
       actorId: "reviewer",
       createdAt: "2026-07-31T00:03:00.000Z",
     });
-    assert.equal(adjusted.status, 200);
-    const adjustedValue = (await adjusted.json()) as {
-      review: { revision: number; adjustments: unknown[]; auditTrail: Array<{ action: string }> };
-    };
-    assert.equal(adjustedValue.review.revision, 3);
-    assert.equal(adjustedValue.review.adjustments.length, 1);
-    assert.equal(
-      adjustedValue.review.auditTrail.at(-1)?.action,
-      "analysis-ran",
-    );
-
-    const resolved = await post("/api/review/decision", {
+    assert.equal(edited.status, 200);
+    const preview = await post("/api/review/patch-preview", {
       expectedRevision: 3,
+      patchId: patch.patchId,
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:03:30.000Z",
+    });
+    assert.equal(preview.status, 200);
+    const previewValue = (await preview.json()) as {
+      session: { revision: number; preview: unknown; authoritativeState: unknown; sourceState: unknown };
+    };
+    assert.equal(previewValue.session.revision, 4);
+    assert.notEqual(previewValue.session.preview, null);
+    assert.deepEqual(previewValue.session.authoritativeState, previewValue.session.sourceState);
+
+    const applied = await post("/api/review/patch-apply", {
+      expectedRevision: 4,
+      patchId: patch.patchId,
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:04:00.000Z",
+    });
+    assert.equal(applied.status, 200);
+    const appliedValue = (await applied.json()) as {
+      session: { revision: number; historyCursor: number; auditTrail: Array<{ action: string }> };
+    };
+    assert.equal(appliedValue.session.revision, 5);
+    assert.equal(appliedValue.session.historyCursor, 1);
+    assert.equal(appliedValue.session.auditTrail.at(-1)?.action, "analysis-ran");
+
+    assert.equal((await post("/api/review/undo", {
+      expectedRevision: 5,
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:04:10.000Z",
+    })).status, 200);
+    assert.equal((await post("/api/review/redo", {
+      expectedRevision: 6,
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:04:20.000Z",
+    })).status, 200);
+    assert.equal((await post("/api/review/human-rule", {
+      expectedRevision: 7,
+      ruleId: "human-motion-quality",
+      decision: "passed",
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:04:30.000Z",
+    })).status, 200);
+    assert.equal((await post("/api/review/human-finding-create", {
+      expectedRevision: 8,
+      findingId: "human-finding-silhouette",
+      summary: "Check the hand silhouette at the wave apex.",
+      targetIds: ["hand-left"],
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:04:40.000Z",
+    })).status, 200);
+    assert.equal((await post("/api/review/human-rule-create", {
+      expectedRevision: 9,
+      ruleId: "human-wave-silhouette",
+      details: "A human must confirm the wave silhouette.",
+      relatedFindingIds: ["human-finding-silhouette"],
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:04:50.000Z",
+    })).status, 200);
+
+    const resolved = await post("/api/review/finding-decision", {
+      expectedRevision: 10,
       decisionId: "decision-resolve",
       findingId: finding.findingId,
       decision: "resolve",
@@ -253,12 +323,6 @@ test("serves an end-to-end AI and human review loop with optimistic review revis
       /^[a-f0-9]{64}$/,
     );
 
-    const rejectedProvider = await post("/api/review/provider", {
-      actorId: "reviewer",
-      createdAt: "2026-07-31T00:05:00.000Z",
-      proposal: { protocolVersion: "2.0.0" },
-    });
-    assert.equal(rejectedProvider.status, 409);
   } finally {
     await running.close();
   }
@@ -273,6 +337,7 @@ test("fails closed for remote bind, bad mutation inputs, traversal, and stale re
   await assert.rejects(
     startAnimationReviewServer({
       adapter,
+      sessionStore: await sessionStore(),
       host: "0.0.0.0",
       uiModulePath: resolve(
         repositoryRoot,
@@ -283,6 +348,7 @@ test("fails closed for remote bind, bad mutation inputs, traversal, and stale re
   );
   const running = await startAnimationReviewServer({
     adapter,
+    sessionStore: await sessionStore(),
     mutationToken: "test-token",
     uiModulePath: resolve(
       repositoryRoot,
@@ -368,6 +434,27 @@ test("fails closed for remote bind, bad mutation inputs, traversal, and stale re
         })
       ).status,
       200,
+    );
+    assert.equal(
+      (
+        await post(JSON.stringify(first), {
+          "content-type": "application/json",
+          "x-animation-review-token": "test-token",
+        })
+      ).status,
+      200,
+    );
+    const conflictingDuplicate = await post(
+      JSON.stringify({ ...first, payload: { time: 0.75 } }),
+      {
+        "content-type": "application/json",
+        "x-animation-review-token": "test-token",
+      },
+    );
+    assert.equal(conflictingDuplicate.status, 409);
+    assert.equal(
+      ((await conflictingDuplicate.json()) as { error: { code: string } }).error.code,
+      "WORKSPACE_DUPLICATE_REQUEST_ID",
     );
     assert.equal(
       (

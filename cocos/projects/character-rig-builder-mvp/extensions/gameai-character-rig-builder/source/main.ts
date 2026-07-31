@@ -1,4 +1,5 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { request as httpRequest } from "node:http";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import { parseCharacterRig } from "@gameai/character-contracts";
@@ -12,6 +13,8 @@ import {
 } from "@gameai/rig-animation";
 import {
   validateAnimationReviewAdapterRequest,
+  validateAnimationReviewAdapterResponse,
+  type AnimationReviewAdapterRequest,
   type AnimationReviewAdapterResponse,
 } from "@gameai/animation-review-core";
 
@@ -34,6 +37,85 @@ import type {
 } from "./types";
 
 const EXTENSION_NAME = "gameai-character-rig-builder";
+const REVIEW_SERVICE_HOST = "127.0.0.1";
+const REVIEW_SERVICE_PORT = 41715;
+const sceneReviewResponses = new Map<
+  string,
+  { readonly fingerprint: string; readonly response: AnimationReviewAdapterResponse }
+>();
+
+async function localReviewServiceRequest(
+  method: "GET" | "POST",
+  path: string,
+  value?: unknown,
+): Promise<unknown> {
+  const bootstrap = await new Promise<{ mutationToken: string }>((resolvePromise, reject) => {
+    const request = httpRequest(
+      {
+        host: REVIEW_SERVICE_HOST,
+        port: REVIEW_SERVICE_PORT,
+        method: "GET",
+        path: "/api/bootstrap",
+        headers: { accept: "application/json" },
+      },
+      (response) => {
+        const chunks: Buffer[] = [];
+        response.on("data", (chunk: Buffer) => chunks.push(chunk));
+        response.on("end", () => {
+          try {
+            resolvePromise(JSON.parse(Buffer.concat(chunks).toString("utf8")) as { mutationToken: string });
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+    );
+    request.setTimeout(2_000, () => request.destroy(new Error("Animation Review service bootstrap timed out.")));
+    request.on("error", reject);
+    request.end();
+  });
+  const body = value === undefined ? undefined : JSON.stringify(value);
+  return new Promise((resolvePromise, reject) => {
+    const request = httpRequest(
+      {
+        host: REVIEW_SERVICE_HOST,
+        port: REVIEW_SERVICE_PORT,
+        method,
+        path,
+        headers: {
+          accept: "application/json",
+          ...(body === undefined
+            ? {}
+            : {
+                "content-type": "application/json",
+                "content-length": Buffer.byteLength(body),
+                "x-animation-review-token": bootstrap.mutationToken,
+              }),
+        },
+      },
+      (response) => {
+        const chunks: Buffer[] = [];
+        response.on("data", (chunk: Buffer) => chunks.push(chunk));
+        response.on("end", () => {
+          const text = Buffer.concat(chunks).toString("utf8");
+          try {
+            const parsed = JSON.parse(text) as unknown;
+            if ((response.statusCode ?? 500) >= 400) {
+              reject(new Error(`Animation Review service ${response.statusCode}: ${text}`));
+            } else {
+              resolvePromise(parsed);
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+    );
+    request.setTimeout(3_000, () => request.destroy(new Error("Animation Review service request timed out.")));
+    request.on("error", reject);
+    request.end(body);
+  });
+}
 
 async function requestAnimationReviewScene(
   value: unknown,
@@ -47,6 +129,17 @@ async function requestAnimationReviewScene(
       diagnostic?.message ?? "Animation review request is invalid.",
     );
   }
+  const fingerprint = JSON.stringify(parsed.value);
+  const prior = sceneReviewResponses.get(parsed.value.requestId);
+  if (prior !== undefined) {
+    return prior.fingerprint === fingerprint
+      ? prior.response
+      : animationReviewFailure(
+          parsed.value,
+          "COCOS_REVIEW_DUPLICATE_REQUEST_ID",
+          "A requestId cannot be reused with different content.",
+        );
+  }
   try {
     const response = (await Editor.Message.request(
       "scene",
@@ -57,24 +150,47 @@ async function requestAnimationReviewScene(
         args: [parsed.value],
       },
     )) as AnimationReviewAdapterResponse;
+    const validated = validateAnimationReviewAdapterResponse(response);
+    if (!validated.ok) {
+      const diagnostic = validated.diagnostics[0];
+      const failed = animationReviewFailure(
+        parsed.value,
+        diagnostic?.code ?? "ADAPTER_SCHEMA_VALIDATION_ERROR",
+        diagnostic?.message ?? "Scene adapter response is invalid.",
+      );
+      sceneReviewResponses.set(parsed.value.requestId, { fingerprint, response: failed });
+      return failed;
+    }
     if (
-      response.requestId !== parsed.value.requestId ||
-      response.adapterId !== parsed.value.adapterId ||
-      response.protocolVersion !== parsed.value.protocolVersion
+      validated.value.requestId !== parsed.value.requestId ||
+      validated.value.adapterId !== parsed.value.adapterId ||
+      validated.value.protocolVersion !== parsed.value.protocolVersion
     ) {
-      return animationReviewFailure(
+      const failed = animationReviewFailure(
         parsed.value,
         "COCOS_REVIEW_RESPONSE_CORRELATION_FAILED",
         "Scene adapter response identity did not match the request.",
       );
+      sceneReviewResponses.set(parsed.value.requestId, { fingerprint, response: failed });
+      return failed;
     }
-    return response;
+    if (sceneReviewResponses.size >= 1_024) {
+      const oldest = sceneReviewResponses.keys().next().value as string | undefined;
+      if (oldest !== undefined) sceneReviewResponses.delete(oldest);
+    }
+    sceneReviewResponses.set(parsed.value.requestId, {
+      fingerprint,
+      response: validated.value,
+    });
+    return validated.value;
   } catch (error) {
-    return animationReviewFailure(
+    const failed = animationReviewFailure(
       parsed.value,
       "COCOS_REVIEW_SCENE_BRIDGE_FAILED",
       error instanceof Error ? error.message : String(error),
     );
+    sceneReviewResponses.set(parsed.value.requestId, { fingerprint, response: failed });
+    return failed;
   }
 }
 
@@ -262,6 +378,57 @@ export const methods = {
     return requestAnimationReviewScene(value);
   },
 
+  async reviewWorkspace(): Promise<unknown> {
+    return localReviewServiceRequest("GET", "/api/workspace");
+  },
+
+  async reviewWorkspaceAction(
+    action: string,
+    value: unknown,
+  ): Promise<unknown> {
+    if (!/^[a-z-]{1,40}$/.test(action)) {
+      throw new Error("Animation Review action is invalid.");
+    }
+    return localReviewServiceRequest("POST", `/api/review/${action}`, value);
+  },
+
+  async saveAnimationReviewSession(): Promise<unknown> {
+    return localReviewServiceRequest("POST", "/api/session/save", {});
+  },
+
+  async syncAnimationReviewAdapter(value: unknown): Promise<unknown> {
+    const parsed = validateAnimationReviewAdapterRequest(value);
+    if (!parsed.ok) {
+      throw new Error(
+        parsed.diagnostics[0]?.message ??
+          "Animation Review adapter sync request is invalid.",
+      );
+    }
+    if (
+      parsed.value.command === "describe" ||
+      parsed.value.command === "observe-playback"
+    ) {
+      throw new Error(
+        `Animation Review command ${parsed.value.command} is not a sync mutation.`,
+      );
+    }
+    const workspace = (await localReviewServiceRequest(
+      "GET",
+      "/api/workspace",
+    )) as {
+      snapshot: { adapterId: string; adapterRevision: number };
+    };
+    return localReviewServiceRequest("POST", "/api/adapter", {
+      kind: "request",
+      protocolVersion: "1.0.0",
+      requestId: `cocos-adapter-sync-${Date.now()}-${parsed.value.requestId}`,
+      adapterId: workspace.snapshot.adapterId,
+      command: parsed.value.command,
+      expectedRevision: workspace.snapshot.adapterRevision,
+      payload: parsed.value.payload,
+    } satisfies AnimationReviewAdapterRequest);
+  },
+
   async buildCharacterRig(
     request: BuildCharacterRigRequest,
   ): Promise<CharacterRigBuilderEvidence> {
@@ -280,4 +447,6 @@ export async function load(): Promise<void> {
   await Editor.Panel.open(EXTENSION_NAME);
 }
 
-export function unload(): void {}
+export function unload(): void {
+  sceneReviewResponses.clear();
+}

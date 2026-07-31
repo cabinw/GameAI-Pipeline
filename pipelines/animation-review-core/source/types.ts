@@ -171,6 +171,27 @@ export type AnimationReviewDiagnosticCode =
   | "REVIEW_REVISION_INVALID"
   | "REVIEW_DECISION_TRANSITION_INVALID"
   | "REVIEW_ADJUSTMENT_INVALID"
+  | "SESSION_JSON_PARSE_ERROR"
+  | "SESSION_SCHEMA_VALIDATION_ERROR"
+  | "SESSION_UNSUPPORTED_SCHEMA_VERSION"
+  | "SESSION_SEMANTIC_VALIDATION_ERROR"
+  | "SESSION_REVISION_INVALID"
+  | "SESSION_BUDGET_EXCEEDED"
+  | "PATCH_SCHEMA_VALIDATION_ERROR"
+  | "PATCH_JSON_PARSE_ERROR"
+  | "PATCH_UNSUPPORTED_SCHEMA_VERSION"
+  | "PATCH_DUPLICATE_ID"
+  | "PATCH_STATUS_TRANSITION_INVALID"
+  | "PATCH_TARGET_INVALID"
+  | "PATCH_PREVIEW_REQUIRED"
+  | "PATCH_HISTORY_INVALID"
+  | "VALIDATION_TRANSITION_INVALID"
+  | "VALIDATION_SCHEMA_VALIDATION_ERROR"
+  | "VALIDATION_JSON_PARSE_ERROR"
+  | "VALIDATION_UNSUPPORTED_SCHEMA_VERSION"
+  | "DIAGNOSIS_SCHEMA_VALIDATION_ERROR"
+  | "DIAGNOSIS_JSON_PARSE_ERROR"
+  | "DIAGNOSIS_UNSUPPORTED_SCHEMA_VERSION"
   | "PROVIDER_SCHEMA_VALIDATION_ERROR"
   | "PROVIDER_UNSUPPORTED_PROTOCOL_VERSION"
   | "PROVIDER_SUBJECT_MISMATCH"
@@ -199,6 +220,7 @@ export type ParseAnimationReviewResult =
 
 export type AnimationReviewAdapterCommand =
   | "describe"
+  | "observe-playback"
   | "select-clip"
   | "play"
   | "pause"
@@ -318,6 +340,7 @@ export type AnimationReviewAdapterResponse =
       readonly requestId: string;
       readonly adapterId: string;
       readonly ok: true;
+      readonly responseType: "snapshot";
       readonly snapshot: AnimationReviewAdapterSnapshot;
     }
   | {
@@ -325,7 +348,21 @@ export type AnimationReviewAdapterResponse =
       readonly protocolVersion: typeof ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION;
       readonly requestId: string;
       readonly adapterId: string;
+      readonly ok: true;
+      readonly responseType: "playback";
+      readonly adapterRevision: number;
+      readonly playback: AnimationReviewPlaybackSnapshot;
+      readonly runtimeDiagnostics: Readonly<
+        Record<string, number | string | boolean>
+      >;
+    }
+  | {
+      readonly kind: "response";
+      readonly protocolVersion: typeof ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION;
+      readonly requestId: string;
+      readonly adapterId: string;
       readonly ok: false;
+      readonly responseType: "error";
       readonly error: {
         readonly code: string;
         readonly message: string;
@@ -336,6 +373,17 @@ export type ParseAdapterRequestResult =
   | {
       readonly ok: true;
       readonly value: AnimationReviewAdapterRequest;
+      readonly diagnostics: readonly [];
+    }
+  | {
+      readonly ok: false;
+      readonly diagnostics: readonly AnimationReviewDiagnostic[];
+    };
+
+export type ParseAdapterResponseResult =
+  | {
+      readonly ok: true;
+      readonly value: AnimationReviewAdapterResponse;
       readonly diagnostics: readonly [];
     }
   | {

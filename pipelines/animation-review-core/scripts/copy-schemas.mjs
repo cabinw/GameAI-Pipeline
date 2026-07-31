@@ -10,6 +10,10 @@ await mkdir(outputRoot, { recursive: true });
 for (const file of [
   "animation-review.schema.json",
   "animation-review-engine-adapter.schema.json",
+  "animation-review-patch.schema.json",
+  "animation-review-session.schema.json",
+  "animation-review-validation.schema.json",
+  "animation-review-diagnosis.schema.json",
 ]) {
   await copyFile(
     path.join(repositoryRoot, "schemas", file),

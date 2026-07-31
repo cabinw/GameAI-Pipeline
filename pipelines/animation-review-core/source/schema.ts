@@ -13,3 +13,15 @@ export const animationReviewSchema = readSchema("animation-review.schema.json");
 export const animationReviewEngineAdapterSchema = readSchema(
   "animation-review-engine-adapter.schema.json",
 );
+export const animationReviewPatchSchema = readSchema(
+  "animation-review-patch.schema.json",
+);
+export const animationReviewSessionSchema = readSchema(
+  "animation-review-session.schema.json",
+);
+export const animationReviewValidationSchema = readSchema(
+  "animation-review-validation.schema.json",
+);
+export const animationReviewDiagnosisSchema = readSchema(
+  "animation-review-diagnosis.schema.json",
+);

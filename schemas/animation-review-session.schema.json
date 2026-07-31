@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review-session/1.0.0",
+  "title": "GameAI Animation Review Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sessionId",
+    "revision",
+    "characterId",
+    "rigId",
+    "activeClipId",
+    "sourceRevision",
+    "sourceState",
+    "authoritativeState",
+    "preview",
+    "patches",
+    "history",
+    "historyCursor",
+    "review",
+    "validation",
+    "diagnoses",
+    "auditTrail",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "sessionId": { "$ref": "#/$defs/id" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "characterId": { "$ref": "#/$defs/id" },
+    "rigId": { "$ref": "#/$defs/id" },
+    "activeClipId": { "$ref": "#/$defs/id" },
+    "sourceRevision": { "$ref": "#/$defs/id" },
+    "sourceState": { "$ref": "#/$defs/editableState" },
+    "authoritativeState": { "$ref": "#/$defs/editableState" },
+    "preview": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/preview" }
+      ]
+    },
+    "patches": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "type": "object" }
+    },
+    "history": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/history" }
+    },
+    "historyCursor": { "type": "integer", "minimum": 0, "maximum": 128 },
+    "review": { "type": "object" },
+    "validation": {
+      "type": "array",
+      "maxItems": 512,
+      "items": { "$ref": "#/$defs/validation" }
+    },
+    "diagnoses": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": { "$ref": "#/$defs/diagnosis" }
+    },
+    "auditTrail": {
+      "type": "array",
+      "maxItems": 2048,
+      "items": { "$ref": "#/$defs/audit" }
+    },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "updatedAt": { "$ref": "#/$defs/timestamp" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "timestamp": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "keyframe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time", "value", "interpolation", "easing"],
+      "properties": {
+        "time": { "type": "number", "minimum": 0 },
+        "value": {
+          "oneOf": [
+            { "type": "number" },
+            { "$ref": "#/$defs/vector" }
+          ]
+        },
+        "interpolation": { "enum": ["linear", "step"] },
+        "easing": {
+          "enum": [
+            "linear",
+            "ease-in-sine",
+            "ease-out-sine",
+            "ease-in-out-sine"
+          ]
+        }
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jointId", "property", "keyframes"],
+      "properties": {
+        "jointId": { "$ref": "#/$defs/id" },
+        "property": { "enum": ["position", "rotation", "scale"] },
+        "keyframes": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": { "$ref": "#/$defs/keyframe" }
+        }
+      }
+    },
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "animationId",
+        "rigId",
+        "rigSchemaVersion",
+        "duration",
+        "loop",
+        "tracks"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "animationId": { "$ref": "#/$defs/id" },
+        "rigId": { "$ref": "#/$defs/id" },
+        "rigSchemaVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "duration": { "type": "number", "exclusiveMinimum": 0 },
+        "loop": { "type": "boolean" },
+        "tracks": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/track" }
+        }
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["partId", "pivotOffset", "drawOrder"],
+      "properties": {
+        "partId": { "$ref": "#/$defs/id" },
+        "pivotOffset": { "$ref": "#/$defs/vector" },
+        "drawOrder": { "type": "integer", "minimum": -1000000, "maximum": 1000000 }
+      }
+    },
+    "editableState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["animation", "parts"],
+      "properties": {
+        "animation": { "$ref": "#/$defs/animation" },
+        "parts": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/part" }
+        }
+      }
+    },
+    "preview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["patchId", "state"],
+      "properties": {
+        "patchId": { "$ref": "#/$defs/id" },
+        "state": { "$ref": "#/$defs/editableState" }
+      }
+    },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "historyId",
+        "patchId",
+        "beforeState",
+        "afterState",
+        "beforeReview",
+        "afterReview",
+        "actorId",
+        "appliedAt"
+      ],
+      "properties": {
+        "historyId": { "$ref": "#/$defs/id" },
+        "patchId": { "$ref": "#/$defs/id" },
+        "beforeState": { "$ref": "#/$defs/editableState" },
+        "afterState": { "$ref": "#/$defs/editableState" },
+        "beforeReview": { "type": "object" },
+        "afterReview": { "type": "object" },
+        "actorId": { "$ref": "#/$defs/id" },
+        "appliedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "ruleId",
+        "ruleKind",
+        "status",
+        "details",
+        "relatedFindingIds"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "ruleId": { "$ref": "#/$defs/id" },
+        "ruleKind": { "enum": ["automatic", "human-judgment"] },
+        "status": { "enum": ["unresolved", "waived", "passed", "failed"] },
+        "details": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "relatedFindingIds": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "decidedBy": { "$ref": "#/$defs/id" },
+        "decidedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "diagnosis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "diagnosisId",
+        "findingId",
+        "source",
+        "severity",
+        "status",
+        "summary",
+        "targetIds",
+        "ruleId",
+        "providerId"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "diagnosisId": { "$ref": "#/$defs/id" },
+        "findingId": { "$ref": "#/$defs/id" },
+        "source": { "enum": ["validator", "assistant", "provider", "human"] },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "status": { "enum": ["open", "resolved"] },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "targetIds": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "timeRange": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "number", "minimum": 0 },
+            "end": { "type": "number", "minimum": 0 }
+          }
+        },
+        "ruleId": { "$ref": "#/$defs/id" },
+        "providerId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "action",
+        "actorId",
+        "revision",
+        "details",
+        "createdAt"
+      ],
+      "properties": {
+        "entryId": { "$ref": "#/$defs/id" },
+        "action": {
+          "enum": [
+            "session-created",
+            "analysis-ran",
+            "patch-proposed",
+            "patch-decided",
+            "patch-edited",
+            "patch-previewed",
+            "patch-applied",
+            "undo",
+            "redo",
+            "human-rule-decided",
+            "human-finding-created",
+            "human-rule-created",
+            "exact-reset"
+          ]
+        },
+        "actorId": { "$ref": "#/$defs/id" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "details": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "createdAt": { "$ref": "#/$defs/timestamp" }
+      }
+    }
+  }
+}

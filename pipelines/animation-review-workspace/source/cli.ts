@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 
 import {
+  AnimationReviewSessionStore,
   RedCapFixtureAdapter,
   startAnimationReviewServer,
 } from "./index";
@@ -14,14 +15,25 @@ async function main(): Promise<void> {
   const repositoryRoot = resolve(__dirname, "../../..");
   const host = valueAfter("--host") ?? "127.0.0.1";
   const portText = valueAfter("--port");
-  const port = portText === undefined ? 0 : Number(portText);
+  const port = portText === undefined ? 41715 : Number(portText);
   const fixtureRoot = resolve(
     valueAfter("--fixture") ??
       resolve(repositoryRoot, "examples/red-cap-production-v1"),
   );
   const adapter = await RedCapFixtureAdapter.load({ fixtureRoot });
+  const sessionStore = new AnimationReviewSessionStore({
+    sessionRoot: resolve(
+      valueAfter("--session-root") ??
+        resolve(repositoryRoot, ".gameai/animation-review/sessions"),
+    ),
+    exportRoot: resolve(
+      valueAfter("--export-root") ??
+        resolve(repositoryRoot, ".gameai/animation-review/exports"),
+    ),
+  });
   const running = await startAnimationReviewServer({
     adapter,
+    sessionStore,
     host,
     port,
     uiModulePath: resolve(

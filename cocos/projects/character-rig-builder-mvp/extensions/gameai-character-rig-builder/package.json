@@ -80,6 +80,26 @@
           "reviewAnimation"
         ]
       },
+      "review-workspace": {
+        "methods": [
+          "reviewWorkspace"
+        ]
+      },
+      "review-workspace-action": {
+        "methods": [
+          "reviewWorkspaceAction"
+        ]
+      },
+      "save-animation-review-session": {
+        "methods": [
+          "saveAnimationReviewSession"
+        ]
+      },
+      "sync-animation-review-adapter": {
+        "methods": [
+          "syncAnimationReviewAdapter"
+        ]
+      },
       "open-panel": {
         "methods": [
           "openPanel"

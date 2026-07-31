@@ -28,31 +28,45 @@ const root = document.querySelector("#workspace");
 const fatal = document.querySelector("#fatal");
 
 try {
-  const bootstrapResponse = await fetch("/api/bootstrap", {
-    headers: { "accept": "application/json" },
-  });
-  if (!bootstrapResponse.ok) throw new Error("Workspace bootstrap failed.");
-  const bootstrap = await bootstrapResponse.json();
+  async function readBootstrap() {
+    const response = await fetch("/api/bootstrap", {
+      headers: { "accept": "application/json" },
+    });
+    if (!response.ok) throw new Error("Workspace bootstrap failed.");
+    return response.json();
+  }
+  let bootstrap = await readBootstrap();
+  async function post(path, value) {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-animation-review-token": bootstrap.mutationToken,
+        },
+        body: JSON.stringify(value),
+      });
+      if (response.status === 403 && attempt === 0) {
+        bootstrap = await readBootstrap();
+        continue;
+      }
+      return response;
+    }
+    throw new Error("Workspace mutation retry was exhausted.");
+  }
   mountAnimationReviewWorkspace(root, {
     adapterId: bootstrap.adapterId,
     transport: {
       async request(request) {
-        const response = await fetch("/api/adapter", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-animation-review-token": bootstrap.mutationToken,
-          },
-          body: JSON.stringify(request),
-        });
+        const response = await post("/api/adapter", request);
         return response.json();
       },
-      async readReview() {
+      async readWorkspace() {
         const response = await fetch("/api/workspace", {
           headers: { "accept": "application/json" },
         });
         if (!response.ok) throw new Error("Review state request failed.");
-        return (await response.json()).review;
+        return response.json();
       },
       async exportReview() {
         const response = await fetch("/api/export", {
@@ -61,15 +75,13 @@ try {
         if (!response.ok) throw new Error("Review export failed.");
         return response.json();
       },
+      async saveSession() {
+        const response = await post("/api/session/save", {});
+        if (!response.ok) throw new Error("Session save failed.");
+        return response.json();
+      },
       async reviewAction(action, payload) {
-        const response = await fetch("/api/review/" + action, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-animation-review-token": bootstrap.mutationToken,
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = await post("/api/review/" + action, payload);
         const value = await response.json();
         if (!response.ok) {
           throw new Error(value.error?.code + ": " + value.error?.message);

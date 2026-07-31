@@ -8,7 +8,15 @@ import {
   ANIMATION_REVIEW_PROVIDER_PROTOCOL_VERSION,
   validateAnimationReviewAdapterRequest,
   type AnimationReviewAdapterResponse,
-  type ReviewAdjustmentInput,
+  type AnimationReviewHumanRuleDecisionInput,
+  type AnimationReviewHumanFindingInput,
+  type AnimationReviewHumanRuleCreateInput,
+  type AnimationReviewPatchActionInput,
+  type AnimationReviewPatchDecisionInput,
+  type AnimationReviewPatchDocument,
+  type AnimationReviewPatchEditInput,
+  type AnimationReviewPatchOperation,
+  type AnimationReviewRevisionInput,
   type ReviewDecisionInput,
 } from "@gameai/animation-review-core";
 
@@ -16,6 +24,7 @@ import {
   RedCapFixtureAdapter,
   resolveDeclaredAsset,
 } from "./fixture-adapter";
+import { AnimationReviewSessionStore } from "./session-store";
 import {
   standaloneBrowserModule,
   standaloneWorkspaceHtml,
@@ -32,6 +41,7 @@ export interface AnimationReviewServerOptions {
   readonly host?: string;
   readonly port?: number;
   readonly mutationToken?: string;
+  readonly sessionStore: AnimationReviewSessionStore;
 }
 
 export interface RunningAnimationReviewServer {
@@ -77,6 +87,7 @@ function failure(
         ? value.adapterId
         : "standalone-red-cap-production-v1",
     ok: false,
+    responseType: "error",
     error: { code, message },
   };
 }
@@ -168,7 +179,177 @@ function assistantInput(value: unknown): {
   };
 }
 
-function decisionInput(value: unknown): ReviewDecisionInput {
+function patchActionInput(value: unknown): AnimationReviewPatchActionInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "patchId",
+    "actorId",
+    "createdAt",
+  ]);
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    patchId: actionId(object.patchId, "patchId"),
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function revisionInput(value: unknown): AnimationReviewRevisionInput {
+  return assistantInput(value);
+}
+
+function patchDecisionInput(value: unknown): AnimationReviewPatchDecisionInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "patchId",
+    "decision",
+    "actorId",
+    "createdAt",
+  ]);
+  if (
+    object.decision !== "accept" && object.decision !== "reject"
+  ) {
+    return actionError("Patch decision is not supported.");
+  }
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    patchId: actionId(object.patchId, "patchId"),
+    decision: object.decision,
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function patchOperation(value: unknown): AnimationReviewPatchOperation {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    Array.isArray(value) ||
+    JSON.stringify(value).length > 8_192
+  ) {
+    return actionError("Patch operation must be a bounded object.");
+  }
+  const kind = (value as { kind?: unknown }).kind;
+  if (
+    kind !== "pivot-offset" &&
+    kind !== "rotation-offset" &&
+    kind !== "keyframe-time" &&
+    kind !== "keyframe-value" &&
+    kind !== "curve" &&
+    kind !== "layer-order"
+  ) {
+    return actionError("Patch operation kind is not supported.");
+  }
+  return value as AnimationReviewPatchOperation;
+}
+
+function patchEditInput(value: unknown): AnimationReviewPatchEditInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "patchId",
+    "operation",
+    "actorId",
+    "createdAt",
+  ]);
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    patchId: actionId(object.patchId, "patchId"),
+    operation: patchOperation(object.operation),
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function humanRuleInput(value: unknown): AnimationReviewHumanRuleDecisionInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "ruleId",
+    "decision",
+    "actorId",
+    "createdAt",
+  ]);
+  if (object.decision !== "passed" && object.decision !== "waived") {
+    return actionError("Human rule decision is not supported.");
+  }
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    ruleId: actionId(object.ruleId, "ruleId"),
+    decision: object.decision,
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function idArray(value: unknown, field: string): readonly string[] {
+  if (!Array.isArray(value) || value.length > 100) {
+    return actionError(`${field} must be a bounded identifier array.`);
+  }
+  return value.map((item) => actionId(item, field));
+}
+
+function humanFindingInput(value: unknown): AnimationReviewHumanFindingInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "findingId",
+    "summary",
+    "targetIds",
+    "timeRange",
+    "actorId",
+    "createdAt",
+  ]);
+  if (typeof object.summary !== "string" || object.summary.length > 500) {
+    return actionError("Human Finding summary must be a bounded string.");
+  }
+  let timeRange: { start: number; end: number } | undefined;
+  if (object.timeRange !== undefined) {
+    const range = actionRecord(object.timeRange, ["start", "end"]);
+    if (
+      typeof range.start !== "number" ||
+      typeof range.end !== "number" ||
+      !Number.isFinite(range.start) ||
+      !Number.isFinite(range.end)
+    ) {
+      return actionError("Human Finding timeRange is invalid.");
+    }
+    timeRange = { start: range.start, end: range.end };
+  }
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    findingId: actionId(object.findingId, "findingId"),
+    summary: object.summary,
+    targetIds: idArray(object.targetIds ?? [], "targetIds"),
+    ...(timeRange === undefined ? {} : { timeRange }),
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function humanRuleCreateInput(value: unknown): AnimationReviewHumanRuleCreateInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "ruleId",
+    "details",
+    "relatedFindingIds",
+    "actorId",
+    "createdAt",
+  ]);
+  if (typeof object.details !== "string" || object.details.length > 2_000) {
+    return actionError("Human Rule details must be a bounded string.");
+  }
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    ruleId: actionId(object.ruleId, "ruleId"),
+    details: object.details,
+    relatedFindingIds: idArray(
+      object.relatedFindingIds ?? [],
+      "relatedFindingIds",
+    ),
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function findingDecisionInput(value: unknown): ReviewDecisionInput {
   const object = actionRecord(value, [
     "expectedRevision",
     "decisionId",
@@ -178,13 +359,8 @@ function decisionInput(value: unknown): ReviewDecisionInput {
     "note",
     "createdAt",
   ]);
-  if (
-    object.decision !== "accept" &&
-    object.decision !== "reject" &&
-    object.decision !== "resolve" &&
-    object.decision !== "comment"
-  ) {
-    return actionError("decision is not supported.");
+  if (object.decision !== "resolve" && object.decision !== "comment") {
+    return actionError("Only resolve and comment finding decisions are supported after reanalysis.");
   }
   if (typeof object.note !== "string" || object.note.length > 2_000) {
     return actionError("note must be a bounded string.");
@@ -200,50 +376,10 @@ function decisionInput(value: unknown): ReviewDecisionInput {
   };
 }
 
-function adjustmentInput(value: unknown): ReviewAdjustmentInput {
-  const object = actionRecord(value, [
-    "expectedRevision",
-    "adjustmentId",
-    "findingId",
-    "parameterPath",
-    "nextValue",
-    "actorId",
-    "createdAt",
-  ]);
-  if (
-    typeof object.parameterPath !== "string" ||
-    object.parameterPath.length === 0 ||
-    object.parameterPath.length > 500 ||
-    typeof object.nextValue !== "number" ||
-    !Number.isFinite(object.nextValue)
-  ) {
-    return actionError("Adjustment path or value is invalid.");
-  }
-  return {
-    expectedRevision: actionRevision(object.expectedRevision),
-    adjustmentId: actionId(object.adjustmentId, "adjustmentId"),
-    findingId: actionId(object.findingId, "findingId"),
-    parameterPath: object.parameterPath,
-    nextValue: object.nextValue,
-    actorId: actionId(object.actorId, "actorId"),
-    createdAt: actionTime(object.createdAt),
-  };
-}
-
-function providerInput(value: unknown): {
-  actorId: string;
-  createdAt: string;
-  proposal: unknown;
-} {
-  const object = actionRecord(value, ["actorId", "createdAt", "proposal"]);
-  if (!("proposal" in object)) {
-    return actionError("Provider proposal is required.");
-  }
-  return {
-    actorId: actionId(object.actorId, "actorId"),
-    createdAt: actionTime(object.createdAt),
-    proposal: object.proposal,
-  };
+function patchProposalInput(value: unknown): AnimationReviewPatchDocument {
+  const object = actionRecord(value, ["patch"]);
+  if (!("patch" in object)) return actionError("Patch proposal is required.");
+  return object.patch as AnimationReviewPatchDocument;
 }
 
 async function body(request: IncomingMessage): Promise<unknown> {
@@ -299,6 +435,12 @@ function originAllowed(request: IncomingMessage, host: string, port: number): bo
 export async function startAnimationReviewServer(
   options: AnimationReviewServerOptions,
 ): Promise<RunningAnimationReviewServer> {
+  await options.sessionStore.initialize();
+  const restoredSessions = await options.sessionStore.loadAll();
+  if (restoredSessions.length > 0) {
+    options.adapter.restoreSessions(restoredSessions);
+  }
+  await options.sessionStore.saveAll(options.adapter.sessionDocuments());
   const host = options.host ?? "127.0.0.1";
   if (!LOOPBACK_HOSTS.has(host)) {
     throw Object.assign(new Error(`Host ${host} is not loopback.`), {
@@ -317,6 +459,14 @@ export async function startAnimationReviewServer(
     options.mutationToken ?? randomBytes(24).toString("base64url");
   const uiModule = await readFile(options.uiModulePath, "utf8");
   let actualPort = 0;
+  const processedRequests = new Map<
+    string,
+    { readonly fingerprint: string; readonly status: number; readonly response: AnimationReviewAdapterResponse }
+  >();
+
+  const persist = async (): Promise<void> => {
+    await options.sessionStore.saveAll(options.adapter.sessionDocuments());
+  };
 
   const server = createServer(async (request, response) => {
     const securityHeaders = {
@@ -373,6 +523,13 @@ export async function startAnimationReviewServer(
       if (request.method === "GET" && url.pathname === "/api/workspace") {
         json(response, 200, {
           snapshot: options.adapter.snapshot(),
+          session: options.adapter.sessionDocument(),
+          sessions: options.adapter.sessionDocuments().map((session) => ({
+            sessionId: session.sessionId,
+            activeClipId: session.activeClipId,
+            revision: session.revision,
+            updatedAt: session.updatedAt,
+          })),
           review: options.adapter.reviewDocument(),
         });
         return;
@@ -389,6 +546,45 @@ export async function startAnimationReviewServer(
         );
         return;
       }
+      if (request.method === "POST" && url.pathname === "/api/export") {
+        if (
+          request.headers["x-animation-review-token"] !== mutationToken ||
+          !originAllowed(request, host, actualPort)
+        ) {
+          json(response, 403, {
+            error: {
+              code: "WORKSPACE_MUTATION_FORBIDDEN",
+              message: "Mutation token or same-origin check failed.",
+            },
+          });
+          return;
+        }
+        const bundle = options.adapter.exportBundle();
+        const path = await options.sessionStore.writeExport(
+          `${options.adapter.sessionDocument().sessionId}-r${options.adapter.sessionDocument().revision}`,
+          bundle,
+        );
+        json(response, 200, { path, bundle });
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/session/save") {
+        if (
+          request.headers["x-animation-review-token"] !== mutationToken ||
+          !originAllowed(request, host, actualPort)
+        ) {
+          json(response, 403, {
+            error: {
+              code: "WORKSPACE_MUTATION_FORBIDDEN",
+              message: "Mutation token or same-origin check failed.",
+            },
+          });
+          return;
+        }
+        actionRecord(await body(request), []);
+        await persist();
+        json(response, 200, { session: options.adapter.sessionDocument() });
+        return;
+      }
       const reviewAction =
         request.method === "POST" &&
         url.pathname.startsWith("/api/review/")
@@ -396,9 +592,18 @@ export async function startAnimationReviewServer(
           : null;
       if (
         reviewAction === "assistant" ||
-        reviewAction === "decision" ||
-        reviewAction === "adjustment" ||
-        reviewAction === "provider"
+        reviewAction === "patch-propose" ||
+        reviewAction === "patch-decision" ||
+        reviewAction === "patch-edit" ||
+        reviewAction === "patch-preview" ||
+        reviewAction === "patch-apply" ||
+        reviewAction === "undo" ||
+        reviewAction === "redo" ||
+        reviewAction === "human-rule" ||
+        reviewAction === "human-finding-create" ||
+        reviewAction === "human-rule-create" ||
+        reviewAction === "finding-decision" ||
+        reviewAction === "exact-reset"
       ) {
         if (
           request.headers["x-animation-review-token"] !== mutationToken ||
@@ -413,22 +618,37 @@ export async function startAnimationReviewServer(
           return;
         }
         const value = await body(request);
-        const result =
-          reviewAction === "assistant"
-            ? options.adapter.runAssistant(assistantInput(value))
-            : reviewAction === "decision"
-              ? options.adapter.decideReviewFinding(decisionInput(value))
-              : reviewAction === "adjustment"
-                ? options.adapter.applyReviewAdjustment(
-                    adjustmentInput(value),
-                  )
-                : (() => {
-                    const input = providerInput(value);
-                    return options.adapter.appendProviderProposal(
-                      input.proposal,
-                      input,
-                    );
-                  })();
+        const result = (() => {
+          switch (reviewAction) {
+            case "assistant":
+              return options.adapter.runAssistant(assistantInput(value));
+            case "patch-propose":
+              return options.adapter.proposePatch(patchProposalInput(value));
+            case "patch-decision":
+              return options.adapter.decidePatch(patchDecisionInput(value));
+            case "patch-edit":
+              return options.adapter.editPatch(patchEditInput(value));
+            case "patch-preview":
+              return options.adapter.previewPatch(patchActionInput(value));
+            case "patch-apply":
+              return options.adapter.applyPatch(patchActionInput(value));
+            case "undo":
+              return options.adapter.undo(revisionInput(value));
+            case "redo":
+              return options.adapter.redo(revisionInput(value));
+            case "human-rule":
+              return options.adapter.decideHumanRule(humanRuleInput(value));
+            case "human-finding-create":
+              return options.adapter.createHumanFinding(humanFindingInput(value));
+            case "human-rule-create":
+              return options.adapter.createHumanRule(humanRuleCreateInput(value));
+            case "finding-decision":
+              return options.adapter.resolveFinding(findingDecisionInput(value));
+            case "exact-reset":
+              return options.adapter.resetSession(revisionInput(value));
+          }
+        })();
+        await persist();
         json(response, 200, result);
         return;
       }
@@ -460,23 +680,68 @@ export async function startAnimationReviewServer(
           );
           return;
         }
+        const fingerprint = JSON.stringify(parsed.value);
+        const prior = processedRequests.get(parsed.value.requestId);
+        if (prior !== undefined) {
+          if (prior.fingerprint !== fingerprint) {
+            json(
+              response,
+              409,
+              failure(
+                parsed.value,
+                "WORKSPACE_DUPLICATE_REQUEST_ID",
+                "A requestId cannot be reused with different content.",
+              ),
+            );
+          } else {
+            json(response, prior.status, prior.response);
+          }
+          return;
+        }
         try {
           const snapshot = options.adapter.execute(parsed.value);
-          json(response, 200, {
-            kind: "response",
-            protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
-            requestId: parsed.value.requestId,
-            adapterId: parsed.value.adapterId,
-            ok: true,
-            snapshot,
-          } satisfies AnimationReviewAdapterResponse);
+          await persist();
+          const success: AnimationReviewAdapterResponse =
+            parsed.value.command === "observe-playback"
+              ? {
+                  kind: "response",
+                  protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+                  requestId: parsed.value.requestId,
+                  adapterId: parsed.value.adapterId,
+                  ok: true,
+                  responseType: "playback",
+                  adapterRevision: snapshot.adapterRevision,
+                  playback: snapshot.playback,
+                  runtimeDiagnostics: snapshot.runtimeDiagnostics,
+                }
+              : {
+                  kind: "response",
+                  protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+                  requestId: parsed.value.requestId,
+                  adapterId: parsed.value.adapterId,
+                  ok: true,
+                  responseType: "snapshot",
+                  snapshot,
+                };
+          if (processedRequests.size >= 1_024) {
+            const oldest = processedRequests.keys().next().value as string | undefined;
+            if (oldest !== undefined) processedRequests.delete(oldest);
+          }
+          processedRequests.set(parsed.value.requestId, {
+            fingerprint,
+            status: 200,
+            response: success,
+          });
+          json(response, 200, success);
         } catch (error) {
           const fields = errorFields(error);
-          json(
-            response,
-            409,
-            failure(parsed.value, fields.code, fields.message),
-          );
+          const failed = failure(parsed.value, fields.code, fields.message);
+          processedRequests.set(parsed.value.requestId, {
+            fingerprint,
+            status: 409,
+            response: failed,
+          });
+          json(response, 409, failed);
         }
         return;
       }
@@ -522,7 +787,10 @@ export async function startAnimationReviewServer(
           : fields.code.startsWith("WORKSPACE_ASSET_")
             ? 404
             : fields.code.startsWith("REVIEW_") ||
-                fields.code.startsWith("PROVIDER_")
+                fields.code.startsWith("PROVIDER_") ||
+                fields.code.startsWith("SESSION_") ||
+                fields.code.startsWith("PATCH_") ||
+                fields.code.startsWith("VALIDATION_")
               ? 409
             : 400;
       json(response, status, { error: fields });

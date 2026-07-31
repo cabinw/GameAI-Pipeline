@@ -52,7 +52,8 @@ A session binds:
 - deterministic metrics and validation results;
 - findings from validators, a local assistant, an external provider, or a
   human;
-- decisions, adjustments, revisions, and audit history.
+- versioned diagnoses, validation rules, decisions, Patches, revisions,
+  undo/redo history, and audit history.
 
 ### Preview and timeline
 
@@ -68,16 +69,18 @@ diagnosis, suggestion, allowed range, confidence, and provider provenance.
 The output is schema validated and cannot mutate source or session state.
 
 A human explicitly accepts or rejects a proposal. Only accepted proposals can
-be applied through a constrained quick edit. Manual human edits are also
-allowed. Every mutation requires the expected revision, creates a new
-in-memory revision, records before/after values and actor identity, and
-triggers deterministic revalidation.
+be edited and Previewed; Apply requires the exact current Preview. Manual
+human findings and human-judgment rules are also supported. Every mutation
+requires the expected Session revision, records actor/provenance, and Apply
+triggers deterministic revalidation. Undo/redo and Exact Reset preserve the
+immutable source authority.
 
 ### Export
 
 Export is a self-contained JSON bundle with:
 
 - review document;
+- Session, Patch, Validation, and Diagnosis documents;
 - original source binding and current proposed animation;
 - metrics and checklist;
 - findings, decisions, adjustments, and audit history;
@@ -87,9 +90,10 @@ Export does not require GIF, MP4, screenshot, or local Creator cache.
 
 ## Contracts
 
-### Animation Review Document 1.0
+### Review, Session, Patch, Validation, and Diagnosis 1.0
 
-The document uses SemVer `1.0.0`. Its stable public concepts are:
+Every document uses SemVer `1.0.0`, closed fields, stable diagnostics, and
+deterministic canonical serialization. Stable public concepts include:
 
 - subject;
 - metrics;
@@ -99,6 +103,11 @@ The document uses SemVer `1.0.0`. Its stable public concepts are:
 - adjustment;
 - audit entry;
 - review status and revision.
+- source/authoritative/Preview states, optimistic Session revision, and
+  bounded history;
+- six closed Patch operations: pivot offset, rotation offset, keyframe time,
+  keyframe value, curve, and layer order;
+- automatic and human-judgment Validation plus provenance-bearing Diagnosis.
 
 New optional fields may be added within the 1.x line only after compatibility
 tests. Unknown major/minor versions fail closed until implemented.
@@ -114,7 +123,7 @@ Requests and responses are plain JSON with:
 - command-specific payload;
 - either a complete snapshot or a stable failure.
 
-Commands are `describe`, `select-clip`, `play`, `pause`, `seek`, `step`,
+Commands are `describe`, `observe-playback`, `select-clip`, `play`, `pause`, `seek`, `step`,
 `set-rate`, `set-loop`, `set-overlay`, and `exact-reset`. An adapter may
 declare a command unavailable, but it cannot silently reinterpret it.
 
@@ -145,8 +154,9 @@ The service owns:
 - one selected fixture/adapter;
 - bounded request parsing and revision conflict handling;
 - safe declared asset serving;
-- process-lifetime workspace state;
-- explicit export responses.
+- persistent Session authority shared by Panel and standalone;
+- atomic, safe-root Session and export publication with restart restore;
+- explicit export responses and duplicate request replay.
 
 It binds only to `127.0.0.1` or `::1`. It has no remote server mode,
 authentication credential store, file-upload surface, directory browser, or
@@ -154,8 +164,10 @@ source overwrite endpoint.
 
 ### Shared Workspace UI
 
-One dependency-free TypeScript module owns layout, status, controls, preview,
-structure, timeline, findings, checklist, decisions, quick edit, and export.
+One dependency-free TypeScript module owns layout, status, controls,
+Before/After Preview, structure, timeline, findings, Patch parameter editing,
+validation, human findings/rules, history, undo/redo/reset, save/load, and
+export.
 Host adapters provide transport:
 
 - Cocos Panel transport uses `Editor.Message.request`;
@@ -171,6 +183,10 @@ The Cocos boundary:
 - validates the protocol request before action;
 - invokes real playback/overlay/reset operations;
 - snapshots the runtime and portable preview state;
+- hydrates accepted runtime resources and owns one disposable editor-mode tick
+  only while the Scene Component is live;
+- mirrors successful Panel playback mutations to the local adapter while
+  preserving the Cocos snapshot as live Scene authority;
 - fails on absent/ambiguous runtime or stale request;
 - preserves existing lifecycle, input, renderer, and Scene ownership.
 
@@ -182,6 +198,10 @@ The Cocos boundary:
   files, below the real fixture root, and a supported safe type.
 - Request bodies have a fixed byte ceiling and JSON content type.
 - State mutations require an expected revision and same-origin mutation token.
+- Adapter request IDs are idempotent for identical content and rejected when
+  reused for different content.
+- Persistent filenames derive only from bounded IDs; symlinks, non-files,
+  traversal, partial writes, and unsafe export roots fail closed.
 - Logs use review/session IDs and stable diagnostics, not private file names,
   absolute paths, asset hashes, or request bodies.
 - Source animation documents and accepted assets are read-only.

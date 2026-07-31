@@ -143,13 +143,19 @@ local judgment but cannot be a mandatory input to remote checks.
 
 PROGRAM-015D review code, tests, the local service, and both UI hosts use only
 public, programmatic, synthetic, or Accepted Repository Asset fixtures.
-`artifacts/experimental/` is not a review-library root and remains opaque:
-the service and adapters must not list, search, watch, hash, log, serve, or
-accept a path below it.
+`artifacts/experimental/` is not a review-fixture or asset-library root and
+remains opaque to adapters: they must not list, search, watch, hash, log, or
+serve asset inputs below it. A local operator may explicitly select a bounded
+PROGRAM review subdirectory below it as `--session-root` or `--export-root`.
+That exception covers only exact versioned Session/export filenames created
+by the local store; it does not authorize asset discovery or publication.
 
 Review documents and proposed animation revisions do not promote asset bytes.
-The default workspace keeps them in memory and exports them explicitly to the
-user; it does not overwrite accepted source clips or create tracked evidence.
+The default workspace atomically persists them under ignored `.gameai/` safe
+roots and exports them explicitly to the user; it does not overwrite accepted
+source clips or create tracked evidence. Session/export files directed to an
+experimental PROGRAM root remain ignored, untracked, local-only, and are
+never CI or PR inputs.
 If a review export, proposed animation, screenshot, video, or other derivative
 of a Local Experimental Asset is prepared for Git or any remote surface, both
 the required source closure and derivative enter Repository Candidate review

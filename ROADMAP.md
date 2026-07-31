@@ -87,7 +87,7 @@ v0.5.0 is a prerelease production-character vertical-slice baseline. It does
 not claim a complete game, general art-production system, Windows support,
 cross-engine adapters, audio/gameplay execution, or a complete editor UI.
 
-## PROGRAM-015D — Animation Review Workspace — External review pending
+## PROGRAM-015D — Animation Review Workspace — Final acceptance pending
 
 - TASK-015D1: versioned Review Document and Engine Adapter Protocol contracts,
   deterministic metrics/findings/checklist, immutable review state, and
@@ -102,8 +102,12 @@ cross-engine adapters, audio/gameplay execution, or a complete editor UI.
   `feat/task-015d-animation-review-workspace`, followed by one Draft PR and a
   single external code/UI/Creator review
 
-TASK-015D1–D4 implementation is complete. The feature remains unreleased and
-unmerged until its Draft PR passes the one combined external review gate.
+TASK-015D1–D4 implementation is complete. Independent external code/UI/
+Creator review produced one centralized remediation: versioned persistent
+Sessions, six-kind Patch Preview/Apply, human Finding/Rule authoring,
+undo/redo/reset, atomic storage, lightweight observation, and one shared
+Panel/Standalone Session authority. The feature remains unreleased and
+unmerged until exact-head acceptance and CI pass.
 
 PROGRAM-015D is a bounded review and correction workspace, not a complete
 animation authoring suite. It does not add IK, blending, automatic repair,

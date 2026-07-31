@@ -18,14 +18,23 @@ Create an engine-neutral `@gameai/animation-review-core` package and a
 separate versioned Engine Adapter Protocol.
 
 The core owns JSON Schema parsing, stable diagnostics, metrics, findings,
-checklist, review revisions, decisions, adjustments, assistant-provider
-validation, and deterministic export. It operates on portable IDs, numbers,
-arrays, records, animation tracks, and 2D affine transforms.
+checklist, Review, Session, Patch, Validation and Diagnosis revisions,
+assistant-provider validation, six-kind Patch transitions, deterministic
+serialization, undo/redo, and exact reset. It operates on portable IDs,
+numbers, arrays, records, animation tracks, and 2D affine transforms.
 
 The Cocos bridge lives under the existing Creator extension/runtime boundary.
 It validates portable requests, locates an explicitly supported live runtime,
 invokes real runtime operations, and returns a portable snapshot. No Cocos
 object or identifier crosses the protocol.
+
+Creator Scene Script execution is outside the normal Component lifecycle in
+edit mode. The bridge therefore hydrates the accepted SpriteFrame through
+AssetDB, calls the runtime's existing public rebuild boundary once when no
+runtime root exists, and owns one `WeakMap`-deduplicated editor tick per live
+Component. The tick is removed when the Component or Scene becomes inactive.
+Loop clocks are normalized only in the returned JSON snapshot; the accepted
+runtime and its monotonic playback state remain unchanged.
 
 ```text
 review core types/state
@@ -41,6 +50,10 @@ actual supported runtime
 
 - The same review document and analyzer can be used from tests, standalone,
   Cocos, and future adapters.
+- AI output enters only as `AI_PROPOSED`; a human decision and a matching
+  Preview are mandatory before Apply can change Session authority.
+- Pivot offset, rotation offset, keyframe time, keyframe value, curve, and
+  layer order are closed, executable Patch kinds with bounded targets.
 - Cocos continues to own actual engine state and lifecycle.
 - Adapter snapshots may differ in optional host diagnostics, but required
   playback/structure/timeline semantics are versioned and portable.

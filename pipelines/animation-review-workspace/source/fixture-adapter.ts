@@ -3,19 +3,36 @@ import { readFile, realpath, stat } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
 import {
-  appendAnimationReviewProviderProposal,
-  applyAnimationReviewAdjustment,
-  AnimationReviewError,
-  createAnimationReviewDocument,
-  createDeterministicAnimationAssistantProposal,
-  decideAnimationReviewFinding,
+  applyAnimationReviewPatch,
+  decideAnimationReviewHumanRule,
+  decideAnimationReviewPatch,
+  editAnimationReviewPatch,
+  exactResetAnimationReviewSession,
+  previewAnimationReviewPatch,
+  proposeAnimationReviewPatch,
+  redoAnimationReviewSession,
+  resolveAnimationReviewFindingInSession,
+  runAnimationReviewAssistant,
+  serializeAnimationReviewSession,
+  undoAnimationReviewSession,
+  createAnimationReviewSession,
+  createAnimationReviewHumanFinding,
+  createAnimationReviewHumanRule,
   serializeAnimationReviewDocument,
   type AnimationReviewAdapterRequest,
   type AnimationReviewAdapterSnapshot,
   type AnimationReviewDocument,
   type AnimationReviewOverlay,
   type AnimationReviewOverlayPrimitive,
-  type ReviewAdjustmentInput,
+  type AnimationReviewHumanRuleDecisionInput,
+  type AnimationReviewHumanFindingInput,
+  type AnimationReviewHumanRuleCreateInput,
+  type AnimationReviewPatchActionInput,
+  type AnimationReviewPatchDecisionInput,
+  type AnimationReviewPatchDocument,
+  type AnimationReviewPatchEditInput,
+  type AnimationReviewRevisionInput,
+  type AnimationReviewSessionDocument,
   type ReviewDecisionInput,
 } from "@gameai/animation-review-core";
 import {
@@ -49,6 +66,7 @@ const OVERLAYS: readonly AnimationReviewOverlay[] = [
 ];
 const COMMANDS: readonly AnimationReviewAdapterRequest["command"][] = [
   "describe",
+  "observe-playback",
   "select-clip",
   "play",
   "pause",
@@ -102,9 +120,11 @@ export interface RedCapFixtureAdapterOptions {
   readonly fixtureRoot: string;
   readonly nowMilliseconds?: () => number;
   readonly createdAt?: string;
+  readonly restoredSessions?: readonly AnimationReviewSessionDocument[];
 }
 
 export interface ReviewMutationResult {
+  readonly session: AnimationReviewSessionDocument;
   readonly review: AnimationReviewDocument;
   readonly snapshot: AnimationReviewAdapterSnapshot;
 }
@@ -122,11 +142,7 @@ export class RedCapFixtureAdapter {
   readonly #nowMilliseconds: () => number;
   readonly #createdAt: string;
   readonly #rigJointIds: readonly string[];
-  readonly #reviews: Record<StandaloneClipId, AnimationReviewDocument>;
-  readonly #proposedAnimations: Record<
-    StandaloneClipId,
-    NormalizedRigAnimation
-  >;
+  readonly #sessions: Record<StandaloneClipId, AnimationReviewSessionDocument>;
   #revision = 0;
   #clipId: StandaloneClipId = "rest";
   #status: "playing" | "paused" | "stopped" = "stopped";
@@ -179,21 +195,25 @@ export class RedCapFixtureAdapter {
     this.declaredAssets = new Set(
       this.#layout.parts.map((part) => part.file),
     );
-    this.#proposedAnimations = { ...this.#clips };
-    this.#reviews = Object.fromEntries(
+    this.#sessions = Object.fromEntries(
       STANDALONE_CLIP_IDS.map((clipId) => [
         clipId,
-        createAnimationReviewDocument({
-          reviewId: `workspace-${clipId}`,
+        createAnimationReviewSession({
+          sessionId: `red-cap-production-v1-${clipId}`,
           sourceRevision: this.sourceRevision,
           characterId: this.#character.characterId,
+          activeClipId: clipId,
           animation: this.#clips[clipId],
           rigJointIds: this.#rigJointIds,
+          parts: this.#layout.parts.map((part) => ({
+            partId: part.partId,
+            drawOrder: part.drawOrder,
+          })),
           createdAt: this.#createdAt,
           actorId: "workspace-validator",
         }),
       ]),
-    ) as Record<StandaloneClipId, AnimationReviewDocument>;
+    ) as Record<StandaloneClipId, AnimationReviewSessionDocument>;
     this.#loop = this.#clips.rest.loop;
   }
 
@@ -262,7 +282,7 @@ export class RedCapFixtureAdapter {
     for (const part of layout.value.parts) {
       await resolveDeclaredAsset(fixtureRoot, new Set([part.file]), part.file);
     }
-    return new RedCapFixtureAdapter({
+    const adapter = new RedCapFixtureAdapter({
       fixtureRoot,
       character: character.value,
       layout: layout.value,
@@ -276,6 +296,10 @@ export class RedCapFixtureAdapter {
       nowMilliseconds: options.nowMilliseconds ?? Date.now,
       createdAt: options.createdAt ?? new Date().toISOString(),
     });
+    if (options.restoredSessions !== undefined) {
+      adapter.restoreSessions(options.restoredSessions);
+    }
+    return adapter;
   }
 
   execute(request: AnimationReviewAdapterRequest): AnimationReviewAdapterSnapshot {
@@ -297,6 +321,7 @@ export class RedCapFixtureAdapter {
     }
     switch (request.command) {
       case "describe":
+      case "observe-playback":
         break;
       case "select-clip": {
         const clipId = request.payload.clipId as StandaloneClipId;
@@ -349,11 +374,10 @@ export class RedCapFixtureAdapter {
         this.#touch();
         break;
       case "exact-reset":
-        this.#clipId = "rest";
         this.#status = "stopped";
         this.#time = 0;
         this.#rate = 1;
-        this.#loop = this.#clips.rest.loop;
+        this.#loop = this.#clips[this.#clipId].loop;
         for (const overlay of OVERLAYS) this.#overlays[overlay] = false;
         this.#touch();
         break;
@@ -363,7 +387,8 @@ export class RedCapFixtureAdapter {
 
   snapshot(): AnimationReviewAdapterSnapshot {
     this.#advanceClock();
-    const animation = this.currentAnimation();
+    const presentation = this.presentationState();
+    const animation = presentation.animation;
     const effectiveAnimation = Object.freeze({
       ...animation,
       loop: this.#loop,
@@ -372,8 +397,12 @@ export class RedCapFixtureAdapter {
       this.#hierarchy,
       sampleRigAnimation(effectiveAnimation, this.#time),
     );
+    const presentationParts = new Map(
+      presentation.parts.map((part) => [part.partId, part]),
+    );
     const parts = this.#layout.parts.map((part) => {
       const joint = pose.joints[part.partId]!;
+      const presentationPart = presentationParts.get(part.partId)!;
       const width = part.originalRect.width * this.#layout.referenceScale;
       const height = part.originalRect.height * this.#layout.referenceScale;
       const anchor = { x: part.anchor.x, y: 1 - part.anchor.y };
@@ -385,7 +414,7 @@ export class RedCapFixtureAdapter {
         partId: part.partId,
         parentId: part.parentId,
         assetUrl: encodeAssetPath(part.file),
-        drawOrder: part.drawOrder,
+        drawOrder: presentationPart.drawOrder,
         width,
         height,
         anchor,
@@ -395,8 +424,8 @@ export class RedCapFixtureAdapter {
           b: 0,
           c: 0,
           d: 1,
-          tx: visualOffset.x,
-          ty: visualOffset.y,
+          tx: visualOffset.x + presentationPart.pivotOffset.x,
+          ty: visualOffset.y + presentationPart.pivotOffset.y,
         }),
       };
     });
@@ -442,18 +471,76 @@ export class RedCapFixtureAdapter {
         sourceRevision: this.sourceRevision,
         declaredAssetCount: this.declaredAssets.size,
         hierarchyJointCount: this.#hierarchy.length,
-        processLocal: true,
+        sessionId: this.sessionDocument().sessionId,
+        sessionRevision: this.sessionDocument().revision,
+        previewPatchId: this.sessionDocument().preview?.patchId ?? "none",
+        authority: this.sessionDocument().preview === null ? "source-or-applied" : "preview",
+        playbackObservation: "lightweight-observe-playback",
+        persistenceBoundary: "local-review-service",
         sourceReadOnly: true,
       },
     };
   }
 
   reviewDocument(): AnimationReviewDocument {
-    return this.#reviews[this.#clipId];
+    return this.sessionDocument().review;
+  }
+
+  sessionDocument(): AnimationReviewSessionDocument {
+    return this.#sessions[this.#clipId];
+  }
+
+  sessionDocuments(): readonly AnimationReviewSessionDocument[] {
+    return STANDALONE_CLIP_IDS.map((clipId) => this.#sessions[clipId]);
+  }
+
+  restoreSessions(
+    sessions: readonly AnimationReviewSessionDocument[],
+  ): void {
+    let active: AnimationReviewSessionDocument | undefined;
+    for (const session of sessions) {
+      const clipId = session.activeClipId as StandaloneClipId;
+      if (
+        !STANDALONE_CLIP_IDS.includes(clipId) ||
+        session.characterId !== this.#character.characterId ||
+        session.rigId !== this.#layout.layoutId ||
+        session.sourceRevision !== this.sourceRevision ||
+        session.authoritativeState.animation.animationId !==
+          this.#clips[clipId].animationId
+      ) {
+        throw workspaceError(
+          "WORKSPACE_SESSION_SOURCE_MISMATCH",
+          `Session ${session.sessionId} does not match the accepted fixture source.`,
+        );
+      }
+      this.#sessions[clipId] = session;
+      if (
+        active === undefined ||
+        session.updatedAt > active.updatedAt ||
+        (session.updatedAt === active.updatedAt &&
+          session.revision > active.revision)
+      ) {
+        active = session;
+      }
+    }
+    if (active === undefined) return;
+    this.#clipId = active.activeClipId as StandaloneClipId;
+    this.#loop = this.#clips[this.#clipId].loop;
+    this.#time = 0;
+    this.#status = "stopped";
   }
 
   currentAnimation(): NormalizedRigAnimation {
-    return this.#proposedAnimations[this.#clipId];
+    return this.presentationState().animation;
+  }
+
+  authoritativeAnimation(): NormalizedRigAnimation {
+    return this.sessionDocument().authoritativeState.animation;
+  }
+
+  presentationState(): AnimationReviewSessionDocument["authoritativeState"] {
+    const session = this.sessionDocument();
+    return session.preview?.state ?? session.authoritativeState;
   }
 
   originalAnimationText(): string {
@@ -465,55 +552,105 @@ export class RedCapFixtureAdapter {
     readonly actorId: string;
     readonly createdAt: string;
   }): ReviewMutationResult {
-    const current = this.reviewDocument();
-    if (input.expectedRevision !== current.revision) {
-      throw new AnimationReviewError(
-        "REVIEW_REVISION_INVALID",
-        `Expected revision ${input.expectedRevision}, current revision is ${current.revision}.`,
-        "/expectedRevision",
-      );
-    }
-    const proposal = createDeterministicAnimationAssistantProposal(
-      current,
-      this.currentAnimation(),
-      input.createdAt,
+    return this.#commitSession(
+      runAnimationReviewAssistant(
+        this.sessionDocument(),
+        this.#rigJointIds,
+        input,
+      ),
     );
-    return this.#appendProposal(proposal, input.actorId, input.createdAt);
   }
 
-  appendProviderProposal(
-    proposal: unknown,
-    input: { readonly actorId: string; readonly createdAt: string },
+  proposePatch(patch: AnimationReviewPatchDocument): ReviewMutationResult {
+    return this.#commitSession(
+      proposeAnimationReviewPatch(this.sessionDocument(), patch),
+    );
+  }
+
+  decidePatch(input: AnimationReviewPatchDecisionInput): ReviewMutationResult {
+    return this.#commitSession(
+      decideAnimationReviewPatch(this.sessionDocument(), input),
+    );
+  }
+
+  editPatch(input: AnimationReviewPatchEditInput): ReviewMutationResult {
+    return this.#commitSession(
+      editAnimationReviewPatch(this.sessionDocument(), input),
+    );
+  }
+
+  previewPatch(input: AnimationReviewPatchActionInput): ReviewMutationResult {
+    return this.#commitSession(
+      previewAnimationReviewPatch(this.sessionDocument(), input),
+    );
+  }
+
+  applyPatch(input: AnimationReviewPatchActionInput): ReviewMutationResult {
+    return this.#commitSession(
+      applyAnimationReviewPatch(
+        this.sessionDocument(),
+        this.#rigJointIds,
+        input,
+      ),
+    );
+  }
+
+  undo(input: AnimationReviewRevisionInput): ReviewMutationResult {
+    return this.#commitSession(
+      undoAnimationReviewSession(this.sessionDocument(), input),
+    );
+  }
+
+  redo(input: AnimationReviewRevisionInput): ReviewMutationResult {
+    return this.#commitSession(
+      redoAnimationReviewSession(this.sessionDocument(), input),
+    );
+  }
+
+  decideHumanRule(
+    input: AnimationReviewHumanRuleDecisionInput,
   ): ReviewMutationResult {
-    return this.#appendProposal(proposal, input.actorId, input.createdAt);
+    return this.#commitSession(
+      decideAnimationReviewHumanRule(this.sessionDocument(), input),
+    );
   }
 
-  decideReviewFinding(input: ReviewDecisionInput): ReviewMutationResult {
-    this.#reviews[this.#clipId] = decideAnimationReviewFinding(
-      this.reviewDocument(),
-      input,
+  createHumanFinding(
+    input: AnimationReviewHumanFindingInput,
+  ): ReviewMutationResult {
+    return this.#commitSession(
+      createAnimationReviewHumanFinding(this.sessionDocument(), input),
     );
-    this.#touch();
-    return { review: this.reviewDocument(), snapshot: this.snapshot() };
   }
 
-  applyReviewAdjustment(input: ReviewAdjustmentInput): ReviewMutationResult {
-    const adjusted = applyAnimationReviewAdjustment(
-      this.reviewDocument(),
-      this.currentAnimation(),
-      this.#rigJointIds,
-      input,
+  createHumanRule(
+    input: AnimationReviewHumanRuleCreateInput,
+  ): ReviewMutationResult {
+    return this.#commitSession(
+      createAnimationReviewHumanRule(this.sessionDocument(), input),
     );
-    this.#reviews[this.#clipId] = adjusted.document;
-    this.#proposedAnimations[this.#clipId] = adjusted.animation;
-    this.#time = this.#boundedTime(this.#time);
-    this.#touch();
-    return { review: adjusted.document, snapshot: this.snapshot() };
+  }
+
+  resolveFinding(input: ReviewDecisionInput): ReviewMutationResult {
+    return this.#commitSession(
+      resolveAnimationReviewFindingInSession(this.sessionDocument(), input),
+    );
+  }
+
+  resetSession(input: AnimationReviewRevisionInput): ReviewMutationResult {
+    return this.#commitSession(
+      exactResetAnimationReviewSession(
+        this.sessionDocument(),
+        this.#rigJointIds,
+        input,
+      ),
+    );
   }
 
   exportBundle(): unknown {
     const review = this.reviewDocument();
-    const proposedAnimation = this.currentAnimation();
+    const session = this.sessionDocument();
+    const proposedAnimation = this.authoritativeAnimation();
     const originalText = this.originalAnimationText();
     return {
       exportVersion: "1.0.0",
@@ -531,32 +668,30 @@ export class RedCapFixtureAdapter {
         clipId: this.#clipId,
       },
       review,
+      session,
       originalAnimation: JSON.parse(originalText) as unknown,
       proposedAnimation,
       manifest: {
         algorithm: "sha256",
         reviewSha256: sha256([serializeAnimationReviewDocument(review)]),
+        sessionSha256: sha256([serializeAnimationReviewSession(session)]),
         originalAnimationSha256: sha256([originalText]),
         proposedAnimationSha256: sha256([canonicalJson(proposedAnimation)]),
       },
     };
   }
 
-  #appendProposal(
-    proposal: unknown,
-    actorId: string,
-    createdAt: string,
+  #commitSession(
+    session: AnimationReviewSessionDocument,
   ): ReviewMutationResult {
-    const current = this.reviewDocument();
-    const next = appendAnimationReviewProviderProposal(current, proposal, {
-      actorId,
-      createdAt,
-    });
-    if (next !== current) {
-      this.#reviews[this.#clipId] = next;
-      this.#touch();
-    }
-    return { review: this.reviewDocument(), snapshot: this.snapshot() };
+    this.#sessions[this.#clipId] = session;
+    this.#time = this.#boundedTime(this.#time);
+    this.#touch();
+    return {
+      session,
+      review: session.review,
+      snapshot: this.snapshot(),
+    };
   }
 
   #touch(): void {

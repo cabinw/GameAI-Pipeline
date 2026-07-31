@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review-patch/1.0.0",
+  "title": "GameAI Animation Review Patch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "patchId",
+    "expectedRevision",
+    "source",
+    "status",
+    "operation",
+    "actorId",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "patchId": { "$ref": "#/$defs/id" },
+    "findingId": { "$ref": "#/$defs/id" },
+    "expectedRevision": { "type": "integer", "minimum": 0 },
+    "source": { "enum": ["ai", "human"] },
+    "status": {
+      "enum": [
+        "AI_PROPOSED",
+        "HUMAN_ACCEPTED",
+        "HUMAN_REJECTED",
+        "PREVIEWED",
+        "APPLIED"
+      ]
+    },
+    "operation": {
+      "oneOf": [
+        { "$ref": "#/$defs/pivotOffset" },
+        { "$ref": "#/$defs/rotationOffset" },
+        { "$ref": "#/$defs/keyframeTime" },
+        { "$ref": "#/$defs/keyframeValue" },
+        { "$ref": "#/$defs/curve" },
+        { "$ref": "#/$defs/layerOrder" }
+      ]
+    },
+    "actorId": { "$ref": "#/$defs/id" },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "updatedAt": { "$ref": "#/$defs/timestamp" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "timestamp": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["trackIndex", "keyframeIndex"],
+      "properties": {
+        "trackIndex": { "type": "integer", "minimum": 0, "maximum": 9999 },
+        "keyframeIndex": { "type": "integer", "minimum": 0, "maximum": 99999 }
+      }
+    },
+    "pivotOffset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "partId", "offset"],
+      "properties": {
+        "kind": { "const": "pivot-offset" },
+        "partId": { "$ref": "#/$defs/id" },
+        "offset": { "$ref": "#/$defs/vector" }
+      }
+    },
+    "rotationOffset": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/target" },
+        {
+          "type": "object",
+          "required": ["kind", "deltaDegrees"],
+          "properties": {
+            "kind": { "const": "rotation-offset" },
+            "deltaDegrees": { "type": "number", "minimum": -3600, "maximum": 3600 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "keyframeTime": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/target" },
+        {
+          "type": "object",
+          "required": ["kind", "time"],
+          "properties": {
+            "kind": { "const": "keyframe-time" },
+            "time": { "type": "number", "minimum": 0 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "keyframeValue": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/target" },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "keyframe-value" },
+            "value": {
+              "oneOf": [
+                { "type": "number" },
+                { "$ref": "#/$defs/vector" }
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "curve": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/target" },
+        {
+          "type": "object",
+          "required": ["kind", "interpolation", "easing"],
+          "properties": {
+            "kind": { "const": "curve" },
+            "interpolation": { "enum": ["linear", "step"] },
+            "easing": {
+              "enum": [
+                "linear",
+                "ease-in-sine",
+                "ease-out-sine",
+                "ease-in-out-sine"
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "layerOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "partId", "drawOrder"],
+      "properties": {
+        "kind": { "const": "layer-order" },
+        "partId": { "$ref": "#/$defs/id" },
+        "drawOrder": { "type": "integer", "minimum": -1000000, "maximum": 1000000 }
+      }
+    }
+  }
+}

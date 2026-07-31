@@ -38,6 +38,22 @@ describe("Character Rig Builder extension manifest", () => {
       ["reviewAnimation"],
     );
     assert.deepEqual(
+      value.contributions.messages["review-workspace"]?.methods,
+      ["reviewWorkspace"],
+    );
+    assert.deepEqual(
+      value.contributions.messages["review-workspace-action"]?.methods,
+      ["reviewWorkspaceAction"],
+    );
+    assert.deepEqual(
+      value.contributions.messages["save-animation-review-session"]?.methods,
+      ["saveAnimationReviewSession"],
+    );
+    assert.deepEqual(
+      value.contributions.messages["sync-animation-review-adapter"]?.methods,
+      ["syncAnimationReviewAdapter"],
+    );
+    assert.deepEqual(
       value.contributions.messages["open-animation-review-panel"]?.methods,
       ["openAnimationReviewPanel"],
     );

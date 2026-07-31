@@ -35,6 +35,7 @@ export type {
   AnimationReviewTimelineTrack,
   CreateAnimationReviewInput,
   ParseAdapterRequestResult,
+  ParseAdapterResponseResult,
   ParseAnimationReviewProviderProposalResult,
   ParseAnimationReviewResult,
   ReviewCategory,
@@ -48,6 +49,48 @@ export type {
   ReviewSeverity,
   ReviewSuggestion,
 } from "./types";
+export {
+  ANIMATION_REVIEW_DIAGNOSIS_SCHEMA_VERSION,
+  ANIMATION_REVIEW_PATCH_SCHEMA_VERSION,
+  ANIMATION_REVIEW_SESSION_LIMITS,
+  ANIMATION_REVIEW_SESSION_SCHEMA_VERSION,
+  ANIMATION_REVIEW_VALIDATION_SCHEMA_VERSION,
+} from "./session-types";
+export type {
+  AnimationReviewCurveOperation,
+  AnimationReviewDiagnosis,
+  AnimationReviewEditableState,
+  AnimationReviewHistoryEntry,
+  AnimationReviewHumanRuleDecisionInput,
+  AnimationReviewHumanFindingInput,
+  AnimationReviewHumanRuleCreateInput,
+  AnimationReviewKeyframeTimeOperation,
+  AnimationReviewKeyframeValueOperation,
+  AnimationReviewLayerOrderOperation,
+  AnimationReviewPatchActionInput,
+  AnimationReviewPatchDecisionInput,
+  AnimationReviewPatchDocument,
+  AnimationReviewPatchEditInput,
+  AnimationReviewPatchOperation,
+  AnimationReviewPatchSource,
+  AnimationReviewPatchStatus,
+  AnimationReviewPivotOffsetOperation,
+  AnimationReviewPresentationPart,
+  AnimationReviewPreviewState,
+  AnimationReviewRevisionInput,
+  AnimationReviewRotationOffsetOperation,
+  AnimationReviewRuleKind,
+  AnimationReviewRuleStatus,
+  AnimationReviewSessionAuditAction,
+  AnimationReviewSessionAuditEntry,
+  AnimationReviewSessionDocument,
+  AnimationReviewValidationResult,
+  CreateAnimationReviewSessionInput,
+  ParseAnimationReviewPatchResult,
+  ParseAnimationReviewValidationResult,
+  ParseAnimationReviewDiagnosisResult,
+  ParseAnimationReviewSessionResult,
+} from "./session-types";
 export { applyAnimationReviewAdjustment } from "./adjustment";
 export { analyzeRigAnimation } from "./analyzer";
 export { AnimationReviewError, sortReviewDiagnostics } from "./diagnostics";
@@ -57,7 +100,9 @@ export {
 } from "./parser";
 export {
   parseAnimationReviewAdapterRequest,
+  parseAnimationReviewAdapterResponse,
   validateAnimationReviewAdapterRequest,
+  validateAnimationReviewAdapterResponse,
 } from "./protocol";
 export {
   createAnimationReviewDocument,
@@ -71,5 +116,40 @@ export {
 } from "./provider";
 export {
   animationReviewEngineAdapterSchema,
+  animationReviewPatchSchema,
   animationReviewSchema,
+  animationReviewSessionSchema,
+  animationReviewValidationSchema,
+  animationReviewDiagnosisSchema,
 } from "./schema";
+export {
+  parseAnimationReviewPatch,
+  parseAnimationReviewValidation,
+  parseAnimationReviewDiagnosis,
+  parseAnimationReviewSession,
+  serializeAnimationReviewPatch,
+  serializeAnimationReviewValidation,
+  serializeAnimationReviewDiagnosis,
+  serializeAnimationReviewSession,
+  validateAnimationReviewValidation,
+  validateAnimationReviewDiagnosis,
+  validateAnimationReviewPatch,
+  validateAnimationReviewSession,
+} from "./session-parser";
+export {
+  applyAnimationReviewPatch,
+  applyAnimationReviewPatchOperation,
+  createAnimationReviewSession,
+  decideAnimationReviewHumanRule,
+  createAnimationReviewHumanFinding,
+  createAnimationReviewHumanRule,
+  decideAnimationReviewPatch,
+  editAnimationReviewPatch,
+  exactResetAnimationReviewSession,
+  previewAnimationReviewPatch,
+  proposeAnimationReviewPatch,
+  redoAnimationReviewSession,
+  resolveAnimationReviewFindingInSession,
+  runAnimationReviewAssistant,
+  undoAnimationReviewSession,
+} from "./session";

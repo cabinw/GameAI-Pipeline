@@ -14,6 +14,8 @@ export interface CocosAnimationReviewRuntime {
   animationReviewExecute(
     request: AnimationReviewAdapterRequest,
   ): AnimationReviewAdapterSnapshot;
+  animationReviewSnapshot?(): AnimationReviewAdapterSnapshot;
+  rebuild?(): void;
 }
 
 interface RuntimeFailure {
@@ -46,6 +48,7 @@ export function animationReviewFailure(
     requestId: identity(value, "requestId", "invalid-request"),
     adapterId: identity(value, "adapterId", COCOS_RED_CAP_REVIEW_ADAPTER_ID),
     ok: false,
+    responseType: "error",
     error: { code, message },
   };
 }
@@ -69,6 +72,28 @@ function runtimeFailure(error: unknown): {
         : error instanceof Error
           ? error.message
           : String(error),
+  };
+}
+
+function normalizeLoopPlayback(
+  snapshot: AnimationReviewAdapterSnapshot,
+): AnimationReviewAdapterSnapshot {
+  const { duration, loop, time } = snapshot.playback;
+  if (
+    !loop ||
+    !Number.isFinite(time) ||
+    !Number.isFinite(duration) ||
+    duration <= 0 ||
+    time < duration
+  ) {
+    return snapshot;
+  }
+  return {
+    ...snapshot,
+    playback: {
+      ...snapshot.playback,
+      time: time % duration,
+    },
   };
 }
 
@@ -106,7 +131,20 @@ export function executeCocosAnimationReviewRequest(
   }
 
   try {
-    const snapshot = matches[0]!.animationReviewExecute(request);
+    const runtime = matches[0]!;
+    if (
+      runtime.rebuild !== undefined &&
+      runtime.animationReviewSnapshot !== undefined &&
+      runtime.animationReviewSnapshot().runtimeDiagnostics.runtimeRoots === 0
+    ) {
+      runtime.rebuild();
+    }
+    const runtimeSnapshot =
+      request.command === "observe-playback" &&
+      runtime.animationReviewSnapshot !== undefined
+        ? runtime.animationReviewSnapshot()
+        : runtime.animationReviewExecute(request);
+    const snapshot = normalizeLoopPlayback(runtimeSnapshot);
     if (
       snapshot.adapterId !== request.adapterId ||
       snapshot.adapterRevision < 0
@@ -117,14 +155,27 @@ export function executeCocosAnimationReviewRequest(
         "Runtime returned an invalid adapter identity or revision.",
       );
     }
-    return {
-      kind: "response",
-      protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
-      requestId: request.requestId,
-      adapterId: request.adapterId,
-      ok: true,
-      snapshot,
-    };
+    return request.command === "observe-playback"
+      ? {
+          kind: "response",
+          protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+          requestId: request.requestId,
+          adapterId: request.adapterId,
+          ok: true,
+          responseType: "playback",
+          adapterRevision: snapshot.adapterRevision,
+          playback: snapshot.playback,
+          runtimeDiagnostics: snapshot.runtimeDiagnostics,
+        }
+      : {
+          kind: "response",
+          protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+          requestId: request.requestId,
+          adapterId: request.adapterId,
+          ok: true,
+          responseType: "snapshot",
+          snapshot,
+        };
   } catch (error) {
     const failure = runtimeFailure(error);
     return animationReviewFailure(request, failure.code, failure.message);

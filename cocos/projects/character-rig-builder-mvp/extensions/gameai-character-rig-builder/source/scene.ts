@@ -40,10 +40,22 @@ import type {
 import type { NormalizedRigAnimation } from "@gameai/rig-animation";
 
 const EXTENSION_NAME = "gameai-character-rig-builder";
+const RED_CAP_REVIEW_SPRITE_FRAME_UUID =
+  "be7c6f0a-24fc-45dc-9068-83d41ec078ca@f9941";
 
 interface RigAnimationRuntimeComponent {
   configure(animation: NormalizedRigAnimation, autoplay: boolean): void;
 }
+
+interface PreparableAnimationReviewRuntime
+  extends CocosAnimationReviewRuntime {
+  atlasFrame?: SpriteFrame | null;
+}
+
+const editorReviewTimers = new WeakMap<
+  Component,
+  ReturnType<typeof setInterval>
+>();
 
 function diagnosticFromError(
   error: unknown,
@@ -83,6 +95,68 @@ function loadSpriteFrame(uuid: string, correlationId: string): Promise<SpriteFra
       resolve(asset as SpriteFrame);
     });
   });
+}
+
+async function prepareAnimationReviewRuntimes(
+  runtimes: readonly (Component & PreparableAnimationReviewRuntime)[],
+): Promise<void> {
+  for (const runtime of runtimes) {
+    if (
+      runtime.rebuild === undefined ||
+      runtime.animationReviewSnapshot === undefined ||
+      runtime.animationReviewSnapshot().runtimeDiagnostics.runtimeRoots !== 0 ||
+      runtime.atlasFrame !== null
+    ) {
+      continue;
+    }
+    runtime.atlasFrame = await loadSpriteFrame(
+      RED_CAP_REVIEW_SPRITE_FRAME_UUID,
+      "animation-review-runtime",
+    );
+  }
+}
+
+function activateAnimationReviewRuntimes(
+  runtimes: readonly (Component & PreparableAnimationReviewRuntime)[],
+): void {
+  for (const runtime of runtimes) {
+    if (
+      typeof (runtime as { update?: unknown }).update !== "function" ||
+      editorReviewTimers.has(runtime)
+    ) {
+      continue;
+    }
+    let previousTime = Date.now();
+    const stop = (): void => {
+      const timer = editorReviewTimers.get(runtime);
+      if (timer !== undefined) clearInterval(timer);
+      editorReviewTimers.delete(runtime);
+    };
+    const timer = setInterval(() => {
+      const isValid = (runtime as { isValid?: unknown }).isValid;
+      if (isValid === false || !runtime.node.activeInHierarchy) {
+        stop();
+        return;
+      }
+      const currentTime = Date.now();
+      const deltaSeconds = Math.min(
+        Math.max((currentTime - previousTime) / 1000, 0),
+        0.1,
+      );
+      previousTime = currentTime;
+      try {
+        (runtime as unknown as { update(deltaSeconds: number): void })
+          .update(deltaSeconds);
+      } catch (error) {
+        stop();
+        console.error(
+          `[${EXTENSION_NAME}] Animation review editor tick failed.`,
+          error,
+        );
+      }
+    }, 16);
+    editorReviewTimers.set(runtime, timer);
+  }
 }
 
 function configureNode(node: Node): void {
@@ -382,7 +456,7 @@ function failure(
 }
 
 export const methods = {
-  reviewAnimation(value: unknown) {
+  async reviewAnimation(value: unknown) {
     const scene = director.getScene();
     if (scene === null) {
       return executeCocosAnimationReviewRequest(value, []);
@@ -394,6 +468,8 @@ export const methods = {
       ): component is Component & CocosAnimationReviewRuntime =>
         isCocosAnimationReviewRuntime(component),
     );
+    await prepareAnimationReviewRuntimes(runtimes);
+    activateAnimationReviewRuntimes(runtimes);
     return executeCocosAnimationReviewRequest(
       value,
       runtimes,

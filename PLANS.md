@@ -5,18 +5,45 @@ time.
 
 ## Active plan: PROGRAM-015D Animation Review Workspace
 
-- Status: D1–D4 implementation and verification complete; fourth commit,
-  push, and Draft PR in progress
+- Status: independent external review complete; one centralized remediation
+  is in progress before final acceptance and integration
 - Started: 2026-07-31
 - Branch: `feat/task-015d-animation-review-workspace`
 - Exact baseline `main` / `origin/main`:
   `8e12a07619ec1bfc9c47590b862f91fbf2edf669`
-- Aggregate scope ceiling: at most 85 changed files and 20,000 changed lines;
+- Aggregate scope ceiling: at most 120 changed files and 22,000 changed lines;
   zero binary, PNG, audio, video, MP4, evidence-media, Scene, accepted-asset,
   rights, provenance, tag, Release, or protected-reference changes.
 - Commit policy: exactly four append-only feature commits, one for each of
   TASK-015D1 through TASK-015D4. Reviewed ancestors are never amended,
-  squashed, rebased, or force-pushed.
+  squashed, rebased, or force-pushed. External-review defects close in at
+  most one append-only remediation commit, followed by one documentation-only
+  acceptance commit.
+
+### External review remediation budget
+
+- Reviewed feature SHA:
+  `f99273c821f9c16e1d781c6302cffb90790a1909`.
+- Independent baseline: fresh detached frozen install plus
+  `CI=true pnpm verify`, 534/534 PASS.
+- Defect ledger: 14 complete findings recorded below the ignored local-only
+  review root; 7 are blocking and 7 are major.
+- Remediation estimate: at most 40 distinct tracked files and 10,500 changed
+  lines beyond the reviewed feature SHA. The final aggregate 120-file and
+  22,000-line ceilings remain authoritative.
+- Acceptance closeout estimate: exactly the approved `PLANS.md`, master
+  PROGRAM task, and PROGRAM acceptance document, at most 1,200 lines.
+- Zero binary/media, MP4, Scene, `.meta`, accepted-asset, rights,
+  provenance, public Character/Semantic Event/VFX schema, tag, Release, or
+  protected-reference change.
+
+The root remediation adds versioned Session/Patch contracts, executable
+six-kind reversible patches, preview/apply/undo/redo/reset semantics,
+fail-closed adapter responses and duplicate-command handling, one persistent
+loopback service authority with atomic safe-root publication, and the shared
+Standalone/Compact workflows required by the external gate. Creator remains
+the Scene and playback authority; the accepted PROGRAM-015 runtime and assets
+are not modified by remediation.
 
 ### Goal
 
@@ -42,7 +69,9 @@ Cocos Scene Adapter / Runtime
 The dependency arrows describe the owned review flow. Contracts and adapter
 messages remain engine neutral. Cocos imports stay in the Cocos extension or
 runtime boundary. The local service binds only to loopback and never scans,
-hashes, logs, or serves `artifacts/experimental/`.
+hashes, logs, or serves asset inputs from `artifacts/experimental/`. An
+explicitly configured local Session/export root may be placed in the bounded
+PROGRAM evidence directory and remains ignored, untracked, and outside CI.
 
 ### Technology and reuse decision
 
@@ -65,7 +94,8 @@ components across both hosts.
   The initial 32-file estimate was raised before the commit gate to preserve
   the pre-existing review-editor design seed as an explicit tracked input and
   to keep the two required ADR decisions independently reviewable; the
-  aggregate 85-file ceiling is unchanged.
+  original aggregate 85-file ceiling was unchanged during D1–D4; the final
+  external-review ceiling is now the approved 120 files.
 - TASK-015D2: at most 20 changed files and 5,000 lines; Cocos extension
   adapter, compact panel, message bridge, PROGRAM-015 motion runtime review
   surface, shared UI package, tests, documentation, and mechanical workspace
@@ -131,26 +161,40 @@ line ceilings remain authoritative.
    frozen tracked-files-only verification, generated/schema/metadata/links,
    scope/media/protected-reference, diff, clean-tree, service security, and
    end-to-end review-loop gates.
-7. Push the exact four-commit branch, create one Draft PR to `main`, and stop
-   at the single external code, standalone UI, compact Panel, and Creator
-   runtime review. Keep the PR Draft and unmerged.
+7. Push the exact four-commit branch and create one Draft PR to `main`.
+8. Independently review the full code/UI/Creator workflow at the locked head,
+   record one complete defect ledger, and close all in-scope defects in one
+   append-only remediation commit.
+9. Re-run focused, working-copy, fresh tracked-only, Creator, UI, persistence,
+   scope, media, schema, mirror, and protected-state gates. Only after every
+   gate passes, create one documentation-only acceptance commit, update the
+   same PR, wait for exact-head CI, mark Ready, and squash merge.
 
-### D4 implementation result
+### External-review remediation implementation
 
-The engine-neutral core now exposes provider protocol `1.0.0`, fail-closed
-proposal validation, a deterministic local animation assistant, immutable
-proposal ingestion, strict human decision transitions, and scalar-keyframe
-adjustments constrained to the accepted proposal path/range. Applying an edit
-creates a new normalized in-memory animation, reruns the shared analyzer, and
-appends both adjustment and reanalysis audit records.
+The engine-neutral core now exposes independent `1.0.0` Review, Session,
+Patch, Validation, Diagnosis, provider, and Engine Adapter contracts. Six
+closed Patch kinds execute through AI proposal → human accept/reject → edit →
+Preview → Apply → deterministic reanalysis. Source authority is immutable;
+Preview is non-authoritative; Apply records before/after history; undo, redo,
+human Finding/Rule creation, human-rule decisions, and Exact Reset are
+optimistic-revision transitions with aggregate budgets.
 
-The process-local service maintains review/proposed-animation state per Red
-Cap clip and exposes token/same-origin-protected assistant, provider,
-decision, and adjustment endpoints. The shared full UI exposes local AI,
-accept/reject/resolve/comment, bounded quick edit, automatic refreshed
-preview/checklist, decision history, and deterministic JSON export. The
-compact Cocos surface remains runtime-focused and continues to reuse the same
-controller/rendering module without acquiring source-edit authority.
+The loopback service is the single persistent Session owner for standalone
+and Compact Panel. It restores per-clip Sessions across process restart,
+atomically publishes safe-root Session/export files, rejects traversal,
+symlinks, malformed bodies, stale revisions and conflicting duplicate request
+IDs, and replays identical duplicate requests idempotently. Full polling was
+replaced with the lightweight `observe-playback` response.
+
+The shared full UI now exposes Session/character/clip status, Before/After
+Preview, Patch cards and JSON parameter editing, validation and errors,
+human-authored Finding/Rule inputs, Apply/reanalysis, undo/redo/reset,
+save/reload/export, and history. The Compact Panel uses the same Session via a
+Main-process loopback proxy and exposes playback, analysis, current Patch
+Preview/Apply, validation status, save, and Standalone entry while Cocos keeps
+live Scene/playback authority. Disconnected or stale state remains visible but
+read-only.
 
 ### Done when
 
@@ -170,9 +214,10 @@ controller/rendering module without acquiring source-edit authority.
   revalidate.
 - Focused, working-copy, frozen tracked-only, generated/schema/metadata,
   service, scope/media, protected-reference, and clean-tree gates pass.
-- The branch contains exactly four append-only commits above the exact
-  baseline. One Draft PR exists and is left at the requested external review;
-  TASK-014D4, TASK-016, `v0.6.0`, merge, Tag, and Release remain untouched.
+- The branch preserves the exact four reviewed append-only commits, adds at
+  most one remediation commit and one documentation-only acceptance commit,
+  then updates the existing PR for final CI and squash merge. TASK-014D4,
+  TASK-016, `v0.6.0`, Tag, and Release remain untouched.
 
 ## Completed plan: v0.5.0 Production Character Vertical Slice Baseline
 
