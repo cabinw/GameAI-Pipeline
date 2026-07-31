@@ -47,6 +47,7 @@ test("serves a usable loopback workspace, accepted assets, adapter API, and expo
       response.text(),
     );
     assert.match(app, /mountAnimationReviewWorkspace/);
+    assert.match(app, /api\/review/);
     const ui = await fetch(`${running.url}/ui/index.js`).then((response) =>
       response.text(),
     );
@@ -119,6 +120,145 @@ test("serves a usable loopback workspace, accepted assets, adapter API, and expo
       bundle.originalAnimation.animationId,
       "red-cap-production-v1-rest",
     );
+  } finally {
+    await running.close();
+  }
+});
+
+test("serves an end-to-end AI and human review loop with optimistic review revisions", async () => {
+  const adapter = await RedCapFixtureAdapter.load({
+    fixtureRoot: resolve(repositoryRoot, "examples/red-cap-production-v1"),
+    nowMilliseconds: () => 0,
+    createdAt: "2026-07-31T00:00:00.000Z",
+  });
+  const running = await startAnimationReviewServer({
+    adapter,
+    mutationToken: "review-loop-token",
+    uiModulePath: resolve(
+      repositoryRoot,
+      "pipelines/animation-review-ui/dist/browser-esm/index.js",
+    ),
+  });
+  const post = (path: string, value: unknown): Promise<Response> =>
+    fetch(`${running.url}${path}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-animation-review-token": "review-loop-token",
+        origin: running.url,
+      },
+      body: JSON.stringify(value),
+    });
+  try {
+    const selected = await post("/api/adapter", {
+      ...describeRequest(),
+      requestId: "select-wave",
+      command: "select-clip",
+      expectedRevision: 0,
+      payload: { clipId: "wave" },
+    });
+    assert.equal(selected.status, 200);
+
+    const assistantResponse = await post("/api/review/assistant", {
+      expectedRevision: 0,
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:01:00.000Z",
+    });
+    assert.equal(assistantResponse.status, 200);
+    const assistant = (await assistantResponse.json()) as {
+      review: {
+        revision: number;
+        findings: Array<{
+          findingId: string;
+          code: string;
+          suggestion?: {
+            parameterPath: string;
+            proposedValue?: number;
+          };
+        }>;
+      };
+    };
+    assert.equal(assistant.review.revision, 1);
+    const finding = assistant.review.findings.find(
+      (item) => item.code === "ASSISTANT_ROTATION_RANGE_PROPOSAL",
+    )!;
+
+    const stale = await post("/api/review/decision", {
+      expectedRevision: 0,
+      decisionId: "decision-stale",
+      findingId: finding.findingId,
+      decision: "accept",
+      actorId: "reviewer",
+      note: "",
+      createdAt: "2026-07-31T00:02:00.000Z",
+    });
+    assert.equal(stale.status, 409);
+    const afterStale = (await fetch(`${running.url}/api/workspace`).then(
+      (response) => response.json(),
+    )) as { review: { revision: number; decisions: unknown[] } };
+    assert.equal(afterStale.review.revision, 1);
+    assert.equal(afterStale.review.decisions.length, 0);
+
+    const accepted = await post("/api/review/decision", {
+      expectedRevision: 1,
+      decisionId: "decision-accept",
+      findingId: finding.findingId,
+      decision: "accept",
+      actorId: "reviewer",
+      note: "Apply the local proposal.",
+      createdAt: "2026-07-31T00:02:00.000Z",
+    });
+    assert.equal(accepted.status, 200);
+    const adjusted = await post("/api/review/adjustment", {
+      expectedRevision: 2,
+      adjustmentId: "adjustment-wave",
+      findingId: finding.findingId,
+      parameterPath: finding.suggestion!.parameterPath,
+      nextValue: finding.suggestion!.proposedValue,
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:03:00.000Z",
+    });
+    assert.equal(adjusted.status, 200);
+    const adjustedValue = (await adjusted.json()) as {
+      review: { revision: number; adjustments: unknown[]; auditTrail: Array<{ action: string }> };
+    };
+    assert.equal(adjustedValue.review.revision, 3);
+    assert.equal(adjustedValue.review.adjustments.length, 1);
+    assert.equal(
+      adjustedValue.review.auditTrail.at(-1)?.action,
+      "analysis-ran",
+    );
+
+    const resolved = await post("/api/review/decision", {
+      expectedRevision: 3,
+      decisionId: "decision-resolve",
+      findingId: finding.findingId,
+      decision: "resolve",
+      actorId: "reviewer",
+      note: "Automatic reanalysis passed.",
+      createdAt: "2026-07-31T00:04:00.000Z",
+    });
+    assert.equal(resolved.status, 200);
+
+    const firstExport = await fetch(`${running.url}/api/export`).then(
+      (response) => response.json(),
+    );
+    const secondExport = await fetch(`${running.url}/api/export`).then(
+      (response) => response.json(),
+    );
+    assert.deepEqual(firstExport, secondExport);
+    assert.match(
+      (firstExport as { manifest: { proposedAnimationSha256: string } })
+        .manifest.proposedAnimationSha256,
+      /^[a-f0-9]{64}$/,
+    );
+
+    const rejectedProvider = await post("/api/review/provider", {
+      actorId: "reviewer",
+      createdAt: "2026-07-31T00:05:00.000Z",
+      proposal: { protocolVersion: "2.0.0" },
+    });
+    assert.equal(rejectedProvider.status, 409);
   } finally {
     await running.close();
   }

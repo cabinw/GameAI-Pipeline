@@ -5,8 +5,11 @@ import { extname } from "node:path";
 
 import {
   ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+  ANIMATION_REVIEW_PROVIDER_PROTOCOL_VERSION,
   validateAnimationReviewAdapterRequest,
   type AnimationReviewAdapterResponse,
+  type ReviewAdjustmentInput,
+  type ReviewDecisionInput,
 } from "@gameai/animation-review-core";
 
 import {
@@ -21,6 +24,7 @@ import {
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_URL_LENGTH = 2048;
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "::1"]);
+const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 
 export interface AnimationReviewServerOptions {
   readonly adapter: RedCapFixtureAdapter;
@@ -78,16 +82,167 @@ function failure(
 }
 
 function errorFields(error: unknown): { code: string; message: string } {
-  const code =
+  const directCode =
     typeof error === "object" &&
     error !== null &&
     "code" in error &&
     typeof (error as { code?: unknown }).code === "string"
       ? (error as { code: string }).code
-      : "WORKSPACE_REQUEST_FAILED";
+      : undefined;
+  const diagnosticCode =
+    typeof error === "object" &&
+    error !== null &&
+    "diagnostics" in error &&
+    Array.isArray((error as { diagnostics?: unknown }).diagnostics) &&
+    typeof (error as { diagnostics: Array<{ code?: unknown }> }).diagnostics[0]
+      ?.code === "string"
+      ? (error as { diagnostics: Array<{ code: string }> }).diagnostics[0]!.code
+      : undefined;
   return {
-    code,
+    code: directCode ?? diagnosticCode ?? "WORKSPACE_REQUEST_FAILED",
     message: error instanceof Error ? error.message : String(error),
+  };
+}
+
+function actionError(message: string): never {
+  throw Object.assign(new Error(message), {
+    code: "WORKSPACE_REVIEW_ACTION_INVALID",
+    status: 400,
+  });
+}
+
+function actionRecord(
+  value: unknown,
+  keys: readonly string[],
+): Record<string, unknown> {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    Array.isArray(value) ||
+    Object.keys(value).some((key) => !keys.includes(key))
+  ) {
+    return actionError("Review action body has an invalid shape.");
+  }
+  return value as Record<string, unknown>;
+}
+
+function actionId(value: unknown, field: string): string {
+  if (
+    typeof value !== "string" ||
+    value.length > 160 ||
+    !ID_PATTERN.test(value)
+  ) {
+    return actionError(`${field} must be a stable identifier.`);
+  }
+  return value;
+}
+
+function actionTime(value: unknown): string {
+  if (typeof value !== "string" || value.length === 0 || value.length > 64) {
+    return actionError("createdAt must be a bounded timestamp.");
+  }
+  return value;
+}
+
+function actionRevision(value: unknown): number {
+  if (!Number.isInteger(value) || (value as number) < 0) {
+    return actionError("expectedRevision must be a non-negative integer.");
+  }
+  return value as number;
+}
+
+function assistantInput(value: unknown): {
+  expectedRevision: number;
+  actorId: string;
+  createdAt: string;
+} {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "actorId",
+    "createdAt",
+  ]);
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function decisionInput(value: unknown): ReviewDecisionInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "decisionId",
+    "findingId",
+    "decision",
+    "actorId",
+    "note",
+    "createdAt",
+  ]);
+  if (
+    object.decision !== "accept" &&
+    object.decision !== "reject" &&
+    object.decision !== "resolve" &&
+    object.decision !== "comment"
+  ) {
+    return actionError("decision is not supported.");
+  }
+  if (typeof object.note !== "string" || object.note.length > 2_000) {
+    return actionError("note must be a bounded string.");
+  }
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    decisionId: actionId(object.decisionId, "decisionId"),
+    findingId: actionId(object.findingId, "findingId"),
+    decision: object.decision,
+    actorId: actionId(object.actorId, "actorId"),
+    note: object.note,
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function adjustmentInput(value: unknown): ReviewAdjustmentInput {
+  const object = actionRecord(value, [
+    "expectedRevision",
+    "adjustmentId",
+    "findingId",
+    "parameterPath",
+    "nextValue",
+    "actorId",
+    "createdAt",
+  ]);
+  if (
+    typeof object.parameterPath !== "string" ||
+    object.parameterPath.length === 0 ||
+    object.parameterPath.length > 500 ||
+    typeof object.nextValue !== "number" ||
+    !Number.isFinite(object.nextValue)
+  ) {
+    return actionError("Adjustment path or value is invalid.");
+  }
+  return {
+    expectedRevision: actionRevision(object.expectedRevision),
+    adjustmentId: actionId(object.adjustmentId, "adjustmentId"),
+    findingId: actionId(object.findingId, "findingId"),
+    parameterPath: object.parameterPath,
+    nextValue: object.nextValue,
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+  };
+}
+
+function providerInput(value: unknown): {
+  actorId: string;
+  createdAt: string;
+  proposal: unknown;
+} {
+  const object = actionRecord(value, ["actorId", "createdAt", "proposal"]);
+  if (!("proposal" in object)) {
+    return actionError("Provider proposal is required.");
+  }
+  return {
+    actorId: actionId(object.actorId, "actorId"),
+    createdAt: actionTime(object.createdAt),
+    proposal: object.proposal,
   };
 }
 
@@ -208,6 +363,8 @@ export async function startAnimationReviewServer(
       if (request.method === "GET" && url.pathname === "/api/bootstrap") {
         json(response, 200, {
           protocolVersion: ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+          providerProtocolVersion:
+            ANIMATION_REVIEW_PROVIDER_PROTOCOL_VERSION,
           adapterId: options.adapter.adapterId,
           mutationToken,
         });
@@ -221,28 +378,58 @@ export async function startAnimationReviewServer(
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/export") {
-        const snapshot = options.adapter.snapshot();
         json(
           response,
           200,
-          {
-            exportVersion: "1.0.0",
-            source: {
-              fixtureId: "red-cap-production-v1",
-              sourceRevision: options.adapter.sourceRevision,
-              sourceReadOnly: true,
-            },
-            snapshot,
-            review: options.adapter.reviewDocument(),
-            originalAnimation: JSON.parse(
-              options.adapter.originalAnimationText(),
-            ) as unknown,
-          },
+          options.adapter.exportBundle(),
           {
             "content-disposition":
               'attachment; filename="animation-review-export.json"',
           },
         );
+        return;
+      }
+      const reviewAction =
+        request.method === "POST" &&
+        url.pathname.startsWith("/api/review/")
+          ? url.pathname.slice("/api/review/".length)
+          : null;
+      if (
+        reviewAction === "assistant" ||
+        reviewAction === "decision" ||
+        reviewAction === "adjustment" ||
+        reviewAction === "provider"
+      ) {
+        if (
+          request.headers["x-animation-review-token"] !== mutationToken ||
+          !originAllowed(request, host, actualPort)
+        ) {
+          json(response, 403, {
+            error: {
+              code: "WORKSPACE_MUTATION_FORBIDDEN",
+              message: "Mutation token or same-origin check failed.",
+            },
+          });
+          return;
+        }
+        const value = await body(request);
+        const result =
+          reviewAction === "assistant"
+            ? options.adapter.runAssistant(assistantInput(value))
+            : reviewAction === "decision"
+              ? options.adapter.decideReviewFinding(decisionInput(value))
+              : reviewAction === "adjustment"
+                ? options.adapter.applyReviewAdjustment(
+                    adjustmentInput(value),
+                  )
+                : (() => {
+                    const input = providerInput(value);
+                    return options.adapter.appendProviderProposal(
+                      input.proposal,
+                      input,
+                    );
+                  })();
+        json(response, 200, result);
         return;
       }
       if (request.method === "POST" && url.pathname === "/api/adapter") {
@@ -334,6 +521,9 @@ export async function startAnimationReviewServer(
           ? (error as { status: number }).status
           : fields.code.startsWith("WORKSPACE_ASSET_")
             ? 404
+            : fields.code.startsWith("REVIEW_") ||
+                fields.code.startsWith("PROVIDER_")
+              ? 409
             : 400;
       json(response, status, { error: fields });
     }

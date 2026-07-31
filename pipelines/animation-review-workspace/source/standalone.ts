@@ -61,6 +61,21 @@ try {
         if (!response.ok) throw new Error("Review export failed.");
         return response.json();
       },
+      async reviewAction(action, payload) {
+        const response = await fetch("/api/review/" + action, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-animation-review-token": bootstrap.mutationToken,
+          },
+          body: JSON.stringify(payload),
+        });
+        const value = await response.json();
+        if (!response.ok) {
+          throw new Error(value.error?.code + ": " + value.error?.message);
+        }
+        return value;
+      },
     },
   });
 } catch (error) {

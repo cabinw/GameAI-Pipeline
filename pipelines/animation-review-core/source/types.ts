@@ -5,6 +5,7 @@ import type {
 
 export const ANIMATION_REVIEW_SCHEMA_VERSION = "1.0.0" as const;
 export const ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION = "1.0.0" as const;
+export const ANIMATION_REVIEW_PROVIDER_PROTOCOL_VERSION = "1.0.0" as const;
 
 export type AnimationReviewStatus =
   | "in-review"
@@ -170,6 +171,10 @@ export type AnimationReviewDiagnosticCode =
   | "REVIEW_REVISION_INVALID"
   | "REVIEW_DECISION_TRANSITION_INVALID"
   | "REVIEW_ADJUSTMENT_INVALID"
+  | "PROVIDER_SCHEMA_VALIDATION_ERROR"
+  | "PROVIDER_UNSUPPORTED_PROTOCOL_VERSION"
+  | "PROVIDER_SUBJECT_MISMATCH"
+  | "PROVIDER_DUPLICATE_FINDING_ID"
   | "ADAPTER_JSON_PARSE_ERROR"
   | "ADAPTER_SCHEMA_VALIDATION_ERROR"
   | "ADAPTER_UNSUPPORTED_PROTOCOL_VERSION"
@@ -346,4 +351,46 @@ export interface ReviewDecisionInput {
   readonly actorId: string;
   readonly note: string;
   readonly createdAt: string;
+}
+
+export interface AnimationReviewProviderProposal {
+  readonly protocolVersion: typeof ANIMATION_REVIEW_PROVIDER_PROTOCOL_VERSION;
+  readonly proposalId: string;
+  readonly providerId: string;
+  readonly reviewId: string;
+  readonly expectedRevision: number;
+  readonly animationId: string;
+  readonly sourceRevision: string;
+  readonly findings: readonly AnimationReviewFinding[];
+}
+
+export type ParseAnimationReviewProviderProposalResult =
+  | {
+      readonly ok: true;
+      readonly value: AnimationReviewProviderProposal;
+      readonly diagnostics: readonly [];
+    }
+  | {
+      readonly ok: false;
+      readonly diagnostics: readonly AnimationReviewDiagnostic[];
+    };
+
+export interface AppendAnimationReviewProposalInput {
+  readonly actorId: string;
+  readonly createdAt: string;
+}
+
+export interface ReviewAdjustmentInput {
+  readonly expectedRevision: number;
+  readonly adjustmentId: string;
+  readonly findingId: string;
+  readonly parameterPath: string;
+  readonly nextValue: number;
+  readonly actorId: string;
+  readonly createdAt: string;
+}
+
+export interface ApplyAnimationReviewAdjustmentResult {
+  readonly document: AnimationReviewDocument;
+  readonly animation: NormalizedRigAnimation;
 }

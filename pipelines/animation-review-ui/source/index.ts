@@ -11,12 +11,26 @@ import type {
 
 export const ANIMATION_REVIEW_UI_PROTOCOL_VERSION = "1.0.0" as const;
 
+export type AnimationReviewUiAction =
+  | "assistant"
+  | "decision"
+  | "adjustment";
+
+export interface AnimationReviewActionResponse {
+  readonly snapshot: AnimationReviewAdapterSnapshot;
+  readonly review: AnimationReviewDocument;
+}
+
 export interface AnimationReviewTransport {
   request(
     request: AnimationReviewAdapterRequest,
   ): Promise<AnimationReviewAdapterResponse>;
   readReview?(): Promise<AnimationReviewDocument | null>;
   exportReview?(): Promise<unknown>;
+  reviewAction?(
+    action: AnimationReviewUiAction,
+    payload: Readonly<Record<string, unknown>>,
+  ): Promise<AnimationReviewActionResponse>;
 }
 
 export interface AnimationReviewWorkspaceState {
@@ -31,6 +45,9 @@ export interface AnimationReviewWorkspaceOptions {
   readonly adapterId: string;
   readonly transport: AnimationReviewTransport;
   readonly nextRequestId?: () => string;
+  readonly nextMutationId?: () => string;
+  readonly now?: () => string;
+  readonly actorId?: string;
 }
 
 export interface AnimationReviewMountOptions
@@ -44,6 +61,10 @@ function defaultRequestId(): string {
   return `review-ui-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function defaultMutationId(): string {
+  return `review-mutation-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 function isMutation(command: AnimationReviewAdapterCommand): boolean {
   return command !== "describe";
 }
@@ -52,6 +73,9 @@ export class AnimationReviewWorkspaceController {
   readonly #adapterId: string;
   readonly #transport: AnimationReviewTransport;
   readonly #nextRequestId: () => string;
+  readonly #nextMutationId: () => string;
+  readonly #now: () => string;
+  readonly #actorId: string;
   readonly #listeners = new Set<StateListener>();
   #state: AnimationReviewWorkspaceState = Object.freeze({
     connection: "connecting",
@@ -65,6 +89,9 @@ export class AnimationReviewWorkspaceController {
     this.#adapterId = options.adapterId;
     this.#transport = options.transport;
     this.#nextRequestId = options.nextRequestId ?? defaultRequestId;
+    this.#nextMutationId = options.nextMutationId ?? defaultMutationId;
+    this.#now = options.now ?? (() => new Date().toISOString());
+    this.#actorId = options.actorId ?? "local-human-reviewer";
   }
 
   get state(): AnimationReviewWorkspaceState {
@@ -118,6 +145,75 @@ export class AnimationReviewWorkspaceController {
         busy: false,
         snapshot: response.snapshot,
         review,
+        error: null,
+      });
+    } catch (error) {
+      this.#setState({
+        ...this.#state,
+        connection: "failed",
+        busy: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+    return this.#state;
+  }
+
+  async runAssistant(): Promise<AnimationReviewWorkspaceState> {
+    return this.#dispatchReviewAction("assistant", {});
+  }
+
+  async decideFinding(
+    findingId: string,
+    decision: "accept" | "reject" | "resolve" | "comment",
+    note: string,
+  ): Promise<AnimationReviewWorkspaceState> {
+    return this.#dispatchReviewAction("decision", {
+      decisionId: `decision-${this.#nextMutationId()}`,
+      findingId,
+      decision,
+      note,
+    });
+  }
+
+  async adjustFinding(
+    findingId: string,
+    parameterPath: string,
+    nextValue: number,
+  ): Promise<AnimationReviewWorkspaceState> {
+    return this.#dispatchReviewAction("adjustment", {
+      adjustmentId: `adjustment-${this.#nextMutationId()}`,
+      findingId,
+      parameterPath,
+      nextValue,
+    });
+  }
+
+  async #dispatchReviewAction(
+    action: AnimationReviewUiAction,
+    payload: Readonly<Record<string, unknown>>,
+  ): Promise<AnimationReviewWorkspaceState> {
+    const review = this.#state.review;
+    if (review === null || this.#transport.reviewAction === undefined) {
+      this.#setState({
+        ...this.#state,
+        connection: "failed",
+        error: "Review mutation transport is unavailable.",
+      });
+      return this.#state;
+    }
+    this.#setState({ ...this.#state, busy: true, error: null });
+    try {
+      const result = await this.#transport.reviewAction(action, {
+        expectedRevision: review.revision,
+        actorId: this.#actorId,
+        createdAt: this.#now(),
+        ...payload,
+      });
+      this.#setState({
+        connection: "connected",
+        busy: false,
+        snapshot: result.snapshot,
+        review: result.review,
         error: null,
       });
     } catch (error) {
@@ -229,11 +325,40 @@ function renderReview(state: AnimationReviewWorkspaceState): string {
   if (review === null) {
     return `<section class="arw__card"><h3>Review</h3><p>No structured review loaded.</p></section>`;
   }
+  const disabled = state.busy ? " disabled" : "";
   const findings = review.findings
-    .map(
-      (finding) =>
-        `<li data-severity="${finding.severity}"><strong>${escapeHtml(finding.summary)}</strong><span>${escapeHtml(finding.code)} · ${escapeHtml(finding.status)}</span><p>${escapeHtml(finding.diagnosis)}</p></li>`,
-    )
+    .map((finding) => {
+      const suggestion = finding.suggestion;
+      const decisions =
+        finding.status === "open"
+          ? `<button type="button" data-review-decision="accept"${disabled}>Accept</button><button type="button" data-review-decision="reject"${disabled}>Reject</button>`
+          : finding.status === "accepted"
+            ? `<button type="button" data-review-decision="resolve"${disabled}>Resolve</button>`
+            : "";
+      const adjustment =
+        suggestion === undefined
+          ? ""
+          : `<div class="arw__proposal">
+              <code>${escapeHtml(suggestion.parameterPath)}</code>
+              <p>${escapeHtml(suggestion.summary)} · ${suggestion.minimum}…${suggestion.maximum}</p>
+              <label>Quick edit
+                <input type="number" data-review-value min="${suggestion.minimum}" max="${suggestion.maximum}" step="any" value="${suggestion.proposedValue ?? ""}"${finding.status !== "accepted" || state.busy ? " disabled" : ""}>
+              </label>
+              <button type="button" data-review-adjustment data-parameter-path="${escapeHtml(suggestion.parameterPath)}"${finding.status !== "accepted" || state.busy ? " disabled" : ""}>Apply + reanalyze</button>
+            </div>`;
+      return `<li data-severity="${finding.severity}" data-finding-id="${escapeHtml(finding.findingId)}">
+        <strong>${escapeHtml(finding.summary)}</strong>
+        <span>${escapeHtml(finding.code)} · ${escapeHtml(finding.source)} · ${escapeHtml(finding.status)} · confidence ${fixed(finding.confidence)}</span>
+        <p>${escapeHtml(finding.diagnosis)}</p>
+        <p class="arw__location">${escapeHtml(finding.targetIds.join(", "))}${finding.timeRange === undefined ? "" : ` · ${fixed(finding.timeRange.start)}–${fixed(finding.timeRange.end)}s`} · ${escapeHtml(finding.providerId)}</p>
+        ${adjustment}
+        <div class="arw__finding-actions">
+          ${decisions}
+          <input type="text" data-review-note maxlength="2000" placeholder="Human review note"${disabled}>
+          <button type="button" data-review-decision="comment"${disabled}>Comment</button>
+        </div>
+      </li>`;
+    })
     .join("");
   const checklist = review.checklist
     .map(
@@ -241,10 +366,24 @@ function renderReview(state: AnimationReviewWorkspaceState): string {
         `<li data-check="${item.status}"><strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(item.status)}</span><p>${escapeHtml(item.details)}</p></li>`,
     )
     .join("");
+  const history = [...review.decisions]
+    .reverse()
+    .slice(0, 8)
+    .map(
+      (decision) =>
+        `<li><strong>${escapeHtml(decision.decision)} · ${escapeHtml(decision.findingId)}</strong><span>r${decision.revision} · ${escapeHtml(decision.actorId)}</span><p>${escapeHtml(decision.note || "No note.")}</p></li>`,
+    )
+    .join("");
   return `
+    <section class="arw__card arw__review-toolbar">
+      <div><h3>AI + Human loop</h3><p>Validated proposals require an explicit human decision before a bounded edit.</p></div>
+      <button type="button" data-review-assistant${disabled}>Run local AI assistant</button>
+    </section>
     <div class="arw__review-grid">
       <section class="arw__card"><h3>Findings <span>${review.findings.length}</span></h3><ul class="arw__review-list">${findings || "<li>No open findings.</li>"}</ul></section>
       <section class="arw__card"><h3>Checklist <span>${review.checklist.length}</span></h3><ul class="arw__review-list">${checklist}</ul></section>
+      <section class="arw__card"><h3>Human decisions <span>${review.decisions.length}</span></h3><ul class="arw__review-list">${history || "<li>No decisions yet.</li>"}</ul></section>
+      <section class="arw__card"><h3>Revision history</h3><p>Review r${review.revision} · ${review.adjustments.length} adjustment(s) · ${review.auditTrail.length} audit entries</p></section>
     </div>
   `;
 }
@@ -407,6 +546,12 @@ export const animationReviewWorkspaceStyles = `
   .arw__review-list li strong, .arw__review-list li span { display: block; }
   .arw__review-list li span { color: #8e99aa; font-size: 11px; }
   .arw__review-list li p { margin-top: 4px; color: #c8d0dc; }
+  .arw__review-toolbar, .arw__finding-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .arw__finding-actions { margin-top: 8px; justify-content: flex-start; flex-wrap: wrap; }
+  .arw__finding-actions input { min-width: 180px; flex: 1; }
+  .arw__proposal { display: grid; gap: 5px; margin-top: 8px; padding: 8px; border: 1px solid #3b4758; border-radius: 4px; background: #1b2029; }
+  .arw__proposal label { grid-template-columns: auto minmax(80px, 1fr); align-items: center; }
+  .arw__location { color: #8e99aa !important; font-size: 11px; }
   .arw pre { max-height: 180px; overflow: auto; white-space: pre-wrap; user-select: text; }
   .arw--compact .arw__structure ul { max-height: 100px; }
   @media (max-width: 720px) { .arw__review-grid { grid-template-columns: 1fr; } }
@@ -502,6 +647,54 @@ export function mountAnimationReviewWorkspace(
         URL.revokeObjectURL(url);
       },
     );
+    root
+      .querySelector<HTMLButtonElement>("[data-review-assistant]")
+      ?.addEventListener("click", () => {
+        void controller.runAssistant();
+      });
+    for (const button of root.querySelectorAll<HTMLButtonElement>(
+      "button[data-review-decision]",
+    )) {
+      button.addEventListener("click", () => {
+        const finding = button.closest<HTMLElement>("[data-finding-id]");
+        const findingId = finding?.dataset.findingId;
+        const decision = button.dataset.reviewDecision as
+          | "accept"
+          | "reject"
+          | "resolve"
+          | "comment";
+        const note =
+          finding?.querySelector<HTMLInputElement>("[data-review-note]")
+            ?.value ?? "";
+        if (findingId !== undefined) {
+          void controller.decideFinding(findingId, decision, note);
+        }
+      });
+    }
+    for (const button of root.querySelectorAll<HTMLButtonElement>(
+      "button[data-review-adjustment]",
+    )) {
+      button.addEventListener("click", () => {
+        const finding = button.closest<HTMLElement>("[data-finding-id]");
+        const findingId = finding?.dataset.findingId;
+        const parameterPath = button.dataset.parameterPath;
+        const nextValue = numberValue(
+          finding?.querySelector<HTMLInputElement>("[data-review-value]") ??
+            null,
+        );
+        if (
+          findingId !== undefined &&
+          parameterPath !== undefined &&
+          nextValue !== null
+        ) {
+          void controller.adjustFinding(
+            findingId,
+            parameterPath,
+            nextValue,
+          );
+        }
+      });
+    }
   };
 
   const unsubscribe = controller.subscribe((state) => {

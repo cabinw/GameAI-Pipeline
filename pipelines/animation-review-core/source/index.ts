@@ -1,8 +1,12 @@
 export {
   ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION,
+  ANIMATION_REVIEW_PROVIDER_PROTOCOL_VERSION,
   ANIMATION_REVIEW_SCHEMA_VERSION,
 } from "./types";
 export type {
+  AnimationReviewProviderProposal,
+  AppendAnimationReviewProposalInput,
+  ApplyAnimationReviewAdjustmentResult,
   AnimationReviewAdapterCapability,
   AnimationReviewAdapterCommand,
   AnimationReviewAdapterPayload,
@@ -31,17 +35,20 @@ export type {
   AnimationReviewTimelineTrack,
   CreateAnimationReviewInput,
   ParseAdapterRequestResult,
+  ParseAnimationReviewProviderProposalResult,
   ParseAnimationReviewResult,
   ReviewCategory,
   ReviewChecklistStatus,
   ReviewDecisionInput,
   ReviewDecisionKind,
+  ReviewAdjustmentInput,
   ReviewFindingSource,
   ReviewFindingStatus,
   ReviewFindingTimeRange,
   ReviewSeverity,
   ReviewSuggestion,
 } from "./types";
+export { applyAnimationReviewAdjustment } from "./adjustment";
 export { analyzeRigAnimation } from "./analyzer";
 export { AnimationReviewError, sortReviewDiagnostics } from "./diagnostics";
 export {
@@ -57,6 +64,11 @@ export {
   decideAnimationReviewFinding,
   serializeAnimationReviewDocument,
 } from "./review";
+export {
+  appendAnimationReviewProviderProposal,
+  createDeterministicAnimationAssistantProposal,
+  validateAnimationReviewProviderProposal,
+} from "./provider";
 export {
   animationReviewEngineAdapterSchema,
   animationReviewSchema,

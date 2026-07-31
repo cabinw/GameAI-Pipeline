@@ -2,8 +2,9 @@
 
 ## Status
 
-TASK-015D1–D3 complete; TASK-015D4 in progress on
-`feat/task-015d-animation-review-workspace`.
+TASK-015D1–D4 implementation complete on
+`feat/task-015d-animation-review-workspace`; final verification, push, Draft
+PR, and the single external review gate remain.
 
 TASK-015D1 through TASK-015D4 are executed continuously on this branch as four
 append-only commits. TASK-014D4 and TASK-016 remain not started.

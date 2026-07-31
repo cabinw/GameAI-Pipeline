@@ -7,14 +7,18 @@ import type { NormalizedRigAnimation } from "@gameai/rig-animation";
 
 import {
   analyzeRigAnimation,
+  appendAnimationReviewProviderProposal,
+  applyAnimationReviewAdjustment,
   AnimationReviewError,
   createAnimationReviewDocument,
+  createDeterministicAnimationAssistantProposal,
   decideAnimationReviewFinding,
   parseAnimationReviewAdapterRequest,
   parseAnimationReviewDocument,
   serializeAnimationReviewDocument,
   validateAnimationReviewAdapterRequest,
   validateAnimationReviewDocument,
+  validateAnimationReviewProviderProposal,
 } from "../source";
 
 const packageRoot = path.resolve(__dirname, "../..");
@@ -213,6 +217,218 @@ test("records human finding decisions with optimistic revision protection", () =
     (error: unknown) =>
       error instanceof AnimationReviewError &&
       error.diagnostics[0]?.code === "REVIEW_DECISION_TRANSITION_INVALID",
+  );
+});
+
+test("validates provider output without granting it mutation authority", () => {
+  const source = animation();
+  const document = createAnimationReviewDocument({
+    reviewId: "provider-boundary",
+    sourceRevision: "source-v1",
+    characterId: "character-1",
+    animation: source,
+    rigJointIds: ["arm"],
+    createdAt: fixedTime,
+  });
+  const proposal = createDeterministicAnimationAssistantProposal(
+    document,
+    source,
+    fixedTime,
+  );
+  assert.equal(validateAnimationReviewProviderProposal(proposal).ok, true);
+  assert.equal(document.revision, 0);
+  assert.equal(document.findings.some((finding) => finding.source === "assistant"), false);
+
+  const invalid = {
+    ...proposal,
+    findings: proposal.findings.map((finding, index) =>
+      index === 0
+        ? {
+            ...finding,
+            suggestion: {
+              ...finding.suggestion!,
+              proposedValue: finding.suggestion!.maximum + 1,
+            },
+          }
+        : finding,
+    ),
+  };
+  const result = validateAnimationReviewProviderProposal(invalid);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(
+      result.diagnostics[0]?.code,
+      "PROVIDER_SCHEMA_VALIDATION_ERROR",
+    );
+  }
+  assert.equal(document.revision, 0);
+
+  const unknownTarget = {
+    ...proposal,
+    proposalId: "provider-unknown-target",
+    findings: [
+      {
+        ...proposal.findings[0]!,
+        findingId: "provider-unknown-target-finding",
+        suggestion: {
+          ...proposal.findings[0]!.suggestion!,
+          parameterPath: "/tracks/99/keyframes/0/value",
+        },
+      },
+    ],
+  };
+  assert.equal(
+    validateAnimationReviewProviderProposal(unknownTarget).ok,
+    true,
+  );
+  const appended = appendAnimationReviewProviderProposal(
+    document,
+    unknownTarget,
+    {
+      actorId: "human-reviewer",
+      createdAt: "2026-07-31T00:01:00.000Z",
+    },
+  );
+  const accepted = decideAnimationReviewFinding(appended, {
+    expectedRevision: 1,
+    decisionId: "decision-unknown-target",
+    findingId: "provider-unknown-target-finding",
+    decision: "accept",
+    actorId: "human-reviewer",
+    note: "Exercise provider target validation.",
+    createdAt: "2026-07-31T00:02:00.000Z",
+  });
+  assert.throws(
+    () =>
+      applyAnimationReviewAdjustment(accepted, source, ["arm"], {
+        expectedRevision: 2,
+        adjustmentId: "adjustment-unknown-target",
+        findingId: "provider-unknown-target-finding",
+        parameterPath: "/tracks/99/keyframes/0/value",
+        nextValue:
+          unknownTarget.findings[0]!.suggestion.proposedValue!,
+        actorId: "human-reviewer",
+        createdAt: "2026-07-31T00:03:00.000Z",
+      }),
+    /not a known scalar keyframe/,
+  );
+  assert.equal(accepted.revision, 2);
+});
+
+test("completes assistant, human decision, constrained adjustment, reanalysis, and resolution without source mutation", () => {
+  const source = animation();
+  const before = JSON.stringify(source);
+  const created = createAnimationReviewDocument({
+    reviewId: "review-loop-round-trip",
+    sourceRevision: "source-v1",
+    characterId: "character-1",
+    animation: source,
+    rigJointIds: ["arm"],
+    createdAt: fixedTime,
+  });
+  const proposal = createDeterministicAnimationAssistantProposal(
+    created,
+    source,
+    "2026-07-31T00:01:00.000Z",
+  );
+  const loop = proposal.findings.find(
+    (finding) => finding.code === "ASSISTANT_LOOP_BOUNDARY_PROPOSAL",
+  )!;
+  const rotation = proposal.findings.find(
+    (finding) => finding.code === "ASSISTANT_ROTATION_RANGE_PROPOSAL",
+  )!;
+  const proposed = appendAnimationReviewProviderProposal(created, proposal, {
+    actorId: "human-reviewer",
+    createdAt: "2026-07-31T00:01:00.000Z",
+  });
+  const accepted = decideAnimationReviewFinding(proposed, {
+    expectedRevision: 1,
+    decisionId: "decision-accept-loop",
+    findingId: loop.findingId,
+    decision: "accept",
+    actorId: "human-reviewer",
+    note: "Apply the exact loop closure.",
+    createdAt: "2026-07-31T00:02:00.000Z",
+  });
+  assert.throws(
+    () =>
+      decideAnimationReviewFinding(accepted, {
+        expectedRevision: 2,
+        decisionId: "decision-accept-loop",
+        findingId: loop.findingId,
+        decision: "comment",
+        actorId: "human-reviewer",
+        note: "Duplicate decision ID.",
+        createdAt: "2026-07-31T00:02:30.000Z",
+      }),
+    /already exists/,
+  );
+  assert.equal(accepted.revision, 2);
+  const adjusted = applyAnimationReviewAdjustment(
+    accepted,
+    source,
+    ["arm"],
+    {
+      expectedRevision: 2,
+      adjustmentId: "adjustment-loop",
+      findingId: loop.findingId,
+      parameterPath: loop.suggestion!.parameterPath,
+      nextValue: loop.suggestion!.proposedValue!,
+      actorId: "human-reviewer",
+      createdAt: "2026-07-31T00:03:00.000Z",
+    },
+  );
+  assert.equal(adjusted.document.revision, 3);
+  assert.equal(adjusted.document.metrics.loopContinuityError, 0);
+  assert.equal(adjusted.document.adjustments.length, 1);
+  assert.equal(
+    adjusted.document.auditTrail.at(-1)?.action,
+    "analysis-ran",
+  );
+  assert.equal(JSON.stringify(source), before);
+
+  const resolved = decideAnimationReviewFinding(adjusted.document, {
+    expectedRevision: 3,
+    decisionId: "decision-resolve-loop",
+    findingId: loop.findingId,
+    decision: "resolve",
+    actorId: "human-reviewer",
+    note: "Automatic reanalysis confirms the loop is closed.",
+    createdAt: "2026-07-31T00:04:00.000Z",
+  });
+  const commented = decideAnimationReviewFinding(resolved, {
+    expectedRevision: 4,
+    decisionId: "decision-comment-rotation",
+    findingId: rotation.findingId,
+    decision: "comment",
+    actorId: "human-reviewer",
+    note: "The silhouette is intentional.",
+    createdAt: "2026-07-31T00:05:00.000Z",
+  });
+  const rejected = decideAnimationReviewFinding(commented, {
+    expectedRevision: 5,
+    decisionId: "decision-reject-rotation",
+    findingId: rotation.findingId,
+    decision: "reject",
+    actorId: "human-reviewer",
+    note: "Keep the authored pose.",
+    createdAt: "2026-07-31T00:06:00.000Z",
+  });
+  assert.equal(rejected.revision, 6);
+  assert.equal(
+    rejected.findings.find((finding) => finding.findingId === loop.findingId)
+      ?.status,
+    "resolved",
+  );
+  assert.equal(
+    rejected.findings.find(
+      (finding) => finding.findingId === rotation.findingId,
+    )?.status,
+    "rejected",
+  );
+  assert.equal(
+    serializeAnimationReviewDocument(rejected),
+    serializeAnimationReviewDocument(rejected),
   );
 });
 

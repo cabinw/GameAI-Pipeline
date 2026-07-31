@@ -5,7 +5,8 @@ time.
 
 ## Active plan: PROGRAM-015D Animation Review Workspace
 
-- Status: In progress
+- Status: D1–D4 implementation and verification complete; fourth commit,
+  push, and Draft PR in progress
 - Started: 2026-07-31
 - Branch: `feat/task-015d-animation-review-workspace`
 - Exact baseline `main` / `origin/main`:
@@ -133,6 +134,23 @@ line ceilings remain authoritative.
 7. Push the exact four-commit branch, create one Draft PR to `main`, and stop
    at the single external code, standalone UI, compact Panel, and Creator
    runtime review. Keep the PR Draft and unmerged.
+
+### D4 implementation result
+
+The engine-neutral core now exposes provider protocol `1.0.0`, fail-closed
+proposal validation, a deterministic local animation assistant, immutable
+proposal ingestion, strict human decision transitions, and scalar-keyframe
+adjustments constrained to the accepted proposal path/range. Applying an edit
+creates a new normalized in-memory animation, reruns the shared analyzer, and
+appends both adjustment and reanalysis audit records.
+
+The process-local service maintains review/proposed-animation state per Red
+Cap clip and exposes token/same-origin-protected assistant, provider,
+decision, and adjustment endpoints. The shared full UI exposes local AI,
+accept/reject/resolve/comment, bounded quick edit, automatic refreshed
+preview/checklist, decision history, and deterministic JSON export. The
+compact Cocos surface remains runtime-focused and continues to reuse the same
+controller/rendering module without acquiring source-edit authority.
 
 ### Done when
 

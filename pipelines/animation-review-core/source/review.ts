@@ -25,21 +25,21 @@ function findingStatusAfterDecision(
   decision: ReviewDecisionInput["decision"],
 ): AnimationReviewFinding["status"] {
   if (decision === "comment") return finding.status;
-  if (finding.status === "resolved") {
+  if (
+    (finding.status === "open" &&
+      decision !== "accept" &&
+      decision !== "reject") ||
+    (finding.status === "accepted" && decision !== "resolve") ||
+    finding.status === "rejected" ||
+    finding.status === "resolved"
+  ) {
     throw new AnimationReviewError(
       "REVIEW_DECISION_TRANSITION_INVALID",
-      `Finding ${finding.findingId} is already resolved.`,
+      `Finding ${finding.findingId} cannot transition from ${finding.status} through ${decision}.`,
       "/decision",
     );
   }
   if (decision === "resolve") {
-    if (finding.status !== "accepted") {
-      throw new AnimationReviewError(
-        "REVIEW_DECISION_TRANSITION_INVALID",
-        `Finding ${finding.findingId} must be accepted before it can be resolved.`,
-        "/decision",
-      );
-    }
     return "resolved";
   }
   return decision === "accept" ? "accepted" : "rejected";

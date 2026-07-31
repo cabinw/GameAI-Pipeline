@@ -5,6 +5,7 @@ import type {
   AnimationReviewAdapterRequest,
   AnimationReviewAdapterResponse,
   AnimationReviewAdapterSnapshot,
+  AnimationReviewDocument,
 } from "@gameai/animation-review-core";
 import { ANIMATION_REVIEW_ADAPTER_PROTOCOL_VERSION } from "@gameai/animation-review-core";
 
@@ -52,6 +53,62 @@ const snapshot: AnimationReviewAdapterSnapshot = {
   joints: [{ jointId: "torso", parentId: null, worldPivot: { x: 0, y: 0 } }],
   timeline: [],
   runtimeDiagnostics: { semanticInstances: 0 },
+};
+
+const review: AnimationReviewDocument = {
+  schemaVersion: "1.0.0",
+  reviewId: "review-ui",
+  revision: 4,
+  status: "in-review",
+  subject: {
+    characterId: "red-cap",
+    rigId: "red-cap-rig",
+    animationId: "red-cap-wave",
+    sourceRevision: "source-v1",
+    duration: 2,
+    loop: true,
+  },
+  metrics: {
+    duration: 2,
+    trackCount: 1,
+    keyframeCount: 2,
+    animatedJointCount: 1,
+    untrackedJointCount: 0,
+    loopContinuityError: 0,
+    maxAbsoluteRotationDegrees: 112,
+    maxAngularSpeedDegreesPerSecond: 112,
+    maxLinearSpeedUnitsPerSecond: 0,
+  },
+  findings: [
+    {
+      findingId: "assistant-rotation-range-0-1",
+      code: "ASSISTANT_ROTATION_RANGE_PROPOSAL",
+      source: "assistant",
+      severity: "warning",
+      category: "visual",
+      status: "accepted",
+      summary: "Pronounced rotation.",
+      diagnosis: "The authored offset is above the assistant threshold.",
+      targetIds: ["upper-arm-left"],
+      timeRange: { start: 1, end: 1 },
+      suggestion: {
+        summary: "Reduce the pose.",
+        parameterPath: "/tracks/0/keyframes/1/value",
+        minimum: -135,
+        maximum: 135,
+        proposedValue: 90,
+      },
+      confidence: 0.78,
+      providerId: "gameai-local-animation-assistant-v1",
+      createdAt: "2026-07-31T00:00:00.000Z",
+    },
+  ],
+  checklist: [],
+  decisions: [],
+  adjustments: [],
+  auditTrail: [],
+  createdAt: "2026-07-31T00:00:00.000Z",
+  updatedAt: "2026-07-31T00:00:00.000Z",
 };
 
 test("shares the exact protocol version and renders the compact control surface", () => {
@@ -117,6 +174,26 @@ test("full workspace renders accepted sprites, overlays, tracks, and review pane
   assert.match(markup, /data-export/);
 });
 
+test("full workspace exposes validated AI, human decision, and bounded quick-edit controls", () => {
+  const markup = renderAnimationReviewWorkspaceMarkup(
+    {
+      connection: "connected",
+      busy: false,
+      snapshot,
+      review,
+      error: null,
+    },
+    false,
+  );
+  assert.match(markup, /data-review-assistant/);
+  assert.match(markup, /data-review-decision="resolve"/);
+  assert.match(markup, /data-review-decision="comment"/);
+  assert.match(markup, /data-review-adjustment/);
+  assert.match(markup, /min="-135" max="135"/);
+  assert.match(markup, /Human decisions/);
+  assert.match(markup, /Revision history/);
+});
+
 test("controller correlates responses and sends optimistic runtime revisions", async () => {
   const requests: AnimationReviewAdapterRequest[] = [];
   const controller = new AnimationReviewWorkspaceController({
@@ -175,4 +252,69 @@ test("controller fails closed on response identity drift", async () => {
   await controller.refresh();
   assert.equal(controller.state.connection, "failed");
   assert.match(controller.state.error ?? "", /correlation/);
+});
+
+test("controller sends optimistic review revisions for assistant, decision, and adjustment actions", async () => {
+  const actions: Array<{
+    action: string;
+    payload: Readonly<Record<string, unknown>>;
+  }> = [];
+  let currentReview = review;
+  const controller = new AnimationReviewWorkspaceController({
+    adapterId: "adapter",
+    nextRequestId: () => "describe-review-actions",
+    nextMutationId: (() => {
+      let id = 0;
+      return () => `mutation-${++id}`;
+    })(),
+    now: () => "2026-07-31T01:00:00.000Z",
+    actorId: "reviewer",
+    transport: {
+      async request(request) {
+        return {
+          kind: "response",
+          protocolVersion: "1.0.0",
+          requestId: request.requestId,
+          adapterId: request.adapterId,
+          ok: true,
+          snapshot,
+        };
+      },
+      async readReview() {
+        return currentReview;
+      },
+      async reviewAction(action, payload) {
+        actions.push({ action, payload });
+        currentReview = {
+          ...currentReview,
+          revision: currentReview.revision + 1,
+        };
+        return { snapshot, review: currentReview };
+      },
+    },
+  });
+  await controller.refresh();
+  await controller.runAssistant();
+  await controller.decideFinding(
+    "assistant-rotation-range-0-1",
+    "resolve",
+    "Looks correct.",
+  );
+  await controller.adjustFinding(
+    "assistant-rotation-range-0-1",
+    "/tracks/0/keyframes/1/value",
+    90,
+  );
+  assert.deepEqual(
+    actions.map((item) => item.action),
+    ["assistant", "decision", "adjustment"],
+  );
+  assert.deepEqual(
+    actions.map((item) => item.payload.expectedRevision),
+    [4, 5, 6],
+  );
+  assert.equal(actions[0]?.payload.actorId, "reviewer");
+  assert.equal(actions[1]?.payload.decisionId, "decision-mutation-1");
+  assert.equal(actions[2]?.payload.adjustmentId, "adjustment-mutation-2");
+  assert.equal(controller.state.review?.revision, 7);
 });

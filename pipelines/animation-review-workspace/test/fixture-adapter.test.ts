@@ -110,6 +110,180 @@ test("review and export inputs are deterministic and source animations remain re
   assert.equal(adapter.originalAnimationText(), before);
 });
 
+test("runs the complete AI proposal, human decision, constrained revision, reanalysis, and deterministic export loop", async () => {
+  const sourcePath = resolve(fixtureRoot, "animations/wave.json");
+  const sourceBefore = await readFile(sourcePath, "utf8");
+  const adapter = await RedCapFixtureAdapter.load({
+    fixtureRoot,
+    nowMilliseconds: () => 0,
+    createdAt: "2026-07-31T00:00:00.000Z",
+  });
+  adapter.execute(request("select-clip", { clipId: "wave" }, 0));
+  const assistant = adapter.runAssistant({
+    expectedRevision: 0,
+    actorId: "reviewer",
+    createdAt: "2026-07-31T00:01:00.000Z",
+  });
+  const finding = assistant.review.findings.find(
+    (item) => item.code === "ASSISTANT_ROTATION_RANGE_PROPOSAL",
+  )!;
+  assert.equal(finding.source, "assistant");
+  assert.equal(finding.status, "open");
+  assert.ok(finding.suggestion);
+
+  assert.throws(
+    () =>
+      adapter.applyReviewAdjustment({
+        expectedRevision: 1,
+        adjustmentId: "adjustment-before-accept",
+        findingId: finding.findingId,
+        parameterPath: finding.suggestion!.parameterPath,
+        nextValue: finding.suggestion!.proposedValue!,
+        actorId: "reviewer",
+        createdAt: "2026-07-31T00:02:00.000Z",
+      }),
+    /Only an accepted AI\/provider proposal/,
+  );
+  const accepted = adapter.decideReviewFinding({
+    expectedRevision: 1,
+    decisionId: "decision-accept",
+    findingId: finding.findingId,
+    decision: "accept",
+    actorId: "reviewer",
+    note: "Use the bounded local proposal.",
+    createdAt: "2026-07-31T00:02:00.000Z",
+  });
+  assert.equal(accepted.review.revision, 2);
+  assert.throws(
+    () =>
+      adapter.applyReviewAdjustment({
+        expectedRevision: 1,
+        adjustmentId: "adjustment-stale",
+        findingId: finding.findingId,
+        parameterPath: finding.suggestion!.parameterPath,
+        nextValue: finding.suggestion!.proposedValue!,
+        actorId: "reviewer",
+        createdAt: "2026-07-31T00:03:00.000Z",
+      }),
+    /REVIEW_REVISION_INVALID/,
+  );
+  assert.throws(
+    () =>
+      adapter.applyReviewAdjustment({
+        expectedRevision: 2,
+        adjustmentId: "adjustment-out-of-range",
+        findingId: finding.findingId,
+        parameterPath: finding.suggestion!.parameterPath,
+        nextValue: finding.suggestion!.maximum + 1,
+        actorId: "reviewer",
+        createdAt: "2026-07-31T00:03:00.000Z",
+      }),
+    /Value must be finite and within/,
+  );
+  assert.throws(
+    () =>
+      adapter.applyReviewAdjustment({
+        expectedRevision: 2,
+        adjustmentId: "adjustment-non-finite",
+        findingId: finding.findingId,
+        parameterPath: finding.suggestion!.parameterPath,
+        nextValue: Number.NaN,
+        actorId: "reviewer",
+        createdAt: "2026-07-31T00:03:00.000Z",
+      }),
+    /Value must be finite and within/,
+  );
+  const pathMatch = /\/tracks\/(\d+)\/keyframes\/(\d+)\/value/.exec(
+    finding.suggestion!.parameterPath,
+  )!;
+  const unchangedValue =
+    adapter.currentAnimation().tracks[Number(pathMatch[1])]!.keyframes[
+      Number(pathMatch[2])
+    ]!.value as number;
+  assert.throws(
+    () =>
+      adapter.applyReviewAdjustment({
+        expectedRevision: 2,
+        adjustmentId: "adjustment-no-op",
+        findingId: finding.findingId,
+        parameterPath: finding.suggestion!.parameterPath,
+        nextValue: unchangedValue,
+        actorId: "reviewer",
+        createdAt: "2026-07-31T00:03:00.000Z",
+      }),
+    /must change the keyframe value/,
+  );
+  const adjusted = adapter.applyReviewAdjustment({
+    expectedRevision: 2,
+    adjustmentId: "adjustment-wave-pose",
+    findingId: finding.findingId,
+    parameterPath: finding.suggestion!.parameterPath,
+    nextValue: finding.suggestion!.proposedValue!,
+    actorId: "reviewer",
+    createdAt: "2026-07-31T00:03:00.000Z",
+  });
+  assert.equal(adjusted.review.revision, 3);
+  assert.equal(adjusted.review.adjustments.length, 1);
+  assert.equal(
+    adjusted.review.auditTrail.at(-1)?.action,
+    "analysis-ran",
+  );
+  const match = /\/tracks\/(\d+)\/keyframes\/(\d+)\/value/.exec(
+    finding.suggestion!.parameterPath,
+  )!;
+  const proposedValue =
+    adapter.currentAnimation().tracks[Number(match[1])]!.keyframes[
+      Number(match[2])
+    ]!.value;
+  assert.equal(proposedValue, finding.suggestion!.proposedValue);
+
+  const resolved = adapter.decideReviewFinding({
+    expectedRevision: 3,
+    decisionId: "decision-resolve",
+    findingId: finding.findingId,
+    decision: "resolve",
+    actorId: "reviewer",
+    note: "Reanalysis completed.",
+    createdAt: "2026-07-31T00:04:00.000Z",
+  });
+  assert.equal(
+    resolved.review.findings.find(
+      (item) => item.findingId === finding.findingId,
+    )?.status,
+    "resolved",
+  );
+  assert.equal(await readFile(sourcePath, "utf8"), sourceBefore);
+  assert.equal(adapter.originalAnimationText(), sourceBefore);
+
+  const firstExport = adapter.exportBundle() as {
+    review: { revision: number; decisions: unknown[]; adjustments: unknown[] };
+    proposedAnimation: { animationId: string };
+    manifest: {
+      algorithm: string;
+      reviewSha256: string;
+      originalAnimationSha256: string;
+      proposedAnimationSha256: string;
+    };
+  };
+  const secondExport = adapter.exportBundle();
+  assert.deepEqual(firstExport, secondExport);
+  assert.equal(firstExport.review.revision, 4);
+  assert.equal(firstExport.review.decisions.length, 2);
+  assert.equal(firstExport.review.adjustments.length, 1);
+  assert.equal(
+    firstExport.proposedAnimation.animationId,
+    "red-cap-production-v1-wave",
+  );
+  assert.equal(firstExport.manifest.algorithm, "sha256");
+  for (const hash of [
+    firstExport.manifest.reviewSha256,
+    firstExport.manifest.originalAnimationSha256,
+    firstExport.manifest.proposedAnimationSha256,
+  ]) {
+    assert.match(hash, /^[a-f0-9]{64}$/);
+  }
+});
+
 test("declared asset resolver rejects traversal, undeclared files, and escaping symlinks", async () => {
   await assert.rejects(
     resolveDeclaredAsset(fixtureRoot, new Set(["parts/torso.png"]), "../source/provenance.json"),

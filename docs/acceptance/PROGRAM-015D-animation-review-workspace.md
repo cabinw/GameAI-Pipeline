@@ -2,9 +2,9 @@
 
 ## Status
 
-In progress. D1–D4 acceptance is accumulated append-only in this document.
-Final external code, standalone UI, compact Cocos Panel, and Creator runtime
-review is intentionally deferred to the Draft PR.
+D1–D4 implementation complete; final publication gates are in progress.
+External code, standalone UI, compact Cocos Panel, and Creator runtime review
+is intentionally deferred to the Draft PR.
 
 ## Baseline
 
@@ -112,20 +112,49 @@ No earlier D1/D2/D3 checkpoint requests external acceptance.
   Service runtime requires no external network, credentials, Creator cache,
   cloud model, untracked input, or ignored experimental asset.
 
-## D4 — AI + Human Review Loop
+## D4 — AI + Human Review Loop — PASS
 
-Pending implementation.
+- Provider protocol `1.0.0` validates exact proposal shape, subject and
+  expected-revision identity, unique findings, concrete scalar keyframe
+  locations, target/time range, bounded proposed value, confidence, and
+  provenance. Validation does not mutate review or animation state.
+- The built-in deterministic assistant returns stable loop-boundary and
+  rotation-range proposals. Re-running against the same review does not
+  duplicate an existing finding.
+- Human accept/reject/resolve/comment and adjustment operations use optimistic
+  review revisions and immutable decision/audit records. Invalid transitions,
+  stale revisions, duplicate IDs, unknown/non-scalar targets, unaccepted
+  proposals, and non-finite/out-of-range/no-op edits fail before mutation.
+- An accepted quick edit clones the proposed normalized animation, preserves
+  the accepted source clip bytes, reruns metrics/findings/checklist, and
+  records both the adjustment and automatic analysis at the new revision.
+- The standalone UI exposes the full action loop and refreshed preview;
+  process-local assistant/provider/decision/adjustment routes retain the D3
+  token, same-origin, JSON, body-size, and loopback boundaries.
+- Export contains source/adapter/review identity, complete review state,
+  original animation, current proposed animation, and SHA-256 review/source/
+  proposal manifests. Two unchanged exports are identical without video.
+- Focused core tests pass 9/9, shared UI tests pass 6/6, and standalone
+  workspace/service tests pass 7/7.
+- `CI=true pnpm verify` passes 534/534.
+- D4 changes exactly 18 text files and 2,120 lines within its
+  18-file/4,500-line gate, with zero dependency resolution, binary, media,
+  Scene, or `.meta` change.
+- Final frozen verification, exact four-commit history, refs, push, Draft PR,
+  and external-gate state are recorded below at publication.
 
-Required evidence:
+## Final publication gates
 
-- validated provider proposals and deterministic local assistant;
-- explicit human accept/reject/resolve/comment;
-- constrained edit with expected revision;
-- automatic reanalysis and source immutability;
-- deterministic review/proposed-animation export;
-- end-to-end review loop;
-- exact four-commit history, final full/frozen/closure/scope audits, push,
-  Draft PR, and pending external gate.
+- Working-copy `CI=true pnpm verify`: 534/534 PASS.
+- An isolated export of the exact staged Git index contains no ignored local
+  experimental data; frozen install reuses the locked dependency graph and
+  `CI=true pnpm verify` passes 534/534.
+- Generated/schema/metadata closure leaves no tracked output change.
+- `git diff --check`, D4 scope, zero-media, zero-Scene/`.meta`, protected
+  rights/provenance hash, Tag, backup/recovery/archive ref, and main-baseline
+  checks pass.
+- Fourth append-only commit, push, Draft PR, and exact-head external-gate
+  state are completed after this pre-commit acceptance record.
 
 ## Publication boundaries
 

@@ -3,12 +3,20 @@ import { readFile, realpath, stat } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
 import {
+  appendAnimationReviewProviderProposal,
+  applyAnimationReviewAdjustment,
+  AnimationReviewError,
   createAnimationReviewDocument,
+  createDeterministicAnimationAssistantProposal,
+  decideAnimationReviewFinding,
+  serializeAnimationReviewDocument,
   type AnimationReviewAdapterRequest,
   type AnimationReviewAdapterSnapshot,
   type AnimationReviewDocument,
   type AnimationReviewOverlay,
   type AnimationReviewOverlayPrimitive,
+  type ReviewAdjustmentInput,
+  type ReviewDecisionInput,
 } from "@gameai/animation-review-core";
 import {
   parseCharacterRig,
@@ -74,10 +82,31 @@ function sha256(values: readonly string[]): string {
   return hash.digest("hex");
 }
 
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (typeof value === "object" && value !== null) {
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, child]) => [key, canonicalize(child)]),
+    );
+  }
+  return value;
+}
+
+function canonicalJson(value: unknown): string {
+  return `${JSON.stringify(canonicalize(value), null, 2)}\n`;
+}
+
 export interface RedCapFixtureAdapterOptions {
   readonly fixtureRoot: string;
   readonly nowMilliseconds?: () => number;
   readonly createdAt?: string;
+}
+
+export interface ReviewMutationResult {
+  readonly review: AnimationReviewDocument;
+  readonly snapshot: AnimationReviewAdapterSnapshot;
 }
 
 export class RedCapFixtureAdapter {
@@ -92,6 +121,12 @@ export class RedCapFixtureAdapter {
   readonly #hierarchy: readonly RigHierarchyJoint[];
   readonly #nowMilliseconds: () => number;
   readonly #createdAt: string;
+  readonly #rigJointIds: readonly string[];
+  readonly #reviews: Record<StandaloneClipId, AnimationReviewDocument>;
+  readonly #proposedAnimations: Record<
+    StandaloneClipId,
+    NormalizedRigAnimation
+  >;
   #revision = 0;
   #clipId: StandaloneClipId = "rest";
   #status: "playing" | "paused" | "stopped" = "stopped";
@@ -125,6 +160,9 @@ export class RedCapFixtureAdapter {
     this.sourceRevision = input.sourceRevision;
     this.#nowMilliseconds = input.nowMilliseconds;
     this.#createdAt = input.createdAt;
+    this.#rigJointIds = Object.freeze(
+      this.#layout.parts.map((part) => part.partId),
+    );
     this.#hierarchy = Object.freeze(
       this.#layout.parts.map((part) =>
         Object.freeze({
@@ -141,6 +179,21 @@ export class RedCapFixtureAdapter {
     this.declaredAssets = new Set(
       this.#layout.parts.map((part) => part.file),
     );
+    this.#proposedAnimations = { ...this.#clips };
+    this.#reviews = Object.fromEntries(
+      STANDALONE_CLIP_IDS.map((clipId) => [
+        clipId,
+        createAnimationReviewDocument({
+          reviewId: `workspace-${clipId}`,
+          sourceRevision: this.sourceRevision,
+          characterId: this.#character.characterId,
+          animation: this.#clips[clipId],
+          rigJointIds: this.#rigJointIds,
+          createdAt: this.#createdAt,
+          actorId: "workspace-validator",
+        }),
+      ]),
+    ) as Record<StandaloneClipId, AnimationReviewDocument>;
     this.#loop = this.#clips.rest.loop;
   }
 
@@ -396,23 +449,114 @@ export class RedCapFixtureAdapter {
   }
 
   reviewDocument(): AnimationReviewDocument {
-    return createAnimationReviewDocument({
-      reviewId: `workspace-${this.#clipId}`,
-      sourceRevision: this.sourceRevision,
-      characterId: this.#character.characterId,
-      animation: this.currentAnimation(),
-      rigJointIds: this.#layout.parts.map((part) => part.partId),
-      createdAt: this.#createdAt,
-      actorId: "workspace-validator",
-    });
+    return this.#reviews[this.#clipId];
   }
 
   currentAnimation(): NormalizedRigAnimation {
-    return this.#clips[this.#clipId];
+    return this.#proposedAnimations[this.#clipId];
   }
 
   originalAnimationText(): string {
     return this.#originalTexts[this.#clipId];
+  }
+
+  runAssistant(input: {
+    readonly expectedRevision: number;
+    readonly actorId: string;
+    readonly createdAt: string;
+  }): ReviewMutationResult {
+    const current = this.reviewDocument();
+    if (input.expectedRevision !== current.revision) {
+      throw new AnimationReviewError(
+        "REVIEW_REVISION_INVALID",
+        `Expected revision ${input.expectedRevision}, current revision is ${current.revision}.`,
+        "/expectedRevision",
+      );
+    }
+    const proposal = createDeterministicAnimationAssistantProposal(
+      current,
+      this.currentAnimation(),
+      input.createdAt,
+    );
+    return this.#appendProposal(proposal, input.actorId, input.createdAt);
+  }
+
+  appendProviderProposal(
+    proposal: unknown,
+    input: { readonly actorId: string; readonly createdAt: string },
+  ): ReviewMutationResult {
+    return this.#appendProposal(proposal, input.actorId, input.createdAt);
+  }
+
+  decideReviewFinding(input: ReviewDecisionInput): ReviewMutationResult {
+    this.#reviews[this.#clipId] = decideAnimationReviewFinding(
+      this.reviewDocument(),
+      input,
+    );
+    this.#touch();
+    return { review: this.reviewDocument(), snapshot: this.snapshot() };
+  }
+
+  applyReviewAdjustment(input: ReviewAdjustmentInput): ReviewMutationResult {
+    const adjusted = applyAnimationReviewAdjustment(
+      this.reviewDocument(),
+      this.currentAnimation(),
+      this.#rigJointIds,
+      input,
+    );
+    this.#reviews[this.#clipId] = adjusted.document;
+    this.#proposedAnimations[this.#clipId] = adjusted.animation;
+    this.#time = this.#boundedTime(this.#time);
+    this.#touch();
+    return { review: adjusted.document, snapshot: this.snapshot() };
+  }
+
+  exportBundle(): unknown {
+    const review = this.reviewDocument();
+    const proposedAnimation = this.currentAnimation();
+    const originalText = this.originalAnimationText();
+    return {
+      exportVersion: "1.0.0",
+      source: {
+        fixtureId: "red-cap-production-v1",
+        animationId: review.subject.animationId,
+        sourceRevision: this.sourceRevision,
+        sourceReadOnly: true,
+      },
+      adapter: {
+        adapterId: this.adapterId,
+        adapterRevision: this.#revision,
+        reviewId: review.reviewId,
+        reviewRevision: review.revision,
+        clipId: this.#clipId,
+      },
+      review,
+      originalAnimation: JSON.parse(originalText) as unknown,
+      proposedAnimation,
+      manifest: {
+        algorithm: "sha256",
+        reviewSha256: sha256([serializeAnimationReviewDocument(review)]),
+        originalAnimationSha256: sha256([originalText]),
+        proposedAnimationSha256: sha256([canonicalJson(proposedAnimation)]),
+      },
+    };
+  }
+
+  #appendProposal(
+    proposal: unknown,
+    actorId: string,
+    createdAt: string,
+  ): ReviewMutationResult {
+    const current = this.reviewDocument();
+    const next = appendAnimationReviewProviderProposal(current, proposal, {
+      actorId,
+      createdAt,
+    });
+    if (next !== current) {
+      this.#reviews[this.#clipId] = next;
+      this.#touch();
+    }
+    return { review: this.reviewDocument(), snapshot: this.snapshot() };
   }
 
   #touch(): void {
