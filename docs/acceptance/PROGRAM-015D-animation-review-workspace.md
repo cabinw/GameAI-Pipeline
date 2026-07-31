@@ -2,18 +2,29 @@
 
 ## Status
 
-`passed-external-code-ui-and-creator-review`.
+`integrated-pending-product-owner-acceptance`.
 
-D1–D4 and the single external code, Standalone UI, Compact Panel, Creator
-runtime, and AI-human workflow review passed at implementation SHA
-`c99cee9ad62c963b1163a6f727604429995b74e2`. Final PR CI and conditional
-squash integration are the only remaining gates.
+D1–D4, automated verification, and Creator technical verification passed.
+PR #27 was squash-merged to `main` at
+`4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`. Product Owner Acceptance is
+PENDING and overall product acceptance is INCOMPLETE. Earlier “accepted and
+merged” wording means successful technical integration only; it does not mean
+that the project owner saw, operated, or formally accepted the editor.
+
+The authoritative human gate is tracked in
+[`PROGRAM-015D-product-owner-acceptance.md`](PROGRAM-015D-product-owner-acceptance.md).
+Only the project owner may mark it PASS.
 
 ## Baseline
 
-- Exact `main` and `origin/main`:
+- Current exact `main` and `origin/main` at acceptance reopen:
+  `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`.
+- Original implementation baseline:
   `8e12a07619ec1bfc9c47590b862f91fbf2edf669`.
-- Branch: `feat/task-015d-animation-review-workspace`.
+- Acceptance-reopen branch:
+  `fix/program-015d-product-owner-acceptance`.
+- Original PR: [#27](https://github.com/cabinw/GameAI-Pipeline/pull/27),
+  merged at `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`.
 - `v0.5.0` annotated tag object:
   `ee030924b6728f5f7b6ff9afc1339a58047adca3`.
 - `v0.5.0^{}`:
@@ -35,19 +46,16 @@ The complete Phase 0 ref, Release, and worktree inventory is recorded in
 
 ## Acceptance model
 
-Visual review complements but does not replace contract, service, protocol,
-revision, security, and tracked-only tests. Automated checks complement but do
-not replace final Cocos Creator lifecycle and UI review.
+Contract, service, protocol, revision, security, tracked-only, UI-operation,
+and Creator checks establish technical confidence. They never substitute for
+the project owner's product judgment. Screenshots, automated tests, Codex
+visual inspection, and Codex-operated Creator sessions are supporting evidence
+only.
 
-The program stops only once, after the exact four commits are pushed and the
-Draft PR is created, for the following combined external gate:
-
-1. engine-neutral core and service code review;
-2. standalone workspace visual/usability review;
-3. compact Cocos Panel review;
-4. Creator 3.8.x runtime control/snapshot/lifecycle review.
-
-No earlier D1/D2/D3 checkpoint requests external acceptance.
+Product Owner Acceptance proceeds through UI/information architecture,
+interaction/workflow, real production task, and final regression rounds. Each
+round hard-stops for complete owner feedback. Only the owner may close a
+product defect or issue the exact final acceptance decision.
 
 ## D1 — Review Contracts & Core — PASS
 
@@ -146,7 +154,7 @@ No earlier D1/D2/D3 checkpoint requests external acceptance.
 - Final frozen verification, exact four-commit history, refs, push, Draft PR,
   and external-gate state are recorded below at publication.
 
-## Final publication gates
+## Technical integration gates
 
 - Remediation commit:
   `c99cee9ad62c963b1163a6f727604429995b74e2`
@@ -158,8 +166,11 @@ No earlier D1/D2/D3 checkpoint requests external acceptance.
 - `git diff --check`, aggregate scope, zero-media, zero-Scene/`.meta`, protected
   rights/provenance hash, Tag, backup/recovery/archive ref, and main-baseline
   checks pass.
-- PR #27 is the only publication surface; no evidence branch or replacement PR
-  is created.
+- PR #27 merged as
+  `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`; pre-merge run
+  `30631333133` and exact-squash post-merge run `30633874514` passed.
+- This proves technical integration only. Product Owner Acceptance remains
+  PENDING.
 
 ## Independent defect closure
 
@@ -185,7 +196,7 @@ closed in the single remediation commit:
 No retry loop, warning suppression, broad fallback, `any`, skipped assertion,
 or accepted PROGRAM-015 runtime/asset/Scene edit was used to close a defect.
 
-## External acceptance matrix
+## Technical verification matrix — not Product Owner Acceptance
 
 | Requirement | Evidence observed | Result |
 | --- | --- | --- |
@@ -228,9 +239,12 @@ unresolved after Exact Reset and require a new human review.
 
 ## Publication boundaries
 
-The feature branch and Draft PR must contain zero MP4 or other evidence media.
+The Product Owner Acceptance branch and Draft PR must contain zero MP4 or
+other evidence media.
 No existing tag, Release, backup/recovery/archive ref, worktree, rights byte,
 provenance byte, accepted source asset, or accepted Scene may change.
 
-PROGRAM-015D does not authorize a merge, `v0.6.0`, Tag, Release, TASK-014D4,
-or TASK-016.
+PR #27 is already merged. This acceptance reopen does not authorize the new
+Draft PR to become Ready or merge, and does not authorize `v0.6.0`, any Tag or
+Release, TASK-015E, TASK-014D4, or TASK-016. `v0.6.0` and TASK-016 must wait
+for explicit Product Owner Acceptance.

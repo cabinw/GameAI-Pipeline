@@ -87,7 +87,7 @@ v0.5.0 is a prerelease production-character vertical-slice baseline. It does
 not claim a complete game, general art-production system, Windows support,
 cross-engine adapters, audio/gameplay execution, or a complete editor UI.
 
-## PROGRAM-015D — Animation Review Workspace — Final acceptance pending
+## PROGRAM-015D — Animation Review Workspace — Integrated; Product Owner Acceptance pending
 
 - TASK-015D1: versioned Review Document and Engine Adapter Protocol contracts,
   deterministic metrics/findings/checklist, immutable review state, and
@@ -98,21 +98,24 @@ cross-engine adapters, audio/gameplay execution, or a complete editor UI.
 - TASK-015D4: deterministic local assistant/provider boundary, explicit human
   decisions, constrained quick edits, automatic revalidation, and structured
   export
-- Four append-only commits on
-  `feat/task-015d-animation-review-workspace`, followed by one Draft PR and a
-  single external code/UI/Creator review
+- Four append-only implementation commits, one technical-review remediation,
+  and one documentation checkpoint were integrated through PR #27 at
+  `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`
 
-TASK-015D1–D4 implementation is complete. Independent external code/UI/
-Creator review produced one centralized remediation: versioned persistent
+TASK-015D1–D4 implementation is merged. Automated verification and Creator
+technical verification passed. The technical code/UI/Creator review produced
+one centralized remediation: versioned persistent
 Sessions, six-kind Patch Preview/Apply, human Finding/Rule authoring,
 undo/redo/reset, atomic storage, lightweight observation, and one shared
-Panel/Standalone Session authority. The feature remains unreleased and
-unmerged until exact-head acceptance and CI pass.
+Panel/Standalone Session authority. Product Owner Acceptance is still PENDING:
+the project owner has not yet operated and formally accepted the editor.
+Therefore overall product acceptance remains INCOMPLETE.
 
 PROGRAM-015D is a bounded review and correction workspace, not a complete
 animation authoring suite. It does not add IK, blending, automatic repair,
 cloud AI, source overwrite, hosted collaboration, or a new engine adapter.
-TASK-016 remains not started until this workspace passes its external gate.
+`v0.6.0` and TASK-016 remain blocked until the project owner explicitly passes
+Product Owner Acceptance. TASK-014D4 also remains not started.
 
 ## Next roadmap
 
@@ -145,9 +148,10 @@ is not part of v0.2.0.
 
 ### Production editor UI
 
-PROGRAM-015D is the first in-progress production-oriented inspection and
-bounded adjustment workflow. Broader asset, rig, animation, VFX, and level
-authoring remains future work and requires separate tasks.
+PROGRAM-015D is the first integrated production-oriented inspection and
+bounded adjustment workflow, pending Product Owner Acceptance. Broader asset,
+rig, animation, VFX, and level authoring remains future work and requires
+separate tasks.
 
 ### Unity adapter
 

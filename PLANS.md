@@ -3,24 +3,44 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: PROGRAM-015D Animation Review Workspace
+## Active plan: PROGRAM-015D Product Owner Acceptance Reopen
 
-- Status: `passed-external-code-ui-and-creator-review`; remediation SHA
-  `c99cee9ad62c963b1163a6f727604429995b74e2` passed working-copy and
-  independent tracked-only verification; acceptance publication and PR
-  integration are the only remaining actions
-- Started: 2026-07-31
-- Branch: `feat/task-015d-animation-review-workspace`
+- Status: `integrated-pending-product-owner-acceptance`.
+- Implementation: merged through PR #27 at
+  `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`.
+- Automated verification: PASS.
+- Creator technical verification: PASS.
+- Product Owner Acceptance: PENDING.
+- Overall product acceptance: INCOMPLETE.
+- Started: 2026-08-01.
+- Branch: `fix/program-015d-product-owner-acceptance`.
 - Exact baseline `main` / `origin/main`:
-  `8e12a07619ec1bfc9c47590b862f91fbf2edf669`
-- Aggregate scope ceiling: at most 120 changed files and 22,000 changed lines;
-  zero binary, PNG, audio, video, MP4, evidence-media, Scene, accepted-asset,
-  rights, provenance, tag, Release, or protected-reference changes.
-- Commit policy: exactly four append-only feature commits, one for each of
-  TASK-015D1 through TASK-015D4. Reviewed ancestors are never amended,
-  squashed, rebased, or force-pushed. External-review defects close in at
-  most one append-only remediation commit, followed by one documentation-only
-  acceptance commit.
+  `4b7a8db34ed00a3d6ef99720c15eeafb96ed702e`.
+- Status-restoration checkpoint budget: at most seven Markdown files and
+  1,200 changed lines. Zero implementation, schema, package, lockfile,
+  generated output, binary/media/evidence, Scene, `.meta`, accepted asset,
+  rights, provenance, Tag, Release, or protected-reference change.
+- Commit policy: one append-only status-restoration checkpoint, followed only
+  by append-only remediation commits for complete Product Owner feedback
+  rounds. Never amend, rebase, force-push, or rewrite the merged implementation
+  history.
+
+Codex technical review, automated checks, Creator operation, screenshots, and
+visual observations are supporting evidence only. They are not Product Owner
+Acceptance. Only the project owner may mark that gate PASS or use
+`CLOSED_BY_PRODUCT_OWNER` in the product-owner defect ledger. `v0.6.0` and
+TASK-016 remain blocked until the owner explicitly completes Product Owner
+Acceptance.
+
+The first checkpoint restores truthful current-facing status, adds the formal
+Product Owner Acceptance record and defect ledger, publishes a Draft PR, then
+starts the real Standalone and Compact Panel for Acceptance Round 1. Round 1
+hard-stops for owner UI and information-architecture feedback; no speculative
+UI change or later acceptance round starts before that feedback is collected.
+
+The implementation history and technical verification record below remain
+historical evidence. Their earlier use of “acceptance” means technical
+integration only and does not close the reopened Product Owner gate.
 
 ### External review remediation budget
 
