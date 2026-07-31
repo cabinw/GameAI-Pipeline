@@ -2,9 +2,11 @@
 
 ## Status
 
-TASK-015D1–D4 implementation complete on
-`feat/task-015d-animation-review-workspace`; final verification, push, Draft
-PR, and the single external review gate remain.
+TASK-015D1–D4 implementation and the single external code/UI/Creator review
+are complete on `feat/task-015d-animation-review-workspace`. Review status is
+`passed-external-code-ui-and-creator-review` at implementation SHA
+`c99cee9ad62c963b1163a6f727604429995b74e2`; acceptance publication, final PR
+CI, and conditional squash integration remain.
 
 TASK-015D1 through TASK-015D4 are executed continuously on this branch as four
 append-only commits. TASK-014D4 and TASK-016 remain not started.
@@ -153,10 +155,43 @@ Cocos Scene Adapter / Runtime
 
 The shared UI owns presentation and user intent, not engine state. The core
 owns validation, deterministic analysis, revisions, decisions, adjustments,
-and export. The service owns loopback transport, bounded persistence for the
-process lifetime, and safe asset access. The adapter protocol owns correlated
+and export. The service owns loopback transport, atomic safe-root Session
+persistence, and safe asset access. The adapter protocol owns correlated
 commands and snapshots. Cocos owns engine state, Scene lookup, playback,
-overlays, and actual runtime diagnostics.
+overlays, and actual runtime diagnostics; successful Panel mutations are
+mirrored to the local adapter so Standalone and Compact views do not diverge.
+
+## External review result
+
+Review date: 2026-07-31, Asia/Shanghai. Creator version: 3.8.8.
+
+| Surface | Executed acceptance | Result |
+| --- | --- | --- |
+| Code/contracts | closed schemas, unknown-input parsers, six Patch kinds, budgets, deterministic bytes, stale-before-mutation, Apply/Undo/Redo/Reset | PASS |
+| Local service | loopback/token/origin boundaries, safe-root atomic persistence, restart restore, retry, export, duplicate requests, disposal | PASS |
+| Standalone | 1280×720 layout, all playback/review controls, AI + human loop, disconnected read-only state, close/reopen restore | PASS |
+| Compact Panel | shared UI, Session/clip/revision/readiness, playback/seek, analysis, Preview/Apply, validation, close/reopen, Scene switch | PASS |
+| Creator runtime | accepted Red Cap Scene, resource hydration, live clock, bounded loop time, overlays, two rebuilds, Exact Reset, clean hold | PASS |
+
+The complete local-only defect ledger records ARW-001 through ARW-019 closed
+by the single remediation commit. Creator logs recorded two successful
+`PROGRAM015_MOTION_READY` events in the final process; each retained one root,
+19 targets, 19 renderers, and no relevant warning/error. Exact Reset converged
+Cocos and local service state to Wave, paused, time zero, all overlays off,
+Session r18, zero Patches, `preview: null`, empty history, and only the fresh
+deterministic coverage diagnosis.
+
+Working-copy and fresh detached tracked-only verification both passed 546/546.
+The reviewed implementation changes 75 tracked text files and 14,735 lines
+against the locked main before this documentation-only acceptance update,
+within the 120-file/22,000-line ceiling. Tracked MP4, binary/media additions,
+accepted PROGRAM-015 asset/runtime/Scene changes, and TASK-016/TASK-014D4
+changes are all zero.
+
+Local screenshots, persisted Sessions, the defect ledger, and the validated
+r13 Review Contract export remain ignored and untracked below
+`artifacts/experimental/program-015d-animation-review-workspace/`. They were
+not staged, pushed, attached to the PR, or used by CI.
 
 ## Deliverables
 

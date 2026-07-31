@@ -2,9 +2,12 @@
 
 ## Status
 
-D1–D4 implementation complete; final publication gates are in progress.
-External code, standalone UI, compact Cocos Panel, and Creator runtime review
-is intentionally deferred to the Draft PR.
+`passed-external-code-ui-and-creator-review`.
+
+D1–D4 and the single external code, Standalone UI, Compact Panel, Creator
+runtime, and AI-human workflow review passed at implementation SHA
+`c99cee9ad62c963b1163a6f727604429995b74e2`. Final PR CI and conditional
+squash integration are the only remaining gates.
 
 ## Baseline
 
@@ -145,16 +148,83 @@ No earlier D1/D2/D3 checkpoint requests external acceptance.
 
 ## Final publication gates
 
-- Working-copy `CI=true pnpm verify`: 534/534 PASS.
-- An isolated export of the exact staged Git index contains no ignored local
-  experimental data; frozen install reuses the locked dependency graph and
-  `CI=true pnpm verify` passes 534/534.
+- Remediation commit:
+  `c99cee9ad62c963b1163a6f727604429995b74e2`
+  (`fix: close Animation Review Workspace acceptance gaps`).
+- Working-copy `CI=true pnpm verify`: 546/546 PASS.
+- Fresh detached tracked-only worktree at the exact remediation SHA:
+  `pnpm install --frozen-lockfile` PASS and `CI=true pnpm verify` 546/546 PASS.
 - Generated/schema/metadata closure leaves no tracked output change.
-- `git diff --check`, D4 scope, zero-media, zero-Scene/`.meta`, protected
+- `git diff --check`, aggregate scope, zero-media, zero-Scene/`.meta`, protected
   rights/provenance hash, Tag, backup/recovery/archive ref, and main-baseline
   checks pass.
-- Fourth append-only commit, push, Draft PR, and exact-head external-gate
-  state are completed after this pre-commit acceptance record.
+- PR #27 is the only publication surface; no evidence branch or replacement PR
+  is created.
+
+## Independent defect closure
+
+The ignored local ledger first identified 14 gaps (7 blocker, 7 major). The
+complete code/UI/Creator pass found five additional integration gaps. All 19
+closed in the single remediation commit:
+
+- versioned closed Session/Patch/Validation/Diagnosis contracts, deterministic
+  parsing/serialization, aggregate budgets, stable IDs, optimistic revisions,
+  and fail-closed adapter responses;
+- executable pivot offset, rotation offset, keyframe time, keyframe value,
+  curve, and layer-order Patches through AI proposal → human accept/edit →
+  Preview → Apply/reanalysis → Undo/Redo;
+- legal automatic/human rule provenance and atomic accept → resolve for an
+  open Finding;
+- atomic safe-root persistence/export, restart restore, traversal/symlink and
+  duplicate-request rejection, reconnect/read-only behavior, and cleanup;
+- complete Standalone/Compact surfaces plus lightweight playback polling;
+- Session clip restoration into Cocos, AssetDB hydration, one invalidation-
+  cleaned Creator edit tick, bounded loop time at the JSON boundary, and
+  mirrored Panel/local-adapter playback mutations.
+
+No retry loop, warning suppression, broad fallback, `any`, skipped assertion,
+or accepted PROGRAM-015 runtime/asset/Scene edit was used to close a defect.
+
+## External acceptance matrix
+
+| Requirement | Evidence observed | Result |
+| --- | --- | --- |
+| Standalone | 1280×720 responsive preview; Rest/Idle/Walk/Wave; play/pause/seek; timeline/markers; AI findings; Patch edit/Preview/Apply; validation; human rules/findings; history; save/export; explicit disconnected read-only state | PASS |
+| Compact Panel | Session `red-cap-production-v1-wave`; clip/revision/readiness; live Play/Pause/+1f seek; overlay; assistant/Preview/Apply; validation; Save/Open Standalone; close/reopen and Scene-switch restore | PASS |
+| Creator 3.8.8 | `red-cap-production-showcase.scene`; live time advanced and loop display stayed within 1.200; pause remained stable; alternate valid Scene and return; two rebuilds each roots=1/targets=19/renderers=19; zero relevant warning/error | PASS |
+| AI + human workflow | controlled Wave defect; deterministic local assistant; correct clip/time/target/rule; AI_PROPOSED only; human accept and numeric edit; Preview non-authoritative; Apply + reanalysis; human rule and Finding resolution; Undo/Redo | PASS |
+| Persistence/conflict | stale Patch rejected before mutation; Session save; Standalone reopen; Panel reopen; service restart; exact revision restore; duplicate request stable | PASS |
+| Exact Reset | Wave, paused, 0.000; Session r18; patches=0; preview=null; history=0; old diagnoses removed; one fresh deterministic coverage diagnosis; all overlays off | PASS |
+| Export | local r13 Review Contract re-read through schema and semantic validation; no ignored asset dependency | PASS |
+| Clean hold/cleanup | final Creator hold exceeded five seconds; relevant warnings/errors=0; service listener after disposal=0 | PASS |
+
+Focused counts at the reviewed SHA are: Review Core 12/12, shared UI 10/10,
+Local Review Workspace 9/9, Creator extension 300/300, Cocos clean project
+9/9, Character Semantic Events 25/25, VFX Authoring 16/16, Character
+Contracts 44/44, Rig Animation 20/20, Character Asset Intake 75/75, Rig
+Layout Generator 22/22, and the spike extension 4/4; aggregate 546/546.
+
+## Scope and evidence audit
+
+- Reviewed implementation before this documentation-only acceptance update:
+  75 files, 14,725 insertions, 10 deletions (14,735 changed lines).
+- Final documentation-only acceptance tree: 75 files, 14,852 insertions,
+  10 deletions (14,862 changed lines).
+- Remediation increment: 41 files, 6,205 insertions, 488 deletions.
+- Aggregate ceiling: 120 files / 22,000 changed lines; PASS.
+- Tracked MP4: 0. Binary/media additions: 0. Accepted PROGRAM-015 runtime,
+  asset, Scene, and `.meta` changes: 0.
+- TASK-016 and TASK-014D4 changes: 0.
+- Local-only review material remains ignored/untracked under
+  `artifacts/experimental/program-015d-animation-review-workspace/`: defect
+  ledger, one local screenshot, four persisted Session files, and the validated
+  r13 export. None is in Git, PR #27, a Tag, or a Release.
+
+Known non-goals remain unchanged: the built-in assistant is a deterministic
+local rule engine, not a cloud model; no cloud credentials, paid dependency,
+video evidence, production asset authoring, or general-purpose animation DCC
+is introduced. Coverage and motion-quality rules intentionally return to
+unresolved after Exact Reset and require a new human review.
 
 ## Publication boundaries
 

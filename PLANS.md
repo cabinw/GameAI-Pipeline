@@ -5,8 +5,10 @@ time.
 
 ## Active plan: PROGRAM-015D Animation Review Workspace
 
-- Status: independent external review complete; one centralized remediation
-  is in progress before final acceptance and integration
+- Status: `passed-external-code-ui-and-creator-review`; remediation SHA
+  `c99cee9ad62c963b1163a6f727604429995b74e2` passed working-copy and
+  independent tracked-only verification; acceptance publication and PR
+  integration are the only remaining actions
 - Started: 2026-07-31
 - Branch: `feat/task-015d-animation-review-workspace`
 - Exact baseline `main` / `origin/main`:
@@ -44,6 +46,26 @@ loopback service authority with atomic safe-root publication, and the shared
 Standalone/Compact workflows required by the external gate. Creator remains
 the Scene and playback authority; the accepted PROGRAM-015 runtime and assets
 are not modified by remediation.
+
+### External review closeout
+
+- Defect ledger: ARW-001 through ARW-019 closed in one append-only remediation
+  commit; no accepted PROGRAM-015 asset, runtime, Scene, `.meta`, public
+  Character/Semantic Event/VFX schema, binary, or media file changed.
+- Working-copy and fresh detached tracked-only `CI=true pnpm verify`: 546/546
+  PASS at the reviewed implementation SHA.
+- Standalone and Compact Panel used the same persisted Wave Session through
+  AI proposal, human accept/edit, Preview, Apply/reanalysis, human rule and
+  Finding decisions, Undo/Redo, save/reopen, service restart, stale rejection,
+  Scene switch, two rebuilds, and Exact Reset.
+- Cocos Creator 3.8.8 ended at Wave, paused, time `0.000`, one runtime root,
+  19 targets, 19 renderers, zero stale/duplicate ownership, and zero relevant
+  warning/error. Local service authority ended at Session r18 with zero
+  Patches, no Preview, empty history, fresh deterministic diagnosis, and all
+  overlays off.
+- Local review records remain ignored and untracked only under
+  `artifacts/experimental/program-015d-animation-review-workspace/`; none are
+  inputs to CI or candidates for PR publication.
 
 ### Goal
 
