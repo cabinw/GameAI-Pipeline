@@ -3,9 +3,159 @@
 Use this file for multi-file or architectural work. Keep one active plan at a
 time.
 
-## Active plan: v0.5.0 Production Character Vertical Slice Baseline
+## Active plan: PROGRAM-015D Animation Review Workspace
 
-- Status: Documentation closeout in progress
+- Status: In progress
+- Started: 2026-07-31
+- Branch: `feat/task-015d-animation-review-workspace`
+- Exact baseline `main` / `origin/main`:
+  `8e12a07619ec1bfc9c47590b862f91fbf2edf669`
+- Aggregate scope ceiling: at most 85 changed files and 20,000 changed lines;
+  zero binary, PNG, audio, video, MP4, evidence-media, Scene, accepted-asset,
+  rights, provenance, tag, Release, or protected-reference changes.
+- Commit policy: exactly four append-only feature commits, one for each of
+  TASK-015D1 through TASK-015D4. Reviewed ancestors are never amended,
+  squashed, rebased, or force-pushed.
+
+### Goal
+
+Deliver a usable local-first AI + Human Animation Review Workspace before
+TASK-016 so animation problems, proposed changes, human decisions, revisions,
+and validation results move through versioned contracts instead of repeated
+screen recordings and unstructured chat descriptions.
+
+### Authoritative architecture
+
+```text
+Shared Workspace UI
+        ↓
+Animation Review Core
+        ↓
+Local Review Service
+        ↓
+Versioned Engine Adapter Protocol
+        ↓
+Cocos Scene Adapter / Runtime
+```
+
+The dependency arrows describe the owned review flow. Contracts and adapter
+messages remain engine neutral. Cocos imports stay in the Cocos extension or
+runtime boundary. The local service binds only to loopback and never scans,
+hashes, logs, or serves `artifacts/experimental/`.
+
+### Technology and reuse decision
+
+The repository has no shared frontend framework. Its accepted editor panels
+use native TypeScript, DOM APIs, Cocos CSS variables, and
+`Editor.Message.request`; the standalone toolchain already uses Node 24 and
+pnpm 11. PROGRAM-015D therefore adds no UI framework or component library.
+One dependency-free TypeScript UI module is compiled for both the dockable
+Cocos Panel and browser ESM use. The standalone service uses Node's built-in
+HTTP server. This keeps the dependency and lockfile surface minimal while
+sharing interaction, rendering, timeline, finding, checklist, and decision
+components across both hosts.
+
+### Phase budgets
+
+- TASK-015D1: at most 36 changed files and 7,500 lines; review schemas, the
+  engine-neutral core, textual fixtures, tests, master/task records, RFC,
+  ADRs, plans, roadmap, index, asset policy, initial acceptance, and one
+  mechanical lockfile importer only; no resolved dependency version changes.
+  The initial 32-file estimate was raised before the commit gate to preserve
+  the pre-existing review-editor design seed as an explicit tracked input and
+  to keep the two required ADR decisions independently reviewable; the
+  aggregate 85-file ceiling is unchanged.
+- TASK-015D2: at most 20 changed files and 5,000 lines; Cocos extension
+  adapter, compact panel, message bridge, PROGRAM-015 motion runtime review
+  surface, tests, and documentation. Zero new Scene or `.meta` files.
+- TASK-015D3: at most 24 changed files and 6,500 lines; loopback local service,
+  Red Cap fixture adapter, shared standalone UI, CLI, API/security tests, and
+  usage documentation.
+- TASK-015D4: at most 18 changed files and 4,500 lines; deterministic local
+  review assistant, provider boundary, human decisions, quick edits,
+  revalidation, export bundle, end-to-end tests, and closeout documentation.
+
+The phase budgets are per-commit ceilings; the aggregate distinct-file and
+line ceilings remain authoritative.
+
+### Boundaries
+
+- Reuse the accepted Rig Layout, Rig Animation, Character Semantic Events,
+  PROGRAM-015 Red Cap, VFX authoring, D2 runtime, lifecycle, diagnostics,
+  metadata, and generated-closure surfaces without changing their published
+  schemas or accepted behavior.
+- Keep source animation documents immutable. Workspace edits create an
+  in-memory revision and an explicit exported proposal; they never overwrite a
+  source clip or silently mutate a Creator Scene.
+- Require human decisions before an AI proposal becomes an applied revision.
+  Preserve proposal, decision, adjustment, validation, and actor history in
+  the exported review contract.
+- Provide a deterministic built-in assistant and a versioned provider
+  interface. Do not add a cloud AI API, credential path, paid dependency, or
+  model-specific core behavior.
+- Serve only declared repository fixture files below a selected root. Reject
+  traversal, absolute paths, non-loopback binding, oversized bodies, unknown
+  commands, stale revisions, and unsupported protocol/schema versions.
+- Feature verification uses textual/synthetic/already accepted fixtures only.
+  The ignored experimental directory remains opaque and cannot become a CI or
+  PR input.
+- Do not start TASK-014D4 or TASK-016, merge `main`, create or move `v0.6.0`,
+  create a GitHub Release, publish feature evidence media, or modify/delete
+  existing tags, releases, backup/recovery/archive refs, or worktrees.
+
+### Execution
+
+1. Record Phase 0 baseline, tags/releases, protected refs/worktrees,
+   rights/provenance hashes, current packages, Cocos bridge, PROGRAM-015
+   runtime, D1/D2/D3 reuse, UI stack, CI, metadata, and generated-mirror
+   findings.
+2. Add the D1 versioned review and adapter contracts, fail-closed parser,
+   deterministic metrics/analyzer, immutable review state, adapter request
+   validation, fixtures, and tests; commit once.
+3. Add the D2 compact Cocos Panel and typed Panel → Main → Scene/runtime
+   adapter bridge over the existing PROGRAM-015 motion Scene; prove exact
+   playback, seek, step, clip, overlay, reset, snapshot, and error behavior;
+   commit once.
+4. Add the D3 loopback HTTP service, repository-fixture adapter, shared UI,
+   real sprite preview, timeline, structure, controls, safe asset serving,
+   export, CLI, and endpoint/browser-contract tests; commit once.
+5. Add the D4 local assistant/provider boundary, AI findings, checklist,
+   human accept/reject/resolve flow, constrained quick edit, revision
+   conflict protection, automatic reanalysis, final review/proposed-animation
+   export, and end-to-end tests; commit once.
+6. Run focused checks after each commit. At final head run working-copy and
+   frozen tracked-files-only verification, generated/schema/metadata/links,
+   scope/media/protected-reference, diff, clean-tree, service security, and
+   end-to-end review-loop gates.
+7. Push the exact four-commit branch, create one Draft PR to `main`, and stop
+   at the single external code, standalone UI, compact Panel, and Creator
+   runtime review. Keep the PR Draft and unmerged.
+
+### Done when
+
+- One versioned review document records subject, metrics, findings, checklist,
+  human decisions, adjustments, revisions, validation, and audit history with
+  deterministic bytes.
+- Both shared UI hosts expose preview, playback, exact seek/step, overlays,
+  structure, timeline, findings, checklist, decisions, quick edit, rerun, and
+  export from the same interaction model.
+- The local service is loopback-only, path-contained, bounded, and usable from
+  a tracked-only checkout without ignored data or external services.
+- Cocos adapter messages are correlated, versioned, fail closed, and exercise
+  the actual PROGRAM-015 motion runtime without Scene mutation or duplicate
+  input/runtime ownership.
+- AI findings remain proposals until explicit human action; accepted edits
+  create new revisions, preserve the original clip, and automatically
+  revalidate.
+- Focused, working-copy, frozen tracked-only, generated/schema/metadata,
+  service, scope/media, protected-reference, and clean-tree gates pass.
+- The branch contains exactly four append-only commits above the exact
+  baseline. One Draft PR exists and is left at the requested external review;
+  TASK-014D4, TASK-016, `v0.6.0`, merge, Tag, and Release remain untouched.
+
+## Completed plan: v0.5.0 Production Character Vertical Slice Baseline
+
+- Status: Published and complete
 - Started: 2026-07-31
 - Branch: `docs/release-v0.5.0-production-character-vertical-slice`
 - Exact baseline `main`: `e24e6d8bb4ee7d9581787814c858a3f4f1dc410e`

@@ -139,6 +139,27 @@ CI and remote PR checks use public, programmatic, synthetic, or already
 accepted fixtures. Local experimental recordings may support a developer's
 local judgment but cannot be a mandatory input to remote checks.
 
+## Animation Review Workspace boundary
+
+PROGRAM-015D review code, tests, the local service, and both UI hosts use only
+public, programmatic, synthetic, or Accepted Repository Asset fixtures.
+`artifacts/experimental/` is not a review-library root and remains opaque:
+the service and adapters must not list, search, watch, hash, log, serve, or
+accept a path below it.
+
+Review documents and proposed animation revisions do not promote asset bytes.
+The default workspace keeps them in memory and exports them explicitly to the
+user; it does not overwrite accepted source clips or create tracked evidence.
+If a review export, proposed animation, screenshot, video, or other derivative
+of a Local Experimental Asset is prepared for Git or any remote surface, both
+the required source closure and derivative enter Repository Candidate review
+before staging.
+
+Structured review output over an Accepted Repository Asset can itself become
+a Repository Candidate, but it still requires privacy, path, source-binding,
+generated-closure, scope, and redistribution review. A review PASS does not
+grant rights or promote the underlying asset.
+
 ## Relationship to accepted assets
 
 This policy does not retroactively change accepted assets or their publication

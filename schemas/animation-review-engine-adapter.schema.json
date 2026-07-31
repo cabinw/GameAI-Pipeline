@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review-engine-adapter/1.0.0",
+  "title": "GameAI Animation Review Engine Adapter Protocol",
+  "oneOf": [
+    { "$ref": "#/$defs/request" },
+    { "$ref": "#/$defs/response" }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "finiteNumber": { "type": "number" },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clipId": { "$ref": "#/$defs/id" },
+        "time": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 },
+        "deltaFrames": { "type": "integer", "minimum": -600, "maximum": 600 },
+        "frameRate": {
+          "type": "number",
+          "$ref": "#/$defs/finiteNumber",
+          "exclusiveMinimum": 0,
+          "maximum": 240
+        },
+        "rate": {
+          "type": "number",
+          "$ref": "#/$defs/finiteNumber",
+          "minimum": 0.05,
+          "maximum": 4
+        },
+        "loop": { "type": "boolean" },
+        "overlay": {
+          "enum": ["skeleton", "pivots", "sockets", "hit-areas", "attachments"]
+        },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "protocolVersion",
+        "requestId",
+        "adapterId",
+        "command",
+        "payload"
+      ],
+      "properties": {
+        "kind": { "const": "request" },
+        "protocolVersion": { "const": "1.0.0" },
+        "requestId": { "$ref": "#/$defs/id" },
+        "adapterId": { "$ref": "#/$defs/id" },
+        "command": {
+          "enum": [
+            "describe",
+            "select-clip",
+            "play",
+            "pause",
+            "seek",
+            "step",
+            "set-rate",
+            "set-loop",
+            "set-overlay",
+            "exact-reset"
+          ]
+        },
+        "expectedRevision": { "type": "integer", "minimum": 0 },
+        "payload": { "$ref": "#/$defs/payload" }
+      }
+    },
+    "adapterError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "$ref": "#/$defs/id" },
+        "message": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "protocolVersion",
+        "requestId",
+        "adapterId",
+        "ok"
+      ],
+      "properties": {
+        "kind": { "const": "response" },
+        "protocolVersion": { "const": "1.0.0" },
+        "requestId": { "$ref": "#/$defs/id" },
+        "adapterId": { "$ref": "#/$defs/id" },
+        "ok": { "type": "boolean" },
+        "snapshot": { "type": "object" },
+        "error": { "$ref": "#/$defs/adapterError" }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "ok": { "const": true },
+            "snapshot": { "type": "object" },
+            "error": false
+          },
+          "required": ["snapshot"]
+        },
+        {
+          "properties": {
+            "ok": { "const": false },
+            "snapshot": false,
+            "error": { "$ref": "#/$defs/adapterError" }
+          },
+          "required": ["error"]
+        }
+      ]
+    }
+  }
+}

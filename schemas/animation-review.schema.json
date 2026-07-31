@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameai://schemas/animation-review/1.0.0",
+  "title": "GameAI Animation Review Document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reviewId",
+    "revision",
+    "status",
+    "subject",
+    "metrics",
+    "findings",
+    "checklist",
+    "decisions",
+    "adjustments",
+    "auditTrail",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "reviewId": { "$ref": "#/$defs/id" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "status": {
+      "enum": ["in-review", "changes-requested", "accepted"]
+    },
+    "subject": { "$ref": "#/$defs/subject" },
+    "metrics": { "$ref": "#/$defs/metrics" },
+    "findings": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "checklist": {
+      "type": "array",
+      "maxItems": 500,
+      "items": { "$ref": "#/$defs/checklistItem" }
+    },
+    "decisions": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": { "$ref": "#/$defs/decision" }
+    },
+    "adjustments": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": { "$ref": "#/$defs/adjustment" }
+    },
+    "auditTrail": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": { "$ref": "#/$defs/auditEntry" }
+    },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "updatedAt": { "$ref": "#/$defs/timestamp" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "finiteNumber": {
+      "type": "number"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "characterId",
+        "rigId",
+        "animationId",
+        "sourceRevision",
+        "duration",
+        "loop"
+      ],
+      "properties": {
+        "characterId": { "$ref": "#/$defs/id" },
+        "rigId": { "$ref": "#/$defs/id" },
+        "animationId": { "$ref": "#/$defs/id" },
+        "sourceRevision": { "$ref": "#/$defs/id" },
+        "duration": {
+          "type": "number",
+          "$ref": "#/$defs/finiteNumber",
+          "exclusiveMinimum": 0
+        },
+        "loop": { "type": "boolean" }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration",
+        "trackCount",
+        "keyframeCount",
+        "animatedJointCount",
+        "untrackedJointCount",
+        "loopContinuityError",
+        "maxAbsoluteRotationDegrees",
+        "maxAngularSpeedDegreesPerSecond",
+        "maxLinearSpeedUnitsPerSecond"
+      ],
+      "properties": {
+        "duration": { "type": "number", "$ref": "#/$defs/finiteNumber", "exclusiveMinimum": 0 },
+        "trackCount": { "type": "integer", "minimum": 0 },
+        "keyframeCount": { "type": "integer", "minimum": 0 },
+        "animatedJointCount": { "type": "integer", "minimum": 0 },
+        "untrackedJointCount": { "type": "integer", "minimum": 0 },
+        "loopContinuityError": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 },
+        "maxAbsoluteRotationDegrees": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 },
+        "maxAngularSpeedDegreesPerSecond": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 },
+        "maxLinearSpeedUnitsPerSecond": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 }
+      }
+    },
+    "timeRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 },
+        "end": { "type": "number", "$ref": "#/$defs/finiteNumber", "minimum": 0 }
+      }
+    },
+    "suggestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "parameterPath", "minimum", "maximum"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "parameterPath": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "minimum": { "$ref": "#/$defs/finiteNumber" },
+        "maximum": { "$ref": "#/$defs/finiteNumber" },
+        "proposedValue": { "$ref": "#/$defs/finiteNumber" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "findingId",
+        "code",
+        "source",
+        "severity",
+        "category",
+        "status",
+        "summary",
+        "diagnosis",
+        "targetIds",
+        "confidence",
+        "providerId",
+        "createdAt"
+      ],
+      "properties": {
+        "findingId": { "$ref": "#/$defs/id" },
+        "code": { "$ref": "#/$defs/id" },
+        "source": { "enum": ["validator", "assistant", "provider", "human"] },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "category": {
+          "enum": [
+            "contract",
+            "coverage",
+            "loop",
+            "timing",
+            "velocity",
+            "contact",
+            "hierarchy",
+            "layer",
+            "semantic",
+            "visual"
+          ]
+        },
+        "status": { "enum": ["open", "accepted", "rejected", "resolved"] },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "diagnosis": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "targetIds": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "timeRange": { "$ref": "#/$defs/timeRange" },
+        "suggestion": { "$ref": "#/$defs/suggestion" },
+        "confidence": {
+          "type": "number",
+          "$ref": "#/$defs/finiteNumber",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "providerId": { "$ref": "#/$defs/id" },
+        "createdAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "checklistItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkId",
+        "label",
+        "status",
+        "details",
+        "relatedFindingIds"
+      ],
+      "properties": {
+        "checkId": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "status": { "enum": ["passed", "warning", "failed"] },
+        "details": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "relatedFindingIds": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decisionId",
+        "findingId",
+        "decision",
+        "actorId",
+        "note",
+        "revision",
+        "createdAt"
+      ],
+      "properties": {
+        "decisionId": { "$ref": "#/$defs/id" },
+        "findingId": { "$ref": "#/$defs/id" },
+        "decision": { "enum": ["accept", "reject", "resolve", "comment"] },
+        "actorId": { "$ref": "#/$defs/id" },
+        "note": { "type": "string", "maxLength": 2000 },
+        "revision": { "type": "integer", "minimum": 1 },
+        "createdAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "adjustment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adjustmentId",
+        "findingId",
+        "parameterPath",
+        "previousValue",
+        "nextValue",
+        "actorId",
+        "revision",
+        "createdAt"
+      ],
+      "properties": {
+        "adjustmentId": { "$ref": "#/$defs/id" },
+        "findingId": { "$ref": "#/$defs/id" },
+        "parameterPath": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "previousValue": { "$ref": "#/$defs/finiteNumber" },
+        "nextValue": { "$ref": "#/$defs/finiteNumber" },
+        "actorId": { "$ref": "#/$defs/id" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "createdAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "auditEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "action",
+        "actorId",
+        "revision",
+        "details",
+        "createdAt"
+      ],
+      "properties": {
+        "entryId": { "$ref": "#/$defs/id" },
+        "action": {
+          "enum": [
+            "review-created",
+            "analysis-ran",
+            "finding-decided",
+            "adjustment-applied",
+            "review-status-changed",
+            "export-created"
+          ]
+        },
+        "actorId": { "$ref": "#/$defs/id" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "details": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "createdAt": { "$ref": "#/$defs/timestamp" }
+      }
+    }
+  }
+}

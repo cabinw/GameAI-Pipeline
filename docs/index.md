@@ -18,6 +18,12 @@
 - [Character semantic events and VFX cues RFC](rfc/RFC-0014-character-semantic-events-and-vfx-cues.md)
 - [Cocos Scene Rig Builder](cocos-scene-rig-builder.md)
 
+## Animation review
+
+- [Animation Review Workspace RFC](rfc/RFC-0016-animation-review-workspace.md)
+- [PROGRAM-015D master task](../tasks/PROGRAM-015D-animation-review-workspace.md)
+- [Animation review editor design seed](task15-animation-review-editor-design.md)
+
 ## Architecture decisions
 
 - [Cocos baseline](adr/ADR-0001-cocos-creator-baseline.md)
@@ -28,6 +34,8 @@
 - [Engine-neutral character semantic events](adr/ADR-0015-engine-neutral-character-semantic-events.md)
 - [Engine-neutral VFX authoring and compilation](adr/ADR-0016-engine-neutral-vfx-authoring-compilation.md)
 - [Canonical loadout VFX over the shared Cocos runtime](adr/ADR-0017-canonical-loadout-vfx-authoring-integration.md)
+- [Engine-neutral review core with Cocos bridge](adr/ADR-0019-engine-neutral-review-core-cocos-bridge.md)
+- [Local review service and shared UI boundary](adr/ADR-0020-local-review-service-shared-ui-boundary.md)
 
 ## Acceptance and learning
 
@@ -37,6 +45,7 @@
 - [TASK-014C canonical full-loadout Semantic VFX acceptance](acceptance/TASK-014C-canonical-loadout-semantic-vfx.md)
 - [TASK-014D3 canonical full-loadout data-driven VFX acceptance](acceptance/TASK-014D3-canonical-loadout-vfx-authoring-integration.md)
 - [PROGRAM-015 Red Cap production vertical slice acceptance](acceptance/PROGRAM-015-red-cap-production-vertical-slice.md)
+- [PROGRAM-015D Animation Review Workspace acceptance](acceptance/PROGRAM-015D-animation-review-workspace.md)
 - [PROGRAM-015 Phase 0 source-readiness report](reports/PROGRAM-015-phase-0-source-readiness.md)
 - [PROGRAM-015 Phase C showcase report](reports/PROGRAM-015-phase-c-showcase.md)
 - [ADR-0018 production-slice source readiness](adr/ADR-0018-production-slice-source-readiness.md)

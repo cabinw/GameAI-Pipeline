@@ -95,6 +95,22 @@ importers:
         specifier: 'catalog:'
         version: 5.8.2
 
+  pipelines/animation-review-core:
+    dependencies:
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../rig-animation
+      ajv:
+        specifier: 'catalog:'
+        version: 8.17.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
   pipelines/character-asset-intake:
     dependencies:
       '@gameai/character-contracts':

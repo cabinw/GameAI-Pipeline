@@ -1,0 +1,10 @@
+{
+  "kind": "request",
+  "protocolVersion": "1.0.0",
+  "requestId": "request-invalid",
+  "adapterId": "minimal-adapter",
+  "command": "seek",
+  "payload": {
+    "rate": 1
+  }
+}
