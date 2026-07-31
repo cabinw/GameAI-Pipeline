@@ -277,6 +277,20 @@ export interface AnimationReviewTimelineTrack {
   readonly keyframes: readonly AnimationReviewTimelineKeyframe[];
 }
 
+export interface AnimationReviewOverlayPrimitive {
+  readonly primitiveId: string;
+  readonly overlay: AnimationReviewOverlay;
+  readonly shape: "point" | "line" | "rect" | "circle";
+  readonly label: string;
+  readonly x: number;
+  readonly y: number;
+  readonly x2?: number;
+  readonly y2?: number;
+  readonly width?: number;
+  readonly height?: number;
+  readonly radius?: number;
+}
+
 export interface AnimationReviewAdapterSnapshot {
   readonly adapterId: string;
   readonly adapterRevision: number;
@@ -288,6 +302,7 @@ export interface AnimationReviewAdapterSnapshot {
   readonly parts: readonly AnimationReviewPartSnapshot[];
   readonly joints: readonly AnimationReviewJointSnapshot[];
   readonly timeline: readonly AnimationReviewTimelineTrack[];
+  readonly overlayPrimitives?: readonly AnimationReviewOverlayPrimitive[];
   readonly runtimeDiagnostics: Readonly<Record<string, number | string | boolean>>;
 }
 

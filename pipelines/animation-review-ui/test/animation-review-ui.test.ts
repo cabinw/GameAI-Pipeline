@@ -64,6 +64,7 @@ test("shares the exact protocol version and renders the compact control surface"
       connection: "connected",
       busy: false,
       snapshot,
+      review: null,
       error: null,
     },
     true,
@@ -82,6 +83,38 @@ test("shares the exact protocol version and renders the compact control surface"
     assert.match(markup, new RegExp(expected));
   }
   assert.match(markup, /arw--compact/);
+});
+
+test("full workspace renders accepted sprites, overlays, tracks, and review panels", () => {
+  const markup = renderAnimationReviewWorkspaceMarkup(
+    {
+      connection: "connected",
+      busy: false,
+      snapshot: {
+        ...snapshot,
+        overlays: { ...snapshot.overlays, pivots: true },
+        overlayPrimitives: [
+          {
+            primitiveId: "pivot-torso",
+            overlay: "pivots",
+            shape: "point",
+            label: "torso",
+            x: 0,
+            y: 0,
+          },
+        ],
+      },
+      review: null,
+      error: null,
+    },
+    false,
+  );
+  assert.match(markup, /data-preview-clip="idle"/);
+  assert.match(markup, /src="\/asset\/torso\.png"/);
+  assert.match(markup, /data-overlay-shape="pivots"/);
+  assert.match(markup, /Animation timeline tracks/);
+  assert.match(markup, /No structured review loaded/);
+  assert.match(markup, /data-export/);
 });
 
 test("controller correlates responses and sends optimistic runtime revisions", async () => {

@@ -2,7 +2,7 @@
 
 ## Status
 
-TASK-015D1 complete; TASK-015D2 in progress on
+TASK-015D1–D3 complete; TASK-015D4 in progress on
 `feat/task-015d-animation-review-workspace`.
 
 TASK-015D1 through TASK-015D4 are executed continuously on this branch as four

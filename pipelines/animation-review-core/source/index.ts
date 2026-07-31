@@ -22,6 +22,7 @@ export type {
   AnimationReviewJointSnapshot,
   AnimationReviewMetrics,
   AnimationReviewOverlay,
+  AnimationReviewOverlayPrimitive,
   AnimationReviewPartSnapshot,
   AnimationReviewPlaybackSnapshot,
   AnimationReviewStatus,

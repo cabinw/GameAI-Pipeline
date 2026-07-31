@@ -133,6 +133,28 @@ importers:
         specifier: 'catalog:'
         version: 5.8.2
 
+  pipelines/animation-review-workspace:
+    dependencies:
+      '@gameai/animation-review-core':
+        specifier: workspace:*
+        version: link:../animation-review-core
+      '@gameai/animation-review-ui':
+        specifier: workspace:*
+        version: link:../animation-review-ui
+      '@gameai/character-contracts':
+        specifier: workspace:*
+        version: link:../../framework/character-contracts
+      '@gameai/rig-animation':
+        specifier: workspace:*
+        version: link:../rig-animation
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.2
+
   pipelines/character-asset-intake:
     dependencies:
       '@gameai/character-contracts':

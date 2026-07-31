@@ -88,17 +88,29 @@ No earlier D1/D2/D3 checkpoint requests external acceptance.
   accepted asset, binary, evidence, or media file changes; tracked MP4 remains
   zero and protected rights/provenance hashes remain exact.
 
-## D3 — Standalone Workspace MVP
+## D3 — Standalone Workspace MVP — PASS
 
-Pending implementation.
-
-Required evidence:
-
-- loopback-only service;
-- bounded/path-contained API and asset serving;
-- accepted Red Cap sprite preview, structure, timeline, controls, and export;
-- tracked-only/no-network/no-experimental dependency;
-- endpoint, UI contract, focused, and full verification.
+- `pnpm review:animation` builds and starts the shared browser UI and local
+  service on an ephemeral `127.0.0.1` port using the explicitly selected,
+  accepted Red Cap fixture.
+- The fixture adapter parses accepted Character Rig, Rig Layout, and four Rig
+  Animation documents, samples the shared evaluator, and exposes 19 real PNG
+  parts, portable transforms, structure, timeline, sockets, hit areas,
+  attachments, metrics, findings, and checklist state without source writes.
+- The full shared UI renders layered sprites, playback/seek/step/rate/loop,
+  five overlay types, track keyframes, structure, findings/checklist,
+  structured state, and explicit JSON download export.
+- Five focused tests cover deterministic fixture sampling/review, source byte
+  preservation, real PNG delivery, loopback startup, UI/bootstrap/workspace/
+  command/export endpoints, mutation token/origin/content-type/body/version/
+  revision checks, undeclared asset rejection, traversal, and escaping
+  symlinks.
+- Shared UI tests pass 4/4, workspace tests pass 5/5, and
+  `CI=true pnpm verify` passes 528/528.
+- D3 changes 21 files and 1,832 lines within its 24-file/6,500-line gate, with
+  zero binary, media, Scene, or `.meta` files.
+  Service runtime requires no external network, credentials, Creator cache,
+  cloud model, untracked input, or ignored experimental asset.
 
 ## D4 — AI + Human Review Loop
 

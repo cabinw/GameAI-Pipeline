@@ -72,7 +72,8 @@ components across both hosts.
   resolved third-party versions.
 - TASK-015D3: at most 24 changed files and 6,500 lines; loopback local service,
   Red Cap fixture adapter, shared standalone UI, CLI, API/security tests, and
-  usage documentation.
+  usage documentation plus one mechanical workspace importer in the lockfile;
+  no new third-party package or resolved version.
 - TASK-015D4: at most 18 changed files and 4,500 lines; deterministic local
   review assistant, provider boundary, human decisions, quick edits,
   revalidation, export bundle, end-to-end tests, and closeout documentation.

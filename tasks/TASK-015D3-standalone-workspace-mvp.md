@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned after TASK-015D2.
+Complete.
 
 ## Scope budget
 
@@ -32,3 +32,36 @@ workspace for the accepted PROGRAM-015 Red Cap character and animations.
   experimental asset, Creator cache, or untracked input.
 - Endpoint, asset-containment, UI contract, adapter, fixture, export,
   working-copy, tracked-only, and clean-tree checks pass before the D3 commit.
+
+## Usage
+
+From the repository root:
+
+```bash
+pnpm review:animation
+```
+
+The command builds the shared browser ESM and service, validates the accepted
+`examples/red-cap-production-v1` fixture, binds an ephemeral port on
+`127.0.0.1`, and prints the local URL. Optional `--port` and `--fixture` values
+are forwarded through the workspace package; `--host` accepts loopback only.
+
+## Result
+
+- The process-local fixture adapter parses the accepted Character Rig, Rig
+  Layout, and Rest/Idle/Walk/Wave contracts; samples the shared Rig Animation
+  evaluator; and returns 19 real PNG part transforms, hierarchy, tracks,
+  keyframes, sockets, hit areas, attachment markers, metrics, findings, and
+  checklist state.
+- The shared standalone UI renders layered sprites, timeline, structure,
+  playback/rate/loop/step controls, five overlays, findings/checklist, runtime
+  JSON, and explicit download export.
+- The Node built-in service binds loopback only, uses a same-origin mutation
+  token, 64 KiB request limit, JSON content enforcement, protocol/revision
+  validation, declared-asset realpath containment, CSP, and no-store headers.
+  It has no upload, directory listing, source-write, remote bind, cloud, or
+  ignored experimental path.
+- Focused shared UI tests pass 4/4, focused workspace tests pass 5/5, and
+  `CI=true pnpm verify` passes 528/528. D3 closes at 21 files and 1,832
+  changed lines with zero binary, media, Scene, or `.meta` files; closure and
+  protected-value audits remain clean.

@@ -63,6 +63,17 @@ pnpm install --frozen-lockfile
 pnpm verify
 ```
 
+Start the local Animation Review Workspace for the accepted PROGRAM-015 Red
+Cap fixture with:
+
+```bash
+pnpm review:animation
+```
+
+The command binds an ephemeral port on `127.0.0.1` and prints the browser URL.
+The workspace is process-local, serves only declared accepted fixture PNGs,
+and exports proposals without overwriting source animation or asset files.
+
 Exact versions, individual commands, the workspace topology, and the Cocos extension spike are documented in `docs/environment.md`.
 
 Character Rig and Rig Layout contracts, validation codes, and usage are documented in `docs/character-contracts.md`. Schema compatibility rules are documented in `docs/schema-versioning.md`.
